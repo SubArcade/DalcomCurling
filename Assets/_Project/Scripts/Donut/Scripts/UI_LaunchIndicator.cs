@@ -53,7 +53,7 @@ public class UI_LaunchIndicator : MonoBehaviour
         {
             if (rotationSlider != null)
             {
-                rotationSlider.value = launchScript.currentLaunchAngle;
+                rotationSlider.value = launchScript.finalRotationValue;
             }
             
             

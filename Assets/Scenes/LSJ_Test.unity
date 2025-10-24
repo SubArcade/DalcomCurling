@@ -507,12 +507,12 @@ GameObject:
   - component: {fileID: 660654044}
   - component: {fileID: 660654043}
   m_Layer: 5
-  m_Name: pos (1)
+  m_Name: power&dir
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &660654042
 RectTransform:
   m_ObjectHideFlags: 0
@@ -552,7 +552,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Set Power
+  m_text: 'Set Power &
+
+    Direction'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -735,12 +737,12 @@ GameObject:
   - component: {fileID: 717066832}
   - component: {fileID: 717066831}
   m_Layer: 5
-  m_Name: pos
+  m_Name: make
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &717066830
 RectTransform:
   m_ObjectHideFlags: 0
@@ -780,9 +782,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'choose position
+  m_text: 'spacebar
 
-'
+    to make'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -871,12 +873,12 @@ GameObject:
   - component: {fileID: 736816426}
   - component: {fileID: 736816425}
   m_Layer: 5
-  m_Name: pos (2)
+  m_Name: rotation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &736816424
 RectTransform:
   m_ObjectHideFlags: 0
@@ -916,7 +918,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Set Spin Amount
+  m_text: Set Rotation Amount
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1884,6 +1886,9 @@ MonoBehaviour:
   maxDragDistance: 0.5
   maxRotationDragDistance: 1
   maxRotationValue: 5
+  makeDonutText: {fileID: 717066829}
+  powerAndDirectionText: {fileID: 660654041}
+  rotationText: {fileID: 736816423}
 --- !u!4 &1970583201
 Transform:
   m_ObjectHideFlags: 0

@@ -34,6 +34,11 @@ public class StoneShoot : MonoBehaviour
     
     // 임시 회전 입력 시작점 (새로 추가)
     private Vector3 rotationDragStartScreenPos;
+
+    [Header("UI 오브젝트")] 
+    public GameObject makeDonutText;
+    public GameObject powerAndDirectionText;
+    public GameObject rotationText;
     
     //--- UI 연결 변수 ---
     public float currentDragRatio { get; private set; }
@@ -49,6 +54,7 @@ public class StoneShoot : MonoBehaviour
     {
         mainCamera = Camera.main;
         currentState = LaunchState.WaitingForInitialDrag;
+        makeDonutText.SetActive(true);
     }
 
     // Update is called once per frame
@@ -56,8 +62,11 @@ public class StoneShoot : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            if (rb != null) return;
             GameObject st = Instantiate(stone, spawnPos.position, spawnPos.rotation);
             rb = st.GetComponent<Rigidbody>();
+            powerAndDirectionText.SetActive(true);
+            makeDonutText.SetActive(false);
             //st.GetComponent<StoneForceController>().AddForceToStone(powerAmount, spinAmount);
         }
 
@@ -115,6 +124,7 @@ public class StoneShoot : MonoBehaviour
 
     private void StartDrag_Launch(Vector3 screenPosition)
     {
+        
         // **오브젝트 확인 없이** 드래그 시작
         isDragging = true;
         
@@ -189,8 +199,10 @@ public class StoneShoot : MonoBehaviour
         currentState = LaunchState.WaitingForRotationInput;
        // rb.gameObject.GetComponent<StoneForceController>().AddForceToStone(powerAmount, spinAmount);
         isDragging = false;
-       // CurrentDragRatio = 0f;
-       // CurrentLaunchAngle = 0f;
+        powerAndDirectionText.SetActive(false);
+        rotationText.SetActive(true);
+        // CurrentDragRatio = 0f;
+        // CurrentLaunchAngle = 0f;
     }
     
     private void HandleMouseInput_Rotation()
@@ -257,6 +269,9 @@ public class StoneShoot : MonoBehaviour
         currentLaunchAngle = 0f;
         currentDragRatio = 0f;
 
+        rb = null;
+        rotationText.SetActive(false);
+        makeDonutText.SetActive(true);
         currentState = LaunchState.WaitingForInitialDrag;
     }
     
