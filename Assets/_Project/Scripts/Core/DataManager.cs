@@ -18,7 +18,7 @@ public class DataManager : MonoBehaviour
 
     async void Start()
     {
-        // 0) Firebase 준비
+        // Firebase 준비
         var dep = await FirebaseApp.CheckAndFixDependenciesAsync();
         if (dep != DependencyStatus.Available)
         {
@@ -28,24 +28,25 @@ public class DataManager : MonoBehaviour
         db = FirebaseFirestore.DefaultInstance;
         Debug.Log("[FS] Firestore instance OK");
 
-        var added = await AddUserAutoAsync("test@example.com", "홍길동");
-        if (added != null)
-        {
-            Debug.Log($"[FS] 새 문서 추가 완료! docId={added.Id}");
-
-            // 확인용으로 곧바로 읽어보기
-            var snap = await added.GetSnapshotAsync();
-            Debug.Log($"[FS] 저장 확인: {snap.ToDictionary()["email"]}, {snap.ToDictionary()["password"]}");
-        }
+        // 새로운 데이터 추가
+        // var added = await AddUserAutoAsync("test@example.com", "홍길동");
+        // if (added != null)
+        // {
+        //     Debug.Log($"[FS] 새 문서 추가 완료! docId={added.Id}");
+        //
+        //     // 확인용으로 곧바로 읽어보기
+        //     var snap = await added.GetSnapshotAsync();
+        //     Debug.Log($"[FS] 저장 확인: {snap.ToDictionary()["email"]}, {snap.ToDictionary()["password"]}");
+        // }
         
-        // 1) 쓰기 (해당 문서에 email, password 세팅)
+        // 업데이트
         //await WriteUser(DOC_ID, TEST_EMAIL, TEST_PASSWORD);
 
-        // 2) 읽기 (문서 단건 조회)
-        await ReadUser(DOC_ID);
+        // 읽기
+        //await ReadUser(DOC_ID);
 
-        // 3) 쿼리 (email로 검색)
-        await FindUserByEmail(TEST_EMAIL);
+        // 검색
+       // await FindUserByEmail(TEST_EMAIL);
     }
     
     // 새 문서 추가 (자동 PK 생성)
@@ -134,13 +135,11 @@ public class DataManager : MonoBehaviour
 
             string docId = doc.Id;
             string emailValue = data.ContainsKey("email") ? data["email"].ToString() : "(null)";
-            string nicknameValue = data.ContainsKey("nickname") ? data["nickname"].ToString() : "(null)";
-            string createdDate = data.ContainsKey("createdAt") ? data["createdAt"].ToString() : "(null)";
+            string passwordValue = data.ContainsKey("password") ? data["nickname"].ToString() : "(null)";
 
             Debug.Log($"[FS][QUERY] docId={docId}");
             Debug.Log($"[FS][QUERY] email={emailValue}");
-            Debug.Log($"[FS][QUERY] nickname={nicknameValue}");
-            Debug.Log($"[FS][QUERY] createdAt={createdDate}");
+            Debug.Log($"[FS][QUERY] password={passwordValue}");
         }
     }
 }
