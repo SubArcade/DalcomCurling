@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Firebase.Auth;
-using TMPro;
 using System;
 
 public class FirebaseAuthManager
@@ -31,10 +30,10 @@ public class FirebaseAuthManager
     {
         auth = FirebaseAuth.DefaultInstance;
 
-        if (auth.CurrentUser != null)
-        {
-            Logout();
-        }
+        //if (auth.CurrentUser != null)
+        //{
+        //    Logout();
+        //}
         auth.StateChanged += Onchanged;
     }
 
@@ -72,7 +71,7 @@ public class FirebaseAuthManager
                 Debug.LogError("회원가입 실패");
                 return;
             }
-            FirebaseUser newUser = task.Result.User;
+            FirebaseUser newUser = task.Result.User;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
             Debug.LogError("회원가입 완료");
         });
     }
@@ -94,6 +93,27 @@ public class FirebaseAuthManager
             
             FirebaseUser newUser = task.Result.User;
             Debug.LogError("로그인 완료");
+        });
+    }
+
+    public void AnonymousLogin()
+    {
+        auth.SignInAnonymouslyAsync().ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("익명 로그인 취소됨");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("익명 로그인 실패: " + task.Exception);
+                return;
+            }
+
+            user = task.Result.User;
+            Debug.Log($"익명 로그인 성공! User ID: {user.UserId}");
+            LoginState?.Invoke(true);
         });
     }
 
