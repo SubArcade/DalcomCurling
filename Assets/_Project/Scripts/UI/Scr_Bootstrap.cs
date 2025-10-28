@@ -8,7 +8,7 @@ public class Bootstrap : MonoBehaviour
 {
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
         //PhotonNetwork.AutomaticallySyncScene = true;
     }
 

@@ -36,7 +36,7 @@ public class UIManager : MonoBehaviour
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         HideLoading();
         if (settingsPanel) settingsPanel.SetActive(false);

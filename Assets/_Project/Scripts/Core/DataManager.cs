@@ -22,7 +22,7 @@ public class DataManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        DontDestroyOnLoad(this);
+        //DontDestroyOnLoad(this);
     }
     
     async void Start()
