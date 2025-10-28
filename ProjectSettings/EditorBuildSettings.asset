@@ -6,12 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Project/Scenes/Sce_PhotonNetwork_Test.unity
-    guid: 302e6c450086e644e9113f6577aaf65c
+    path: Assets/_Project/Scenes/Sce_Bootstrap.unity
+    guid: 7b2e90cfd38db9c45a8142206fca936a
   - enabled: 1
-    path: Assets/_Project/Scenes/Sce_GameScene_Test.unity
-    guid: c03d7b12dea96ca44bd916b2e4fec1d0
+    path: Assets/_Project/Scenes/Sce_MainMenu.unity
+    guid: ed7468515c97cb74dbda9862ab462ef7
   - enabled: 1
-    path: Assets/Plugins/Test/SampleScene.unity
-    guid: 7910efa089232b944a76f4ad1f25adb7
+    path: Assets/_Project/Scenes/Sce_Game.unity
+    guid: 826410b826eeff842976d71bfbef6338
   m_configObjects: {}
