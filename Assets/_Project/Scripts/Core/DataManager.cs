@@ -7,15 +7,24 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
+    public static DataManager Instance { get; private set; }
     
     private FirebaseFirestore db;
 
-    // 테스트 값 (원하면 바꿔서 사용)
-    private const string COLLECTION = "user";
-    private const string DOC_ID = "XHcsQo4GTZZFj7aQ6wyB";
-    private const string TEST_EMAIL = "test@example.com";
-    private const string TEST_PASSWORD = "1234"; // 실제 서비스에서는 절대 평문 저장 금지!
-
+    [Header("디비에 저장되는 데이터 초기 값")]
+    private const string COLLECTION = "user";   // 컬랙션(테이블) 이름
+    [SerializeField, Tooltip("골드")] private const int GOLD = 250;
+    [SerializeField, Tooltip("잼")] private const int GEM = 7;
+    [SerializeField, Tooltip("에너지")] private const int ENERGY = 10;
+    [SerializeField, Tooltip("레벨")] private const int LEVEL = 1;
+    [SerializeField, Tooltip("경험치")] private const int EXP = 0;
+    
+    void Awake()
+    {
+        Instance = this;
+        DontDestroyOnLoad(this);
+    }
+    
     async void Start()
     {
         // Firebase 준비
@@ -50,7 +59,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 새 문서 추가 (자동 PK 생성)
-    private async Task<DocumentReference> AddUserAutoAsync(string email, string password)
+    public async Task<DocumentReference> AddUserAutoAsync(string email, string password)
     {
         try
         {
@@ -58,6 +67,12 @@ public class DataManager : MonoBehaviour
             {
                 { "email", email },
                 { "password", password },
+                { "gold", GOLD },
+                { "gem", GEM },
+                { "energy", ENERGY },
+                { "level", LEVEL },
+                { "exp", EXP },
+                { "createAt", Timestamp.GetCurrentTimestamp() },
             };
 
             // AddAsync → 자동으로 고유한 문서 ID 생성
@@ -72,7 +87,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 업데이트
-    private async Task UpdateUser(string docId, string email, string password)
+    public async Task UpdateUser(string docId, string email, string password)
     {
         try
         {
@@ -92,7 +107,7 @@ public class DataManager : MonoBehaviour
     }
 
     // 전체 조회
-    private async Task ReadUser(string docId)
+    public async Task ReadUser(string docId)
     {
         try
         {
@@ -117,7 +132,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 이메일 조회
-    private async Task FindUserByEmail(string email)
+    public async Task FindUserByEmail(string email)
     {
         // user 컬렉션에서 email 조건으로 문서 조회
         var query = db.Collection("user").WhereEqualTo("email", email);

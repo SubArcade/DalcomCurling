@@ -9,11 +9,14 @@ using UnityEngine.UI;
 
 public enum PanelId
 {
+    Start,
     Login,
-    Menu,
-    CreateRoom,
-    RoomList,
-    Room
+    Main,
+    DetailedSettings,
+    Giftbox,
+    Info,
+    DonutInfo,
+    Matching
 }
 
 public class UIManager : MonoBehaviour
