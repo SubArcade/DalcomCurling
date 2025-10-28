@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         // 씬 들어오면 로딩 닫기(혹시 열려 있으면)
-        UIManager.Instance?.HideLoading();
+        UIManager_Test.Instance?.HideLoading();
 
         // 여기서 카운트다운/스폰 트리거 등 시작
         SetState(GameState.Lobby);

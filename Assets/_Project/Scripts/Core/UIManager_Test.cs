@@ -16,9 +16,9 @@ public enum PanelId
     Room
 }
 
-public class UIManager : MonoBehaviour
+public class UIManager_Test : MonoBehaviour
 {
-    public static UIManager Instance { get; private set; }
+    public static UIManager_Test Instance { get; private set; }
     
     [SerializeField] private GameObject loadingPanel;
     [SerializeField] private GameObject settingsPanel;
