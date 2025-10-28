@@ -21,6 +21,8 @@ public class FirebaseAuthManager
     private FirebaseAuth auth; //로그인 / 회원가입
     private FirebaseUser user; // 인증된 유저정보
 
+    private DataManager dataManager; // DataManager 참조용
+
     public string UserId => user.UserId;
 
     public Action<bool> LoginState;
@@ -93,6 +95,7 @@ public class FirebaseAuthManager
             
             FirebaseUser newUser = task.Result.User;
             Debug.LogError("로그인 완료");
+            dataManager.OnLoginSuccess(newUser);
         });
     }
 
@@ -122,6 +125,4 @@ public class FirebaseAuthManager
         auth.SignOut();
         Debug.Log("로그아웃");
     }
-
-
 }

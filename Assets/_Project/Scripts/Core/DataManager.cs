@@ -1,8 +1,9 @@
+﻿using Firebase;
+using Firebase.Auth;
+using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Firebase;
-using Firebase.Firestore;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
@@ -135,11 +136,53 @@ public class DataManager : MonoBehaviour
 
             string docId = doc.Id;
             string emailValue = data.ContainsKey("email") ? data["email"].ToString() : "(null)";
-            string passwordValue = data.ContainsKey("password") ? data["nickname"].ToString() : "(null)";
+            string passwordValue = data.ContainsKey("password") ? data["password"].ToString() : "(null)";
 
             Debug.Log($"[FS][QUERY] docId={docId}");
             Debug.Log($"[FS][QUERY] email={emailValue}");
             Debug.Log($"[FS][QUERY] password={passwordValue}");
         }
+    }
+
+    public async void OnLoginSuccess(FirebaseUser user)
+    {
+        string uid = user.UserId;
+        string email = user.Email;
+
+        Debug.Log($"[DataManager] 로그인된 유저: {email} (uid={uid})");
+
+        // Firestore에 이 유저의 문서가 있는지 확인
+        var docRef = db.Collection("user").Document(uid);
+        var snapshot = await docRef.GetSnapshotAsync();
+
+        if (!snapshot.Exists)
+        {
+            // 문서가 없으면 새로 만들어줌
+            var data = new Dictionary<string, object>
+            {
+                { "email", email },
+                { "createdAt", Timestamp.GetCurrentTimestamp() },
+                { "nickname", "새 유저" }
+            };
+
+            await docRef.SetAsync(data);
+            Debug.Log($"[FS] 새 유저 데이터 생성: {email}");
+        }
+        else
+        {
+            Debug.Log($"[FS] 기존 유저 데이터 존재: {email}");
+        }
+    }
+
+    // 유저 정보 읽기
+    public async Task<Dictionary<string, object>> GetUserData(string uid)
+    {
+        var doc = await db.Collection("user").Document(uid).GetSnapshotAsync();
+        if (!doc.Exists)
+        {
+            Debug.LogWarning("유저 문서 없음");
+            return null;
+        }
+        return doc.ToDictionary();
     }
 }

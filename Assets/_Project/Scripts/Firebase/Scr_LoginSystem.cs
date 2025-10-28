@@ -67,7 +67,6 @@ public class LoginSystem : MonoBehaviour
     public void AnonymousLogin() //게스트 로그인
     {
         FirebaseAuthManager.Instance.AnonymousLogin();
-        loginPanel.SetActive(false);
     }
 
 }
