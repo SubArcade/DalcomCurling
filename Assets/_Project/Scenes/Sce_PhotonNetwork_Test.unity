@@ -535,10 +535,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 797830063}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5da9e97853984d24686d5bc30a9a526e, type: 3}
+  m_Script: {fileID: 11500000, guid: 9064c81cb68b0584d9307f77adb8c56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: -90
+  rotationSpeed: 180
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -866,10 +866,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1082446731}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20c443cd74d5ad24ca30babe9aff7935, type: 3}
+  m_Script: {fileID: 11500000, guid: 616e470756150354d9703d985d154b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: Sce_GameScene
+  gameSceneName: SampleScene
   uiManager: {fileID: 1524867000}
 --- !u!4 &1082446733
 Transform:
@@ -990,12 +990,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1524866999}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bd2b46994022394a92aa759039eabfc, type: 3}
+  m_Script: {fileID: 11500000, guid: 2c9a63035ab10224ea4718e98d289f2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchingPanel: {fileID: 1120360794}
+  matchingPanel: {fileID: 1708176158}
   cancelButton: {fileID: 1068706561}
-  startPanel: {fileID: 0}
+  startPanel: {fileID: 1030199101}
   startButton: {fileID: 769367225}
 --- !u!4 &1524867001
 Transform:
