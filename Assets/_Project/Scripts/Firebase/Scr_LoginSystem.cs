@@ -15,6 +15,7 @@ public class LoginSystem : MonoBehaviour
     [SerializeField] private Button loginButton;
     [SerializeField] private Button logoutButton;
     [SerializeField] private Button guestButton;
+    [SerializeField] private Button testLoginButton;
 
     [SerializeField] private GameObject loginPanel;
 
@@ -31,11 +32,13 @@ public class LoginSystem : MonoBehaviour
         loginButton = GameObject.Find("Login_Button")?.GetComponent<Button>();
         logoutButton = GameObject.Find("Logout_Button")?.GetComponent<Button>();
         guestButton = GameObject.Find("Guest_Button")?.GetComponent<Button>();
+        testLoginButton = GameObject.Find("TestLogin_Button")?.GetComponent<Button>(); //TODO: 테스트용 나중에 삭제
 
         createButton.onClick.AddListener(Create);
         loginButton.onClick.AddListener(Login);
         logoutButton.onClick.AddListener(LogOut);
         guestButton.onClick.AddListener(AnonymousLogin);
+        testLoginButton.onClick.AddListener(TestLogin);
 
         loginPanel = GameObject.Find("Login_Panel");
     }
@@ -67,6 +70,11 @@ public class LoginSystem : MonoBehaviour
     public void AnonymousLogin() //게스트 로그인
     {
         FirebaseAuthManager.Instance.AnonymousLogin();
+    }
+
+    public void TestLogin() //테스트 로그인 나중에 삭제
+    {
+        FirebaseAuthManager.Instance.LoginTestAccount();
     }
 
 }
