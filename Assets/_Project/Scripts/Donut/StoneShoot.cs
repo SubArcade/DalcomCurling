@@ -15,6 +15,14 @@ public class StoneShoot : MonoBehaviour
         WaitingForPressRelease,
         Launched
     }
+
+    public enum SweepState
+    {
+        FrontSweep,
+        LeftSweep,
+        RightSweep,
+        None
+    }
     //public float powerAmount = 10f;
 
     //public float spinAmount = 0f;
@@ -89,10 +97,7 @@ public class StoneShoot : MonoBehaviour
     // 현재 상태 (새로 추가)
     public LaunchState currentState { get; private set; } = LaunchState.WaitingForInitialDrag;
 
-    private Vector3 finalLaunchDirectionWithForce;
-    private float finalLaunchForce;
-
-    private bool needToTap = false;
+    
 
     // 최종 회전값 (외부에 노출할 float 값, 새로 추가)
     // 이 값을 사용자의 회전 로직에 입력하시면 됩니다.
@@ -101,7 +106,8 @@ public class StoneShoot : MonoBehaviour
     // 임시 회전 입력 시작점 (새로 추가)
     private Vector3 rotationDragStartScreenPos;
 
-    [Header("UI 오브젝트")] public GameObject makeDonutText;
+    [Header("UI 오브젝트")] 
+    public GameObject makeDonutText;
     public GameObject powerAndDirectionText;
     public GameObject rotationText;
     public Button releaseButton;
@@ -109,13 +115,41 @@ public class StoneShoot : MonoBehaviour
     public Button leftSweepButton;
     public Button rightSweepButton;
 
-    [Header("게임 오브젝트")] public GameObject stone;
+    [Header("게임 오브젝트")] 
+    public GameObject stone;
     public Transform spawnPos;
 
     public Transform releasePoint;
     public Transform startHogLine;
     public Transform earlyZoneLine;
     public Transform perfectZoneLine;
+    
+    
+    // --- 스위핑 관련 ---
+    private SweepState currentSweepState = SweepState.None;
+    private SweepState previousSweepState = SweepState.None;
+    public bool isSweeping { get; private set; } = false;
+    [Header("현재 스위프 미터 값")]
+    public float currentSweepValue = 0f;
+    private float previousSweepValue = 0f;
+    private const float MAX_VALUE = 1.0f;
+    
+    [Header("홀드시 증가할 값과 주기")]
+    private const float LONG_HOLD_INCREASE_AMOUNT = 0.1f;
+    private const float LONG_HOLD_INCREASE_INTERVAL = 0.1f;
+    private Coroutine longHoldCoroutine;
+
+    [Header("짧게 탭 할 경우의 설정")]
+    private const float SHORT_PRESS_TARGET_INCREASE = 0.3f; // 목표 증가량 (0.3)
+    private const float SHORT_PRESS_INTERVAL = 0.1f;
+    // 짧게 누를 때의 로직도 0.1 단위로 0.1초마다 증가하도록 코루틴을 사용합니다.
+    private const float SHORT_PRESS_STEP = 0.1f; // 0.1씩 증가
+    private Coroutine shortPressCoroutine;
+    
+    [Header("안누르면 감소할 값과 주기")]
+    private const float DECREASE_AMOUNT = 0.1f;
+    private const float DECREASE_INTERVAL = 0.1f; // 0.1초마다
+    private Coroutine autoDecreaseCoroutine; // 자동 감소 코루틴 참조
 
     //--- UI 연결 변수 ---
     public float currentDragRatio { get; private set; }
@@ -125,8 +159,18 @@ public class StoneShoot : MonoBehaviour
     private float releaseRandomValue = -99f;
     private Vector3 actualDragStartScreenPos;
     private Rigidbody rb;
+    private StoneForceController forceController;
     public bool isDragging { get; private set; } = false;
     private Camera mainCamera;
+    private SweepButtonScript frontSweep;
+    private SweepButtonScript leftSweep;
+    private SweepButtonScript rightSweep;
+    
+    private Vector3 finalLaunchDirectionWithForce;
+    private float finalLaunchForce;
+
+    private bool needToTap = false;
+    private bool canSweep = false;
 
     void Start()
     {
@@ -134,9 +178,25 @@ public class StoneShoot : MonoBehaviour
         currentState = LaunchState.WaitingForInitialDrag;
         makeDonutText.SetActive(true);
         releaseButton.onClick.AddListener(ReleaseButtonClicked);
-        frontSweepButton.onClick.AddListener(FrontSweeping);
-        leftSweepButton.onClick.AddListener(LeftSweeping);
-        rightSweepButton.onClick.AddListener(RightSweeping);
+        
+        frontSweep = frontSweepButton.GetComponent<SweepButtonScript>();
+        leftSweep = leftSweepButton.GetComponent<SweepButtonScript>();
+        rightSweep = rightSweepButton.GetComponent<SweepButtonScript>();
+
+        frontSweep.OnPressStarted += FrontSweepingStart;
+        frontSweep.OnShortTap += FrontSweepingTap;
+        frontSweep.OnHoldThresholdReached += FrontSweepingHold;
+        frontSweep.OnPressEnded += FrontSweepingEnd;
+
+        leftSweep.OnPressStarted += LeftSweepingStart;
+        leftSweep.OnShortTap += LeftSweepingTap;
+        leftSweep.OnHoldThresholdReached += LeftSweepingHold;
+        leftSweep.OnPressEnded += LeftSweepingEnd;
+        
+        rightSweep.OnPressStarted += RightSweepingStart;
+        rightSweep.OnShortTap += RightSweepingTap;
+        rightSweep.OnHoldThresholdReached += RightSweepingHold;
+        rightSweep.OnPressEnded += RightSweepingEnd;
     }
 
     // Update is called once per frame
@@ -147,6 +207,7 @@ public class StoneShoot : MonoBehaviour
             if (rb != null) return;
             GameObject st = Instantiate(stone, spawnPos.position, spawnPos.rotation);
             rb = st.GetComponent<Rigidbody>();
+            forceController = st.GetComponent<StoneForceController>();
             powerAndDirectionText.SetActive(true);
             makeDonutText.SetActive(false);
             //st.GetComponent<StoneForceController>().AddForceToStone(powerAmount, spinAmount);
@@ -202,6 +263,7 @@ public class StoneShoot : MonoBehaviour
             Vector3 currentPos = Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
             UpdateDragVisual(currentPos);
         }
+
     }
 
     private void HandleMouseInput_Launch()
@@ -484,14 +546,14 @@ public class StoneShoot : MonoBehaviour
                 
                 // DOMOVE로 움직이던 도넛을 이젠 직접 물리적 힘을 주어서 이동시키기위해 도넛의 물리 스크립트 함수를 호출 
                 rb.gameObject.GetComponent<StoneForceController>().AddForceToStone(finalLaunchDirectionWithForce * calculatedRandomValue,
-                    finalLaunchForce * calculatedRandomValue, finalRotationValue * calculatedRandomValue);
+                    finalLaunchForce * calculatedRandomValue, finalRotationValue * calculatedRandomValue, this);
                 
                 currentLaunchAngle = 0f; //설정했던 각도 초기화
                 currentDragRatio = 0f;  //설정했던 드래그 값 초기화
-
+                canSweep = true;
                 //rb = null;
-                makeDonutText.SetActive(true);
-                currentState = LaunchState.WaitingForInitialDrag;
+                //makeDonutText.SetActive(true);
+                //currentState = LaunchState.WaitingForInitialDrag;
                 releaseButton.interactable = false;
             });
     }
@@ -553,18 +615,271 @@ public class StoneShoot : MonoBehaviour
         }
     }
 
-    private void FrontSweeping()
+    public void DonutAttackFinished()
     {
+        makeDonutText.SetActive(true);
+        currentState = LaunchState.WaitingForInitialDrag;
+    }
+
+    #region Sweep
+    private void FrontSweepingStart()
+    {
+        // 다른 로직이 실행 중이면 중지합니다.
+        if (longHoldCoroutine != null) StopCoroutine(longHoldCoroutine);
+        if (shortPressCoroutine != null) StopCoroutine(shortPressCoroutine);
+        // **새로 추가**: 버튼을 누르는 순간, 자동 감소 코루틴을 중지
+        if (autoDecreaseCoroutine != null)
+        {
+            StopCoroutine(autoDecreaseCoroutine);
+            autoDecreaseCoroutine = null;
+        }
+        isSweeping = true;
+        currentSweepState = SweepState.FrontSweep;
+        
+        if (previousSweepState != currentSweepState)
+        {
+            currentSweepValue = 0;
+        }
+        
+        Debug.Log("버튼 누름 시작됨: 모든 증가 로직 초기화.");
+        // (컬링 예시: UI 게이지 표시 시작)
+    }
+
+    private void FrontSweepingTap()
+    {
+        // 짧게 누르면 0.1초마다 0.1씩, 총 0.3까지 증가시키는 코루틴을 매니저에서 시작
+        shortPressCoroutine = StartCoroutine(ShortTapStepIncrease());
+        Debug.Log("짧게 탭됨: 단계별 증가 코루틴 시작.");
         
     }
 
-    private void LeftSweeping()
+    private void FrontSweepingHold()
     {
+        // 0.1초마다 0.1씩 증가시키는 코루틴을 매니저에서 시작
+        longHoldCoroutine = StartCoroutine(LongHoldContinuousIncrease());
+        Debug.Log("홀드 임계값 도달: 지속적 증가 코루틴 시작.");
+    }
+
+    private void FrontSweepingEnd()
+    {
+        // 모든 지속/예약된 증가 로직을 중지합니다.
+        if (longHoldCoroutine != null)
+        {
+            StopCoroutine(longHoldCoroutine);
+            longHoldCoroutine = null;
+        }
+        
+        Debug.Log($"버튼 뗌. 최종 값: {currentSweepValue:F2}. 스톤 발사 로직 실행!");
+        
+        // 2. [핵심] 감소 시작 조건 확인: 증가 코루틴이 진행 중이 아니고 (ShortPress 코루틴은 스스로 종료 예정), 
+        //    값이 0보다 크며, 자동 감소 코루틴이 실행 중이지 않을 때 시작합니다.
+        if (currentSweepValue > 0f && autoDecreaseCoroutine == null)
+        {
+            // AutoDecreaseValue 코루틴을 시작
+            autoDecreaseCoroutine = StartCoroutine(AutoDecreaseValue());
+        }
+
+        previousSweepState = currentSweepState;
+
+        // 짧게 누른 후 바로 떼서 코루틴이 실행 중인 경우를 처리합니다.
+        // 짧은 탭의 경우 코루틴이 끝날 때 스스로 null 처리하는 것이 더 안전할 수 있습니다.
+    }
+    
+    
+
+    private void LeftSweepingStart()
+    {
+        // 다른 로직이 실행 중이면 중지합니다.
+        if (longHoldCoroutine != null) StopCoroutine(longHoldCoroutine);
+        if (shortPressCoroutine != null) StopCoroutine(shortPressCoroutine);
+        // **새로 추가**: 버튼을 누르는 순간, 자동 감소 코루틴을 중지
+        if (autoDecreaseCoroutine != null)
+        {
+            StopCoroutine(autoDecreaseCoroutine);
+            autoDecreaseCoroutine = null;
+        }
+        isSweeping = true;
+        currentSweepState = SweepState.LeftSweep;
+        
+        if (previousSweepState != currentSweepState)
+        {
+            currentSweepValue = 0;
+        }
+        
+        Debug.Log("버튼 누름 시작됨: 모든 증가 로직 초기화.");
+        // (컬링 예시: UI 게이지 표시 시작)
         
     }
 
-    private void RightSweeping()
+    private void LeftSweepingTap()
     {
+        // 짧게 누르면 0.1초마다 0.1씩, 총 0.3까지 증가시키는 코루틴을 매니저에서 시작
+        shortPressCoroutine = StartCoroutine(ShortTapStepIncrease());
+        Debug.Log("짧게 탭됨: 단계별 증가 코루틴 시작.");
         
     }
+
+    private void LeftSweepingHold()
+    {
+        // 0.1초마다 0.1씩 증가시키는 코루틴을 매니저에서 시작
+        longHoldCoroutine = StartCoroutine(LongHoldContinuousIncrease());
+        Debug.Log("홀드 임계값 도달: 지속적 증가 코루틴 시작.");
+    }
+
+    private void LeftSweepingEnd()
+    {
+        // 모든 지속/예약된 증가 로직을 중지합니다.
+        if (longHoldCoroutine != null)
+        {
+            StopCoroutine(longHoldCoroutine);
+            longHoldCoroutine = null;
+        }
+        
+        Debug.Log($"버튼 뗌. 최종 값: {currentSweepValue:F2}. 스톤 발사 로직 실행!");
+        
+        // 2. [핵심] 감소 시작 조건 확인: 증가 코루틴이 진행 중이 아니고 (ShortPress 코루틴은 스스로 종료 예정), 
+        //    값이 0보다 크며, 자동 감소 코루틴이 실행 중이지 않을 때 시작합니다.
+        if (currentSweepValue > 0f && autoDecreaseCoroutine == null)
+        {
+            // AutoDecreaseValue 코루틴을 시작
+            autoDecreaseCoroutine = StartCoroutine(AutoDecreaseValue());
+        }
+
+        previousSweepState = currentSweepState;
+    }
+
+    
+    
+    private void RightSweepingStart()
+    {
+        // 다른 로직이 실행 중이면 중지합니다.
+        if (longHoldCoroutine != null) StopCoroutine(longHoldCoroutine);
+        if (shortPressCoroutine != null) StopCoroutine(shortPressCoroutine);
+        // **새로 추가**: 버튼을 누르는 순간, 자동 감소 코루틴을 중지
+        if (autoDecreaseCoroutine != null)
+        {
+            StopCoroutine(autoDecreaseCoroutine);
+            autoDecreaseCoroutine = null;
+        }
+        
+        isSweeping = true;
+        currentSweepState = SweepState.RightSweep;
+        
+        if (previousSweepState != currentSweepState)
+        {
+            currentSweepValue = 0;
+        }
+        
+        Debug.Log("버튼 누름 시작됨: 모든 증가 로직 초기화.");
+        // (컬링 예시: UI 게이지 표시 시작)
+    }
+    private void RightSweepingTap()
+    {
+        // 짧게 누르면 0.1초마다 0.1씩, 총 0.3까지 증가시키는 코루틴을 매니저에서 시작
+        shortPressCoroutine = StartCoroutine(ShortTapStepIncrease());
+        Debug.Log("짧게 탭됨: 단계별 증가 코루틴 시작.");
+        
+    }
+
+    private void RightSweepingHold()
+    {
+        // 0.1초마다 0.1씩 증가시키는 코루틴을 매니저에서 시작
+        longHoldCoroutine = StartCoroutine(LongHoldContinuousIncrease());
+        Debug.Log("홀드 임계값 도달: 지속적 증가 코루틴 시작.");
+        
+    }
+
+    private void RightSweepingEnd()
+    {
+        // 모든 지속/예약된 증가 로직을 중지합니다.
+        if (longHoldCoroutine != null)
+        {
+            StopCoroutine(longHoldCoroutine);
+            longHoldCoroutine = null;
+        }
+        
+        Debug.Log($"버튼 뗌. 최종 값: {currentSweepValue:F2}. 스톤 발사 로직 실행!");
+        
+        // 2. [핵심] 감소 시작 조건 확인: 증가 코루틴이 진행 중이 아니고 (ShortPress 코루틴은 스스로 종료 예정), 
+        //    값이 0보다 크며, 자동 감소 코루틴이 실행 중이지 않을 때 시작합니다.
+        if (currentSweepValue > 0f && autoDecreaseCoroutine == null)
+        {
+            // AutoDecreaseValue 코루틴을 시작
+            autoDecreaseCoroutine = StartCoroutine(AutoDecreaseValue());
+        }
+
+        previousSweepState = currentSweepState;
+    }
+    
+    // --- [기능] 길게 누를 때 0.1초마다 0.1씩 증가 ---
+    IEnumerator LongHoldContinuousIncrease()
+    {
+        // 처음 한 번은 즉시 증가시키고 다음 대기 시간을 설정합니다.
+        IncreaseValue(LONG_HOLD_INCREASE_AMOUNT);
+        
+        while (true)
+        {
+            yield return new WaitForSeconds(LONG_HOLD_INCREASE_INTERVAL);
+            IncreaseValue(LONG_HOLD_INCREASE_AMOUNT);
+        }
+    }
+    
+    // --- [기능] 짧게 누를 때 0.3초에 걸쳐 0.3까지 증가 ---
+    IEnumerator ShortTapStepIncrease()
+    {
+        float targetValue = Mathf.Min(currentSweepValue + SHORT_PRESS_TARGET_INCREASE, MAX_VALUE);
+        
+        // 목표 값에 도달할 때까지 반복합니다.
+        while (currentSweepValue < targetValue)
+        {
+            // 0.1초 대기
+            yield return new WaitForSeconds(SHORT_PRESS_INTERVAL); // 기존 LONG_HOLD_INCREASE_INTERVAL 사용 가능
+            
+            // 0.1씩 증가 (Min을 사용하여 목표 값을 초과하지 않도록 방지)
+            currentSweepValue = Mathf.Min(currentSweepValue + SHORT_PRESS_STEP, targetValue);
+            forceController.SweepValueChanged(currentSweepState, currentSweepValue);
+            Debug.Log($"Short Tap Step Value: {currentSweepValue:F1}");
+        }
+
+        shortPressCoroutine = null; // 코루틴 완료
+
+        // 자동 감소 로직 시작 (기존 로직 유지)
+        if (currentSweepValue > 0f && autoDecreaseCoroutine == null)
+        {
+            autoDecreaseCoroutine = StartCoroutine(AutoDecreaseValue());
+        }
+    }
+    
+    // --- [기능] 버튼을 놓았을 때 0.1초마다 0.1씩 감소 ---
+    IEnumerator AutoDecreaseValue()
+    {
+        while (currentSweepValue > 0f)
+        {
+            // 0.1초 대기
+            yield return new WaitForSeconds(DECREASE_INTERVAL);
+
+            // 0.1씩 감소 및 0 미만으로 내려가지 않도록 방지
+            currentSweepValue = Mathf.Max(currentSweepValue - DECREASE_AMOUNT, 0f);
+            forceController.SweepValueChanged(currentSweepState, currentSweepValue);
+            
+            Debug.Log($"Auto Decrease Value: {currentSweepValue:F2}");
+            
+            // UI 업데이트 등이 필요하다면 여기서 처리 (혹은 OnValueUpdate Action을 사용)
+        }
+        
+        // 값이 0이 되면 코루틴을 종료합니다.
+        autoDecreaseCoroutine = null;
+        Debug.Log("Auto Decrease 완료: 값이 0에 도달했습니다.");
+    }
+    
+    // --- [기능] 값 증가 공통 함수 ---
+    private void IncreaseValue(float amount)
+    {
+        currentSweepValue = Mathf.Min(currentSweepValue + amount, MAX_VALUE); 
+        forceController.SweepValueChanged(currentSweepState, currentSweepValue);
+        
+        Debug.Log($"Long Hold Value: {currentSweepValue:F2}");
+    }
+    
+    #endregion
 }

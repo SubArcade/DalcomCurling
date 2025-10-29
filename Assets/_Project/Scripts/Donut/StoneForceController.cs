@@ -12,12 +12,25 @@ public class StoneForceController : MonoBehaviour
     private float spinAmountFactor = 1.5f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
     private float sidewaysForceFactor = 0.07f; // 회전값을 통해 얼마나 옆으로 휘게 할지 적용하는 변수 ( 높을수록 많이 휨 ) , 기본값 0.07
     private float sidewaysForceSpeedLimit = 0.4f; // 속도가 몇%가 될때까지 옆으로 휘는 힘을 가할건지 ( 낮을수록 오래 휨 ), 기본값 0.4
+    private float sweepSidewaysForceFactor = 1f;
     private Rigidbody rigid;
+    private PhysicMaterial physicMaterial;
+    private StoneShoot shoot;
+    private float initialFrictionValue;
     private bool isShooted = false;
+    private bool attackMoveFinished = false;
+    public float sweepSidewaysForce;
+    public float sweepFrictionValue;
     // Start is called before the first frame update
     void Awake()
     {
         rigid =  GetComponent<Rigidbody>();
+    }
+
+    private void Start()
+    {
+        physicMaterial =  transform.GetComponent<MeshCollider>().material;
+        initialFrictionValue = physicMaterial.dynamicFriction;
     }
 
     private void Update()
@@ -30,7 +43,7 @@ public class StoneForceController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isShooted == true)
+        if (isShooted == true && attackMoveFinished == false)
         {
 
 
@@ -40,16 +53,26 @@ public class StoneForceController : MonoBehaviour
             
             
 
-            //현재 이동 속도가 발사속도의 60퍼센트 이상일때까지만 옆으로 밀리는 힘을 추가함( 이후에는 남아있는 힘으로 인해 자연스럽게 휨 )
+            //현재 이동 속도가 발사속도의 설정한 퍼센트 이상일때까지만 옆으로 밀리는 힘을 추가함( 이후에는 남아있는 힘으로 인해 자연스럽게 휨 )
             rigid.AddForce(
-                Vector3.right * spinForce * sidewaysForceFactor * rigid.mass *
-                (velocityCalc > sidewaysForceSpeedLimit ? velocityCalc * 0.5f : 0), ForceMode.Force);
+                Vector3.right * spinForce * sidewaysForceFactor *
+                (velocityCalc > sidewaysForceSpeedLimit ? velocityCalc * 0.5f : 0), ForceMode.Acceleration);
+            
+            // 스위핑으로 인한 꺾임 계산
+            rigid.AddForce(
+                Vector3.right * velocityCalc * sweepSidewaysForce * sweepSidewaysForceFactor, ForceMode.Acceleration);
+
+            if (rigid.velocity.magnitude < 0.01f)
+            {
+                attackMoveFinished = true;
+                shoot.DonutAttackFinished();
+            }
         }
     }
 
-    // Update is called once per frame
-    public void AddForceToStone(Vector3 launchDestination,float force, float spin)
+    public void AddForceToStone(Vector3 launchDestination,float force, float spin, StoneShoot shoot)
     {
+        this.shoot = shoot;
         stoneForce = force;
         
         spinForce = spin;
@@ -60,5 +83,36 @@ public class StoneForceController : MonoBehaviour
         
         Debug.Log($"{force},  {launchDestination.magnitude},  {spin}");
         //rigid.AddForce(Vector3.forward * stoneForce, ForceMode.VelocityChange);
+    }
+
+    public void SweepValueChanged(StoneShoot.SweepState sweepState, float value)
+    {
+        if (sweepState == StoneShoot.SweepState.FrontSweep)
+        {
+            sweepFrictionValue = value;
+            sweepSidewaysForce = 0;
+        }
+        else if (sweepState == StoneShoot.SweepState.LeftSweep)
+        {
+            sweepFrictionValue = 0;
+            sweepSidewaysForce = -value;
+        }
+        else if (sweepState == StoneShoot.SweepState.RightSweep)
+        {
+            sweepFrictionValue = 0;
+            sweepSidewaysForce = value;
+        }
+        else if (sweepState == StoneShoot.SweepState.None)
+        {
+            if (sweepSidewaysForce != 0)
+            {
+                sweepSidewaysForce = value;
+            }
+            else if (sweepFrictionValue != 0)
+            {
+                sweepFrictionValue = value;
+            }
+        }
+        physicMaterial.dynamicFriction = initialFrictionValue - (value * 0.1f);
     }
 }
