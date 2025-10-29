@@ -23,8 +23,14 @@ public class FirebaseAuthManager
     public string UserId => user?.UserId;
     public Action<bool> LoginState;
 
-    
+    // 변경에 이렇게 기능이 Firebase Auth에 존재
+    // 이메일 변경
+    //await FirebaseAuth.DefaultInstance.CurrentUser.UpdateEmailAsync(newEmail);
 
+    // 비밀번호 변경
+    //await FirebaseAuth.DefaultInstance.CurrentUser.UpdatePasswordAsync(newPassword);
+    
+    
     public void Init()
     {
         auth = FirebaseAuth.DefaultInstance;
@@ -51,6 +57,7 @@ public class FirebaseAuthManager
         }
     }
 
+    // 회원가입
     public async void Create(string email, string password)
     {
         try
@@ -58,9 +65,6 @@ public class FirebaseAuthManager
             var result = await auth.CreateUserWithEmailAndPasswordAsync(email, password);
             user = result.User;
             Debug.Log($"회원가입 완료: {user.Email}");
-
-            var dataManager = GameObject.FindAnyObjectByType<DataManager>();
-            dataManager?.RunFirestoreSamples();
 
             LoginState?.Invoke(true);
         }
@@ -71,6 +75,7 @@ public class FirebaseAuthManager
         }
     }
 
+    // 로그인
     public async void Login(string email, string password)
     {
         try
@@ -78,9 +83,8 @@ public class FirebaseAuthManager
             var result = await auth.SignInWithEmailAndPasswordAsync(email, password);
             user = result.User;
             Debug.Log($"로그인 완료: {user.Email}");
-
-            var dataManager = GameObject.FindAnyObjectByType<DataManager>();
-            dataManager?.RunFirestoreSamples();
+            
+            await DataManager.Instance.EnsureUserDocAsync(user.UserId, user.Email);
 
             LoginState?.Invoke(true);
         }
@@ -91,6 +95,7 @@ public class FirebaseAuthManager
         }
     }
 
+    // 게스트 로그인
     public async void AnonymousLogin()
     {
         try
@@ -99,8 +104,7 @@ public class FirebaseAuthManager
             user = result.User;
             Debug.Log($"익명 로그인 성공! User ID: {user.UserId}");
 
-            var dataManager = GameObject.FindAnyObjectByType<DataManager>();
-            dataManager?.RunFirestoreSamples();
+            await DataManager.Instance.EnsureUserDocAsync(user.UserId, user.Email);
 
             LoginState?.Invoke(true);
         }
