@@ -160,6 +160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5228890347509528486}
   - component: {fileID: 1328610712804878825}
+  - component: {fileID: 384021666318600466}
   m_Layer: 5
   m_Name: Pfb_Cell
   m_TagString: Untagged
@@ -196,3 +197,16 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8321153839873950619}
   m_CullTransparentMesh: 1
+--- !u!114 &384021666318600466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8321153839873950619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04cfbd09e9a509d4c9258ff0fe632a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockOverlay: {fileID: 1957737011545275443}

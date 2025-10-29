@@ -39,7 +39,7 @@ public class DataManager : MonoBehaviour
         //     var snap = await added.GetSnapshotAsync();
         //     Debug.Log($"[FS] 저장 확인: {snap.ToDictionary()["email"]}, {snap.ToDictionary()["password"]}");
         // }
-        
+
         // 업데이트
         //await WriteUser(DOC_ID, TEST_EMAIL, TEST_PASSWORD);
 
@@ -47,7 +47,7 @@ public class DataManager : MonoBehaviour
         //await ReadUser(DOC_ID);
 
         // 검색
-       // await FindUserByEmail(TEST_EMAIL);
+        // await FindUserByEmail(TEST_EMAIL);
     }
     
     // 새 문서 추가 (자동 PK 생성)
@@ -118,7 +118,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 이메일 조회
-    private async Task FindUserByEmail(string email)
+    private async Task FindUserByEmail(string email) 
     {
         // user 컬렉션에서 email 조건으로 문서 조회
         var query = db.Collection("user").WhereEqualTo("email", email);
@@ -144,45 +144,52 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public async void OnLoginSuccess(FirebaseUser user)
+    // 외부에서 FirebaseUser를 넘겨받아 Firestore에 등록/갱신하는 함수
+    public async void RunFirestoreSamples()
     {
-        string uid = user.UserId;
-        string email = user.Email;
-
-        Debug.Log($"[DataManager] 로그인된 유저: {email} (uid={uid})");
-
-        // Firestore에 이 유저의 문서가 있는지 확인
-        var docRef = db.Collection("user").Document(uid);
-        var snapshot = await docRef.GetSnapshotAsync();
-
-        if (!snapshot.Exists)
+        if (db == null)
         {
-            // 문서가 없으면 새로 만들어줌
-            var data = new Dictionary<string, object>
+            Debug.LogError("[FS][DEMO] Firestore 초기화가 아직 안 되었습니다.");
+            return;
+        }
+
+        try
+        { 
+            // 1) 새로운 데이터 추가 (자동 문서 ID 생성)
+            var added = await AddUserAutoAsync(TEST_EMAIL, TEST_PASSWORD);
+            if (added != null)
             {
-                { "email", email },
-                { "createdAt", Timestamp.GetCurrentTimestamp() },
-                { "nickname", "새 유저" }
-            };
+                Debug.Log($"[FS][DEMO] 새 문서 추가 완료! docId={added.Id}");
 
-            await docRef.SetAsync(data);
-            Debug.Log($"[FS] 새 유저 데이터 생성: {email}");
-        }
-        else
-        {
-            Debug.Log($"[FS] 기존 유저 데이터 존재: {email}");
-        }
-    }
+                // 1-1) 방금 추가한 문서 바로 읽어보기
+                var snap = await added.GetSnapshotAsync();
+                var dict = snap.ToDictionary();
+                var addedEmail = dict.ContainsKey("email") ? dict["email"] : "(null)";
+                var addedPw = dict.ContainsKey("password") ? dict["password"] : "(null)";
+                Debug.Log($"[FS][DEMO] 저장 확인: email={addedEmail}, password={addedPw}");
+            }
+            else
+            {
+                Debug.LogWarning("[FS][DEMO] 추가 실패(added==null)");
+            }
 
-    // 유저 정보 읽기
-    public async Task<Dictionary<string, object>> GetUserData(string uid)
-    {
-        var doc = await db.Collection("user").Document(uid).GetSnapshotAsync();
-        if (!doc.Exists)
-        {
-            Debug.LogWarning("유저 문서 없음");
-            return null;
+            // 2) 업데이트 (샘플: DOC_ID 상수로 지정된 문서를 업데이트)
+            //    실제로 존재하는 문서 ID여야 합니다. 없으면 새로 생성되며 MergeAll로 병합 저장됩니다.
+            await UpdateUser(DOC_ID, TEST_EMAIL, TEST_PASSWORD);
+            Debug.Log("[FS][DEMO] UpdateUser(DOC_ID, TEST_EMAIL, TEST_PASSWORD) 완료");
+
+            // 3) 읽기 (DOC_ID 문서 읽기)
+            await ReadUser(DOC_ID);
+
+            // 4) 검색 (이메일로 문서 검색)
+            await FindUserByEmail(TEST_EMAIL);
+
+            Debug.Log("[FS][DEMO] === 샘플 완료 ===");
         }
-        return doc.ToDictionary();
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[FS][DEMO][ERR] {e.Message}");
+            Debug.LogException(e);
+        }
     }
 }

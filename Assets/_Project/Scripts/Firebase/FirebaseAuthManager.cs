@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Firebase.Auth;
 using UnityEngine;
-using Firebase.Auth;
 using System;
 
 public class FirebaseAuthManager
@@ -12,34 +10,24 @@ public class FirebaseAuthManager
         get
         {
             if (instance == null)
-            {
                 instance = new FirebaseAuthManager();
-            }
             return instance;
         }
     }
-    private FirebaseAuth auth; //로그인 / 회원가입
-    private FirebaseUser user; // 인증된 유저정보
 
-    private DataManager dataManager; // DataManager 참조용
+    private FirebaseAuth auth;
+    private FirebaseUser user;
 
-    public string UserId => user.UserId;
-
+    public string UserId => user?.UserId;
     public Action<bool> LoginState;
 
-    
     public void Init()
     {
         auth = FirebaseAuth.DefaultInstance;
-
-        //if (auth.CurrentUser != null)
-        //{
-        //    Logout();
-        //}
-        auth.StateChanged += Onchanged;
+        auth.StateChanged += OnChanged;
     }
 
-    private void Onchanged(object sender, EventArgs e)
+    private void OnChanged(object sender, EventArgs e)
     {
         if (auth.CurrentUser != null)
         {
@@ -59,70 +47,70 @@ public class FirebaseAuthManager
         }
     }
 
-    public void Create(string email, string password)
+    public async void Create(string email, string password)
     {
-        auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
+        try
         {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("회원가입 취소");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("회원가입 실패");
-                return;
-            }
-            FirebaseUser newUser = task.Result.User;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-            Debug.LogError("회원가입 완료");
-        });
-    }
+            var result = await auth.CreateUserWithEmailAndPasswordAsync(email, password);
+            user = result.User;
+            Debug.Log($"회원가입 완료: {user.Email}");
 
-    public void Login(string email, string password)
-    {
-        auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("로그인 취소");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("로그인 실패");
-                return;
-            }
-            
-            FirebaseUser newUser = task.Result.User;
-            Debug.LogError("로그인 완료");
-            dataManager.OnLoginSuccess(newUser);
-        });
-    }
+            var dataManager = GameObject.FindAnyObjectByType<DataManager>();
+            dataManager?.RunFirestoreSamples();
 
-    public void AnonymousLogin()
-    {
-        auth.SignInAnonymouslyAsync().ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("익명 로그인 취소됨");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("익명 로그인 실패: " + task.Exception);
-                return;
-            }
-
-            user = task.Result.User;
-            Debug.Log($"익명 로그인 성공! User ID: {user.UserId}");
             LoginState?.Invoke(true);
-        });
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"회원가입 실패: {e.Message}");
+            Debug.LogException(e);
+        }
+    }
+
+    public async void Login(string email, string password)
+    {
+        try
+        {
+            var result = await auth.SignInWithEmailAndPasswordAsync(email, password);
+            user = result.User;
+            Debug.Log($"로그인 완료: {user.Email}");
+
+            var dataManager = GameObject.FindAnyObjectByType<DataManager>();
+            dataManager?.RunFirestoreSamples();
+
+            LoginState?.Invoke(true);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"로그인 실패: {e.Message}");
+            Debug.LogException(e);
+        }
+    }
+
+    public async void AnonymousLogin()
+    {
+        try
+        {
+            var result = await auth.SignInAnonymouslyAsync();
+            user = result.User;
+            Debug.Log($"익명 로그인 성공! User ID: {user.UserId}");
+
+            var dataManager = GameObject.FindAnyObjectByType<DataManager>();
+            dataManager?.RunFirestoreSamples();
+
+            LoginState?.Invoke(true);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"익명 로그인 실패: {e.Message}");
+            Debug.LogException(e);
+        }
     }
 
     public void Logout()
     {
         auth.SignOut();
         Debug.Log("로그아웃");
+        LoginState?.Invoke(false);
     }
 }
