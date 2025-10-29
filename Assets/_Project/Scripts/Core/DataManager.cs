@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Firebase;
 using Firebase.Firestore;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class DataManager : MonoBehaviour
 {
@@ -11,13 +12,15 @@ public class DataManager : MonoBehaviour
     
     private FirebaseFirestore db;
 
-    [Header("디비에 저장되는 데이터 초기 값")]
-    private const string COLLECTION = "user";   // 컬랙션(테이블) 이름
-    [SerializeField, Tooltip("골드")] private const int GOLD = 250;
-    [SerializeField, Tooltip("잼")] private const int GEM = 7;
-    [SerializeField, Tooltip("에너지")] private const int ENERGY = 10;
-    [SerializeField, Tooltip("레벨")] private const int LEVEL = 1;
-    [SerializeField, Tooltip("경험치")] private const int EXP = 0;
+    [Header("플레이어 데이터 (신규 생성 시 초기 저장, 기존 계정은 불러와 갱신)")]
+    private string collection = "user";   // 컬랙션(테이블) 이름
+    [SerializeField, Tooltip("프리미어키(PK)")] private string docId = "ZflvQAZZmYj1SKj8mZKZ";
+    [SerializeField, Tooltip("이메일")] private string email = "";
+    [SerializeField, Tooltip("골드")] private int gold = 250;
+    [SerializeField, Tooltip("잼")] private int gem = 7;
+    [SerializeField, Tooltip("에너지")] private int energy = 10;
+    [SerializeField, Tooltip("레벨")] private int level = 1;
+    [SerializeField, Tooltip("경험치")] private int exp = 0;
     
     void Awake()
     {
@@ -56,6 +59,7 @@ public class DataManager : MonoBehaviour
 
         // 검색
        // await FindUserByEmail(TEST_EMAIL);
+        //await UpdateUserPartial(docId, gold: 500, exp: 1200);
     }
     
     // 새 문서 추가 (자동 PK 생성)
@@ -67,11 +71,11 @@ public class DataManager : MonoBehaviour
             {
                 { "email", email },
                 { "password", password },
-                { "gold", GOLD },
-                { "gem", GEM },
-                { "energy", ENERGY },
-                { "level", LEVEL },
-                { "exp", EXP },
+                { "gold", gold },
+                { "gem", gem },
+                { "energy", energy },
+                { "level", level },
+                { "exp", exp },
                 { "createAt", Timestamp.GetCurrentTimestamp() },
             };
 
@@ -87,34 +91,55 @@ public class DataManager : MonoBehaviour
     }
     
     // 업데이트
-    public async Task UpdateUser(string docId, string email, string password)
+    // 사용법 : await UpdateUserPartial(docId, gold: 500, exp: 1200); 필요한 값만 넣어주세요
+    public async Task UpdateUserPartial(
+        string docId,
+        string email = null,
+        string password = null,
+        int? gold = null,
+        int? gem = null,
+        int? energy = null,
+        int? level = null,
+        int? exp = null)
     {
         try
         {
-            var data = new Dictionary<string, object>
-            {
-                { "email", email },
-                { "password", password }, // 데모용: 운영에선 해시/토큰 등으로 대체
-            };
+            var patch = new Dictionary<string, object>();
 
-            await db.Collection(COLLECTION).Document(docId).SetAsync(data, SetOptions.MergeAll);
-            Debug.Log($"[FS][WRITE] /{COLLECTION}/{docId} 저장 완료 (email={email})");
+            if (email != null)    patch["email"] = email;
+            if (password != null) patch["password"] = password;
+
+            if (gold.HasValue)   patch["gold"]   = gold.Value;
+            if (gem.HasValue)    patch["gem"]    = gem.Value;
+            if (energy.HasValue) patch["energy"] = energy.Value;
+            if (level.HasValue)  patch["level"]  = level.Value;
+            if (exp.HasValue)    patch["exp"]    = exp.Value;
+
+            if (patch.Count == 0)
+            {
+                Debug.LogWarning("[FS][WRITE] 변경할 필드가 없습니다.");
+                return;
+            }
+
+            var docRef = db.Collection(collection).Document(docId);
+            await docRef.UpdateAsync(patch); // 제공한 필드만 변경, 나머지는 그대로
+            Debug.Log($"[FS][WRITE] 부분 업데이트 완료: /{collection}/{docId}");
         }
         catch (System.Exception e)
         {
             Debug.LogError($"[FS][WRITE][ERR] {e}");
         }
     }
-
+    
     // 전체 조회
     public async Task ReadUser(string docId)
     {
         try
         {
-            var snap = await db.Collection(COLLECTION).Document(docId).GetSnapshotAsync();
+            var snap = await db.Collection(collection).Document(docId).GetSnapshotAsync();
             if (!snap.Exists)
             {
-                Debug.LogWarning($"[FS][READ] 문서 없음: /{COLLECTION}/{docId}");
+                Debug.LogWarning($"[FS][READ] 문서 없음: /{collection}/{docId}");
                 return;
             }
 
@@ -122,7 +147,7 @@ public class DataManager : MonoBehaviour
             string email = dict.TryGetValue("email", out var eVal) ? eVal.ToString() : "(null)";
             string password = dict.TryGetValue("password", out var pVal) ? pVal.ToString() : "(null)";
 
-            Debug.Log($"[FS][READ] 문서 찾음: /{COLLECTION}/{docId}");
+            Debug.Log($"[FS][READ] 문서 찾음: /{collection}/{docId}");
             Debug.Log($"[FS][READ] email={email}, password={password}");
         }
         catch (System.Exception e)

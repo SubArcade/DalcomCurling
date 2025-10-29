@@ -1,3 +1,4 @@
+/*
 using System;
 using UnityEngine;
 using GoogleMobileAds.Api;
@@ -118,3 +119,4 @@ public class AdsRewarded : MonoBehaviour
         rewardedAd = null; // 한 번 보여주면 참조 해제
     }
 }
+*/
