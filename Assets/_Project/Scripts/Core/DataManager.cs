@@ -1,3 +1,6 @@
+﻿using Firebase;
+using Firebase.Auth;
+using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -182,4 +185,53 @@ public class DataManager : MonoBehaviour
             Debug.Log($"[FS][QUERY] password={passwordValue}");
         }
     }
+
+    // 외부에서 FirebaseUser를 넘겨받아 Firestore에 등록/갱신하는 함수
+    /*public async void RunFirestoreSamples()
+    {
+        if (db == null)
+        {
+            Debug.LogError("[FS][DEMO] Firestore 초기화가 아직 안 되었습니다.");
+            return;
+        }
+
+        try
+        { 
+            // 1) 새로운 데이터 추가 (자동 문서 ID 생성)
+            var added = await AddUserAutoAsync(TEST_EMAIL, TEST_PASSWORD);
+            if (added != null)
+            {
+                Debug.Log($"[FS][DEMO] 새 문서 추가 완료! docId={added.Id}");
+
+                // 1-1) 방금 추가한 문서 바로 읽어보기
+                var snap = await added.GetSnapshotAsync();
+                var dict = snap.ToDictionary();
+                var addedEmail = dict.ContainsKey("email") ? dict["email"] : "(null)";
+                var addedPw = dict.ContainsKey("password") ? dict["password"] : "(null)";
+                Debug.Log($"[FS][DEMO] 저장 확인: email={addedEmail}, password={addedPw}");
+            }
+            else
+            {
+                Debug.LogWarning("[FS][DEMO] 추가 실패(added==null)");
+            }
+
+            // 2) 업데이트 (샘플: DOC_ID 상수로 지정된 문서를 업데이트)
+            //    실제로 존재하는 문서 ID여야 합니다. 없으면 새로 생성되며 MergeAll로 병합 저장됩니다.
+            await UpdateUser(DOC_ID, TEST_EMAIL, TEST_PASSWORD);
+            Debug.Log("[FS][DEMO] UpdateUser(DOC_ID, TEST_EMAIL, TEST_PASSWORD) 완료");
+
+            // 3) 읽기 (DOC_ID 문서 읽기)
+            await ReadUser(DOC_ID);
+
+            // 4) 검색 (이메일로 문서 검색)
+            await FindUserByEmail(TEST_EMAIL);
+
+            Debug.Log("[FS][DEMO] === 샘플 완료 ===");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[FS][DEMO][ERR] {e.Message}");
+            Debug.LogException(e);
+        }
+    }*/
 }
