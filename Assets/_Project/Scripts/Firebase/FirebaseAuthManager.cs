@@ -1,8 +1,7 @@
 ﻿using Firebase.Auth;
 using UnityEngine;
 using System;
-using Google;
-using System.Threading.Tasks;
+using Google; 
 
 public class FirebaseAuthManager
 {
@@ -205,7 +204,6 @@ public class FirebaseAuthManager
     //        Debug.LogException(e);
     //    }
     //}
-
 
     public void Logout()
     {
