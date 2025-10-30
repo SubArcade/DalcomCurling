@@ -274,12 +274,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   docId: ZflvQAZZmYj1SKj8mZKZ
-  email: test@test.com
-  gold: 250
-  gem: 7
-  energy: 10
-  level: 1
-  exp: 0
+  playerData:
+    <email>k__BackingField: test@test.com
+    <gold>k__BackingField: 250
+    <gem>k__BackingField: 7
+    <energy>k__BackingField: 10
+    <level>k__BackingField: 1
+    <exp>k__BackingField: 0
+    <createdAtUnix>k__BackingField: 0
 --- !u!1001 &469480491
 PrefabInstance:
   m_ObjectHideFlags: 0
