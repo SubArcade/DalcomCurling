@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -14,6 +14,13 @@ public class StoneShoot : MonoBehaviour
         WaitingForRotationInput,
         WaitingForPressRelease,
         Launched
+    }
+    public enum SweepState
+    {
+        FrontSweep,
+        LeftSweep,
+        RightSweep,
+        None
     }
     //public float powerAmount = 10f;
 
@@ -139,19 +146,17 @@ public class StoneShoot : MonoBehaviour
         rightSweepButton.onClick.AddListener(RightSweeping);
     }
 
-    // Update is called once per frame
+    // 스톤 생성부분을 매니저에 일임 (턴 시작시 자동 생성)
+    public void PrepareForShot(Rigidbody stoneRb)
+    {
+        rb = stoneRb;
+        currentState = LaunchState.WaitingForInitialDrag;
+        powerAndDirectionText.SetActive(true);
+        makeDonutText.SetActive(false);
+    }
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (rb != null) return;
-            GameObject st = Instantiate(stone, spawnPos.position, spawnPos.rotation);
-            rb = st.GetComponent<Rigidbody>();
-            powerAndDirectionText.SetActive(true);
-            makeDonutText.SetActive(false);
-            //st.GetComponent<StoneForceController>().AddForceToStone(powerAmount, spinAmount);
-        }
-
         if (rb == null) return;
 
 
