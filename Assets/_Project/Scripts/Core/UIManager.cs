@@ -9,11 +9,14 @@ using UnityEngine.UI;
 
 public enum PanelId
 {
+    Start,
     Login,
-    Menu,
-    CreateRoom,
-    RoomList,
-    Room
+    Main,
+    DetailedSettings,
+    Giftbox,
+    Info,
+    DonutInfo,
+    Matching
 }
 
 public class UIManager : MonoBehaviour
@@ -33,7 +36,7 @@ public class UIManager : MonoBehaviour
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         HideLoading();
         if (settingsPanel) settingsPanel.SetActive(false);

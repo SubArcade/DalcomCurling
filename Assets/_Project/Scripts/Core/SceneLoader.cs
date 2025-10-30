@@ -19,7 +19,7 @@ public class SceneLoader : MonoBehaviour
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
         
         if(string.IsNullOrEmpty(bootstrapSceneName))
             bootstrapSceneName = SceneManager.GetActiveScene().name;
