@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class UIManager_test2 : MonoBehaviour
 {
     [Header("매칭 UI")]
     public GameObject matchingPanel;

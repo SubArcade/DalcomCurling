@@ -9,7 +9,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     [SerializeField] private string gameSceneName = "Sce_GameScene";
 
     [Header("UI Manager")]
-    public UIManager uiManager;
+    public UIManager_test2 uiManager;
 
     private bool isMatching = false;
     private float matchingStartTime;
