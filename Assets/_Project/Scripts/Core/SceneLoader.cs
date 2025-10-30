@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
@@ -39,7 +39,7 @@ public class SceneLoader : MonoBehaviour
     public void LoadLocal(string sceneName, bool wait = false, Action onFinish = null)
     {
         print("Loading local scene: " + sceneName);
-        UIManager_Test.Instance?.ShowLoading("Loading...");
+        UIManager.Instance?.ShowLoading("Loading...");
         StartCoroutine(LoadRoutine(sceneName, wait, onFinish));
     }
 
@@ -66,7 +66,7 @@ public class SceneLoader : MonoBehaviour
         if (!wait)
         {
             //Debug.Log("wait가 false");
-            UIManager_Test.Instance?.HideLoading();
+            UIManager.Instance?.HideLoading();
         }
         
         //Debug.Log($"Loading scene: {sceneName}");
@@ -81,7 +81,7 @@ public class SceneLoader : MonoBehaviour
             return;
         }
 
-        UIManager_Test.Instance?.ShowLoading("Sync loading...");
+        UIManager.Instance?.ShowLoading("Sync loading...");
         
         bool prev = PhotonNetwork.AutomaticallySyncScene;
         PhotonNetwork.AutomaticallySyncScene = false;
@@ -102,7 +102,7 @@ public class SceneLoader : MonoBehaviour
         string sceneName = (string)((object[])ev.CustomData)[0];
         //Debug.Log($"OnPhotonEvent에서 실행하는 sceneName : {sceneName}");
         
-        UIManager_Test.Instance?.ShowLoading("loading...");
+        UIManager.Instance?.ShowLoading("loading...");
         StartCoroutine(LoadRoutine(sceneName));
     }
     

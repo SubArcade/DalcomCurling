@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public enum PanelId_Test
+public enum PanelId
 {
     Start,
     Login,
@@ -19,16 +19,16 @@ public enum PanelId_Test
     Matching
 }
 
-public class UIManager_Test : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
-    public static UIManager_Test Instance { get; private set; }
+    public static UIManager Instance { get; private set; }
     
     [SerializeField] private GameObject loadingPanel;
     [SerializeField] private GameObject settingsPanel;
 
-    private readonly Dictionary<PanelId_Test, GameObject> currentPanel = new();
-    [SerializeField] private PanelId_Test currentPanelId = PanelId_Test.Login;
-    public PanelId_Test CurrentPanelId => currentPanelId;
+    private readonly Dictionary<PanelId, GameObject> currentPanel = new();
+    [SerializeField] private PanelId currentPanelId = PanelId.Login;
+    public PanelId CurrentPanelId => currentPanelId;
     
     [SerializeField] private Button settingsBackBtn;
 
@@ -45,18 +45,18 @@ public class UIManager_Test : MonoBehaviour
     }
 
     // ===== 패널 레지스트리 =====
-    public void RegisterPanel(PanelId_Test id, GameObject panel)
+    public void RegisterPanel(PanelId id, GameObject panel)
     {
         if (panel == null) return;
         currentPanel[id] = panel;
     }
 
-    public void Open(PanelId_Test id, Action onOpen  = null)
+    public void Open(PanelId id, Action onOpen  = null)
     {
         StartCoroutine(OpenRoutine(id, onOpen ));
     }
     
-    private IEnumerator OpenRoutine(PanelId_Test id, Action onOpen)
+    private IEnumerator OpenRoutine(PanelId id, Action onOpen)
     {
         if (currentPanel == null || currentPanel.Count == 0)
         {
