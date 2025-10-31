@@ -13,7 +13,9 @@ public class StoneShoot : MonoBehaviour
         WaitingForInitialDrag,
         WaitingForRotationInput,
         WaitingForPressRelease,
-        Launched
+        MovingToHogLine,
+        Launched,
+        AttackFinished
     }
 
     public enum SweepState
@@ -22,6 +24,12 @@ public class StoneShoot : MonoBehaviour
         LeftSweep,
         RightSweep,
         None
+    }
+
+    public enum Team
+    {
+        A,
+        B
     }
     //public float powerAmount = 10f;
 
@@ -33,11 +41,13 @@ public class StoneShoot : MonoBehaviour
 
 
     // --- 설정 변수 ---
-    [Header("Launch Settings")] public float launchForceMultiplier = 5.5f; // 당긴 거리에 곱해질 힘의 계수, 초기값 5.5
-    public float maxDragDistance = 0.5f; // 최대 드래그 허용 거리 , 초기값 0.5
-    public float maxRotationDragDistance = 1f; // 회전 입력 최대 드래그 거리 (화면 높이 비율), 초기값 1
-    public float maxRotationValue = 5f; // 회전 입력 최대값 (5), 초기값 5
-    public float autoMoveToHogLineSpeed = 5f; // 호그라인까지 자동으로 이동할때 사용될 속도값, 초기값 5
+    //[Header("게임 시스템 변수")] 
+    //public float outJudgeStandard = 0.02f; //벽과 얼마만큼 가까워지면 아웃판정을 할건지 ( 높을수록 벽과 멀어도 아웃판정됨 ) , 초기값 0.02f
+    public float launchForceMultiplier { get; private set; } = 4f; // 당긴 거리에 곱해질 힘의 계수, 초기값 4
+    public float maxDragDistance { get; private set; } = 0.5f; // 최대 드래그 허용 거리 , 초기값 0.5
+    public float maxRotationDragDistance { get; private set; } = 1f; // 회전 입력 최대 드래그 거리 (화면 높이 비율), 초기값 1
+    public float maxRotationValue { get; private set; } = 5f; // 회전 입력 최대값 (5), 초기값 5
+    public float autoMoveToHogLineSpeed { get; private set; } = 6f; // 호그라인까지 자동으로 이동할때 사용될 속도값, 초기값 5
     
     [System.Serializable]
     public struct WeightedItem
@@ -95,7 +105,8 @@ public class StoneShoot : MonoBehaviour
 
     // --- 상태 및 출력 변수 ---
     // 현재 상태 (새로 추가)
-    public LaunchState currentState { get; private set; } = LaunchState.WaitingForInitialDrag;
+    //public LaunchState currentState { get; private set; } = LaunchState.WaitingForInitialDrag;
+    public LaunchState currentState  = LaunchState.WaitingForInitialDrag;
 
     
 
@@ -110,27 +121,39 @@ public class StoneShoot : MonoBehaviour
     public GameObject makeDonutText;
     public GameObject powerAndDirectionText;
     public GameObject rotationText;
+    public GameObject sweepingPanel;
     public Button releaseButton;
     public Button frontSweepButton;
     public Button leftSweepButton;
     public Button rightSweepButton;
+    public GameObject outText;
 
     [Header("게임 오브젝트")] 
     public GameObject stone;
-    public Transform spawnPos;
+    public Transform spawnPos; //생성될 위치
 
-    public Transform releasePoint;
-    public Transform startHogLine;
-    public Transform earlyZoneLine;
-    public Transform perfectZoneLine;
+   // public Transform releasePoint;
+    public Transform startHogLine; // 시작 호그라인, 자동으로 이동하는 구간의 끝점, 실제로 유저가 선택한 방향대로 힘을 주는 지점
+    public Transform endHogLine; // 엔드 호그라인, 도넛이 최소한으로 여기까지는 이동해야 아웃처리가 안됨
+    public Transform endHackLine; // 경기장 끝 아웃라인, 도넛이 이 지점을 넘어가버리면 아웃판정
+    public Transform earlyZoneLine; // 얼리라인
+    public Transform perfectZoneLine; // 퍼펙트존 라인
+    public Transform leftWall;
+    public Transform rightWall;
+    
+    //--- 게임 내 도넛들을 관리하는 리스트 ---
+    public List<GameObject> inGameDonuts_A { get; private set; } = new List<GameObject>(); // A 팀의 도넛 전체를 관리할 리스트
+    public List<GameObject> inGameDonuts_B { get; private set; } = new List<GameObject>(); // B 팀의 도넛 전체를 관리할 리스트
+    public List<int> outDonutsId_A { get; private set; } = new List<int>();
+    public List<int> outDonutsId_B { get; private set; } = new List<int>();
     
     
     // --- 스위핑 관련 ---
     private SweepState currentSweepState = SweepState.None;
     private SweepState previousSweepState = SweepState.None;
     public bool isSweeping { get; private set; } = false;
-    [Header("현재 스위프 미터 값")]
-    public float currentSweepValue = 0f;
+    //[Header("현재 스위프 미터 값")]
+    public float currentSweepValue { get; private set; } = 0f;
     private float previousSweepValue = 0f;
     private const float MAX_VALUE = 1.0f;
     
@@ -172,7 +195,17 @@ public class StoneShoot : MonoBehaviour
     private bool needToTap = false;
     private bool canSweep = false;
 
-    void Start()
+    private GameObject currentDonut;
+    private int currentDonutId_A = -1;
+    private int currentDonutId_B = -1;
+
+    // private float leftWallOutValue;
+    // private float rightWallOutValue;
+    // private float endHogLineOutValue;
+    // private float endHackLineOutValue;
+    
+
+    void Awake()
     {
         mainCamera = Camera.main;
         currentState = LaunchState.WaitingForInitialDrag;
@@ -197,6 +230,16 @@ public class StoneShoot : MonoBehaviour
         rightSweep.OnShortTap += RightSweepingTap;
         rightSweep.OnHoldThresholdReached += RightSweepingHold;
         rightSweep.OnPressEnded += RightSweepingEnd;
+
+        
+        /*
+        // 아웃팟정을 위한 변수. 콜라이더를 사용하지 않도록 하여 물리계산을 줄여 최적화를 위해 미리 아웃 좌표값을 받아옴. (X축이 좌우, Z축이 앞뒤라고 가정. Z축이 값이 높을수록 전진방향으로 가정)
+        // 좌측 아웃라인을 변수로 저장. 벽의 좌표 + 벽의 두께 + 스톤의 두께... 아래 방식들도 비슷함
+        leftWallOutValue = leftWall.position.x + leftWall.GetComponent<Renderer>().bounds.extents.x + stone.GetComponent<Renderer>().bounds.extents.x + outJudgeStandard;
+        rightWallOutValue = rightWall.position.x - rightWall.GetComponent<Renderer>().bounds.extents.x - stone.GetComponent<Renderer>().bounds.extents.x - outJudgeStandard;
+        endHogLineOutValue = endHogLine.position.z + stone.GetComponent<Renderer>().bounds.extents.z;
+        endHackLineOutValue = endHackLine.position.z - stone.GetComponent<Renderer>().bounds.extents.z;
+        */
     }
 
     // Update is called once per frame
@@ -205,9 +248,22 @@ public class StoneShoot : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (rb != null) return;
+            currentState =  LaunchState.WaitingForInitialDrag;
+            previousSweepValue = 0;
+            currentSweepValue = 0;
+            
+            shortPressCoroutine = null;
+            longHoldCoroutine = null;
+            autoDecreaseCoroutine = null;
+            
+            currentDonutId_A++;
+            
             GameObject st = Instantiate(stone, spawnPos.position, spawnPos.rotation);
-            rb = st.GetComponent<Rigidbody>();
             forceController = st.GetComponent<StoneForceController>();
+            forceController.InitializeDonut(Team.A, currentDonutId_A);
+            inGameDonuts_A.Add(st);
+            currentDonut = st;
+            rb = st.GetComponent<Rigidbody>();
             powerAndDirectionText.SetActive(true);
             makeDonutText.SetActive(false);
             //st.GetComponent<StoneForceController>().AddForceToStone(powerAmount, spinAmount);
@@ -241,7 +297,7 @@ public class StoneShoot : MonoBehaviour
             }
         }
 
-        if (currentState == LaunchState.Launched && needToTap == true)
+        if (currentState == LaunchState.MovingToHogLine && needToTap == true)
         {
             if (Input.touchCount > 0)
             {
@@ -255,6 +311,11 @@ public class StoneShoot : MonoBehaviour
             {
                 TapBeforeHogLine();
             }
+        }
+
+        if (currentState == LaunchState.Launched)
+        {
+            //CheckDonutTransformToJudgeOut();
         }
 
         if (isDragging)
@@ -517,7 +578,7 @@ public class StoneShoot : MonoBehaviour
 
     private void ReleaseButtonClicked()
     {
-        currentState = LaunchState.Launched;
+        currentState = LaunchState.MovingToHogLine;
         MoveDonutToHogLine();
         needToTap = true;
         /*
@@ -537,9 +598,13 @@ public class StoneShoot : MonoBehaviour
     private void MoveDonutToHogLine()
     {
         rb.isKinematic = true; //domove로 움직일때, rigidbody때문에 방해받는것을 방지
-        rb.DOMove(releasePoint.position, autoMoveToHogLineSpeed).SetSpeedBased(true).SetEase(Ease.Linear)
+        rb.DOMove(startHogLine.position, autoMoveToHogLineSpeed).SetSpeedBased(true).SetEase(Ease.Linear)
             .OnComplete(() =>
             {
+                if (needToTap == true)
+                {
+                    DonutOut(currentDonut);
+                }
                 rb.isKinematic = false; //이제 물리작용을 적용할것이기에 다시 해제
                 rb.velocity = Vector3.zero; // 올바른 힘을 전달하기 위해 기존의 속도를 제거
                 float calculatedRandomValue = (100 + releaseRandomValue) * 0.01f;   // 릴리즈 탭 판정을 토대로 가져온 수치를 퍼센트만큼 추가함
@@ -547,10 +612,14 @@ public class StoneShoot : MonoBehaviour
                 // DOMOVE로 움직이던 도넛을 이젠 직접 물리적 힘을 주어서 이동시키기위해 도넛의 물리 스크립트 함수를 호출 
                 rb.gameObject.GetComponent<StoneForceController>().AddForceToStone(finalLaunchDirectionWithForce * calculatedRandomValue,
                     finalLaunchForce * calculatedRandomValue, finalRotationValue * calculatedRandomValue, this);
-                
+                currentState = LaunchState.Launched;
                 currentLaunchAngle = 0f; //설정했던 각도 초기화
                 currentDragRatio = 0f;  //설정했던 드래그 값 초기화
-                canSweep = true;
+                DOVirtual.DelayedCall(0.5f, () =>
+                {
+                    sweepingPanel.SetActive(true);
+                    canSweep = true;
+                });
                 //rb = null;
                 //makeDonutText.SetActive(true);
                 //currentState = LaunchState.WaitingForInitialDrag;
@@ -562,10 +631,10 @@ public class StoneShoot : MonoBehaviour
     {
         if (needToTap == true)
         {
-            needToTap = false;
-            if (rb.transform.position.z > perfectZoneLine.position.z &&
+            if (rb.transform.position.z >= perfectZoneLine.position.z &&
                 rb.transform.position.z <= startHogLine.position.z) // 퍼펙트존 안에 있을때 탭했으면
             {
+                needToTap = false;
                 int randomPoint = Random.Range(1, 101); // 0 ~ 100 까지이지만, 소숫점들을 정수로 만들기 위해 10을 곱한 상태에서 계산
 
                 int cumulativeWeight = 0;
@@ -585,9 +654,10 @@ public class StoneShoot : MonoBehaviour
                 Debug.Log("퍼펙트존");
                 Debug.Log($"releaseRandomValue: {releaseRandomValue}");
             }
-            else if (rb.transform.position.z > earlyZoneLine.position.z &&
-                     rb.transform.position.z <= perfectZoneLine.position.z) //얼리존 안에 있을때 탭했으면
+            else if (rb.transform.position.z >= earlyZoneLine.position.z &&
+                     rb.transform.position.z < perfectZoneLine.position.z) //얼리존 안에 있을때 탭했으면
             {
+                needToTap = false;
                 int randomPoint = Random.Range(1, 101); // 0 ~ 100 까지이지만, 소숫점들을 정수로 만들기 위해 10을 곱한 상태에서 계산
 
                 int cumulativeWeight = 0;
@@ -608,22 +678,105 @@ public class StoneShoot : MonoBehaviour
                 Debug.Log($"releaseRandomValue: {releaseRandomValue}");
                 
             }
-            else // 얼리존과 퍼펙트존 모두를 벗어났다면
+            else if(rb.transform.position.z < earlyZoneLine.position.z) // 얼리존보다 일찍 눌렀다면 무시하기
             {
-                Debug.Log("랜덤 릴리즈 벗어남");
+                Debug.Log("너무 일찍 눌러서 탭 무시");
             }
         }
     }
 
-    public void DonutAttackFinished()
+    private void DonutOut(GameObject donut) //도넛의 아웃 판정
     {
+        outText.SetActive(true);
+        DOVirtual.DelayedCall(3f, () =>
+        {
+            outText.SetActive(false);
+        });
+        donut.SetActive(false);
+
+        StoneForceController sfc = donut.GetComponent<StoneForceController>();
+        //sfc.team
+        
+        //rb.gameObject.SetActive(false);
+        //forceController.enabled = false;
+        //DonutAttackFinished();
+        ResetCurrentTurnDonutValues();
+    }
+
+    // private void CheckDonutTransformToJudgeOut() // 도넛이 아웃 좌표를 넘어섰는지 계산
+    // {
+    //     //코드 가독성 및 주석 가독성을 위해 일부로 한줄에 조건을 다 안넣어두고 분리해두었습니다.
+    //     if (rb.transform.position.x <= leftWallOutValue) // 왼쪽 벽(라인)의 사전 계산값과 비교하여 넘었는지 확인
+    //     {
+    //         DonutOut();
+    //     }
+    //     else if (rb.transform.position.x >= rightWallOutValue) // 오른쪽
+    //     {
+    //         DonutOut();
+    //     }
+    //     else if (rb.transform.position.z > endHackLineOutValue) // 엔드 핵 라인 ( 넘어가면 아웃 ) 
+    //     {
+    //         DonutOut();
+    //     }
+    //     
+    //     // 엔드 호그라인은 도넛이 멈추었을때를 기준으로 판정하기에 이 함수에서는 다루지 않음.
+    // }
+
+    public void DonutContactedSideWall(Team team, int donutId)
+    {
+        if (team == Team.A)
+        {
+            DonutOut(inGameDonuts_A[donutId]);
+        }
+        else
+        {
+            DonutOut(inGameDonuts_B[donutId]);
+        }
+    }
+
+    private void ResetCurrentTurnDonutValues()
+    {
+        sweepingPanel.SetActive(false);
         makeDonutText.SetActive(true);
-        currentState = LaunchState.WaitingForInitialDrag;
+        currentState = LaunchState.AttackFinished;
+        currentSweepValue = 0;
+        previousSweepValue = 0;
+        if (shortPressCoroutine != null)
+        {
+            StopCoroutine(shortPressCoroutine);
+            shortPressCoroutine = null;
+        }
+
+        if (longHoldCoroutine != null)
+        {
+            StopCoroutine(longHoldCoroutine);
+            longHoldCoroutine = null;
+        }
+
+        if (autoDecreaseCoroutine != null)
+        {
+            StopCoroutine(autoDecreaseCoroutine);
+            autoDecreaseCoroutine = null;
+        }
+        rb = null;
+    }
+
+    public void DonutAttackFinished(bool isPassedEndHogLine) //도넛이 공격을 마치고 모든 움직임을 멈추었을때 처리하는 함수
+    {
+        if (isPassedEndHogLine == true)
+        {
+            ResetCurrentTurnDonutValues();
+        }
+        else
+        {
+            DonutOut(currentDonut);
+        }
     }
 
     #region Sweep
     private void FrontSweepingStart()
     {
+        if (canSweep == false) return;
         // 다른 로직이 실행 중이면 중지합니다.
         if (longHoldCoroutine != null) StopCoroutine(longHoldCoroutine);
         if (shortPressCoroutine != null) StopCoroutine(shortPressCoroutine);
@@ -640,24 +793,23 @@ public class StoneShoot : MonoBehaviour
         {
             currentSweepValue = 0;
         }
-        
-        Debug.Log("버튼 누름 시작됨: 모든 증가 로직 초기화.");
-        // (컬링 예시: UI 게이지 표시 시작)
     }
 
     private void FrontSweepingTap()
     {
+        if (canSweep == false) return;
+        
         // 짧게 누르면 0.1초마다 0.1씩, 총 0.3까지 증가시키는 코루틴을 매니저에서 시작
         shortPressCoroutine = StartCoroutine(ShortTapStepIncrease());
-        Debug.Log("짧게 탭됨: 단계별 증가 코루틴 시작.");
         
     }
 
     private void FrontSweepingHold()
     {
+        if (canSweep == false) return;
+        
         // 0.1초마다 0.1씩 증가시키는 코루틴을 매니저에서 시작
         longHoldCoroutine = StartCoroutine(LongHoldContinuousIncrease());
-        Debug.Log("홀드 임계값 도달: 지속적 증가 코루틴 시작.");
     }
 
     private void FrontSweepingEnd()
@@ -668,9 +820,6 @@ public class StoneShoot : MonoBehaviour
             StopCoroutine(longHoldCoroutine);
             longHoldCoroutine = null;
         }
-        
-        Debug.Log($"버튼 뗌. 최종 값: {currentSweepValue:F2}. 스톤 발사 로직 실행!");
-        
         // 2. [핵심] 감소 시작 조건 확인: 증가 코루틴이 진행 중이 아니고 (ShortPress 코루틴은 스스로 종료 예정), 
         //    값이 0보다 크며, 자동 감소 코루틴이 실행 중이지 않을 때 시작합니다.
         if (currentSweepValue > 0f && autoDecreaseCoroutine == null)
@@ -680,15 +829,13 @@ public class StoneShoot : MonoBehaviour
         }
 
         previousSweepState = currentSweepState;
-
-        // 짧게 누른 후 바로 떼서 코루틴이 실행 중인 경우를 처리합니다.
-        // 짧은 탭의 경우 코루틴이 끝날 때 스스로 null 처리하는 것이 더 안전할 수 있습니다.
     }
     
     
 
     private void LeftSweepingStart()
     {
+        if (canSweep == false) return;
         // 다른 로직이 실행 중이면 중지합니다.
         if (longHoldCoroutine != null) StopCoroutine(longHoldCoroutine);
         if (shortPressCoroutine != null) StopCoroutine(shortPressCoroutine);
@@ -705,25 +852,20 @@ public class StoneShoot : MonoBehaviour
         {
             currentSweepValue = 0;
         }
-        
-        Debug.Log("버튼 누름 시작됨: 모든 증가 로직 초기화.");
-        // (컬링 예시: UI 게이지 표시 시작)
-        
     }
 
     private void LeftSweepingTap()
     {
+        if (canSweep == false) return;
         // 짧게 누르면 0.1초마다 0.1씩, 총 0.3까지 증가시키는 코루틴을 매니저에서 시작
         shortPressCoroutine = StartCoroutine(ShortTapStepIncrease());
-        Debug.Log("짧게 탭됨: 단계별 증가 코루틴 시작.");
-        
     }
 
     private void LeftSweepingHold()
     {
+        if (canSweep == false) return;
         // 0.1초마다 0.1씩 증가시키는 코루틴을 매니저에서 시작
         longHoldCoroutine = StartCoroutine(LongHoldContinuousIncrease());
-        Debug.Log("홀드 임계값 도달: 지속적 증가 코루틴 시작.");
     }
 
     private void LeftSweepingEnd()
@@ -734,9 +876,6 @@ public class StoneShoot : MonoBehaviour
             StopCoroutine(longHoldCoroutine);
             longHoldCoroutine = null;
         }
-        
-        Debug.Log($"버튼 뗌. 최종 값: {currentSweepValue:F2}. 스톤 발사 로직 실행!");
-        
         // 2. [핵심] 감소 시작 조건 확인: 증가 코루틴이 진행 중이 아니고 (ShortPress 코루틴은 스스로 종료 예정), 
         //    값이 0보다 크며, 자동 감소 코루틴이 실행 중이지 않을 때 시작합니다.
         if (currentSweepValue > 0f && autoDecreaseCoroutine == null)
@@ -752,6 +891,7 @@ public class StoneShoot : MonoBehaviour
     
     private void RightSweepingStart()
     {
+        if (canSweep == false) return;
         // 다른 로직이 실행 중이면 중지합니다.
         if (longHoldCoroutine != null) StopCoroutine(longHoldCoroutine);
         if (shortPressCoroutine != null) StopCoroutine(shortPressCoroutine);
@@ -769,24 +909,19 @@ public class StoneShoot : MonoBehaviour
         {
             currentSweepValue = 0;
         }
-        
-        Debug.Log("버튼 누름 시작됨: 모든 증가 로직 초기화.");
-        // (컬링 예시: UI 게이지 표시 시작)
     }
     private void RightSweepingTap()
     {
+        if (canSweep == false) return;
         // 짧게 누르면 0.1초마다 0.1씩, 총 0.3까지 증가시키는 코루틴을 매니저에서 시작
         shortPressCoroutine = StartCoroutine(ShortTapStepIncrease());
-        Debug.Log("짧게 탭됨: 단계별 증가 코루틴 시작.");
-        
     }
 
     private void RightSweepingHold()
     {
+        if (canSweep == false) return;
         // 0.1초마다 0.1씩 증가시키는 코루틴을 매니저에서 시작
         longHoldCoroutine = StartCoroutine(LongHoldContinuousIncrease());
-        Debug.Log("홀드 임계값 도달: 지속적 증가 코루틴 시작.");
-        
     }
 
     private void RightSweepingEnd()
@@ -797,9 +932,6 @@ public class StoneShoot : MonoBehaviour
             StopCoroutine(longHoldCoroutine);
             longHoldCoroutine = null;
         }
-        
-        Debug.Log($"버튼 뗌. 최종 값: {currentSweepValue:F2}. 스톤 발사 로직 실행!");
-        
         // 2. [핵심] 감소 시작 조건 확인: 증가 코루틴이 진행 중이 아니고 (ShortPress 코루틴은 스스로 종료 예정), 
         //    값이 0보다 크며, 자동 감소 코루틴이 실행 중이지 않을 때 시작합니다.
         if (currentSweepValue > 0f && autoDecreaseCoroutine == null)
@@ -838,7 +970,6 @@ public class StoneShoot : MonoBehaviour
             // 0.1씩 증가 (Min을 사용하여 목표 값을 초과하지 않도록 방지)
             currentSweepValue = Mathf.Min(currentSweepValue + SHORT_PRESS_STEP, targetValue);
             forceController.SweepValueChanged(currentSweepState, currentSweepValue);
-            Debug.Log($"Short Tap Step Value: {currentSweepValue:F1}");
         }
 
         shortPressCoroutine = null; // 코루틴 완료
@@ -861,15 +992,10 @@ public class StoneShoot : MonoBehaviour
             // 0.1씩 감소 및 0 미만으로 내려가지 않도록 방지
             currentSweepValue = Mathf.Max(currentSweepValue - DECREASE_AMOUNT, 0f);
             forceController.SweepValueChanged(currentSweepState, currentSweepValue);
-            
-            Debug.Log($"Auto Decrease Value: {currentSweepValue:F2}");
-            
-            // UI 업데이트 등이 필요하다면 여기서 처리 (혹은 OnValueUpdate Action을 사용)
         }
         
         // 값이 0이 되면 코루틴을 종료합니다.
         autoDecreaseCoroutine = null;
-        Debug.Log("Auto Decrease 완료: 값이 0에 도달했습니다.");
     }
     
     // --- [기능] 값 증가 공통 함수 ---
@@ -877,8 +1003,6 @@ public class StoneShoot : MonoBehaviour
     {
         currentSweepValue = Mathf.Min(currentSweepValue + amount, MAX_VALUE); 
         forceController.SweepValueChanged(currentSweepState, currentSweepValue);
-        
-        Debug.Log($"Long Hold Value: {currentSweepValue:F2}");
     }
     
     #endregion
