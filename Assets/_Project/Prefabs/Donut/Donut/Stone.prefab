@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 4629095626121540798}
   m_Layer: 0
   m_Name: Stone
-  m_TagString: Untagged
+  m_TagString: InGameDonut
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -255,3 +255,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stoneForce: 0
   spinForce: 0
+  sweepSidewaysForce: 0
+  sweepFrictionValue: 0
