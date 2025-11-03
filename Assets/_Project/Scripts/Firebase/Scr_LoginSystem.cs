@@ -22,14 +22,14 @@ public class LoginSystem : MonoBehaviour
     {
         FirebaseAuthManager.Instance.LoginState += OnChangedState;
 
-        // email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
-        // password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
-        // outputText = GameObject.Find("Info_Text")?.GetComponent<TMP_Text>();
+        email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
+        password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
+        outputText = GameObject.Find("Info_Text")?.GetComponent<TMP_Text>();
 
-        // createButton = GameObject.Find("SignUp_Button")?.GetComponent<Button>();
-        // loginButton = GameObject.Find("Login_Button")?.GetComponent<Button>();
-        // logoutButton = GameObject.Find("Logout_Button")?.GetComponent<Button>();
-        // guestButton = GameObject.Find("Guest_Button")?.GetComponent<Button>();
+        createButton = GameObject.Find("SignUp_Button")?.GetComponent<Button>();
+        loginButton = GameObject.Find("Login_Button")?.GetComponent<Button>();
+        logoutButton = GameObject.Find("Logout_Button")?.GetComponent<Button>();
+        guestButton = GameObject.Find("Guest_Button")?.GetComponent<Button>();
 
         createButton.onClick.AddListener(Create);
         loginButton.onClick.AddListener(Login);

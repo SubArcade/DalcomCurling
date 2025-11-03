@@ -7,6 +7,7 @@ public class StoneManager : MonoBehaviour
     [SerializeField] private GameObject stonePrefabA; // 플레이어 A(호스트)의 돌 프리팹
     [SerializeField] private GameObject stonePrefabB; // 플레이어 B의 돌 프리팹
     [SerializeField] private Transform spawnPosition; // 돌이 생성될 위치
+    
 
     private Dictionary<int, StoneForceController_Firebase> _stoneControllers = new Dictionary<int, StoneForceController_Firebase>();
     private StoneForceController_Firebase _currentTurnStone;
@@ -25,12 +26,14 @@ public class StoneManager : MonoBehaviour
         // 상대방 샷 시 시뮬레이션 위치 적용
         if (game.CurrentTurnPlayerId != myUserId && game.LastShot != null && game.LastShot.ReleasePosition != null)
         {
-            Debug.Log($"상대방의 릴리즈 위치({game.LastShot.ReleasePosition["z"]})에서 돌을 생성합니다.");
-            startPos = new Vector3(
-                game.LastShot.ReleasePosition["x"],
-                game.LastShot.ReleasePosition["y"],
-                game.LastShot.ReleasePosition["z"]
-            );
+            
+            // 이성준 수정
+            // Debug.Log($"상대방의 릴리즈 위치({game.LastShot.ReleasePosition["z"]})에서 돌을 생성합니다.");
+            // startPos = new Vector3(
+            //     game.LastShot.ReleasePosition["x"],
+            //     game.LastShot.ReleasePosition["y"],
+            //     game.LastShot.ReleasePosition["z"]
+            // );
         }
         else
         {
@@ -102,7 +105,7 @@ public class StoneManager : MonoBehaviour
 
         // Dictionary를 Vector3로 변환
         Vector3 direction = new Vector3(shotData.Direction["x"], shotData.Direction["y"], shotData.Direction["z"]);
-
+        
         stoneToLaunch.AddForceToStone(direction, shotData.Force, shotData.Spin);
 
         // 발사 후 모든 돌의 움직임 감지 시작 (시뮬레이션 완료 모니터링)
@@ -185,5 +188,17 @@ public class StoneManager : MonoBehaviour
             });
         }
         return positions;
+    }
+
+    public StoneForceController_Firebase GetDonutToLaunch(int donutId)
+    {
+        if (!_stoneControllers.TryGetValue(donutId, out var donutToLaunch))
+        {
+            Debug.LogError($"발사할 돌(ID: {donutId})을 찾을 수 없습니다!");
+            return null;
+        }
+        
+        return donutToLaunch;
+        
     }
 }

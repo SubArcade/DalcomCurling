@@ -274,6 +274,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiLaunch: {fileID: 48117302}
+  stoneManager: {fileID: 48117303}
   powerAndDirectionText: {fileID: 660654041}
   rotationText: {fileID: 736816423}
   releaseButton: {fileID: 1643677546}
