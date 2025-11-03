@@ -9,7 +9,7 @@ FirebaseFirestore iOS and Android Dependencies.
     </iosPod>
   </iosPods>
   <androidPackages>
-    <androidPackage spec="com.google.firebase:firebase-firestore:26.0.2">
+    <androidPackage spec="com.google.firebase:firebase-firestore:25.0.0">
     </androidPackage>
     <androidPackage spec="com.google.firebase:firebase-analytics:23.0.0">
     </androidPackage>

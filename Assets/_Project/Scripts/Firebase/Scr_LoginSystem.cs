@@ -21,7 +21,6 @@ public class LoginSystem : MonoBehaviour
     void Start()
     {
         FirebaseAuthManager.Instance.LoginState += OnChangedState;
-        FirebaseAuthManager.Instance.Init();
 
         email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
         password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
@@ -38,6 +37,8 @@ public class LoginSystem : MonoBehaviour
         guestButton.onClick.AddListener(AnonymousLogin);
 
         loginPanel = GameObject.Find("Login_Panel");
+
+        FirebaseAuthManager.Instance.Init();
     }
 
     private void OnChangedState(bool sign)
@@ -67,6 +68,14 @@ public class LoginSystem : MonoBehaviour
     public void AnonymousLogin() //게스트 로그인
     {
         FirebaseAuthManager.Instance.AnonymousLogin();
+    }
+
+    void OnDestroy()
+    {
+        if (FirebaseAuthManager.Instance != null)
+        {
+            FirebaseAuthManager.Instance.LoginState -= OnChangedState;
+        }
     }
 
 }
