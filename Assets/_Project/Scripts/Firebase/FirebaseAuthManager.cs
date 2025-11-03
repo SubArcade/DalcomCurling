@@ -155,55 +155,40 @@ public class FirebaseAuthManager
         }
     }
 
-    // TODO: GoogleSign SDK설치 후 확인
+    public async void LoginWithGoogle()
+    {
+        try
+        {
+            GoogleSignInConfiguration config = new GoogleSignInConfiguration
+            {
+                WebClientId = "941793478423-scd3qgovjudoiu19jlvltt92ajdc6vuo.apps.googleusercontent.com",
+                RequestIdToken = true
+            };
 
-    //public async void LoginWithGoogle()
-    //{
-    //    try
-    //    {
-    //        // Google 로그인 구성
-    //        GoogleSignInConfiguration config = new GoogleSignInConfiguration
-    //        {
-    //            WebClientId = "YOUR_WEB_CLIENT_ID_HERE", // Firebase 콘솔에서 복사한 Web client ID
-    //            RequestIdToken = true
-    //        };
+            GoogleSignIn.Configuration = config;
+            GoogleSignIn.DefaultInstance.SignOut();
 
-    //        // Google Sign-In 초기화
-    //        GoogleSignIn.Configuration = config;
-    //        GoogleSignIn.Configuration.UseGameSignIn = false;
-    //        GoogleSignIn.DefaultInstance.SignOut(); // 이전 세션 초기화
+            Debug.Log("[Google] 로그인 시도");
+            var googleUser = await GoogleSignIn.DefaultInstance.SignIn();
 
-    //        Debug.Log("[Google] 로그인 시도 중...");
-    //        GoogleSignInUser googleUser = await GoogleSignIn.DefaultInstance.SignIn();
+            if (googleUser == null)
+            {
+                Debug.LogWarning("[Google] 로그인 취소됨");
+                return;
+            }
 
-    //        if (googleUser == null)
-    //        {
-    //            Debug.LogWarning("[Google] 로그인 취소됨");
-    //            return;
-    //        }
+            Debug.Log($"[Google] 로그인 성공: {googleUser.Email}");
 
-    //        Debug.Log($"[Google] 로그인 성공: {googleUser.Email}");
+            var credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
 
-    //        // Firebase 인증과 연동
-    //        Credential credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
-    //        var authResult = await auth.SignInWithCredentialAsync(credential);
-    //        user = authResult.User;
-
-    //        Debug.Log($"[Firebase] 구글 로그인 완료: {user.Email} (UID={user.UserId})");
-
-    //        //  Firestore 연동이 필요하면 주석 해제
-    //        // var dataManager = GameObject.FindAnyObjectByType<DataManager>();
-    //        // if (dataManager != null)
-    //        //     await dataManager.SyncUserData(user, "(Google)");
-
-    //        LoginState?.Invoke(true);
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        Debug.LogError($"[Google/Firebase] 로그인 실패: {e.Message}");
-    //        Debug.LogException(e);
-    //    }
-    //}
+            user = await auth.SignInWithCredentialAsync(credential);
+            Debug.Log($"[Firebase] 구글 로그인 완료: {user.Email} / {user.UserId}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Google/Firebase] 로그인 실패: {e.Message}");
+        }
+    }
 
     public void Logout()
     {
