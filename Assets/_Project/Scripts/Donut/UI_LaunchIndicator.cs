@@ -13,6 +13,7 @@ public class UI_LaunchIndicator : MonoBehaviour
     [Header("UI오브젝트들")]
     public Slider forceSlider;
     public Slider rotationSlider;
+    public Slider sweepValueSlider;
     public RectTransform arrowRectTransform;
     public CanvasGroup arrowCanvasGroup;
     public CanvasGroup rotationAmountSliderCanvasGroup;
@@ -58,6 +59,13 @@ public class UI_LaunchIndicator : MonoBehaviour
             }
             
             
+        }
+        else if (launchScript.currentState == StoneShoot.LaunchState.Launched)
+        {
+            if (sweepValueSlider != null)
+            {
+                sweepValueSlider.value = launchScript.currentSweepValue;
+            }
         }
         else
         {

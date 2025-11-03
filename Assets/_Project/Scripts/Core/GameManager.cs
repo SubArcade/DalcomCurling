@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
 using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 
@@ -12,7 +10,7 @@ public enum GameState
     Result      // 결과
 }
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public GameState State { get; private set; } = GameState.Lobby;

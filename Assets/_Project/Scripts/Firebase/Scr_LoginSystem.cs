@@ -8,7 +8,7 @@ public class LoginSystem : MonoBehaviour
 {
     [SerializeField] private TMP_InputField email;
     [SerializeField] private TMP_InputField password;
-
+    
     [SerializeField] private TMP_Text outputText;
 
     [SerializeField] private Button createButton;
@@ -21,16 +21,15 @@ public class LoginSystem : MonoBehaviour
     void Start()
     {
         FirebaseAuthManager.Instance.LoginState += OnChangedState;
-        FirebaseAuthManager.Instance.Init();
 
-        email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
-        password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
-        outputText = GameObject.Find("Info_Text")?.GetComponent<TMP_Text>();
+        // email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
+        // password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
+        // outputText = GameObject.Find("Info_Text")?.GetComponent<TMP_Text>();
 
-        createButton = GameObject.Find("SignUp_Button")?.GetComponent<Button>();
-        loginButton = GameObject.Find("Login_Button")?.GetComponent<Button>();
-        logoutButton = GameObject.Find("Logout_Button")?.GetComponent<Button>();
-        guestButton = GameObject.Find("Guest_Button")?.GetComponent<Button>();
+        // createButton = GameObject.Find("SignUp_Button")?.GetComponent<Button>();
+        // loginButton = GameObject.Find("Login_Button")?.GetComponent<Button>();
+        // logoutButton = GameObject.Find("Logout_Button")?.GetComponent<Button>();
+        // guestButton = GameObject.Find("Guest_Button")?.GetComponent<Button>();
 
         createButton.onClick.AddListener(Create);
         loginButton.onClick.AddListener(Login);
@@ -38,6 +37,8 @@ public class LoginSystem : MonoBehaviour
         guestButton.onClick.AddListener(AnonymousLogin);
 
         loginPanel = GameObject.Find("Login_Panel");
+
+        FirebaseAuthManager.Instance.Init();
     }
 
     private void OnChangedState(bool sign)
@@ -67,6 +68,14 @@ public class LoginSystem : MonoBehaviour
     public void AnonymousLogin() //게스트 로그인
     {
         FirebaseAuthManager.Instance.AnonymousLogin();
+    }
+
+    void OnDestroy()
+    {
+        if (FirebaseAuthManager.Instance != null)
+        {
+            FirebaseAuthManager.Instance.LoginState -= OnChangedState;
+        }
     }
 
 }

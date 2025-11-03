@@ -1,4 +1,4 @@
-/*using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -46,4 +46,4 @@ public class Scr_RewardButton : MonoBehaviour
         PlayerPrefs.Save();
         statusText.text = $"보상 획득: +{amount} {type} (총 {gold})";
     }
-}*/
+}

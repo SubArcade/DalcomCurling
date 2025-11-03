@@ -3,7 +3,7 @@ using Cinemachine;
 
 /// <summary>
 /// 게임 내 가상 카메라(Cinemachine)를 배열로 관리하고 제어하는 스크립트입니다.
-/// 인덱스를 통해 특정 카메라를 활성화하고 타겟을 지정할 수 있습니다.
+/// SwitchCamera 메서드를 호출해 인덱스를 통해 특정 카메라를 활성화하고 타겟을 지정할 수 있다.
 /// </summary>
 public class Src_GameCamControl : MonoBehaviour
 {
@@ -20,7 +20,7 @@ public class Src_GameCamControl : MonoBehaviour
     }
 
     /// <summary>
-    /// 지정된 인덱스의 가상 카메라를 활성화하고, 선택적으로 타겟을 설정합니다.
+    /// 지정된 인덱스의 가상 카메라를 활성화하고, 선택적으로 타겟을 설정.
     /// </summary>
     /// <param name="cameraIndex">활성화할 카메라의 배열 인덱스</param>
     /// <param name="followTarget">Follow 타겟으로 설정할 Transform</param>
