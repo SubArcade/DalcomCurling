@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Photon.Pun;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -113,8 +112,6 @@ public class UIManager_Test : MonoBehaviour
     public void ShowSettings(bool show)
     {
         if (settingsPanel) settingsPanel.SetActive(show);
-        
-        if (!PhotonNetwork.InRoom) return; //메뉴창(룸입장 전)닫기누르면 오류코드 안나게 방어코드넣음
     }
 
     public void ShowSettings() // 룸입장 안한 메뉴에서 세팅열때 쓸녀석
