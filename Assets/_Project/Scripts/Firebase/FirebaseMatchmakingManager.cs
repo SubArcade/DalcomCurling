@@ -1,4 +1,4 @@
-
+﻿
 using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
@@ -111,6 +111,10 @@ public class FirebaseMatchmakingManager : MonoBehaviour
 
     [SerializeField] private string gameSceneName = "Sce_GameScene"; // 게임 씬 이름
 
+    [SerializeField] private UnityEngine.UI.Button matchmakingButton; // 스타트버튼 
+    [SerializeField] private TMPro.TextMeshProUGUI matchmakingStatusText; // 매칭 상태를 표시할 텍스트 
+    //TODO : 해당 버튼과 매칭상태 표시는 UI쪽으로 옮겨서 필요한 코드를 호출하는 방식으로 변경해야함
+    
     void Awake()
     {
         if (Instance == null)
@@ -134,6 +138,14 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     public async void StartMatchmaking()
     {
         Debug.Log("매치메이킹을 시작합니다...");
+        
+        //매칭버튼을 누르면 버튼 비활성화
+        if (matchmakingButton != null) { matchmakingButton.interactable = false; }
+        if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
+
+        {
+            
+        }
         string userId = FirebaseAuthManager.Instance.UserId;
         if (string.IsNullOrEmpty(userId))
         {
@@ -222,21 +234,24 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         AttachListener(newRoomRef.Id);
     }
 
+    // 다른플레이어의 참가를 감지하는 리스너를 부착하고 룸에 모두 입장했다면 호스트가 방을 생성하고 입장까지 연결 시켜주는 함수
+    // 이부분의 최적화가 읽기를 줄이는 방법중 하나 룸의 변경사항이 있을경우 콜백됨
     private void AttachListener(string roomId)
     {
-        if (roomListener != null)
+        if (roomListener != null) // 리스너 중복 방지
         {
             roomListener.Stop();
             roomListener = null;
         }
+
 
         DocumentReference roomRef = db.Collection(RoomsCollection).Document(roomId);
         roomListener = roomRef.Listen(snapshot =>
         {
             if (!snapshot.Exists) return;
 
-            Debug.Log($"룸 데이터 변경 감지: {snapshot.Id}");
             Room room = snapshot.ConvertTo<Room>();
+            Debug.Log($"룸 데이터 변경 감지: {snapshot.Id}");
 
             // 룸이 채워졌는지 확인합니다.
             if (room.Status == "playing" && room.PlayerIds.Count == 2)
@@ -253,15 +268,13 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                         roomListener.Stop();
                         roomListener = null;
                     }
-
-                    // TODO: SceneLoader.Instance.LoadLocal(gameSceneName); 으로 변경
                     SceneManager.LoadScene(gameSceneName);
                 }
                 else
                 {
                     // GameId가 없으면, 호스트 플레이어가 게임을 생성해야 합니다.
                     string myUserId = FirebaseAuthManager.Instance.UserId;
-                    // 첫 번째 플레이어를 호스트로 지정합니다.
+                    // 첫 번째 플레이어를 호스트로 지정합니다. 
                     if (room.PlayerIds[0] == myUserId)
                     {
                         Debug.Log("내가 호스트이므로 게임 생성을 시작합니다.");
@@ -295,13 +308,12 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         DocumentReference gameRef = await db.Collection(GamesCollection).AddAsync(newGame);
         Debug.Log($"새 게임 문서 생성 완료: {gameRef.Id}");
 
-        // "rooms" 문서에 생성된 GameId를 업데이트합니다.
+        // "rooms" 문서에 생성된 GameId를 업데이트합니다.  콜백으로 AttachListener이 다시 호출 됨
         await db.Collection(RoomsCollection).Document(room.RoomId).UpdateAsync("GameId", gameRef.Id);
         Debug.Log($"룸({room.RoomId})에 GameId({gameRef.Id}) 업데이트 완료.");
     }
 
-    // 룸 리스너를 해제하는 함수입니다.
-    void OnDestroy()
+    void OnDestroy() // 게임이 종료되거나 명시적으로 파괴할시 호출되므로 필요한코드, 삭제금지
     {
         if (roomListener != null)
         {
@@ -310,4 +322,5 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
     }
 }
+
 
