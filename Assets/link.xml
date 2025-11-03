@@ -1,0 +1,23 @@
+﻿ <linker>
+   <assembly fullname="Firebase.App">
+     <type fullname="Firebase.Platform.FirebaseAppUtils" preserve="all"/>
+
+	</assembly>
+   <assembly fullname="Firebase.Auth">
+     <type fullname="Firebase.Auth.FirebaseAuth" preserve="all"/>
+
+	</assembly>
+   <assembly fullname="Firebase.Firestore">
+     <type fullname="Firebase.Firestore.FirebaseFirestore" preserve="all"/>
+
+	</assembly>
+   <assembly fullname="Google.MiniJson">
+     <type fullname="Google.MiniJson" preserve="all"/>
+
+	</assembly>
+   <assembly fullname="System.Core">
+     <type fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
+
+	</assembly>
+
+</linker>
