@@ -2,7 +2,6 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using TMPro;
 
 public class Scr_PlayerLevelPopUp : MonoBehaviour

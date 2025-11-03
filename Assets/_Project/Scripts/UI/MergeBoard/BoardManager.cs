@@ -1,17 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour
 {
     public GameObject cellPrefab; // 칸 프리팹  
+    public GameObject donutPrefab; // 
     public int boardSize = 7;
     private Cells[,] cells;
+
+    [Header("테스트 아이템 스프라이트")]
+    public Sprite startSpriteA;
+    public Sprite startSpriteB;
 
     void Start()
     {
         GenerateBoard();
         UpdateBoardUnlock(1);
+
+        SpawnItemAt(3, 3, startSpriteA);
+        SpawnItemAt(3, 4, startSpriteA);
+        SpawnItemAt(4, 4, startSpriteB);
     }
 
     void GenerateBoard()
@@ -59,5 +69,25 @@ public class BoardManager : MonoBehaviour
         if (level < 7) return 5;
         if (level < 10) return 6;
         return 7;
+    }
+
+    public void SpawnItemAt(int x, int y, Sprite sprite)
+    {
+        var cell = GetCell(x, y);
+        if (cell == null || !cell.isActive || !cell.IsEmpty()) return;
+
+        GameObject itemObj = Instantiate(donutPrefab, cell.transform);
+        RectTransform rt = itemObj.GetComponent<RectTransform>();
+        rt.anchoredPosition = Vector2.zero;
+
+        var item = itemObj.GetComponent<MergeItemUI>();
+        item.GetComponent<Image>().sprite = sprite;
+        cell.SetItem(item);
+    }
+
+    public Cells GetCell(int x, int y)
+    {
+        if (x < 0 || y < 0 || x >= boardSize || y >= boardSize) return null;
+        return cells[x, y];
     }
 }

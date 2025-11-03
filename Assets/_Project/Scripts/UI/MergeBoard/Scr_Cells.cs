@@ -9,6 +9,7 @@ public class Cells : MonoBehaviour
     public Image lockOverlay; // 이 이미지는 CellPrefab 안에 자식 오브젝트로 둔다
 
     public bool isActive { get; private set; }
+    public MergeItemUI occupant { get; private set; }
 
     public void Init(int x, int y)
     {
@@ -24,4 +25,12 @@ public class Cells : MonoBehaviour
         if (lockOverlay != null)
             lockOverlay.gameObject.SetActive(!active);
     }
+    public bool IsEmpty() => occupant == null;
+    public void SetItem(MergeItemUI item)
+    {
+        occupant = item;
+        if (item) item.BindToCell(this);
+    }
+
+    public void ClearItem() => occupant = null;
 }
