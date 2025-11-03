@@ -1889,14 +1889,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a277e2014a6da1c4f844e7cbeeb3a6b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  email: {fileID: 0}
-  password: {fileID: 0}
+  email: {fileID: 1860269652}
+  password: {fileID: 1706655001}
   outputText: {fileID: 0}
-  createButton: {fileID: 0}
-  loginButton: {fileID: 0}
-  logoutButton: {fileID: 0}
-  guestButton: {fileID: 1143595816}
-  loginPanel: {fileID: 0}
+  createButton: {fileID: 2027027882}
+  loginButton: {fileID: 1981516829}
+  logoutButton: {fileID: 1252674177}
+  guestButton: {fileID: 834907339}
+  loginPanel: {fileID: 64470338}
 --- !u!1 &1154803767
 GameObject:
   m_ObjectHideFlags: 0
@@ -1913,7 +1913,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1154803768
 MonoBehaviour:
   m_ObjectHideFlags: 0
