@@ -94,7 +94,7 @@ public class Game_Manager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
                 PhotonView stonePv = stone.GetComponent<PhotonView>();
 
                 // StoneShoot 스크립트에 제어할 스톤을 알려줍니다.
-                GetComponent<StoneShoot>().PrepareForShot(stone.GetComponent<Rigidbody>());
+                //GetComponent<StoneShoot>().PrepareForShot(stone.GetComponent<Rigidbody>());
 
                 // 모든 클라이언트에게 카메라를 전환하라는 RPC를 보냅니다.
                 photonView.RPC("FocusCameraOnStone", RpcTarget.All, stonePv.ViewID);

@@ -29,10 +29,19 @@ public class FirebaseAuthManager
     //await FirebaseAuth.DefaultInstance.CurrentUser.UpdatePasswordAsync(newPassword);
     
     
-    public void Init()
+    public async void Init()
     {
+        // FirebaseInitializer가 완료될 때까지 기다립니다.
+        while (!FirebaseInitializer.IsInitialized)
+        {
+            await System.Threading.Tasks.Task.Yield();
+        }
+
         auth = FirebaseAuth.DefaultInstance;
         auth.StateChanged += OnChanged;
+
+        // 초기 상태 강제 확인
+        OnChanged(this, null);
     }
 
     private void OnChanged(object sender, EventArgs e)

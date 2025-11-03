@@ -51,6 +51,7 @@ public class DataManager : MonoBehaviour
         //DontDestroyOnLoad(this);
     }
     
+    /*
     async void Start()
     {
         // Firebase 준비
@@ -64,6 +65,21 @@ public class DataManager : MonoBehaviour
         Debug.Log("[FS] Firestore instance OK");
         
         //await UpdateUserDataAsync(docId, gold: 500, exp: 1200);
+    }
+    */
+
+    async void Start()
+    {
+        // FirebaseInitializer가 완료될 때까지 기다립니다.
+        while (!FirebaseInitializer.IsInitialized)
+        {
+            await System.Threading.Tasks.Task.Yield();
+        }
+
+        // 여러 클라이언트 테스트 시 로컬 DB 충돌을 막기 위해 지속성 비활성화
+        FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;
+        db = FirebaseFirestore.DefaultInstance;
+        Debug.Log("[FS] Firestore instance OK");
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
