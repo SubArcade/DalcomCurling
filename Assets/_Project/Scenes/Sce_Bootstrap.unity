@@ -521,7 +521,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beb50361c4ffd5244a995baa5862aa22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: Sce_Game
+  gameSceneName: Sce_PhotonNetwork_Test
   menuSceneName: Sce_MainMenu
 --- !u!1 &1137162047
 GameObject:

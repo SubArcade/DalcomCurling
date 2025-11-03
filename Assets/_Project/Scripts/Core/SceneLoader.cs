@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using ExitGames.Client.Photon;
-using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,16 +21,6 @@ public class SceneLoader : MonoBehaviour
         if(string.IsNullOrEmpty(bootstrapSceneName))
             bootstrapSceneName = SceneManager.GetActiveScene().name;
     }
-
-    private void OnEnable()
-    {
-        PhotonNetwork.NetworkingClient.EventReceived += OnPhotonEvent;
-    }
-
-    private void OnDisable()
-    {
-        PhotonNetwork.NetworkingClient.EventReceived -= OnPhotonEvent;
-    }
     
     // 로컬
     public void LoadLocal(string sceneName, bool wait = false, Action onFinish = null)
@@ -45,7 +32,6 @@ public class SceneLoader : MonoBehaviour
 
     private IEnumerator LoadRoutine(string sceneName, bool wait = false, Action onFinish = null)
     {
-        PhotonNetwork.AutomaticallySyncScene = false;
         var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         while (!op.isDone) yield return null;
         
@@ -73,9 +59,11 @@ public class SceneLoader : MonoBehaviour
         onFinish?.Invoke();
     } 
     
+    
+    // 기존 포톤 이벤트
     public void LoadAdditiveForAll(string sceneName)
     {
-        if (!PhotonNetwork.InRoom || !PhotonNetwork.IsMasterClient)
+        /*if (!PhotonNetwork.InRoom || !PhotonNetwork.IsMasterClient)
         {
             //Debug.LogWarning("[SceneLoader] Only MasterClient can call LoadForAll inside a room.");
             return;
@@ -90,11 +78,11 @@ public class SceneLoader : MonoBehaviour
         var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
         PhotonNetwork.RaiseEvent(EV_LOAD_ADD, content, options, SendOptions.SendReliable);
         
-        PhotonNetwork.AutomaticallySyncScene = prev;
+        PhotonNetwork.AutomaticallySyncScene = prev;*/
     }
     
     // 방장이외의 다른사람들 이벤트
-    private void OnPhotonEvent(EventData ev)
+    /*private void OnPhotonEvent(EventData ev)
     {
         if (ev.Code != EV_LOAD_ADD) return;
     
@@ -104,7 +92,7 @@ public class SceneLoader : MonoBehaviour
         
         UIManager.Instance?.ShowLoading("loading...");
         StartCoroutine(LoadRoutine(sceneName));
-    }
+    }*/
     
     private IEnumerator UnloadOthersExcept(string keepA, string keepB)
     {
