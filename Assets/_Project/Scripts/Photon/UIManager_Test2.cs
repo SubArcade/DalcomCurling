@@ -39,11 +39,11 @@ public class UIManager_test2 : MonoBehaviour
         ShowMatchingUI();
 
         // PhotonManager에 전달
-        PhotonManager photonManager = FindObjectOfType<PhotonManager>();
+        /*PhotonManager photonManager = FindObjectOfType<PhotonManager>();
         if (photonManager != null)
         {
             photonManager.OnStartButtonClicked();
-        }
+        }*/
     }
 
     public void ShowMatchingUI()
@@ -66,10 +66,10 @@ public class UIManager_test2 : MonoBehaviour
     {
         Debug.Log("취소 버튼 클릭됨");
 
-        PhotonManager photonManager = FindObjectOfType<PhotonManager>();
+        /*PhotonManager photonManager = FindObjectOfType<PhotonManager>();
         if (photonManager != null)
         {
             photonManager.OnCancelButtonClicked();
-        }
+        }*/
     }
 }
