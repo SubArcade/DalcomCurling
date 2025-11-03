@@ -8,7 +8,7 @@ public class LoginSystem : MonoBehaviour
 {
     [SerializeField] private TMP_InputField email;
     [SerializeField] private TMP_InputField password;
-
+    
     [SerializeField] private TMP_Text outputText;
 
     [SerializeField] private Button createButton;
@@ -22,11 +22,10 @@ public class LoginSystem : MonoBehaviour
     void Start()
     {
         FirebaseAuthManager.Instance.LoginState += OnChangedState;
-        FirebaseAuthManager.Instance.Init();
 
-        email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
-        password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
-        outputText = GameObject.Find("Info_Text")?.GetComponent<TMP_Text>();
+        // email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
+        // password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
+        // outputText = GameObject.Find("Info_Text")?.GetComponent<TMP_Text>();
 
         createButton = GameObject.Find("SignUp_Button")?.GetComponent<Button>();
         loginButton = GameObject.Find("Login_Button")?.GetComponent<Button>();
@@ -41,6 +40,8 @@ public class LoginSystem : MonoBehaviour
         testLoginButton.onClick.AddListener(TestLogin);
 
         loginPanel = GameObject.Find("Login_Panel");
+
+        FirebaseAuthManager.Instance.Init();
     }
 
     private void OnChangedState(bool sign)
@@ -75,6 +76,14 @@ public class LoginSystem : MonoBehaviour
     public void TestLogin() //테스트 로그인 나중에 삭제
     {
         FirebaseAuthManager.Instance.LoginTestAccount();
+    }
+
+    void OnDestroy()
+    {
+        if (FirebaseAuthManager.Instance != null)
+        {
+            FirebaseAuthManager.Instance.LoginState -= OnChangedState;
+        }
     }
 
 }
