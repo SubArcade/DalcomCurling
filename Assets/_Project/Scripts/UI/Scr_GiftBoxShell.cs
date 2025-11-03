@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,8 +18,7 @@ public class Scr_GiftBoxShell : MonoBehaviour
     private Scr_GiftBoxPopUp giftBoxPopUp;
 
     void Awake()
-    {
-        //인스펙터 자동연결 싹다 다시해야합니다
+    {        
         giftBoxButton = transform.Find("Giftbox")?.GetComponent<Button>();
         getRewardButton = transform.Find("GetRewardButton")?.GetComponentInChildren<Button>();
         giftBoxImage = transform.Find("Giftbox")?.GetComponent<Image>();

@@ -107,9 +107,9 @@ public class DataManager : MonoBehaviour
     }
     
     // 업데이트
-    // 사용법 : await UpdateUserData(docId, gold: 500, exp: 1200); 필요한 값만 넣어주세요
+    // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
     public async Task UpdateUserDataAsync(
-        string docId,
+       
         string email = null,
         int? gold = null,
         int? gem = null,

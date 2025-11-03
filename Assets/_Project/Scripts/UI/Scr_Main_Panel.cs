@@ -25,11 +25,21 @@ public class Scr_Main_Panel : MonoBehaviour
     [SerializeField] private Button UpgradeButton;
     [SerializeField] private Button LevelButton;
 
+    //메인 패널창에 아직 연결 및 생성되지않은 것
+    // 1. 휴지통
+    // 2. 엔트리
+    // 3. 환경설정
+    // 4. 컬링시작
+    // 5. 주문서
+    // 6. 머지(합성)칸
+    // 그외에는 더 있을 수 있으니 확인 부탁드립니다.
 
-    void Awake()
+    IEnumerator Start()
     {
-        Transform canvas = GameObject.Find("Canvas")?.transform;
-        DonutCodex = canvas.Find("DonutCodex")?.gameObject;
+        yield return new WaitForSeconds(0.2f); // 혹시라도 로딩 지연 대비
+
+        Transform canvas = GameObject.FindGameObjectWithTag("MainCanvas")?.transform;
+        DonutCodex = canvas.Find("DonutCodex")?.gameObject;       
         DonutUpgrade = canvas.Find("DonutUpgrade")?.gameObject;
         PlayerLevelInfo = canvas.Find("PlayerLevelInfo")?.gameObject;
         GiftBoxPopUp = canvas.Find("GiftBoxPopUp")?.gameObject;
@@ -47,10 +57,6 @@ public class Scr_Main_Panel : MonoBehaviour
         //basketButton.onClick.AddListener(() => BasketPopUp.SetActive(true));
         UpgradeButton.onClick.AddListener(()=> DonutUpgrade.SetActive(true));
         LevelButton.onClick.AddListener(() => PlayerLevelInfo.SetActive(true));
-    }
-    void Start()
-    {
-        
     }
 
 }
