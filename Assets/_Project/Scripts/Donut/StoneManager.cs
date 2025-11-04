@@ -342,6 +342,11 @@ public class StoneManager : MonoBehaviour
         return positions;
     }
 
+    public StoneForceController_Firebase GetCurrentTurnStone() // FirebaseGameManager가 현재 턴의 돌 정보를 가져갈 수 있도록 쓰이는 함수
+    {
+        return _currentTurnStone;
+    }
+
     public StoneForceController_Firebase GetDonutToLaunch(int donutId) // 상대 입장에서 시뮬레이션 돌릴때 호출되는 함수
     {
         StoneForceController_Firebase donutToLaunch;
