@@ -53,7 +53,7 @@ public class Game
     public int TurnNumber { get; set; } // 현재 턴 번호 (1~8)
 
     [FirestoreProperty]
-    public Dictionary<string, int> StonesUsed { get; set; } // 플레이어별 사용한 돌 개수
+    public Dictionary<string, int> DonutsIndex { get; set; } // 플레이어별 사용한 돌 개수
 
     [FirestoreProperty]
     public LastShot LastShot { get; set; } // 마지막으로 쏜 샷의 정보
@@ -353,10 +353,10 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             GameState = "Initializing",
             ReadyPlayers = new List<string>(),
             TurnNumber = 1,
-            StonesUsed = new Dictionary<string, int>
+            DonutsIndex = new Dictionary<string, int>
             {
-                { room.PlayerIds[0], 0 },
-                { room.PlayerIds[1], 0 }
+                { room.PlayerIds[0], -1 },
+                { room.PlayerIds[1], -1 }
             },
             LastShot = null,
             PredictedResult = null

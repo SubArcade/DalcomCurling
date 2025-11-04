@@ -210,12 +210,14 @@ public class FirebaseGameManager : MonoBehaviour
         else if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;
-            Debug.Log($"상대 샷(ID: {_currentGame.StonesUsed[_currentGame.LastShot.PlayerId]}) 시뮬레이션 시작.");
             stoneManager?.SpawnStoneForTurn(_currentGame);
-            float simulationSpeed = (_currentGame.TurnNumber > 1) ? 2.0f : timeMultiplier;
+            int stoneIdToLaunch = 
+                stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.bShotCount : stoneManager.aShotCount;
+            Debug.Log($"상대 샷(ID: {stoneIdToLaunch}) 시뮬레이션 시작.");
+            //float simulationSpeed = (_currentGame.TurnNumber > 1) ? 2.0f : timeMultiplier;
+            float simulationSpeed = timeMultiplier;
             Time.timeScale = simulationSpeed;
             Time.fixedDeltaTime = initialFixedDeltaTime / simulationSpeed;
-            int stoneIdToLaunch = _currentGame.StonesUsed[_currentGame.LastShot.PlayerId];
             Rigidbody rb = stoneManager.GetDonutToLaunch(stoneIdToLaunch).GetComponent<Rigidbody>();
             inputController.SimulateStone(rb, _currentGame.LastShot, stoneIdToLaunch);
             //stoneManager?.LaunchStone(_currentGame.LastShot, stoneIdToLaunch);
@@ -275,17 +277,31 @@ public class FirebaseGameManager : MonoBehaviour
     {
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
+        int count = stoneManager.myTeam == StoneForceController_Firebase.Team.A
+            ? stoneManager.aShotCount
+            : stoneManager.bShotCount;
 
         
         var updates = new Dictionary<string, object>
         {
             { "LastShot", shotData },
-            { $"StonesUsed.{myUserId}", _currentGame.StonesUsed[myUserId] } // 발사 횟수 올림
+            { $"StonesUsed.{myUserId}", count } // 발사 횟수 올림
         };
         
+        Debug.Log($"SubmitShot.count = {count}");
         
         db.Collection("games").Document(gameId).UpdateAsync(updates);
         inputController?.DisableInput();
+    }
+
+    public void UpdateDonutIndexToDatabase(string userId, int index)
+    {
+        var updates = new Dictionary<string, object>
+        {
+            //{ "LastShot", shotData },
+            { $"StonesUsed.{userId}", index} // 발사 횟수 올림
+        };
+        db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
 
     /// <summary>
@@ -340,7 +356,7 @@ public class FirebaseGameManager : MonoBehaviour
 
     public int GetCurrentStoneId()
     {
-        return _currentGame.StonesUsed[myUserId];
+        return _currentGame.DonutsIndex[myUserId];
     }
     #endregion
 
