@@ -33,10 +33,6 @@ public class Scr_DonutCodex : MonoBehaviour
         startZip(); //start에서 추가로 넣을 코드 있으면 해당 메서드 안에 작성
     }
 
-    void Update()
-    {
-        
-    }
     void startZip() 
     {
         hardDonutToggle.onValueChanged.AddListener((isOn) => TogglePanel(hardPanel, isOn));
