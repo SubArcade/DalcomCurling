@@ -117,6 +117,9 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     [SerializeField] private UnityEngine.UI.Button matchmakingButton; // 스타트버튼 
     [SerializeField] private TMPro.TextMeshProUGUI matchmakingStatusText; // 매칭 상태를 표시할 텍스트 
     //TODO : 해당 버튼과 매칭상태 표시는 UI쪽으로 옮겨서 필요한 코드를 호출하는 방식으로 변경해야함
+
+    private Coroutine matchmakingTimeoutCoroutine; // 매치메이킹 타임아웃 코루틴
+    private string waitingRoomId; // 현재 대기 중인 룸의 ID
     
     // 점수 구간 정의
     private const string ScoreBracket_0_199 = "0-199";
@@ -286,6 +289,10 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         await newRoomRef.SetAsync(room);
         Debug.Log($"새 룸을 생성했습니다: {newRoomRef.Id}");
 
+        // 타임아웃 처리를 위해 현재 룸 ID를 저장하고 코루틴을 시작합니다.
+        waitingRoomId = newRoomRef.Id;
+        matchmakingTimeoutCoroutine = StartCoroutine(MatchmakingTimeoutCoroutine());
+
         // 룸 생성 후, 다른 플레이어가 참여하는 것을 감지하기 위해 리스너를 부착합니다.
         AttachListener(newRoomRef.Id);
     }
@@ -312,6 +319,14 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             // 룸이 채워졌는지 확인합니다.
             if (room.Status == "playing" && room.PlayerIds.Count == 2)
             {
+                // 매칭이 성공했으므로 타임아웃 코루틴을 중지합니다.
+                if (matchmakingTimeoutCoroutine != null)
+                {
+                    StopCoroutine(matchmakingTimeoutCoroutine);
+                    matchmakingTimeoutCoroutine = null;
+                }
+                waitingRoomId = null; // 대기 룸 ID 초기화
+
                 // GameId가 설정되었는지 확인합니다.
                 if (!string.IsNullOrEmpty(room.GameId))
                 {
@@ -369,12 +384,61 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         Debug.Log($"룸({room.RoomId})에 GameId({gameRef.Id}) 업데이트 완료.");
     }
 
+    private System.Collections.IEnumerator MatchmakingTimeoutCoroutine()
+    {
+        yield return new WaitForSeconds(30f);
+
+        // 타임아웃 시점에 waitingRoomId가 아직 설정되어 있다면 (즉, 매칭이 안됨) 매칭을 취소합니다.
+        if (!string.IsNullOrEmpty(waitingRoomId))
+        {
+            CancelMatchmaking();
+        }
+    }
+
+    private async void CancelMatchmaking()
+    {
+        Debug.Log("매치메이킹 시간 초과 또는 취소. 매칭을 중단합니다.");
+
+        // 리스너 중지
+        if (roomListener != null)
+        {
+            roomListener.Stop();
+            roomListener = null;
+        }
+
+        // 타임아웃 코루틴 중지
+        if (matchmakingTimeoutCoroutine != null)
+        { 
+            StopCoroutine(matchmakingTimeoutCoroutine);
+            matchmakingTimeoutCoroutine = null;
+        }
+
+        // Firestore에서 룸 삭제
+        if (!string.IsNullOrEmpty(waitingRoomId))
+        {
+            await db.Collection(RoomsCollection).Document(waitingRoomId).DeleteAsync();
+            Debug.Log($"Firestore에서 룸({waitingRoomId})을 삭제했습니다.");
+            waitingRoomId = null; // 룸 ID 초기화
+        }
+
+        // UI 리셋
+        if (matchmakingButton != null) { matchmakingButton.interactable = true; }
+        if (matchmakingStatusText != null) { matchmakingStatusText.gameObject.SetActive(false); }
+    }
+
     void OnDestroy() // 게임이 종료되거나 명시적으로 파괴할시 호출되므로 필요한코드, 삭제금지
     {
         if (roomListener != null)
         {
             roomListener.Stop();
             roomListener = null;
+        }
+
+        // 코루린이 돌고있다면 삭제
+        if (matchmakingTimeoutCoroutine != null)
+        {
+            StopCoroutine(matchmakingTimeoutCoroutine);
+            matchmakingTimeoutCoroutine = null;
         }
     }
 }
