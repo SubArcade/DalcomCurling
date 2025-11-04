@@ -39,7 +39,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     [Header("퍼펙트존 확률 조정 가능 변수")]
     //public List<StoneShoot.WeightedItem> perfectZoneRandomWeights; // StoneShoot의 구조체 재사용
     //public List<StoneShoot.WeightedItem> earlyZoneRandomWeights;
-    public List<StoneShoot.WeightedItem> perfectZoneRandomWeights = new List<StoneShoot.WeightedItem>
+    private List<StoneShoot.WeightedItem> perfectZoneRandomWeights = new List<StoneShoot.WeightedItem>
     {
         new StoneShoot.WeightedItem { value = -5, weight = 2f },
         new StoneShoot.WeightedItem { value = -4, weight = 4f },
@@ -55,7 +55,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         // 총 합계는 반드시 100이어야 합니다.
     };
     
-    public List<StoneShoot.WeightedItem> earlyZoneRandomWeights = new List<StoneShoot.WeightedItem>
+    private List<StoneShoot.WeightedItem> earlyZoneRandomWeights = new List<StoneShoot.WeightedItem>
     {
         new StoneShoot.WeightedItem { value = -10, weight = 0.5f },
         new StoneShoot.WeightedItem { value = -9, weight = 1f },
@@ -292,7 +292,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 }
                 // FinalizeShot()에서 샷 데이터를 FirebaseGameManager에 전달하고, 실제 발사는 StoneManager에서 담당
                 FinalizeShot();
-                FirebaseGameManager.Instance.ChangeLocalStateToWaitingForInput();
+                FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot();
                 stoneManager.LaunchStone(myShot, FirebaseGameManager.Instance.GetCurrentStoneId());
             });
     }
@@ -329,10 +329,12 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             _needToTap = false;
             int randomPoint = Random.Range(1, 101);
+            Debug.Log($"randomPoint : {randomPoint}");
             int cumulativeWeight = 0;
             foreach (var item in weights)
             {
                 cumulativeWeight += (int)(item.weight * 10);
+                Debug.Log($"itemweight : {item.weight}");
                 if (randomPoint * 10 <= cumulativeWeight)
                 { 
                     _releaseRandomValue = item.value;
@@ -373,6 +375,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         LastShot shotData = new LastShot
         {
             Force = finalForce * calculatedRandomValue,
+            Team = stoneManager.myTeam,
             Spin = FinalRotationValue * calculatedRandomValue,
             Direction = directionDict,
             ReleasePosition = releasePosDict

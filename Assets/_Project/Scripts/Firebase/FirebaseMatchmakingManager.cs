@@ -65,6 +65,8 @@ public class LastShot
     [FirestoreProperty]
     public string PlayerId { get; set; }
     [FirestoreProperty]
+    public StoneForceController_Firebase.Team Team { get; set; }
+    [FirestoreProperty]
     public float Force { get; set; }
     [FirestoreProperty] public float Spin { get; set; }
     [FirestoreProperty] public Dictionary<string, float> Direction { get; set; }

@@ -14,7 +14,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     public float spinForce;
     private float velocityCalc; // 발사 파워와 현재 속도를 1로 노멀라이징한 변수
     private float spinAmountFactor = 1.5f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
-    private float sidewaysForceFactor = 0.07f; // 회전값을 통해 얼마나 옆으로 휘게 할지 적용하는 변수 ( 높을수록 많이 휨 ) , 기본값 0.07
+    private float sidewaysForceFactor = 0.15f; // 회전값을 통해 얼마나 옆으로 휘게 할지 적용하는 변수 ( 높을수록 많이 휨 ) , 기본값 0.07
     private float sidewaysForceSpeedLimit = 0.4f; // 속도가 몇%가 될때까지 옆으로 휘는 힘을 가할건지 ( 낮을수록 오래 휨 ), 기본값 0.4
     private float sweepSidewaysForceFactor = 0.3f; // 스위핑으로 양옆으로 얼마나 휘게 만들지 ( 높을수록 많이 휨 ) , 기본값 0.3
     private Rigidbody rigid;
@@ -31,7 +31,8 @@ public class StoneForceController_Firebase : MonoBehaviour
     public enum Team
     {
         A,
-        B
+        B,
+        None
     }
 
     // Start is called before the first frame update
@@ -79,11 +80,11 @@ public class StoneForceController_Firebase : MonoBehaviour
             //현재 이동 속도가 발사속도의 설정한 퍼센트 이상일때까지만 옆으로 밀리는 힘을 추가함( 이후에는 남아있는 힘으로 인해 자연스럽게 휨 )
             rigid.AddForce(
                 Vector3.right * spinForce * sidewaysForceFactor *
-                (velocityCalc > sidewaysForceSpeedLimit ? velocityCalc * 0.5f : 0), ForceMode.Acceleration);
+                (velocityCalc > sidewaysForceSpeedLimit ? velocityCalc * 0.3f : 0), ForceMode.Acceleration);
 
             // 스위핑으로 인한 꺾임 계산
-            rigid.AddForce(
-                Vector3.right * velocityCalc * 0.5f * sweepSidewaysForce * sweepSidewaysForceFactor, ForceMode.Acceleration);
+            //rigid.AddForce(
+            //    Vector3.right * velocityCalc * 0.5f * sweepSidewaysForce * sweepSidewaysForceFactor, ForceMode.Acceleration);
         }
     }
 
@@ -94,10 +95,11 @@ public class StoneForceController_Firebase : MonoBehaviour
 
         spinForce = spin;
         rigid.AddForce(launchDestination, ForceMode.VelocityChange);
-        DOVirtual.DelayedCall(0.5f, () =>
-        {
-            isShooted = true;
-        });
+        // DOVirtual.DelayedCall(0.5f, () =>
+        // {
+        //     isShooted = true;
+        // });
+        isShooted = true;
         Debug.Log($"[StoneForceController_Firebase] Force: {force}, Spin: {spin}");
     }
 

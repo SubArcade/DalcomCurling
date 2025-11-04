@@ -276,12 +276,14 @@ public class FirebaseGameManager : MonoBehaviour
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
 
+        
         var updates = new Dictionary<string, object>
         {
             { "LastShot", shotData },
-            { $"StonesUsed.{myUserId}", FieldValue.Increment(1) }
+            { $"StonesUsed.{myUserId}", _currentGame.StonesUsed[myUserId] } // 발사 횟수 올림
         };
-
+        
+        
         db.Collection("games").Document(gameId).UpdateAsync(updates);
         inputController?.DisableInput();
     }
@@ -338,15 +340,15 @@ public class FirebaseGameManager : MonoBehaviour
 
     public int GetCurrentStoneId()
     {
-        return _currentGame.StonesUsed[myUserId] - 1;
+        return _currentGame.StonesUsed[myUserId];
     }
     #endregion
 
     #region Change Private Variables
 
-    public void ChangeLocalStateToWaitingForInput()
+    public void ChangeLocalStateToSimulatingMyShot()
     {
-        _localState = LocalGameState.WaitingForInput;
+        _localState = LocalGameState.SimulatingMyShot;
     }
 
     #endregion
