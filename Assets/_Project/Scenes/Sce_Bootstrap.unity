@@ -276,15 +276,18 @@ MonoBehaviour:
   docId: ZflvQAZZmYj1SKj8mZKZ
   playerData:
     <email>k__BackingField: test@test.com
+    <nickname>k__BackingField: test
     <gold>k__BackingField: 250
     <gem>k__BackingField: 7
     <energy>k__BackingField: 10
     <level>k__BackingField: 1
     <exp>k__BackingField: 0
-    <createdAt>k__BackingField: 0
     <lastAt>k__BackingField: 0
+    <soloScore>k__BackingField: 0
+    <solotTier>k__BackingField: 0
     <maxEnergy>k__BackingField: 20
     <perminuteEnergy>k__BackingField: 1
+  Season: 2025
 --- !u!1001 &469480491
 PrefabInstance:
   m_ObjectHideFlags: 0

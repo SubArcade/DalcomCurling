@@ -4,7 +4,6 @@ using Firebase.Auth;
 using Firebase.Firestore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.Build.Content;
 using UnityEngine;
 
 [System.Serializable, FirestoreData]
@@ -86,7 +85,7 @@ public class DataManager : MonoBehaviour
     private GameMode gameMode = GameMode.SOLO;
     
     // 데이터 값 바뀐거 호출
-    public event System.Action<PlayerData> OnUserDataChanged;
+    public event Action<PlayerData> OnUserDataChanged;
     
     void Awake()
     {
@@ -119,6 +118,7 @@ public class DataManager : MonoBehaviour
         playerData.email = userEmail;
         int maxEnergy = playerData.maxEnergy;
         float perminuteEnergy = playerData.perminuteEnergy;
+        // Debug.Log($"maxEnergy: {maxEnergy}, perminuteEnergy: {perminuteEnergy}");
         
         var docRef = db.Collection("user").Document(uId);
         var snap = await docRef.GetSnapshotAsync();
@@ -138,13 +138,14 @@ public class DataManager : MonoBehaviour
             BasePlayerData(maxEnergy,perminuteEnergy);
             Debug.Log($"[FS] 기존 유저 로드 완료: /{userCollection}/{uId}");
         }
+        OnUserDataChanged?.Invoke(playerData);
     }
 
     // 기본 데이터 적용
     private void BasePlayerData(int maxEnergy, float perminuteEnergy)
     {
-        playerData.maxEnergy = playerData.maxEnergy;
-        playerData.perminuteEnergy = playerData.perminuteEnergy;
+        playerData.maxEnergy = maxEnergy;
+        playerData.perminuteEnergy = perminuteEnergy;
     }
     
     // 업데이트

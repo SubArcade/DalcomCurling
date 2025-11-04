@@ -27,7 +27,7 @@ public class Scr_EnergyRegenNotifier : MonoBehaviour
     }
 
     // 백그라운드 or 복귀 시 회복량 계산 및 재등록
-    private void OnApplicationPause(bool paused)
+    /*private void OnApplicationPause(bool paused)
     {
         DataManager.Instance.SaveAllUserDataAsync();
         if (paused)
@@ -42,7 +42,7 @@ public class Scr_EnergyRegenNotifier : MonoBehaviour
     {
         DataManager.Instance.SaveAllUserDataAsync();
         ApplyLazyRegenAndReschedule();
-    }
+    }*/
     
     // 회복 계산 후 알림 재등록
     private void ApplyLazyRegenAndReschedule()

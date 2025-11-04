@@ -15,7 +15,8 @@ public enum PanelId
     Giftbox,
     Info,
     DonutInfo,
-    Matching
+    PlayerLevelInfo,
+    Matching,
 }
 
 public class UIManager : MonoBehaviour

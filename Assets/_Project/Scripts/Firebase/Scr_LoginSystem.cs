@@ -17,7 +17,7 @@ public class LoginSystem : MonoBehaviour
     [SerializeField] private Button guestButton;
 
     [SerializeField] private GameObject loginPanel;
-
+    
     void Start()
     {
         FirebaseAuthManager.Instance.LoginState += OnChangedState;
@@ -58,9 +58,10 @@ public class LoginSystem : MonoBehaviour
     public void Login()
     {
         FirebaseAuthManager.Instance.Login(email.text, password.text);
+        //FirebaseAuthManager.Instance.LoginWithGoogle();
         UIManager.Instance.Open(PanelId.Main);
     }
-
+    
     public void LogOut()
     {
         FirebaseAuthManager.Instance.Logout();
@@ -78,5 +79,5 @@ public class LoginSystem : MonoBehaviour
             FirebaseAuthManager.Instance.LoginState -= OnChangedState;
         }
     }
-
+    
 }
