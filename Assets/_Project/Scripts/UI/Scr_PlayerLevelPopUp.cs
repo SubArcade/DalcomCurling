@@ -194,7 +194,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     }
     void OnClickCloseButton() 
     {
-       this.gameObject.SetActive(false);
+       //this.gameObject.SetActive(false);
+       UIManager.Instance.Open(PanelId.MainPanel);
     }
     void OnClickCloseRewardPopUp()
     {

@@ -128,6 +128,6 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     }
     void OnClickClosePopUp() 
     {
-        this.gameObject.SetActive(false);
+        UIManager.Instance.Open(PanelId.MainPanel);
     }
 }

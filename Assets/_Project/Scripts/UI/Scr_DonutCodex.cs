@@ -66,6 +66,6 @@ public class Scr_DonutCodex : MonoBehaviour
     }
     void CloseCollectionPopUp() 
     {
-        this.gameObject.SetActive(false);
+        UIManager.Instance.Open(PanelId.MainPanel);
     }
 }

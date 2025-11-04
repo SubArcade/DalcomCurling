@@ -59,7 +59,7 @@ public class LoginSystem : MonoBehaviour
     {
         FirebaseAuthManager.Instance.Login(email.text, password.text);
         //FirebaseAuthManager.Instance.LoginWithGoogle();
-        UIManager.Instance.Open(PanelId.Main);
+        UIManager.Instance.Open(PanelId.MainPanel);
     }
     
     public void LogOut()

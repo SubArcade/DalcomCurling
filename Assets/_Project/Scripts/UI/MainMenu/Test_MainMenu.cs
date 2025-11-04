@@ -38,6 +38,6 @@ public class Test_MainMenu : MonoBehaviour
     void TestLogin()
     {
         FirebaseAuthManager.Instance.Login("asd@asd.asd", "asdasd");
-        UIManager.Instance.Open(PanelId.Main);
+        UIManager.Instance.Open(PanelId.MainPanel);
     }
 }
