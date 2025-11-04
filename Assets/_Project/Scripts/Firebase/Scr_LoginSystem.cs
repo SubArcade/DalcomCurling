@@ -25,7 +25,7 @@ public class LoginSystem : MonoBehaviour
         // email = GameObject.Find("Input_Email")?.GetComponent<TMP_InputField>();
         // password = GameObject.Find("Input_PW")?.GetComponent<TMP_InputField>();
         // outputText = GameObject.Find("Info_Text")?.GetComponent<TMP_Text>();
-
+        //
         // createButton = GameObject.Find("SignUp_Button")?.GetComponent<Button>();
         // loginButton = GameObject.Find("Login_Button")?.GetComponent<Button>();
         // logoutButton = GameObject.Find("Logout_Button")?.GetComponent<Button>();
@@ -58,6 +58,7 @@ public class LoginSystem : MonoBehaviour
     public void Login()
     {
         FirebaseAuthManager.Instance.Login(email.text, password.text);
+        UIManager.Instance.Open(PanelId.Main);
     }
 
     public void LogOut()

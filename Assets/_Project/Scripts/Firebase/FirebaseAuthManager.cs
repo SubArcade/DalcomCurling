@@ -28,6 +28,10 @@ public class FirebaseAuthManager
     // 비밀번호 변경
     //await FirebaseAuth.DefaultInstance.CurrentUser.UpdatePasswordAsync(newPassword);
     
+    void Awake()
+    {
+        Instance.Init();
+    }
     
     public async void Init()
     {
@@ -85,6 +89,7 @@ public class FirebaseAuthManager
     // 로그인
     public async void Login(string email, string password)
     {
+        Debug.Log($"email: {email}, password: {password}");
         try
         {
             var result = await auth.SignInWithEmailAndPasswordAsync(email, password);
