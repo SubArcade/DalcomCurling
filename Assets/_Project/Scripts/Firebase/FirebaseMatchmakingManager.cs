@@ -28,6 +28,9 @@ public class Room
 
     [FirestoreProperty]
     public string GameId { get; set; } // 생성된 게임의 ID
+
+    [FirestoreProperty]
+    public string ScoreBracket { get; set; } // 룸 생성자의 점수 구간
 }
 
 // Firestore의 'games' 문서 구조를 나타내는 클래스입니다.
@@ -115,6 +118,13 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI matchmakingStatusText; // 매칭 상태를 표시할 텍스트 
     //TODO : 해당 버튼과 매칭상태 표시는 UI쪽으로 옮겨서 필요한 코드를 호출하는 방식으로 변경해야함
     
+    // 점수 구간 정의
+    private const string ScoreBracket_0_199 = "0-199";
+    private const string ScoreBracket_200_499 = "200-499";
+    private const string ScoreBracket_500_999 = "500-999";
+    private const string ScoreBracket_1000_1499 = "1000-1499";
+    private const string ScoreBracket_1500_Plus = "1500+";
+
     void Awake()
     {
         if (Instance == null)
@@ -132,6 +142,35 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     {
         // Firestore 인스턴스를 초기화합니다.
         db = FirebaseFirestore.DefaultInstance;
+    }
+
+    /// <summary>
+    /// 경험치(exp)에 따라 점수 구간을 반환합니다.
+    /// </summary>
+    /// <param name="exp">플레이어의 경험치</param>
+    /// <returns>점수 구간 문자열</returns>
+    private string GetScoreBracket(int exp)
+    {
+        if (exp >= 0 && exp <= 199)
+        {
+            return ScoreBracket_0_199;
+        }
+        else if (exp >= 200 && exp <= 499)
+        {
+            return ScoreBracket_200_499;
+        }
+        else if (exp >= 500 && exp <= 999)
+        {
+            return ScoreBracket_500_999;
+        }
+        else if (exp >= 1000 && exp <= 1499)
+        {
+            return ScoreBracket_1000_1499;
+        }
+        else // 1500 이상
+        {
+            return ScoreBracket_1500_Plus;
+        }
     }
 
     // 매치메이킹 시작 버튼을 누를 때 호출될 함수입니다.
@@ -153,10 +192,26 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             return;
         }
 
-        // 'waiting' 상태이고 플레이어가 2명 미만인 룸을 찾습니다.
+        // Firestore에서 현재 플레이어의 데이터를 직접 가져와 경험치(exp)를 얻습니다. TODO : 경험치를 점수로 바꿔야함.
+        // 스냅샷기능은 메모리에 안좋긴한데 일단 데이터 매니저 완성안됬으므로 사용
+        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync(); 
+        if (!userDoc.Exists)
+        {
+            Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
+            return;
+        }
+
+        // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
+        DataManager.PlayerData playerData = userDoc.ConvertTo<DataManager.PlayerData>();
+        int playerExp = playerData.exp;
+        string playerScoreBracket = GetScoreBracket(playerExp);
+        Debug.Log($"현재 플레이어의 경험치: {playerExp}, 점수 구간: {playerScoreBracket}");
+
+        // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
         Query waitingRoomsQuery = db.Collection(RoomsCollection)
             .WhereEqualTo("Status", "waiting")
-            .WhereLessThan("PlayerCount", 2) // PlayerCount 필드를 추가해야 합니다.
+            .WhereLessThan("PlayerCount", 2)
+            .WhereEqualTo("ScoreBracket", playerScoreBracket)
             .Limit(1);
 
         QuerySnapshot snapshot = await waitingRoomsQuery.GetSnapshotAsync();
@@ -172,7 +227,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         {
             // 참여할 룸이 없으므로 새 룸을 생성합니다.
             Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
-            await CreateRoomAsync();
+            await CreateRoomAsync(playerScoreBracket); // 점수 구간을 전달
         }
     }
 
@@ -212,7 +267,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         AttachListener(roomRef.Id); // 참여 후 리스너 부착
     }
 
-    private async System.Threading.Tasks.Task CreateRoomAsync()
+    private async System.Threading.Tasks.Task CreateRoomAsync(string playerScoreBracket)
     {
         string userId = FirebaseAuthManager.Instance.UserId;
         DocumentReference newRoomRef = db.Collection(RoomsCollection).Document();
@@ -224,7 +279,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             PlayerIds = new List<string> { userId },
             PlayerCount = 1, // 플레이어 수 초기화
             CreatedAt = Timestamp.GetCurrentTimestamp(),
-            GameId = null // 초기에는 GameId가 없습니다.
+            GameId = null, // 초기에는 GameId가 없습니다.
+            ScoreBracket = playerScoreBracket // 룸 생성 시 점수 구간 설정
         };
 
         await newRoomRef.SetAsync(room);
