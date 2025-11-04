@@ -1,19 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Cells : MonoBehaviour
+public class Cells : MonoBehaviour, IPointerClickHandler
 {
     [Header("잠금 상태 표시용 UI")]
     public Image lockOverlay; // 이 이미지는 CellPrefab 안에 자식 오브젝트로 둔다
 
     public bool isActive { get; private set; }
     public MergeItemUI occupant { get; private set; }
+    public int gridX, gridY;
 
     public void Init(int x, int y)
     {
-        // 처음엔 전부 잠긴 상태로 시작
+        gridX = x;
+        gridY = y;
         SetActive(false);
     }
 
@@ -33,4 +36,10 @@ public class Cells : MonoBehaviour
     }
 
     public void ClearItem() => occupant = null;
+    
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (!isActive) return;
+        BoardManager.Instance.OnCellClicked(this);
+    }
 }

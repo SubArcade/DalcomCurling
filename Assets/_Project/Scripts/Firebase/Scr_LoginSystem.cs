@@ -23,14 +23,10 @@ public class LoginSystem : MonoBehaviour
 
     private async void Awake()
     {
-        Debug.Log("[FirebaseInit] Firebase 초기화 시작");
-
         var dep = await FirebaseApp.CheckAndFixDependenciesAsync();
 
         if (dep == DependencyStatus.Available)
         {
-            Debug.Log("[FirebaseInit] Firebase 초기화 완료 ✅");
-
             // Firebase가 완전히 준비된 시점에 AuthManager 초기화
             InitializeAuthManager();
         }
@@ -42,9 +38,6 @@ public class LoginSystem : MonoBehaviour
     private void InitializeAuthManager()
     {
         FirebaseAuthManager.Instance.Init();
-
-        // 확인용 로그
-        Debug.Log($"[FirebaseInit] AuthManager 초기화 완료 상태: {FirebaseAuthManager.Instance != null}");
     }
 
     void Start()

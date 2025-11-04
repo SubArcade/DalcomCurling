@@ -170,7 +170,7 @@ public class FirebaseAuthManager
         {
             GoogleSignInConfiguration config = new GoogleSignInConfiguration
             {
-                WebClientId = "941793478423-scd3qgovjudoiu19jlvltt92ajdc6vuo.apps.googleusercontent.com",
+                WebClientId = "941793478423-sq6ikguem1f8q62vduokq6gi0jidu1uo.apps.googleusercontent.com",
                 RequestIdToken = true
             };
 
