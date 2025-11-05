@@ -90,6 +90,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         TryPlaceOrMerge(targetCell);
+        BoardSaveManager.Save(BoardManager.Instance);
         BoardManager.Instance.selectedCell = null; //선택 초기화
     }
 

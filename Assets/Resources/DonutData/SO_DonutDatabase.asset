@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfc300196f2b5ed4ab38ee9e2c804633, type: 3}
   m_Name: SO_DonutDatabase
   m_EditorClassIdentifier: 
-  items:
+  donuts:
   - id: 1
-    sprite: {fileID: 21300000, guid: a8df119f4b2ecdf408d0cae4b17de1e9, type: 3}
+    sprite: {fileID: 21300000, guid: c4b43f0107ab756458db8a627c5aa6c8, type: 2}
   - id: 2
-    sprite: {fileID: 21300000, guid: 586cce6e34a1e754b8fc0a198d6ba21d, type: 3}
+    sprite: {fileID: 21300000, guid: b02c71a37a54d9544a3ecd243e1adbcc, type: 2}
   - id: 3
-    sprite: {fileID: 21300000, guid: a8bae5ac95bce6e4eb16f84ba82176e8, type: 3}
+    sprite: {fileID: 21300000, guid: e2aae1bedee327e4fa183d6ebcf07e45, type: 2}

@@ -5,13 +5,13 @@ using UnityEngine;
 public class DonutDatabase : ScriptableObject
 {
     [System.Serializable]
-    public class ItemInfo
+    public class donutInfo
     {
         public string id;        // 고유 ID
         public Sprite sprite;    // 스프라이트 참조
     }
 
-    public List<ItemInfo> items = new List<ItemInfo>();
+    public List<donutInfo> donuts = new List<donutInfo>();
 
     private static DonutDatabase _instance;
     public static DonutDatabase Instance
@@ -26,7 +26,7 @@ public class DonutDatabase : ScriptableObject
 
     public static Sprite GetSpriteByID(string id)
     {
-        foreach (var item in Instance.items)
+        foreach (var item in Instance.donuts)
         {
             if (item.id == id)
                 return item.sprite;
@@ -36,7 +36,7 @@ public class DonutDatabase : ScriptableObject
 
     public static string GetIDBySprite(Sprite sprite)
     {
-        foreach (var item in Instance.items)
+        foreach (var item in Instance.donuts)
         {
             if (item.sprite == sprite)
                 return item.id;

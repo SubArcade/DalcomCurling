@@ -24,7 +24,6 @@ public class BoardManager : MonoBehaviour
     private Cells generatorCell; // 도넛 생성기가 위치한 셀
     public Cells GeneratorCell => generatorCell;
 
-    [Tooltip("참조때문에 퍼블릭")]
     public Cells selectedCell; // 선택한 셀
 
     [Header("도넛 스프라이트")]
@@ -86,6 +85,7 @@ public class BoardManager : MonoBehaviour
             if (isSameCell)
             {
                 SpawnDonutToEmptyCell();
+                BoardSaveManager.Save(this); // 저장
             }
         }
         else if (cell.occupant != null)
