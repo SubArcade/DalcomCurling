@@ -37,6 +37,10 @@ public class BoardManager : MonoBehaviour
 
     void Start()
     {
+        selectionHighlight = GameObject.Find("Canvas/Main_Panel/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
+        infoPopup = GameObject.Find("Canvas/Main_Panel/Bottom/Description");
+        infoText = GameObject.Find("Canvas/Main_Panel/Bottom/Description/Text").GetComponent<TMP_Text>();
+
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
@@ -114,8 +118,8 @@ public class BoardManager : MonoBehaviour
         btnRect.pivot = new Vector2(0.5f, 0.5f);
         btnRect.anchoredPosition = Vector2.zero;
 
-        Button btn = buttonObj.GetComponent<Button>();
-        btn.onClick.AddListener(SpawnDonutToEmptyCell);
+        //Button btn = buttonObj.GetComponent<Button>();
+        //btn.onClick.AddListener(SpawnDonutToEmptyCell);
 
         // 중앙 칸은 항상 활성화하지만 아이템은 못 들어오게 잠금 표시 꺼둠
         generatorCell.SetActive(true);
