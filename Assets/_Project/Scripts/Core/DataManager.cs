@@ -191,6 +191,8 @@ public class DataManager : MonoBehaviour
                 Debug.LogWarning("변경할 필드가 없습니다.");
                 return;
             }
+            if(patch.ContainsKey("energy"))
+                patch["lastAt"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             
             // var docRef = db.Collection(userCollection).Document(docId);
             // await docRef.UpdateAsync(patch);
@@ -226,7 +228,7 @@ public class DataManager : MonoBehaviour
                 ["energy"]  = playerData.energy,
                 ["level"]   = playerData.level,
                 ["exp"]     = playerData.exp,
-                ["lastAt"] = FieldValue.ServerTimestamp,
+                ["lastAt"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 ["soloScore"]   = playerData.soloScore,
                 ["soloTier"] = playerData.solotTier
             };
