@@ -294,6 +294,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 FinalizeShot();
                 FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot();
                 //stoneManager.LaunchStone(myShot, FirebaseGameManager.Instance.GetCurrentStoneId());
+                FirebaseGameManager.Instance.ChangeFixedDeltaTime();
                 stoneManager.LaunchStone(myShot, stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.aShotCount : stoneManager.bShotCount);
             });
     }

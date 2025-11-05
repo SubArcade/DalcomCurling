@@ -284,8 +284,6 @@ MonoBehaviour:
   maxRotationValue: 5
   autoMoveToHogLineSpeed: 6
   maxUIDirectionAngle: 60
-  perfectZoneRandomWeights: []
-  earlyZoneRandomWeights: []
   startHogLine: {fileID: 1964964876}
   perfectZoneLine: {fileID: 1750921521}
   earlyZoneLine: {fileID: 1267973038}

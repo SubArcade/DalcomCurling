@@ -215,9 +215,9 @@ public class FirebaseGameManager : MonoBehaviour
                 stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.bShotCount : stoneManager.aShotCount;
             Debug.Log($"상대 샷(ID: {stoneIdToLaunch}) 시뮬레이션 시작.");
             //float simulationSpeed = (_currentGame.TurnNumber > 1) ? 2.0f : timeMultiplier;
-            float simulationSpeed = timeMultiplier;
-            Time.timeScale = simulationSpeed;
-            Time.fixedDeltaTime = initialFixedDeltaTime / simulationSpeed;
+           
+            Time.timeScale = timeMultiplier;
+            Time.fixedDeltaTime = initialFixedDeltaTime / 2f;
             Rigidbody rb = stoneManager.GetDonutToLaunch(stoneIdToLaunch).GetComponent<Rigidbody>();
             inputController.SimulateStone(rb, _currentGame.LastShot, stoneIdToLaunch);
             //stoneManager?.LaunchStone(_currentGame.LastShot, stoneIdToLaunch);
@@ -257,10 +257,11 @@ public class FirebaseGameManager : MonoBehaviour
             {
                 { "CurrentTurnPlayerId", nextPlayerId }
             };
-            if (nextPlayerId == _currentGame.PlayerIds[0])
-            {
-                updates.Add("TurnNumber", FieldValue.Increment(1));
-            }
+            // if (nextPlayerId == _currentGame.PlayerIds[0])
+            // {
+            //     updates.Add("TurnNumber", FieldValue.Increment(1));
+            // }
+            updates.Add("TurnNumber", FieldValue.Increment(1));
             db.Collection("games").Document(gameId).UpdateAsync(updates);
             _localState = LocalGameState.Idle;
             _cachedPrediction = null;
@@ -285,7 +286,7 @@ public class FirebaseGameManager : MonoBehaviour
         var updates = new Dictionary<string, object>
         {
             { "LastShot", shotData },
-            { $"StonesUsed.{myUserId}", count } // 발사 횟수 올림
+            { $"DonutsIndex.{myUserId}", count } // 발사 횟수 올림
         };
         
         Debug.Log($"SubmitShot.count = {count}");
@@ -304,6 +305,11 @@ public class FirebaseGameManager : MonoBehaviour
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
 
+    public void ChangeFixedDeltaTime()
+    {
+        Time.fixedDeltaTime = initialFixedDeltaTime / 2f;
+    }
+
     /// <summary>
     /// 돌 시뮬레이션이 완료되면 호출됩니다.
     /// 예측 결과를 전송하거나, 상대의 예측 결과를 기다립니다.
@@ -313,7 +319,7 @@ public class FirebaseGameManager : MonoBehaviour
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = initialFixedDeltaTime;
         Debug.Log("시뮬레이션 완료.");
-
+        
         if (_localState == LocalGameState.SimulatingOpponentShot)
         {
             Debug.Log("예측 결과를 서버에 전송합니다.");
