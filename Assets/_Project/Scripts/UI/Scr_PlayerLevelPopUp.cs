@@ -97,7 +97,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         //버튼 이벤트 연결
         LevelReward.onClick.AddListener(OpenGiftBox);
         CloseButton.onClick.AddListener(OnClickCloseButton);
-        CloseReward.onClick.AddListener(OnClickCloseRewardPopUp);
+        //CloseReward.onClick.AddListener(OnClickCloseRewardPopUp);
 
         //레벨과 경험치 초기값 설정
         LevelText.text = $"{currentLevel}";

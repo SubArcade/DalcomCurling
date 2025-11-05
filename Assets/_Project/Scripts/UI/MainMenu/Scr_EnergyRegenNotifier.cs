@@ -1,3 +1,4 @@
+/*
 using System;
 using UnityEngine;
 using Unity.Notifications.Android;
@@ -42,7 +43,7 @@ public class Scr_EnergyRegenNotifier : MonoBehaviour
     {
         DataManager.Instance.SaveAllUserDataAsync();
         ApplyLazyRegenAndReschedule();
-    }*/
+    }#1#
     
     // 회복 계산 후 알림 재등록
     private void ApplyLazyRegenAndReschedule()
@@ -118,3 +119,4 @@ public class Scr_EnergyRegenNotifier : MonoBehaviour
     private static long NowUtcSeconds() => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     private static DateTime FromUnixSeconds(long s) => DateTimeOffset.FromUnixTimeSeconds(s).UtcDateTime;
 }
+*/

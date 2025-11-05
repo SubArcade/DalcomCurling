@@ -3,6 +3,7 @@ using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -147,6 +148,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     {
         // Firestore 인스턴스를 초기화합니다.
         db = FirebaseFirestore.DefaultInstance;
+        matchmakingButton.onClick.AddListener(()=>StartMatchmaking());
     }
 
     /// <summary>
@@ -179,17 +181,14 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     }
 
     // 매치메이킹 시작 버튼을 누를 때 호출될 함수입니다.
-    public async void StartMatchmaking()
+    public async Task StartMatchmaking()
     {
         Debug.Log("매치메이킹을 시작합니다...");
         
         //매칭버튼을 누르면 버튼 비활성화
         if (matchmakingButton != null) { matchmakingButton.interactable = false; }
         if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
-
-        {
-            
-        }
+        
         string userId = FirebaseAuthManager.Instance.UserId;
         if (string.IsNullOrEmpty(userId))
         {

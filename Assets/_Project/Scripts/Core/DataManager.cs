@@ -174,8 +174,8 @@ public class DataManager : MonoBehaviour
             PatchUtil.SetIfHasValue(patch, "gem",    gem,    v => playerData.gem = v);
             PatchUtil.SetIfHasValue(
                 patch, "energy", energy,
-                v => playerData.energy = v,
-                onChanged: () => Scr_EnergyRegenNotifier.Instance?.RescheduleNotification()
+                v => playerData.energy = v//,
+                //onChanged: () => Scr_EnergyRegenNotifier.Instance?.RescheduleNotification()
             );
             PatchUtil.SetIfHasValue(patch, "level",  level,  v => playerData.level = v);
             PatchUtil.SetIfHasValue(patch, "exp",    exp,    v => playerData.exp = v);
