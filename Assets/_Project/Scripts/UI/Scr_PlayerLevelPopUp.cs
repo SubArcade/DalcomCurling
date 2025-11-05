@@ -2,11 +2,13 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using TMPro;
 
 public class Scr_PlayerLevelPopUp : MonoBehaviour
 {
+    [Header("로비화면에서의 플레이어 레벨 텍스트")]
+    [SerializeField] private TextMeshProUGUI Level_Text;
+
     [Header("플레이어 레벨 텍스트")]
     [SerializeField] private TextMeshProUGUI LevelText;
 
@@ -52,13 +54,11 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
       startZip(); //start에서 추가로 넣을 코드 있으면 해당 메서드 안에 작성
                   ////스타트도 겸사겸사 연결보십시오
     }
-    void Update()
-    {
  
-    }
-
     void awakeGetInspector() 
     {
+        Transform canvas = GameObject.FindGameObjectWithTag("MainCanvas")?.transform;
+        Level_Text = canvas.Find("Main_Panel/Top/Level/Level_Text")?.GetComponent<TextMeshProUGUI>();
         LevelText = transform.Find("LevelBox/LevelCount")?.GetComponent<TextMeshProUGUI>();
         PlayerExp = transform.Find("ExpBackground")?.GetComponent<Image>();
         ExpView = transform.Find("ExpBackground/ExpText")?.GetComponent<TextMeshProUGUI>();
@@ -83,7 +83,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             if (obj.name == "RewardCheckPanel")
             {
                 RewardCheckPanel = obj;
-                Transform closeTransform = RewardCheckPanel.transform.Find("close");
+                Transform closeTransform = RewardCheckPanel.transform.Find("Close");
                 if (closeTransform != null)
                 {
                     CloseReward = closeTransform.GetComponent<Button>();
@@ -97,7 +97,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         //버튼 이벤트 연결
         LevelReward.onClick.AddListener(OpenGiftBox);
         CloseButton.onClick.AddListener(OnClickCloseButton);
-        CloseReward.onClick.AddListener(OnClickCloseRewardPopUp);
+        //CloseReward.onClick.AddListener(OnClickCloseRewardPopUp);
 
         //레벨과 경험치 초기값 설정
         LevelText.text = $"{currentLevel}";
@@ -115,9 +115,10 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
        //유저의 프로필 사진.데이터 저장해서 다른사람에게 보이도록 해야함
     }
 
+    //레벨 및 경험치
     private int currentExp = 0;
     private int maxExp = 100;
-    private int currentLevel = 1;//레벨관련 변수들
+    private int currentLevel = 1;
     void LevelUp(int gainExp) 
     { 
         // 갱신된 레벨과 경험치 데이터 저장
@@ -134,12 +135,19 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         {
             LevelText.text = $"{currentLevel}";
         }
+
+        if (Level_Text != null)
+        {
+            Level_Text.text = $"{currentLevel}";
+        }
+
         if (PlayerExp != null)
         {
             PlayerExp.fillAmount = (float)currentExp / maxExp;
             ExpView.text = $"{currentExp}/{maxExp}Exp";
         }
         LevelUpReward();
+        SaveLevelData();
     }
 
     private HashSet<int> receivedLevel = new HashSet<int>(); //보상수령 기록
@@ -178,9 +186,16 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
 
         //획득한 보상은 기프트박스 or 머지화면의 합성쪽으로 넘겨야합니다
     }
+
+    //레벨 및 경험치 파이어베이스에 저장하기 위한 메서드
+    async void SaveLevelData() 
+    {        
+        await DataManager.Instance.UpdateUserDataAsync(level: currentLevel, exp: currentExp);
+    }
     void OnClickCloseButton() 
     {
-       this.gameObject.SetActive(false);
+       //this.gameObject.SetActive(false);
+       UIManager.Instance.Open(PanelId.MainPanel);
     }
     void OnClickCloseRewardPopUp()
     {

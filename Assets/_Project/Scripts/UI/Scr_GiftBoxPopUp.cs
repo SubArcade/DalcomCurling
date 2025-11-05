@@ -62,7 +62,7 @@ public class Scr_GiftBoxPopUp : MonoBehaviour
             if (obj.name == "RewardCheckPanel")
             {
                 getCheckPopUp = obj;
-                Transform closeTransform = getCheckPopUp.transform.Find("close");
+                Transform closeTransform = getCheckPopUp.transform.Find("Close");
                 if (closeTransform != null)
                 {
                     CloseReward = closeTransform.GetComponent<Button>();

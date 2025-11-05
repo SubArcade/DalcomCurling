@@ -22,6 +22,8 @@ public class StoneShoot_Firebase : MonoBehaviour
 
     [Header("스크립트 및 UI 참조")]
     public UI_LaunchIndicator_Firebase uiLaunch;
+
+    public StoneManager stoneManager;
     public GameObject powerAndDirectionText;
     public GameObject rotationText;
     public Button releaseButton;
@@ -35,8 +37,49 @@ public class StoneShoot_Firebase : MonoBehaviour
     public float maxUIDirectionAngle = 60f;
 
     [Header("퍼펙트존 확률 조정 가능 변수")]
-    public List<StoneShoot.WeightedItem> perfectZoneRandomWeights; // StoneShoot의 구조체 재사용
-    public List<StoneShoot.WeightedItem> earlyZoneRandomWeights;
+    //public List<StoneShoot.WeightedItem> perfectZoneRandomWeights; // StoneShoot의 구조체 재사용
+    //public List<StoneShoot.WeightedItem> earlyZoneRandomWeights;
+    private List<StoneShoot.WeightedItem> perfectZoneRandomWeights = new List<StoneShoot.WeightedItem>
+    {
+        new StoneShoot.WeightedItem { value = -5, weight = 2f },
+        new StoneShoot.WeightedItem { value = -4, weight = 4f },
+        new StoneShoot.WeightedItem { value = -3, weight = 6f },
+        new StoneShoot.WeightedItem { value = -2, weight = 11f },
+        new StoneShoot.WeightedItem { value = -1, weight = 17f },
+        new StoneShoot.WeightedItem { value = 0, weight = 20f },
+        new StoneShoot.WeightedItem { value = 1, weight = 17f },
+        new StoneShoot.WeightedItem { value = 2, weight = 11f },
+        new StoneShoot.WeightedItem { value = 3, weight = 6f },
+        new StoneShoot.WeightedItem { value = 4, weight = 4f },
+        new StoneShoot.WeightedItem { value = 5, weight = 2f }
+        // 총 합계는 반드시 100이어야 합니다.
+    };
+    
+    private List<StoneShoot.WeightedItem> earlyZoneRandomWeights = new List<StoneShoot.WeightedItem>
+    {
+        new StoneShoot.WeightedItem { value = -10, weight = 0.5f },
+        new StoneShoot.WeightedItem { value = -9, weight = 1f },
+        new StoneShoot.WeightedItem { value = -8, weight = 1.5f },
+        new StoneShoot.WeightedItem { value = -7, weight = 2f },
+        new StoneShoot.WeightedItem { value = -6, weight = 3f },
+        new StoneShoot.WeightedItem { value = -5, weight = 4f },
+        new StoneShoot.WeightedItem { value = -4, weight = 6f },
+        new StoneShoot.WeightedItem { value = -3, weight = 7f },
+        new StoneShoot.WeightedItem { value = -2, weight = 9f },
+        new StoneShoot.WeightedItem { value = -1, weight = 10f },
+        new StoneShoot.WeightedItem { value = 0, weight = 12f },
+        new StoneShoot.WeightedItem { value = 1, weight = 10f },
+        new StoneShoot.WeightedItem { value = 2, weight = 9f },
+        new StoneShoot.WeightedItem { value = 3, weight = 7f },
+        new StoneShoot.WeightedItem { value = 4, weight = 6f },
+        new StoneShoot.WeightedItem { value = 5, weight = 4f },
+        new StoneShoot.WeightedItem { value = 6, weight = 3f },
+        new StoneShoot.WeightedItem { value = 7, weight = 2f },
+        new StoneShoot.WeightedItem { value = 8, weight = 1.5f },
+        new StoneShoot.WeightedItem { value = 9, weight = 1f },
+        new StoneShoot.WeightedItem { value = 10, weight = 0.5f }
+        // 총 합계는 반드시 100이어야 합니다.
+    };
 
     [Header("씬 참조 오브젝트")]
     public Transform startHogLine;
@@ -60,6 +103,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     private float _finalLaunchForce;
     private float _releaseRandomValue = -99f;
     private bool _needToTap = false;
+    private LastShot myShot;
 
     void Awake()
     {
@@ -248,6 +292,19 @@ public class StoneShoot_Firebase : MonoBehaviour
                 }
                 // FinalizeShot()에서 샷 데이터를 FirebaseGameManager에 전달하고, 실제 발사는 StoneManager에서 담당
                 FinalizeShot();
+                FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot();
+                //stoneManager.LaunchStone(myShot, FirebaseGameManager.Instance.GetCurrentStoneId());
+                stoneManager.LaunchStone(myShot, stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.aShotCount : stoneManager.bShotCount);
+            });
+    }
+
+    public void SimulateStone(Rigidbody currentDonut, LastShot shotData, int stoneId)
+    {
+        currentDonut.isKinematic = true;
+        currentDonut.DOMove(startHogLine.position, autoMoveToHogLineSpeed).SetSpeedBased(true).SetEase(Ease.Linear)
+            .OnComplete(() =>
+            {
+                stoneManager.LaunchStone(shotData, stoneId);
             });
     }
 
@@ -273,10 +330,12 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             _needToTap = false;
             int randomPoint = Random.Range(1, 101);
+            Debug.Log($"randomPoint : {randomPoint}");
             int cumulativeWeight = 0;
             foreach (var item in weights)
             {
                 cumulativeWeight += (int)(item.weight * 10);
+                Debug.Log($"itemweight : {item.weight}");
                 if (randomPoint * 10 <= cumulativeWeight)
                 { 
                     _releaseRandomValue = item.value;
@@ -317,12 +376,15 @@ public class StoneShoot_Firebase : MonoBehaviour
         LastShot shotData = new LastShot
         {
             Force = finalForce * calculatedRandomValue,
+            Team = stoneManager.myTeam,
             Spin = FinalRotationValue * calculatedRandomValue,
             Direction = directionDict,
             ReleasePosition = releasePosDict
         };
 
+        myShot = shotData;
         OnShotConfirmed?.Invoke(shotData);
+        
         Debug.Log("샷 정보 전송 완료.");
 
         DisableInput();

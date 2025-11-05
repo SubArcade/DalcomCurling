@@ -8,14 +8,20 @@ using UnityEngine.UI;
 
 public enum PanelId
 {
-    Start,
-    Login,
-    Main,
-    DetailedSettings,
-    Giftbox,
-    Info,
-    DonutInfo,
-    Matching
+    StartPanel,
+    LoginPanel,
+    MainPanel,
+    DetailedSettingsPanel,
+    GiftboxPopup,
+    PlayerLevelInfoPopup,
+    AskUpgradePopup,
+    FailUpgradePopup,
+    DonutCodexPopup,
+    DonutUpgradePopup,
+    DonutCodexClickPopup,
+    RewardCheckPopup,
+    NickNameChangePopup,
+    Matching,
 }
 
 public class UIManager : MonoBehaviour
@@ -26,7 +32,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
 
     private readonly Dictionary<PanelId, GameObject> currentPanel = new();
-    [SerializeField] private PanelId currentPanelId = PanelId.Login;
+    [SerializeField] private PanelId currentPanelId = PanelId.LoginPanel;
     public PanelId CurrentPanelId => currentPanelId;
     
     [SerializeField] private Button settingsBackBtn;
@@ -65,7 +71,7 @@ public class UIManager : MonoBehaviour
         }
 
         GameObject target = null;
-
+        
         // 선택한 패널만 활성화, 나머지는 비활성화
         foreach (var kv in currentPanel)
         {
@@ -76,7 +82,22 @@ public class UIManager : MonoBehaviour
             if (active) target = go;
 
             if (go.activeSelf != active)
+            {
+                Debug.Log($"Panelid : {go}");
                 go.SetActive(active);
+            }
+            
+        }
+
+        switch (id) 
+        {
+            case PanelId.LoginPanel:
+            case PanelId.MainPanel:
+                break;
+            default:
+                Debug.Log("vkvkvkvkvkvkvk");
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                break;
         }
 
         currentPanelId = id;
