@@ -676,9 +676,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f654d560d5895341bd4b702084a001f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: LSJ_Test
-  matchmakingButton: {fileID: 0}
-  matchmakingStatusText: {fileID: 0}
 --- !u!1 &1182476506
 GameObject:
   m_ObjectHideFlags: 0
