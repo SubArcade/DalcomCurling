@@ -30,20 +30,21 @@ public class Scr_RewardButton : MonoBehaviour
         Debug.Log("광고 보기 버튼 클릭됨!");
         if (AdsRewarded.Instance.IsReady())
         {
-            statusText.text = "광고 표시 중...";
+            //statusText.text = "광고 표시 중...";
             AdsRewarded.Instance.ShowRewarded();
         }
         else
         {
-            statusText.text = "광고 준비 중...";
+            //statusText.text = "광고 준비 중...";
         }
     }
 
+    // 광고 수량 받는 곳
     private void OnReward(int amount, string type)
     {
         int gold = PlayerPrefs.GetInt("gold", 0) + amount;
         PlayerPrefs.SetInt("gold", gold);
         PlayerPrefs.Save();
-        statusText.text = $"보상 획득: +{amount} {type} (총 {gold})";
+        Debug.Log($"보상 획득: +{amount} {type} (총 {gold})");
     }
 }

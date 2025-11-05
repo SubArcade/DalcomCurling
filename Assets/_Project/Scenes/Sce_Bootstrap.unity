@@ -276,12 +276,18 @@ MonoBehaviour:
   docId: ZflvQAZZmYj1SKj8mZKZ
   playerData:
     <email>k__BackingField: test@test.com
+    <nickname>k__BackingField: test
     <gold>k__BackingField: 250
     <gem>k__BackingField: 7
     <energy>k__BackingField: 10
     <level>k__BackingField: 1
     <exp>k__BackingField: 0
-    <createdAtUnix>k__BackingField: 0
+    <lastAt>k__BackingField: 0
+    <soloScore>k__BackingField: 0
+    <solotTier>k__BackingField: 0
+    <maxEnergy>k__BackingField: 20
+    <perminuteEnergy>k__BackingField: 1
+  Season: 2025
 --- !u!1001 &469480491
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -521,7 +527,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beb50361c4ffd5244a995baa5862aa22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: Sce_PhotonNetwork_Test
+  gameSceneName: LSJ_Test
   menuSceneName: Sce_MainMenu
 --- !u!1 &1137162047
 GameObject:
@@ -709,8 +715,53 @@ Transform:
   - {fileID: 1182476507}
   - {fileID: 262738613}
   - {fileID: 575155504}
+  - {fileID: 1342822454}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1342822453
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1342822454}
+  - component: {fileID: 1342822455}
+  m_Layer: 0
+  m_Name: EnergyRegenNotifier
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1342822454
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342822453}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1294903637}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1342822455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342822453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c06de9ac4b69b104d8197a9564ddc569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1478617187
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,6 +772,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1478617188}
   - component: {fileID: 1478617189}
+  - component: {fileID: 1478617190}
   m_Layer: 0
   m_Name: Bootstrap
   m_TagString: Untagged
@@ -753,6 +805,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5930f1c4501e26c4c878f2a4118da12f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1478617190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478617187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5918d220a71efb42a692be7c4bd22cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

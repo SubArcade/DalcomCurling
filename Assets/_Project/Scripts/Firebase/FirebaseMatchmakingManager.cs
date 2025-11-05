@@ -1,8 +1,9 @@
-
+﻿
 using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -28,6 +29,9 @@ public class Room
 
     [FirestoreProperty]
     public string GameId { get; set; } // 생성된 게임의 ID
+
+    [FirestoreProperty]
+    public string ScoreBracket { get; set; } // 룸 생성자의 점수 구간
 }
 
 // Firestore의 'games' 문서 구조를 나타내는 클래스입니다.
@@ -50,7 +54,7 @@ public class Game
     public int TurnNumber { get; set; } // 현재 턴 번호 (1~8)
 
     [FirestoreProperty]
-    public Dictionary<string, int> StonesUsed { get; set; } // 플레이어별 사용한 돌 개수
+    public Dictionary<string, int> DonutsIndex { get; set; } // 플레이어별 사용한 돌 개수
 
     [FirestoreProperty]
     public LastShot LastShot { get; set; } // 마지막으로 쏜 샷의 정보
@@ -64,6 +68,8 @@ public class LastShot
 {
     [FirestoreProperty]
     public string PlayerId { get; set; }
+    [FirestoreProperty]
+    public StoneForceController_Firebase.Team Team { get; set; }
     [FirestoreProperty]
     public float Force { get; set; }
     [FirestoreProperty] public float Spin { get; set; }
@@ -111,6 +117,20 @@ public class FirebaseMatchmakingManager : MonoBehaviour
 
     [SerializeField] private string gameSceneName = "Sce_GameScene"; // 게임 씬 이름
 
+    [SerializeField] private UnityEngine.UI.Button matchmakingButton; // 스타트버튼 
+    [SerializeField] private TMPro.TextMeshProUGUI matchmakingStatusText; // 매칭 상태를 표시할 텍스트 
+    //TODO : 해당 버튼과 매칭상태 표시는 UI쪽으로 옮겨서 필요한 코드를 호출하는 방식으로 변경해야함
+
+    private Coroutine matchmakingTimeoutCoroutine; // 매치메이킹 타임아웃 코루틴
+    private string waitingRoomId; // 현재 대기 중인 룸의 ID
+    
+    // 점수 구간 정의
+    private const string ScoreBracket_0_199 = "0-199";
+    private const string ScoreBracket_200_499 = "200-499";
+    private const string ScoreBracket_500_999 = "500-999";
+    private const string ScoreBracket_1000_1499 = "1000-1499";
+    private const string ScoreBracket_1500_Plus = "1500+";
+
     void Awake()
     {
         if (Instance == null)
@@ -128,12 +148,47 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     {
         // Firestore 인스턴스를 초기화합니다.
         db = FirebaseFirestore.DefaultInstance;
+        matchmakingButton.onClick.AddListener(()=>StartMatchmaking());
+    }
+
+    /// <summary>
+    /// 솔로 점수(soloScore)에 따라 점수 구간을 반환합니다.
+    /// </summary>
+    /// <param name="soloScore">플레이어의 솔로 점수</param>
+    /// <returns>점수 구간 문자열</returns>
+    private string GetScoreBracket(int soloScore)
+    {
+        if (soloScore >= 0 && soloScore <= 199)
+        {
+            return ScoreBracket_0_199;
+        }
+        else if (soloScore >= 200 && soloScore <= 499)
+        {
+            return ScoreBracket_200_499;
+        }
+        else if (soloScore >= 500 && soloScore <= 999)
+        {
+            return ScoreBracket_500_999;
+        }
+        else if (soloScore >= 1000 && soloScore <= 1499)
+        {
+            return ScoreBracket_1000_1499;
+        }
+        else // 1500 이상
+        {
+            return ScoreBracket_1500_Plus;
+        }
     }
 
     // 매치메이킹 시작 버튼을 누를 때 호출될 함수입니다.
-    public async void StartMatchmaking()
+    public async Task StartMatchmaking()
     {
         Debug.Log("매치메이킹을 시작합니다...");
+        
+        //매칭버튼을 누르면 버튼 비활성화
+        if (matchmakingButton != null) { matchmakingButton.interactable = false; }
+        if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
+        
         string userId = FirebaseAuthManager.Instance.UserId;
         if (string.IsNullOrEmpty(userId))
         {
@@ -141,10 +196,25 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             return;
         }
 
-        // 'waiting' 상태이고 플레이어가 2명 미만인 룸을 찾습니다.
+        // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
+        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync(); 
+        if (!userDoc.Exists)
+        {
+            Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
+            return;
+        }
+
+        // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
+        PlayerData playerData = userDoc.ConvertTo<PlayerData>();
+        int playerSoloScore = playerData.soloScore;
+        string playerScoreBracket = GetScoreBracket(playerSoloScore);
+        Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
+
+        // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
         Query waitingRoomsQuery = db.Collection(RoomsCollection)
             .WhereEqualTo("Status", "waiting")
-            .WhereLessThan("PlayerCount", 2) // PlayerCount 필드를 추가해야 합니다.
+            .WhereLessThan("PlayerCount", 2)
+            .WhereEqualTo("ScoreBracket", playerScoreBracket)
             .Limit(1);
 
         QuerySnapshot snapshot = await waitingRoomsQuery.GetSnapshotAsync();
@@ -160,7 +230,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         {
             // 참여할 룸이 없으므로 새 룸을 생성합니다.
             Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
-            await CreateRoomAsync();
+            await CreateRoomAsync(playerScoreBracket); // 점수 구간을 전달
         }
     }
 
@@ -200,7 +270,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         AttachListener(roomRef.Id); // 참여 후 리스너 부착
     }
 
-    private async System.Threading.Tasks.Task CreateRoomAsync()
+    private async System.Threading.Tasks.Task CreateRoomAsync(string playerScoreBracket)
     {
         string userId = FirebaseAuthManager.Instance.UserId;
         DocumentReference newRoomRef = db.Collection(RoomsCollection).Document();
@@ -212,35 +282,51 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             PlayerIds = new List<string> { userId },
             PlayerCount = 1, // 플레이어 수 초기화
             CreatedAt = Timestamp.GetCurrentTimestamp(),
-            GameId = null // 초기에는 GameId가 없습니다.
+            GameId = null, // 초기에는 GameId가 없습니다.
+            ScoreBracket = playerScoreBracket // 룸 생성 시 점수 구간 설정
         };
 
         await newRoomRef.SetAsync(room);
         Debug.Log($"새 룸을 생성했습니다: {newRoomRef.Id}");
 
+        // 타임아웃 처리를 위해 현재 룸 ID를 저장하고 코루틴을 시작합니다.
+        waitingRoomId = newRoomRef.Id;
+        matchmakingTimeoutCoroutine = StartCoroutine(MatchmakingTimeoutCoroutine());
+
         // 룸 생성 후, 다른 플레이어가 참여하는 것을 감지하기 위해 리스너를 부착합니다.
         AttachListener(newRoomRef.Id);
     }
 
+    // 다른플레이어의 참가를 감지하는 리스너를 부착하고 룸에 모두 입장했다면 호스트가 방을 생성하고 입장까지 연결 시켜주는 함수
+    // 이부분의 최적화가 읽기를 줄이는 방법중 하나 룸의 변경사항이 있을경우 콜백됨
     private void AttachListener(string roomId)
     {
-        if (roomListener != null)
+        if (roomListener != null) // 리스너 중복 방지
         {
             roomListener.Stop();
             roomListener = null;
         }
+
 
         DocumentReference roomRef = db.Collection(RoomsCollection).Document(roomId);
         roomListener = roomRef.Listen(snapshot =>
         {
             if (!snapshot.Exists) return;
 
-            Debug.Log($"룸 데이터 변경 감지: {snapshot.Id}");
             Room room = snapshot.ConvertTo<Room>();
+            Debug.Log($"룸 데이터 변경 감지: {snapshot.Id}");
 
             // 룸이 채워졌는지 확인합니다.
             if (room.Status == "playing" && room.PlayerIds.Count == 2)
             {
+                // 매칭이 성공했으므로 타임아웃 코루틴을 중지합니다.
+                if (matchmakingTimeoutCoroutine != null)
+                {
+                    StopCoroutine(matchmakingTimeoutCoroutine);
+                    matchmakingTimeoutCoroutine = null;
+                }
+                waitingRoomId = null; // 대기 룸 ID 초기화
+
                 // GameId가 설정되었는지 확인합니다.
                 if (!string.IsNullOrEmpty(room.GameId))
                 {
@@ -253,15 +339,13 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                         roomListener.Stop();
                         roomListener = null;
                     }
-
-                    // TODO: SceneLoader.Instance.LoadLocal(gameSceneName); 으로 변경
                     SceneManager.LoadScene(gameSceneName);
                 }
                 else
                 {
                     // GameId가 없으면, 호스트 플레이어가 게임을 생성해야 합니다.
                     string myUserId = FirebaseAuthManager.Instance.UserId;
-                    // 첫 번째 플레이어를 호스트로 지정합니다.
+                    // 첫 번째 플레이어를 호스트로 지정합니다. 
                     if (room.PlayerIds[0] == myUserId)
                     {
                         Debug.Log("내가 호스트이므로 게임 생성을 시작합니다.");
@@ -282,10 +366,10 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             GameState = "Initializing",
             ReadyPlayers = new List<string>(),
             TurnNumber = 1,
-            StonesUsed = new Dictionary<string, int>
+            DonutsIndex = new Dictionary<string, int>
             {
-                { room.PlayerIds[0], 0 },
-                { room.PlayerIds[1], 0 }
+                { room.PlayerIds[0], -1 },
+                { room.PlayerIds[1], -1 }
             },
             LastShot = null,
             PredictedResult = null
@@ -295,19 +379,68 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         DocumentReference gameRef = await db.Collection(GamesCollection).AddAsync(newGame);
         Debug.Log($"새 게임 문서 생성 완료: {gameRef.Id}");
 
-        // "rooms" 문서에 생성된 GameId를 업데이트합니다.
+        // "rooms" 문서에 생성된 GameId를 업데이트합니다.  콜백으로 AttachListener이 다시 호출 됨
         await db.Collection(RoomsCollection).Document(room.RoomId).UpdateAsync("GameId", gameRef.Id);
         Debug.Log($"룸({room.RoomId})에 GameId({gameRef.Id}) 업데이트 완료.");
     }
 
-    // 룸 리스너를 해제하는 함수입니다.
-    void OnDestroy()
+    private System.Collections.IEnumerator MatchmakingTimeoutCoroutine()
+    {
+        yield return new WaitForSeconds(30f);
+
+        // 타임아웃 시점에 waitingRoomId가 아직 설정되어 있다면 (즉, 매칭이 안됨) 매칭을 취소합니다.
+        if (!string.IsNullOrEmpty(waitingRoomId))
+        {
+            CancelMatchmaking();
+        }
+    }
+
+    private async void CancelMatchmaking()
+    {
+        Debug.Log("매치메이킹 시간 초과 또는 취소. 매칭을 중단합니다.");
+
+        // 리스너 중지
+        if (roomListener != null)
+        {
+            roomListener.Stop();
+            roomListener = null;
+        }
+
+        // 타임아웃 코루틴 중지
+        if (matchmakingTimeoutCoroutine != null)
+        { 
+            StopCoroutine(matchmakingTimeoutCoroutine);
+            matchmakingTimeoutCoroutine = null;
+        }
+
+        // Firestore에서 룸 삭제
+        if (!string.IsNullOrEmpty(waitingRoomId))
+        {
+            await db.Collection(RoomsCollection).Document(waitingRoomId).DeleteAsync();
+            Debug.Log($"Firestore에서 룸({waitingRoomId})을 삭제했습니다.");
+            waitingRoomId = null; // 룸 ID 초기화
+        }
+
+        // UI 리셋
+        if (matchmakingButton != null) { matchmakingButton.interactable = true; }
+        if (matchmakingStatusText != null) { matchmakingStatusText.gameObject.SetActive(false); }
+    }
+
+    void OnDestroy() // 게임이 종료되거나 명시적으로 파괴할시 호출되므로 필요한코드, 삭제금지
     {
         if (roomListener != null)
         {
             roomListener.Stop();
             roomListener = null;
         }
+
+        // 코루린이 돌고있다면 삭제
+        if (matchmakingTimeoutCoroutine != null)
+        {
+            StopCoroutine(matchmakingTimeoutCoroutine);
+            matchmakingTimeoutCoroutine = null;
+        }
     }
 }
+
 
