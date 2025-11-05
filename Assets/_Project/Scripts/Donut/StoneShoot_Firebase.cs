@@ -96,7 +96,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     // --- 내부 변수 ---
     private bool _inputEnabled = false;
     private Rigidbody _currentStoneRb;
-    private Camera _mainCamera;
+    [SerializeField]private Camera _mainCamera;
     private Vector3 _actualDragStartScreenPos;
     private Vector3 _rotationDragStartScreenPos;
     private Vector3 _finalLaunchDirection;
@@ -107,7 +107,7 @@ public class StoneShoot_Firebase : MonoBehaviour
 
     void Awake()
     {
-        _mainCamera = Camera.main;
+        //_mainCamera = Camera.main;
         releaseButton.onClick.AddListener(ReleaseButtonClicked);
         DisableInput(); // 시작 시 비활성화
     }

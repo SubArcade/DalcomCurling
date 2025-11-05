@@ -115,10 +115,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     private const string RoomsCollection = "rooms"; // Firestore의 룸 컬렉션 이름
     private const string GamesCollection = "games"; // Firestore의 게임 컬렉션 이름
 
-    [SerializeField] private string gameSceneName = "Sce_GameScene"; // 게임 씬 이름
-
-    [SerializeField] private UnityEngine.UI.Button matchmakingButton; // 스타트버튼 
-    [SerializeField] private TMPro.TextMeshProUGUI matchmakingStatusText; // 매칭 상태를 표시할 텍스트 
+    // [SerializeField] private UnityEngine.UI.Button matchmakingButton; // 스타트버튼 
+    // [SerializeField] private TMPro.TextMeshProUGUI matchmakingStatusText; // 매칭 상태를 표시할 텍스트 
     //TODO : 해당 버튼과 매칭상태 표시는 UI쪽으로 옮겨서 필요한 코드를 호출하는 방식으로 변경해야함
 
     private Coroutine matchmakingTimeoutCoroutine; // 매치메이킹 타임아웃 코루틴
@@ -136,7 +134,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -148,7 +146,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     {
         // Firestore 인스턴스를 초기화합니다.
         db = FirebaseFirestore.DefaultInstance;
-        matchmakingButton.onClick.AddListener(()=>StartMatchmaking());
+        //matchmakingButton.onClick.AddListener(()=>StartMatchmaking());
     }
 
     /// <summary>
@@ -186,8 +184,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         Debug.Log("매치메이킹을 시작합니다...");
         
         //매칭버튼을 누르면 버튼 비활성화
-        if (matchmakingButton != null) { matchmakingButton.interactable = false; }
-        if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
+        //if (matchmakingButton != null) { matchmakingButton.interactable = false; }
+        //if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
         
         string userId = FirebaseAuthManager.Instance.UserId;
         if (string.IsNullOrEmpty(userId))
@@ -339,7 +337,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                         roomListener.Stop();
                         roomListener = null;
                     }
-                    SceneManager.LoadScene(gameSceneName);
+                    SceneLoader.Instance.LoadLocal(GameManager.Instance.gameSceneName);
                 }
                 else
                 {
@@ -422,8 +420,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
 
         // UI 리셋
-        if (matchmakingButton != null) { matchmakingButton.interactable = true; }
-        if (matchmakingStatusText != null) { matchmakingStatusText.gameObject.SetActive(false); }
+        //if (matchmakingButton != null) { matchmakingButton.interactable = true; }
+        //if (matchmakingStatusText != null) { matchmakingStatusText.gameObject.SetActive(false); }
     }
 
     void OnDestroy() // 게임이 종료되거나 명시적으로 파괴할시 호출되므로 필요한코드, 삭제금지
