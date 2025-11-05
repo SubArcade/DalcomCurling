@@ -150,25 +150,25 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 경험치(exp)에 따라 점수 구간을 반환합니다.
+    /// 솔로 점수(soloScore)에 따라 점수 구간을 반환합니다.
     /// </summary>
-    /// <param name="exp">플레이어의 경험치</param>
+    /// <param name="soloScore">플레이어의 솔로 점수</param>
     /// <returns>점수 구간 문자열</returns>
-    private string GetScoreBracket(int exp)
+    private string GetScoreBracket(int soloScore)
     {
-        if (exp >= 0 && exp <= 199)
+        if (soloScore >= 0 && soloScore <= 199)
         {
             return ScoreBracket_0_199;
         }
-        else if (exp >= 200 && exp <= 499)
+        else if (soloScore >= 200 && soloScore <= 499)
         {
             return ScoreBracket_200_499;
         }
-        else if (exp >= 500 && exp <= 999)
+        else if (soloScore >= 500 && soloScore <= 999)
         {
             return ScoreBracket_500_999;
         }
-        else if (exp >= 1000 && exp <= 1499)
+        else if (soloScore >= 1000 && soloScore <= 1499)
         {
             return ScoreBracket_1000_1499;
         }
@@ -197,8 +197,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             return;
         }
 
-        // Firestore에서 현재 플레이어의 데이터를 직접 가져와 경험치(exp)를 얻습니다. TODO : 경험치를 점수로 바꿔야함.
-        // 스냅샷기능은 메모리에 안좋긴한데 일단 데이터 매니저 완성안됬으므로 사용
+        // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
         DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync(); 
         if (!userDoc.Exists)
         {
@@ -207,10 +206,10 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
 
         // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
-        DataManager.PlayerData playerData = userDoc.ConvertTo<DataManager.PlayerData>();
-        int playerExp = playerData.exp;
-        string playerScoreBracket = GetScoreBracket(playerExp);
-        Debug.Log($"현재 플레이어의 경험치: {playerExp}, 점수 구간: {playerScoreBracket}");
+        PlayerData playerData = userDoc.ConvertTo<PlayerData>();
+        int playerSoloScore = playerData.soloScore;
+        string playerScoreBracket = GetScoreBracket(playerSoloScore);
+        Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
 
         // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
         Query waitingRoomsQuery = db.Collection(RoomsCollection)

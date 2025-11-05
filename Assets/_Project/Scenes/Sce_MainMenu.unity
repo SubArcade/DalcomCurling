@@ -5546,11 +5546,9 @@ MonoBehaviour:
   DonutUpgrade: {fileID: 0}
   PlayerLevelInfo: {fileID: 0}
   GiftBoxPopUp: {fileID: 0}
-  TrashCan: {fileID: 0}
-  TrashCanTransform: {fileID: 0}
-  TrashCanImage: {fileID: 0}
   EntryButton: {fileID: 0}
   CodexButton: {fileID: 0}
+  basketButton: {fileID: 0}
   UpgradeButton: {fileID: 0}
   LevelButton: {fileID: 0}
 --- !u!1 &895497914
@@ -5582,22 +5580,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c25cfc93a10c427429ef2ba1da109083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPanel: {fileID: 743854375}
-  loginPanel: {fileID: 964621348}
-  mainPanel: {fileID: 893214902}
-  detailedSettigsPanel: {fileID: 34543539}
-  giftboxPopup: {fileID: 8073361000207683384}
-  playerLevelInfoPopup: {fileID: 8474420197769629571}
-  askUpgradePopup: {fileID: 0}
-  failUpgradePopup: {fileID: 0}
-  donutCodexPopup: {fileID: 6364049171969606559}
-  donutUpgradePopup: {fileID: 5203661123018135579}
-  donutCodexClickPopup: {fileID: 5421841190702800612}
-  rewardCheckPopup: {fileID: 1324433270}
-  nickNameChangePopup: {fileID: 1531287273}
-  playerLevelInfoButton: {fileID: 167146305}
-  donutCodexButton: {fileID: 26647358}
-  donutUpgradeButton: {fileID: 2077622009}
+  StartPanel: {fileID: 0}
+  LoginPanel: {fileID: 0}
+  MainPanel: {fileID: 0}
+  DetailedSettigsPanel: {fileID: 0}
+  GiftboxPopup: {fileID: 0}
+  InfoPopup: {fileID: 0}
+  DonutInfoPopup: {fileID: 0}
 --- !u!4 &895497916
 Transform:
   m_ObjectHideFlags: 0
@@ -8056,6 +8045,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1335322838}
   m_CullTransparentMesh: 1
+--- !u!1 &1351308898
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1351308900}
+  - component: {fileID: 1351308899}
+  m_Layer: 0
+  m_Name: MatchmakingManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1351308899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351308898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f654d560d5895341bd4b702084a001f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameSceneName: LSJ_Test
+  matchmakingButton: {fileID: 27116538}
+  matchmakingStatusText: {fileID: 1544136113709519502}
+--- !u!4 &1351308900
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351308898}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.6358044, y: 2.6714187, z: -54.51045}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1351903499
 GameObject:
   m_ObjectHideFlags: 0
@@ -16549,6 +16585,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7012013490533025225, guid: f7b4df507629940419addc445bf17912, type: 3}
   m_PrefabInstance: {fileID: 1544136113709519500}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1544136113709519502 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3709520764564807504, guid: f7b4df507629940419addc445bf17912, type: 3}
+  m_PrefabInstance: {fileID: 1544136113709519500}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1559334017567046515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33546,7 +33593,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc3c9ac2bf880a14d8ccb657c63b9a2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Level_Text: {fileID: 0}
   LevelText: {fileID: 0}
   PlayerExp: {fileID: 0}
   ExpView: {fileID: 0}
@@ -35184,3 +35230,4 @@ SceneRoots:
   - {fileID: 895497916}
   - {fileID: 8058048}
   - {fileID: 474502451}
+  - {fileID: 1351308900}
