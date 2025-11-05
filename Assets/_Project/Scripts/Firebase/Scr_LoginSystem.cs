@@ -8,7 +8,7 @@ public class LoginSystem : MonoBehaviour
 {
     [SerializeField] private TMP_InputField email;
     [SerializeField] private TMP_InputField password;
-    
+
     [SerializeField] private TMP_Text outputText;
 
     [SerializeField] private Button createButton;

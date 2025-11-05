@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_Project/Scenes/Sce_Game.unity
     guid: 826410b826eeff842976d71bfbef6338
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Project/Scenes/Sce_PhotonNetwork_Test.unity
     guid: 302e6c450086e644e9113f6577aaf65c
   - enabled: 0
@@ -22,5 +22,5 @@ EditorBuildSettings:
     guid: 7910efa089232b944a76f4ad1f25adb7
   - enabled: 1
     path: Assets/_Project/Scenes/LSJ_Test.unity
-    guid: b7efc48460eb6b346a2ebcafa1bc4c98
+    guid: dff3a15a051ef54408ccbb7c52e7f6e3
   m_configObjects: {}
