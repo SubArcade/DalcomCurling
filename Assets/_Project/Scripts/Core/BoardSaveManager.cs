@@ -22,7 +22,7 @@ public static class BoardSaveManager
 {
     private static string SavePath => Path.Combine(Application.persistentDataPath, "board.json");
 
-    // 🔹 저장
+    // 저장
     public static void Save(BoardManager board)
     {
         if (board == null)
@@ -61,7 +61,7 @@ public static class BoardSaveManager
         Debug.Log($"보드 저장 완료 ({SavePath})");
     }
 
-    // 🔹 불러오기
+    // 불러오기
     public static void Load(BoardManager board)
     {
         if (board == null)
@@ -72,7 +72,7 @@ public static class BoardSaveManager
 
         if (!File.Exists(SavePath))
         {
-            Debug.Log("저장된 보드 파일이 없습니다. 새로 시작합니다.");
+            Debug.Log("저장된 보드 파일이 없습니다.");
             return;
         }
 
@@ -112,7 +112,7 @@ public static class BoardSaveManager
         Debug.Log("보드 불러오기 완료");
     }
 
-    public static void DeleteSave()
+    public static void DeleteSave() 
     {
         if (File.Exists(SavePath))
         {

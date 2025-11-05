@@ -30,6 +30,9 @@ public class BoardManager : MonoBehaviour
     [Header("도넛 스프라이트")]
     public Sprite donutSprite;
 
+    [Header("테스트 버튼")]
+    [SerializeField] private Button deleteButton;
+
     void Awake()
     {
         Instance = this;
@@ -41,6 +44,10 @@ public class BoardManager : MonoBehaviour
         infoPopup = GameObject.Find("Canvas/Main_Panel/Bottom/Description");
         infoText = GameObject.Find("Canvas/Main_Panel/Bottom/Description/Text").GetComponent<TMP_Text>();
 
+        //저장내역 삭제 테스트용
+        deleteButton = GameObject.Find("Canvas/Delete_Button").GetComponent<Button>();
+        deleteButton.onClick.AddListener(BoardSaveManager.DeleteSave);
+
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
@@ -50,6 +57,11 @@ public class BoardManager : MonoBehaviour
 
         BoardSaveManager.Load(this);
     }
+
+    //void OnApplicationQuit()
+    //{
+    //    BoardSaveManager.Save(this);
+    //}
 
     public void OnCellClicked(Cells cell)
     {
