@@ -33,13 +33,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
 
     [Header("단계보상 텍스트")]
     [SerializeField] private TextMeshProUGUI RewardLabel;
-
-    [Header("기프트박스 프리팹")]
-    [SerializeField] private GameObject GiftBoxShellPrefab;
-
-    [Header("프리팹들이 들어갈 팝업창")]
-    [SerializeField] private Scr_GiftBoxPopUp giftBoxPopUp;
-    
+   
     [Header("임시용 경험치주는버튼 삭제예정")]
     public Button getExpButton;
 
@@ -66,17 +60,6 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         LevelReward = transform.Find("GiftBoxHouse")?.GetComponent<Button>();
         RewardLabel = transform.Find("RewardNameLabel/RewardText")?.GetComponent<TextMeshProUGUI>();
         
-        giftBoxPopUp = null;
-
-        foreach (var obj in Resources.FindObjectsOfTypeAll<Scr_GiftBoxPopUp>())
-        {
-            if (obj.name == "GiftBoxPopUp") // 이름으로 정확히 비교
-            {
-                giftBoxPopUp = obj;
-                break;
-            }
-        }
-
         GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
         foreach (GameObject obj in allObjects)
         {
@@ -95,7 +78,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     void startZip() 
     {      
         //버튼 이벤트 연결
-        LevelReward.onClick.AddListener(OpenGiftBox);
+        LevelReward.onClick.AddListener(LevelUpRewardPickUp);
         CloseButton.onClick.AddListener(OnClickCloseButton);
         //CloseReward.onClick.AddListener(OnClickCloseRewardPopUp);
 
@@ -166,7 +149,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             LevelReward.interactable = false;
         }
     }
-    void OpenGiftBox()
+    void LevelUpRewardPickUp()
     {
         if (currentLevel == 1) return;
         if (currentLevel % 2 ==1 && !receivedLevel.Contains(currentLevel)) 
@@ -175,16 +158,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             receivedLevel.Add(currentLevel);
             LevelReward.interactable = false;
         }
-
-        // 프리팹 생성 및 리스트에 추가
-        if (giftBoxPopUp != null && giftBoxPopUp.GiftBoxList != null && GiftBoxShellPrefab != null)
-        {
-            Transform parentTransform = giftBoxPopUp.GiftBoxList.transform;
-            GameObject newGiftBox = Instantiate(GiftBoxShellPrefab, parentTransform);
-            newGiftBox.transform.localScale = Vector3.one;
-        }
-
-        //획득한 보상은 기프트박스 or 머지화면의 합성쪽으로 넘겨야합니다
+        //기프트박스 수령시 머지칸으로 보내도록 코드 추가하셔야합니다
     }
 
     //레벨 및 경험치 파이어베이스에 저장하기 위한 메서드
