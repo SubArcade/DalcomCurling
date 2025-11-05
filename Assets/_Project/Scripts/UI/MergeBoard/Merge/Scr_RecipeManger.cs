@@ -24,14 +24,22 @@ public class RecipeManager : MonoBehaviour
     // 두 스프라이트로 결과물 찾기
     public Sprite GetMergeResult(Sprite sprite1, Sprite sprite2)
     {
-        foreach (MergeRecipe recipe in recipes)
+        // 스프라이트 → ID 변환
+        string id1 = DonutDatabase.GetIDBySprite(sprite1);
+        string id2 = DonutDatabase.GetIDBySprite(sprite2);
+
+        // 두 스프라이트가 같지 않으면 합성 불가
+        if (id1 != id2) return null;
+
+        // 레시피에 해당 ID가 있으면 결과 Sprite 반환
+        foreach (var recipe in recipes)
         {
-            // 같은 스프라이트이고 레시피에 등록된 경우
-            if (sprite1 == sprite2 && recipe.inputSprite == sprite1)
+            if (recipe.inputID == id1)
             {
-                return recipe.outputSprite;
+                return DonutDatabase.GetSpriteByID(recipe.outputID);
             }
         }
+
         return null; // 합성 불가
     }
 
@@ -40,4 +48,12 @@ public class RecipeManager : MonoBehaviour
     {
         return GetMergeResult(sprite1, sprite2) != null;
     }
+
+    [System.Serializable]
+    public class MergeRecipe
+    {
+        public string inputID;    // 합칠 도넛
+        public string outputID;   // 결과물 도넛
+    }
+
 }

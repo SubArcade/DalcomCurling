@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfc300196f2b5ed4ab38ee9e2c804633, type: 3}
+  m_Name: SO_DonutDatabase
+  m_EditorClassIdentifier: 
+  items:
+  - id: 1
+    sprite: {fileID: 21300000, guid: a8df119f4b2ecdf408d0cae4b17de1e9, type: 3}
+  - id: 2
+    sprite: {fileID: 21300000, guid: 586cce6e34a1e754b8fc0a198d6ba21d, type: 3}
+  - id: 3
+    sprite: {fileID: 21300000, guid: a8bae5ac95bce6e4eb16f84ba82176e8, type: 3}

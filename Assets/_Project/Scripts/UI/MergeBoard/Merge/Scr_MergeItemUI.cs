@@ -76,6 +76,13 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             }
         }
 
+        if (targetCell == BoardManager.Instance.GeneratorCell)
+        {
+            // 생성기 칸 도넛 차단
+            ResetPosition();
+            return;
+        }
+
         if (targetCell == null || !targetCell.isActive)
         {
             ResetPosition();
@@ -83,7 +90,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         TryPlaceOrMerge(targetCell);
-        BoardManager.Instance.selectedCell = null;
+        BoardManager.Instance.selectedCell = null; //선택 초기화
     }
 
     private void TryPlaceOrMerge(Cells targetCell)

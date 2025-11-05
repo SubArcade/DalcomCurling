@@ -9,7 +9,7 @@ public class CellData
     public int x;
     public int y;
     public bool isActive;
-    public string spriteName; // 도넛이 있으면 sprite 이름, 없으면 ""
+    public string itemID; // Sprite 대신 고유 ID 사용
 }
 
 [System.Serializable]
@@ -33,7 +33,6 @@ public static class BoardSaveManager
 
         BoardData data = new BoardData();
 
-        // 모든 셀 데이터 저장
         foreach (Cells cell in board.GetAllCells())
         {
             CellData cd = new CellData
@@ -41,14 +40,17 @@ public static class BoardSaveManager
                 x = cell.gridX,
                 y = cell.gridY,
                 isActive = cell.isActive,
-                spriteName = ""
+                itemID = ""
             };
 
+            // 도넛이 있는 셀만 ID 저장
             if (cell.occupant != null)
             {
                 Image img = cell.occupant.GetComponent<Image>();
                 if (img != null && img.sprite != null)
-                    cd.spriteName = img.sprite.name;
+                {
+                    cd.itemID = DonutDatabase.GetIDBySprite(img.sprite);
+                }
             }
 
             data.cells.Add(cd);
@@ -56,7 +58,6 @@ public static class BoardSaveManager
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(SavePath, json);
-
         Debug.Log($"보드 저장 완료 ({SavePath})");
     }
 
@@ -84,41 +85,31 @@ public static class BoardSaveManager
             if (cell == null) continue;
 
             cell.SetActive(cd.isActive);
-
-            // 기존 도넛 제거
             cell.ClearItem();
 
-            // 스프라이트 이름이 있으면 재생성
-            if (!string.IsNullOrEmpty(cd.spriteName))
+            if (!string.IsNullOrEmpty(cd.itemID))
             {
-                Sprite s = LoadSpriteByName(cd.spriteName);
-                if (s != null)
+                Sprite sprite = DonutDatabase.GetSpriteByID(cd.itemID);
+                if (sprite == null)
                 {
-                    GameObject obj = Object.Instantiate(board.donutPrefab, cell.transform);
-                    RectTransform rt = obj.GetComponent<RectTransform>();
-                    rt.anchoredPosition = Vector2.zero;
-                    rt.localScale = Vector3.one;
-
-                    Image img = obj.GetComponent<Image>();
-                    img.sprite = s;
-
-                    MergeItemUI item = obj.GetComponent<MergeItemUI>();
-                    cell.SetItem(item);
+                    Debug.LogWarning($"Sprite ID '{cd.itemID}'을(를) 찾을 수 없습니다.");
+                    continue;
                 }
+
+                GameObject obj = Object.Instantiate(board.donutPrefab, cell.transform);
+                RectTransform rt = obj.GetComponent<RectTransform>();
+                rt.anchoredPosition = Vector2.zero;
+                rt.localScale = Vector3.one;
+
+                Image img = obj.GetComponent<Image>();
+                img.sprite = sprite;
+
+                MergeItemUI item = obj.GetComponent<MergeItemUI>();
+                cell.SetItem(item);
             }
         }
 
         Debug.Log("보드 불러오기 완료");
-    }
-
-    // Sprite 이름으로 로드
-    private static Sprite LoadSpriteByName(string name)
-    {
-        // Resources/Sprites/Donuts/ 폴더 안의 파일명과 같아야 함
-        Sprite s = Resources.Load<Sprite>("Sprites/Donuts/" + name);
-        if (s == null)
-            Debug.LogWarning($"Sprite를 찾을 수 없음: {name}");
-        return s;
     }
 
     public static void DeleteSave()
@@ -130,4 +121,3 @@ public static class BoardSaveManager
         }
     }
 }
-
