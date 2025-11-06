@@ -280,8 +280,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 743854376}
-  - {fileID: 964621349}
   - {fileID: 893214903}
+  - {fileID: 964621349}
   - {fileID: 949655319}
   - {fileID: 6728775937098141296}
   - {fileID: 4994506826642362530}
@@ -3937,7 +3937,7 @@ MonoBehaviour:
   donutCodexClickPopup: {fileID: 5421841190702800612}
   rewardCheckPopup: {fileID: 1324433270}
   nickNameChangePopup: {fileID: 1531287273}
-  playerLevelInfoButton: {fileID: 0}
+  playerLevelInfoButton: {fileID: 1952190920}
   donutCodexButton: {fileID: 26647358}
   donutUpgradeButton: {fileID: 2077622009}
 --- !u!4 &895497916
@@ -7061,6 +7061,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1946515339}
   m_CullTransparentMesh: 1
+--- !u!114 &1952190920 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8649395632582868393, guid: 32f4c8ba7ce3b70468684b6d4d5ca518, type: 3}
+  m_PrefabInstance: {fileID: 7354404034762234177}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1969841682
 GameObject:
   m_ObjectHideFlags: 0
@@ -24232,6 +24243,10 @@ PrefabInstance:
     - target: {fileID: 593869847783146146, guid: 32f4c8ba7ce3b70468684b6d4d5ca518, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 642584905306223530, guid: 32f4c8ba7ce3b70468684b6d4d5ca518, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 703294912301638613, guid: 32f4c8ba7ce3b70468684b6d4d5ca518, type: 3}
       propertyPath: m_AnchorMax.x

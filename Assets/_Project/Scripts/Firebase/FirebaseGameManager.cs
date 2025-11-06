@@ -32,6 +32,7 @@ public class FirebaseGameManager : MonoBehaviour
     private FirebaseFirestore db; // Firebase Firestore 데이터베이스 접근 객체
     private ListenerRegistration gameListener; // Firestore 데이터 변경 감시자
     private string gameId; // 현재 진행 중인 게임의 고유 ID
+    private string roomId; // 현재 진행 중인 게임의 룸 ID
     private string myUserId; // 현재 플레이 중인 나의 고유 ID
 
     // --- 게임 상태 관련 필드 ---
@@ -45,13 +46,15 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private Src_GameCamControl gameCamControl; // 카메라 연출을 제어하는 스크립트
 
     // --- 카메라 인덱스 상수 --- (카메라 추가하고 명칭도 다시 명명해야함)
-    private const int WIDE_VIEW_CAM = 0; // 기본 뷰 카메라
-    private const int FOLLOW_STONE_CAM = 1; // 돌 따라가는 카메라 (비스듬한 탑뷰)
-    private const int FREE_LOOK_CAM = 2; // 점수라인 카메라
+    private const int START_VIEW_CAM = 0; // 기본 뷰 카메라
+    private const int FOLLOW_STONE_CAM1 = 1; // 돌 따라가는 카메라 (비스듬한 탑뷰)
+    private const int FOLLOW_STONE_CAM2 = 2; // 돌 따라가는 카메라 (발사 후)
+    private const int FREE_LOOK_CAM = 3; // 점수라인 카메라
+    private const int SIMULATING_VIEW_CAM = 4; // 시뮬레이션 카메라
 
     // --- 게임 시스템 변수 ---
     public float timeMultiplier { get; private set; } = 5f; //게임 빨리감기 속도를 결정할 변수, 읽기전용 (기본값 5)
-    
+
     // --- 게임 내부 변수 ---
     private float initialFixedDeltaTime;
 
@@ -74,6 +77,7 @@ public class FirebaseGameManager : MonoBehaviour
     {
         db = FirebaseFirestore.DefaultInstance;
         gameId = FirebaseMatchmakingManager.CurrentGameId;
+        roomId = FirebaseMatchmakingManager.CurrentRoomId; // RoomId 가져오기
         myUserId = FirebaseAuthManager.Instance.UserId;
 
         initialFixedDeltaTime = Time.fixedDeltaTime;
@@ -148,8 +152,11 @@ public class FirebaseGameManager : MonoBehaviour
             case "Timeline":
                 if (_localState == LocalGameState.Idle)
                 {
-                    Debug.Log("타임라인 재생 시작 (3초 대기)");
-                    DOVirtual.DelayedCall(3f, () =>
+                    Debug.Log("타임라인 재생 및 5.83초 대기 시작");
+                    gameCamControl?.PlayStartTimeline(); // 타임라인 재생만 실행
+
+                    // 5.83초 후 게임 상태 변경
+                    DOVirtual.DelayedCall(5.83f, () =>
                     {
                         if (IsHost())
                         {
@@ -172,6 +179,9 @@ public class FirebaseGameManager : MonoBehaviour
                 if (newShotFired) HandleNewShot();
                 if (newPredictionReceived) HandleNewPrediction();
                 break;
+            case "Finished":
+                HandleGameFinished();
+                break;
         }
     }
 
@@ -181,7 +191,10 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleTurnChange()
     {
-        gameCamControl?.SwitchCamera(WIDE_VIEW_CAM); // 턴 시작 시 카메라를 기본 뷰로 전환
+        DOVirtual.DelayedCall(0.5f, () => { // 턴시작시 카메라전환에 약간 딜레이
+            gameCamControl?.SwitchCamera(START_VIEW_CAM); // 내 턴 시작 시 카메라를 기본 뷰로 전환
+        });
+
 
         if (_isMyTurn && _localState == LocalGameState.Idle)
         {
@@ -219,14 +232,14 @@ public class FirebaseGameManager : MonoBehaviour
         {
             _localState = LocalGameState.SimulatingOpponentShot;
 
-            gameCamControl?.SwitchCamera(FREE_LOOK_CAM); // 수비 턴에는 기본 시점 카메라로 전환
+            gameCamControl?.SwitchCamera(SIMULATING_VIEW_CAM); // 시뮬레이션 시작 카메라로 전환
 
             stoneManager?.SpawnStoneForTurn(_currentGame);
-            int stoneIdToLaunch = 
+            int stoneIdToLaunch =
                 stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.bShotCount : stoneManager.aShotCount;
             Debug.Log($"상대 샷(ID: {stoneIdToLaunch}) 시뮬레이션 시작.");
             //float simulationSpeed = (_currentGame.TurnNumber > 1) ? 2.0f : timeMultiplier;
-           
+
             Time.timeScale = timeMultiplier;
             Time.fixedDeltaTime = initialFixedDeltaTime / 2f;
             Rigidbody rb = stoneManager.GetDonutToLaunch(stoneIdToLaunch).GetComponent<Rigidbody>();
@@ -263,20 +276,65 @@ public class FirebaseGameManager : MonoBehaviour
 
         DOVirtual.DelayedCall(1f, () =>
         {
-            string nextPlayerId = GetNextPlayerId();
-            var updates = new Dictionary<string, object>
+            // 9턴이 끝나면 게임 종료 상태로 전환 (5개씩 돌 던지면 끝)
+            if (_currentGame.TurnNumber >= 9 && IsHost())
             {
-                { "CurrentTurnPlayerId", nextPlayerId }
-            };
-            // if (nextPlayerId == _currentGame.PlayerIds[0])
-            // {
-            //     updates.Add("TurnNumber", FieldValue.Increment(1));
-            // }
-            updates.Add("TurnNumber", FieldValue.Increment(1));
-            db.Collection("games").Document(gameId).UpdateAsync(updates);
+                db.Collection("games").Document(gameId).UpdateAsync("GameState", "Finished");
+            }
+            else
+            {
+                string nextPlayerId = GetNextPlayerId();
+                var updates = new Dictionary<string, object>
+                {
+                    { "CurrentTurnPlayerId", nextPlayerId },
+                    { "TurnNumber", FieldValue.Increment(1) }
+                };
+                db.Collection("games").Document(gameId).UpdateAsync(updates);
+            }
+
             _localState = LocalGameState.Idle;
             _cachedPrediction = null;
         });
+    }
+
+    /// <summary>
+    /// 게임 종료 상태가 감지되었을 때 호출됩니다.
+    /// </summary>
+    private void HandleGameFinished()
+    {
+        // 리스너를 즉시 중지하여 추가 데이터 변경 감지를 막습니다.
+        gameListener?.Stop();
+        gameListener = null;
+
+        Debug.Log("게임 종료! 3초 후 메뉴 씬으로 돌아갑니다.");
+
+        // 호스트인 경우에만 DB 문서를 정리합니다.
+        if (IsHost())
+        {
+            CleanupGameDocuments();
+        }
+
+        // 3초 후에 모든 플레이어를 메뉴 씬으로 보냅니다.
+        DOVirtual.DelayedCall(3f, () =>
+        {
+            SceneLoader.Instance.LoadLocal(GameManager.Instance.menuSceneName); // 메뉴씬으로 이동
+        });
+    }
+
+    /// <summary>
+    /// 호스트 플레이어가 게임 관련 DB 문서를 삭제합니다.
+    /// </summary>
+    private async void CleanupGameDocuments()
+    {
+        Debug.Log("호스트로서 게임 및 룸 문서를 정리합니다.");
+        if (!string.IsNullOrEmpty(gameId))
+        {
+            await db.Collection("games").Document(gameId).DeleteAsync();
+        }
+        if (!string.IsNullOrEmpty(roomId))
+        {
+            await db.Collection("rooms").Document(roomId).DeleteAsync();
+        }
     }
     #endregion
 
@@ -293,17 +351,29 @@ public class FirebaseGameManager : MonoBehaviour
             ? stoneManager.aShotCount
             : stoneManager.bShotCount;
 
-        
+
         var updates = new Dictionary<string, object>
         {
             { "LastShot", shotData },
             { $"DonutsIndex.{myUserId}", count } // 발사 횟수 올림
         };
-        
+
         Debug.Log($"SubmitShot.count = {count}");
-        
+
         db.Collection("games").Document(gameId).UpdateAsync(updates);
         inputController?.DisableInput();
+    }
+
+    /// <summary>
+    /// 플레이어가 중간에 게임을 나갈 때 호출됩니다.
+    /// </summary>
+    public void LeaveGame()
+    {
+        // 게임 상태를 "Finished"로 설정하여 모든 플레이어가 게임을 종료하도록 합니다.
+        if (!string.IsNullOrEmpty(gameId))
+        {
+            db.Collection("games").Document(gameId).UpdateAsync("GameState", "Finished");
+        }
     }
 
     public void UpdateDonutIndexToDatabase(string userId, int index)
@@ -331,31 +401,35 @@ public class FirebaseGameManager : MonoBehaviour
         Time.fixedDeltaTime = initialFixedDeltaTime;
         Debug.Log("시뮬레이션 완료.");
 
-        gameCamControl?.SwitchCamera(WIDE_VIEW_CAM); // 시뮬레이션 완료 후 시점 전환
-
-        if (_localState == LocalGameState.SimulatingOpponentShot)
+        //시뮬레이션 완료 후 딜레이주기
+        DOVirtual.DelayedCall(1.5f, () =>
         {
-            Debug.Log("예측 결과를 서버에 전송합니다.");
-            PredictedResult result = new PredictedResult
-            {
-                PredictingPlayerId = myUserId,
-                TurnNumber = _currentGame.TurnNumber,
-                FinalStonePositions = finalPositions
-            };
-            db.Collection("games").Document(gameId).UpdateAsync("PredictedResult", result);
-            _localState = LocalGameState.Idle;
-        }
-        else if (_localState == LocalGameState.SimulatingMyShot)
-        {
-            _localState = LocalGameState.WaitingForPrediction;
-            Debug.Log("내 샷 시뮬레이션 완료. 상대방의 예측 결과를 기다립니다.");
+            gameCamControl?.SwitchCamera(START_VIEW_CAM); // 시뮬레이션 완료 후 시점 전환
 
-            if (_cachedPrediction != null && _cachedPrediction.TurnNumber == _currentGame.TurnNumber)
+            if (_localState == LocalGameState.SimulatingOpponentShot)
             {
-                Debug.Log("캐시된 예측 결과를 즉시 처리합니다.");
-                ProcessPrediction(_cachedPrediction);
+                Debug.Log("예측 결과를 서버에 전송합니다.");
+                PredictedResult result = new PredictedResult
+                {
+                    PredictingPlayerId = myUserId,
+                    TurnNumber = _currentGame.TurnNumber,
+                    FinalStonePositions = finalPositions
+                };
+                db.Collection("games").Document(gameId).UpdateAsync("PredictedResult", result);
+                _localState = LocalGameState.Idle;
             }
-        }
+            else if (_localState == LocalGameState.SimulatingMyShot)
+            {
+                _localState = LocalGameState.WaitingForPrediction;
+                Debug.Log("내 샷 시뮬레이션 완료. 상대방의 예측 결과를 기다립니다.");
+
+                if (_cachedPrediction != null && _cachedPrediction.TurnNumber == _currentGame.TurnNumber)
+                {
+                    Debug.Log("캐시된 예측 결과를 즉시 처리합니다.");
+                    ProcessPrediction(_cachedPrediction);
+                }
+            }
+        });
     }
     #endregion
 
@@ -370,7 +444,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private string GetNextPlayerId() => _currentGame.PlayerIds.FirstOrDefault(id => id != myUserId);
     #endregion
-    
+
     #region Return Variables
 
     public int GetCurrentStoneId()
@@ -389,9 +463,17 @@ public class FirebaseGameManager : MonoBehaviour
         var stoneToFollow = stoneManager?.GetCurrentTurnStone();
         if (stoneToFollow != null)
         {
-            gameCamControl?.SwitchCamera(FOLLOW_STONE_CAM, stoneToFollow.transform, stoneToFollow.transform);
+            gameCamControl?.SwitchCamera(FOLLOW_STONE_CAM2, stoneToFollow.transform, stoneToFollow.transform);
+
         }
+    }
+    public void ChangeCameraRelease()
+    {
+        var stoneToFollow = stoneManager?.GetCurrentTurnStone();
+
+        gameCamControl?.SwitchCamera(FOLLOW_STONE_CAM1, stoneToFollow.transform, stoneToFollow.transform);
     }
 
     #endregion
+
 }

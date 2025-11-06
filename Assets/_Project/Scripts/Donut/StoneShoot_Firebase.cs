@@ -275,6 +275,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     {
         CurrentState = LaunchState.MovingToHogLine;
         MoveDonutToHogLine();
+        FirebaseGameManager.Instance.ChangeCameraRelease(); // 버튼누르면 시점 변화
         _needToTap = true;
     }
 
@@ -292,8 +293,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 }
                 // FinalizeShot()에서 샷 데이터를 FirebaseGameManager에 전달하고, 실제 발사는 StoneManager에서 담당
                 FinalizeShot();
-                FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot();
-                //stoneManager.LaunchStone(myShot, FirebaseGameManager.Instance.GetCurrentStoneId());
+                FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot();                
                 FirebaseGameManager.Instance.ChangeFixedDeltaTime();
                 stoneManager.LaunchStone(myShot, stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.aShotCount : stoneManager.bShotCount);
             });

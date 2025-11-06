@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -62,12 +62,12 @@ public class Test_MainMenu : MonoBehaviour
     {
         energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
     }
-    
+
     // 에너지 추가
-    void testAdd()
+    async void testAdd()
     {
         int energy = DataManager.Instance.PlayerData.energy + 1;
-        DataManager.Instance.UpdateUserDataAsync(energy: energy);
+        await DataManager.Instance.UpdateUserDataAsync(energy: energy);
         energyText.text = $"{energy}/{DataManager.Instance.PlayerData.maxEnergy}";
     }
     
