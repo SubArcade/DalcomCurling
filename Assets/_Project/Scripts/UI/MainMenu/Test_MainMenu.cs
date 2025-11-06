@@ -10,11 +10,13 @@ public class Test_MainMenu : MonoBehaviour
     public TMP_Text energyText;
     
     public Button loginButton;
+    public Button loginButton2;
 
     void Awake()
     {
         energyButton.onClick.AddListener(()=> testAdd());
         loginButton.onClick.AddListener(TestLogin);
+        loginButton2.onClick.AddListener(TestLogin2);
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
@@ -38,6 +40,12 @@ public class Test_MainMenu : MonoBehaviour
     void TestLogin()
     {
         FirebaseAuthManager.Instance.Login("asd@asd.asd", "asdasd");
+        UIManager.Instance.Open(PanelId.MainPanel);
+    }
+    
+    void TestLogin2()
+    {
+        FirebaseAuthManager.Instance.Login("qwer@qwer.qwer", "qwerqwer");
         UIManager.Instance.Open(PanelId.MainPanel);
     }
 }
