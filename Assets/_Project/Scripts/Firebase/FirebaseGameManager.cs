@@ -42,7 +42,13 @@ public class FirebaseGameManager : MonoBehaviour
     // --- 다른 스크립트들과의 연결 ---
     [SerializeField] private StoneShoot_Firebase inputController; // 돌 조작(입력)을 담당하는 스크립트
     [SerializeField] private StoneManager stoneManager; // 돌 생성 및 움직임 관리 스크립트
-    
+    [SerializeField] private Src_GameCamControl gameCamControl; // 카메라 연출을 제어하는 스크립트
+
+    // --- 카메라 인덱스 상수 --- (카메라 추가하고 명칭도 다시 명명해야함)
+    private const int WIDE_VIEW_CAM = 0; // 기본 뷰 카메라
+    private const int FOLLOW_STONE_CAM = 1; // 돌 따라가는 카메라 (비스듬한 탑뷰)
+    private const int FREE_LOOK_CAM = 2; // 점수라인 카메라
+
     // --- 게임 시스템 변수 ---
     public float timeMultiplier { get; private set; } = 5f; //게임 빨리감기 속도를 결정할 변수, 읽기전용 (기본값 5)
     
@@ -175,6 +181,8 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleTurnChange()
     {
+        gameCamControl?.SwitchCamera(WIDE_VIEW_CAM); // 턴 시작 시 카메라를 기본 뷰로 전환
+
         if (_isMyTurn && _localState == LocalGameState.Idle)
         {
             Debug.Log("내 턴 시작. 입력을 준비합니다.");
@@ -210,6 +218,9 @@ public class FirebaseGameManager : MonoBehaviour
         else if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;
+
+            gameCamControl?.SwitchCamera(FREE_LOOK_CAM); // 수비 턴에는 기본 시점 카메라로 전환
+
             stoneManager?.SpawnStoneForTurn(_currentGame);
             int stoneIdToLaunch = 
                 stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.bShotCount : stoneManager.aShotCount;
@@ -319,7 +330,9 @@ public class FirebaseGameManager : MonoBehaviour
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = initialFixedDeltaTime;
         Debug.Log("시뮬레이션 완료.");
-        
+
+        gameCamControl?.SwitchCamera(WIDE_VIEW_CAM); // 시뮬레이션 완료 후 시점 전환
+
         if (_localState == LocalGameState.SimulatingOpponentShot)
         {
             Debug.Log("예측 결과를 서버에 전송합니다.");
@@ -371,6 +384,13 @@ public class FirebaseGameManager : MonoBehaviour
     public void ChangeLocalStateToSimulatingMyShot()
     {
         _localState = LocalGameState.SimulatingMyShot;
+
+        // 방금 쏜 돌을 추적하도록 카메라 설정
+        var stoneToFollow = stoneManager?.GetCurrentTurnStone();
+        if (stoneToFollow != null)
+        {
+            gameCamControl?.SwitchCamera(FOLLOW_STONE_CAM, stoneToFollow.transform, stoneToFollow.transform);
+        }
     }
 
     #endregion

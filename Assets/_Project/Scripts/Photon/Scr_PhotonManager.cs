@@ -4,7 +4,7 @@ using System.Collections;
 public class PhotonManager 
 {
     [Header("씬 설정")]
-    [SerializeField] private string gameSceneName = "Sce_GameScene";
+    //[SerializeField] private string gameSceneName = "Sce_GameScene";
 
     [Header("UI Manager")]
     public UIManager_test2 uiManager;
