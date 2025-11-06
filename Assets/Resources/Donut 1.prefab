@@ -318,8 +318,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf3afefb8b3e38444a12ff49cbe32256, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentStrength: 0
-  currentAgility: 0
+  currentStrength: 5
+  currentAgility: 5
   currentIntelligence: 0
 --- !u!114 &-4434606408728382256
 MonoBehaviour:
