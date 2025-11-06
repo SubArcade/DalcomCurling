@@ -58,7 +58,8 @@ MonoBehaviour:
   infoPopup: {fileID: 0}
   infoText: {fileID: 0}
   selectedCell: {fileID: 0}
-  donutSprite: {fileID: 21300000, guid: a8df119f4b2ecdf408d0cae4b17de1e9, type: 3}
+  donutSprite: {fileID: 21300000, guid: c4b43f0107ab756458db8a627c5aa6c8, type: 2}
+  deleteButton: {fileID: 0}
 --- !u!114 &5533148575551117252
 MonoBehaviour:
   m_ObjectHideFlags: 0
