@@ -12,7 +12,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private Vector2 originalPos;
     private Transform originalParent;
 
+    public Transform OriginalParent => originalParent;
+
     public Cells currentCell { get; private set; }
+    public Cells originalCell { get; private set; } // 드래그 시작 시 셀 (EntrySlot용)
 
     private void Awake()
     {
@@ -32,8 +35,14 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         originalPos = rectTransform.anchoredPosition;
         originalParent = transform.parent;
+        originalCell = currentCell;
 
-        transform.SetParent(canvas.transform, true); // 최상단으로 올리기
+        // EntrySlot이라면 currentItem 비워두기
+        var originSlot = originalParent.GetComponent<EntrySlot>();
+        if (originSlot != null)
+            originSlot.currentItem = null;
+
+        transform.SetParent(canvas.transform, true);
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.8f;
     }
@@ -55,6 +64,15 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         canvasGroup.alpha = 1f;
 
         GameObject targetObj = eventData.pointerEnter;
+
+        // EntrySlot 우선 체크
+        var entrySlot = targetObj ? targetObj.GetComponentInParent<EntrySlot>() : null;
+        if (entrySlot != null)
+        {
+            entrySlot.OnDrop(eventData);
+            return;
+        }
+
         Cells targetCell = targetObj ? targetObj.GetComponentInParent<Cells>() : null;
 
         // 드롭 위치에 격자 이동
@@ -108,6 +126,13 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
+        // 엔트리 슬롯에는 머지 금지
+        if (targetCell.CompareTag("EntrySlot"))
+        {
+            ResetPosition();
+            return;
+        }
+
         var otherItem = targetCell.occupant;
         if (otherItem != null)
         {
@@ -135,7 +160,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         rectTransform.anchoredPosition = Vector2.zero;
     }
 
-    private void ResetPosition()
+    public void ResetPosition()
     {
         transform.SetParent(originalParent, false);
         rectTransform.anchoredPosition = originalPos;
