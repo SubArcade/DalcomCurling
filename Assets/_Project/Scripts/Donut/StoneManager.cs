@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -93,7 +95,7 @@ public class StoneManager : MonoBehaviour
         
 
         Debug.Log($"currentDonutId = {currentDonutId}");
-        Debug.Log($"stonesUsed = {game.DonutsIndex[currentTurnPlayerId]}");
+        Debug.Log($"DonutsIndex = {game.DonutsIndex[currentTurnPlayerId]}");
         if (selectedPrefab == null)
         {
             Debug.LogError("돌 프리팹이 할당되지 않았습니다! 인스펙터에서 할당해주세요.");
@@ -198,8 +200,8 @@ public class StoneManager : MonoBehaviour
                 {
                     var rb = controller.GetComponent<Rigidbody>();
                     float velocity = rb.velocity.magnitude;
-                    Debug.Log(
-                        $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
+                    // Debug.Log(
+                    //     $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
                     if (velocity > 0.01f)
                     {
                         allStonesStopped = false;
@@ -214,8 +216,8 @@ public class StoneManager : MonoBehaviour
                 {
                     var rb = controller.GetComponent<Rigidbody>();
                     float velocity = rb.velocity.magnitude;
-                    Debug.Log(
-                        $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
+                    // Debug.Log(
+                    //     $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
                     if (velocity > 0.01f)
                     {
                         allStonesStopped = false;
@@ -234,6 +236,22 @@ public class StoneManager : MonoBehaviour
 
         // 시뮬레이션 완료 후 서버에 위치 전송
         
+        foreach (var controller in _stoneControllers_A.Values)
+        {
+            if (controller != null)
+            {
+                controller.MoveFinishedInTurn();
+            }
+        }
+
+        foreach (var controller in _stoneControllers_B.Values)
+        {
+            if (controller != null)
+            {
+                controller.MoveFinishedInTurn();
+            }
+        }
+        
         FirebaseGameManager.Instance.OnSimulationComplete(GetAllStonePositions());
         
     }
@@ -244,41 +262,79 @@ public class StoneManager : MonoBehaviour
         Debug.Log("서버의 최종 위치로 모든 돌을 동기화합니다.");
         StoneForceController_Firebase fc;
         Rigidbody rb;
-        foreach (KeyValuePair<int, StoneForceController_Firebase> aValues in _stoneControllers_A)
-        {
-            fc = aValues.Value;
-            rb = fc.GetComponent<Rigidbody>();
-            rb.isKinematic = true;
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            fc.transform.GetComponent<MeshCollider>().isTrigger = true;
-        }
-
-        foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
-        {
-            fc = bValues.Value;
-            rb = fc.GetComponent<Rigidbody>();
-            rb.isKinematic = true;
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            fc.transform.GetComponent<MeshCollider>().isTrigger = true;
-        }
-
+        Vector3 newPosition;
+        Debug.Log($"A컨트롤러 개수 : {_stoneControllers_A.Count}");
+        // foreach (KeyValuePair<int, StoneForceController_Firebase> aValues in _stoneControllers_A)
+        // {
+        //     fc = aValues.Value;
+        //     rb = fc.GetComponent<Rigidbody>();
+        //     rb.isKinematic = true;
+        //     rb.velocity = Vector3.zero;
+        //     rb.angularVelocity = Vector3.zero;
+        //     fc.transform.GetComponent<MeshCollider>().isTrigger = true;
+        // }
+        //
+         Debug.Log($"B컨트롤러 개수 : {_stoneControllers_B.Count}");
+        // foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
+        // {
+        //     fc = bValues.Value;
+        //     rb = fc.GetComponent<Rigidbody>();
+        //     rb.isKinematic = true;
+        //     rb.velocity = Vector3.zero;
+        //     rb.angularVelocity = Vector3.zero;
+        //     fc.transform.GetComponent<MeshCollider>().isTrigger = true;
+        // }
+        
+        Debug.Log($"serverPositions 개수 : {serverPositions.Count}");
         for (int i = 0; i < serverPositions.Count; i++)
         {
             if (i == 0 || (i % 2 == 0))
             {
                 fc = _stoneControllers_A[i / 2];
-                fc.transform.position = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-                    serverPositions[i].Position["z"]);
+                // newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
+                //     serverPositions[i].Position["z"]);
+                // fc.transform.DOMove(newPosition, 0.1f).OnComplete(() =>
+                // {
+                //     fc.GetComponent<Rigidbody>().isKinematic = false;
+                //     fc.transform.GetComponent<MeshCollider>().isTrigger = false;
+                // });
+            }
+            else if (i % 2 == 1)
+            {
+                fc = _stoneControllers_B[i / 2];
+                // fc.transform.position = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
+                //     serverPositions[i].Position["z"]);
             }
             else
             {
-                fc = _stoneControllers_B[(i / 2)];
-                fc.transform.position = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-                    serverPositions[i].Position["z"]);
+                fc = _stoneControllers_A[i / 2];
+                Debug.Log("계산 오류");
             }
+
+            rb = fc.GetComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            fc.transform.GetComponent<MeshCollider>().isTrigger = true;
+
+            newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
+                serverPositions[i].Position["z"]);
+            float distance = Vector3.Distance(fc.transform.position, newPosition);
+            if (distance > 0.1f)
+            {
+                Debug.Log($"좌표값이 크게 차이남");
+                Debug.Log($"기존 : {fc.transform.position}, 새 좌표 : {newPosition}");
+            }
+
+            Debug.Log($"도넛ID : {fc.donutId}, 팀 : {fc.team} 을 포지션 변경합니다");
+            Debug.Log($"새 포지션 : ({newPosition.x}, {newPosition.y}, {newPosition.z})");
+            // GameObject t = Instantiate(testText, content.transform);
+            // t.GetComponent<TextMeshProUGUI>().text = $"(도넛ID : {fc.donutId}, 팀 : {fc.team}" +
+            //                                          $"\n  {newPosition.x}, {newPosition.y}, {newPosition.z})";
+
+            fc.transform.DOMove(newPosition, 0.1f);
         }
+
 
         foreach (KeyValuePair<int, StoneForceController_Firebase> aValues in _stoneControllers_A)
         {
@@ -287,7 +343,7 @@ public class StoneManager : MonoBehaviour
             rb.isKinematic = false;
             fc.transform.GetComponent<MeshCollider>().isTrigger = false;
         }
-
+        
         foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
         {
             fc = bValues.Value;
@@ -320,6 +376,7 @@ public class StoneManager : MonoBehaviour
                         { "z", sfc.transform.position.z }
                     }
                 });
+                Debug.Log($"donutId = {sfc.donutId}, Team = {sfc.team}, Position = ({sfc.transform.position.x}, {sfc.transform.position.y}, {sfc.transform.position.z})");
             }
 
             if (i < _stoneControllers_B.Count)
@@ -336,6 +393,8 @@ public class StoneManager : MonoBehaviour
                         { "z", sfc.transform.position.z }
                     }
                 });
+                Debug.Log($"donutId = {sfc.donutId}, Team = {sfc.team}, Position = ({sfc.transform.position.x}, {sfc.transform.position.y}, {sfc.transform.position.z})");
+                
             }
         }
 

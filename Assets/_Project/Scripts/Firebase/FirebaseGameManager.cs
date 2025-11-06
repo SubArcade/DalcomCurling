@@ -42,12 +42,6 @@ public class FirebaseGameManager : MonoBehaviour
     // --- 다른 스크립트들과의 연결 ---
     [SerializeField] private StoneShoot_Firebase inputController; // 돌 조작(입력)을 담당하는 스크립트
     [SerializeField] private StoneManager stoneManager; // 돌 생성 및 움직임 관리 스크립트
-    [SerializeField] private Src_GameCamControl gameCamControl; // 카메라 연출을 제어하는 스크립트
-
-    // --- 카메라 인덱스 상수 --- (카메라 추가하고 명칭도 다시 명명해야함)
-    private const int WIDE_VIEW_CAM = 0; // 기본 뷰 카메라
-    private const int FOLLOW_STONE_CAM = 1; // 돌 따라가는 카메라 (비스듬한 탑뷰)
-    private const int FREE_LOOK_CAM = 2; // 점수라인 카메라
     
     // --- 게임 시스템 변수 ---
     public float timeMultiplier { get; private set; } = 5f; //게임 빨리감기 속도를 결정할 변수, 읽기전용 (기본값 5)
@@ -181,8 +175,6 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleTurnChange()
     {
-        gameCamControl?.SwitchCamera(WIDE_VIEW_CAM); // 턴 시작 시 카메라를 기본 뷰로 전환
-
         if (_isMyTurn && _localState == LocalGameState.Idle)
         {
             Debug.Log("내 턴 시작. 입력을 준비합니다.");
@@ -218,15 +210,14 @@ public class FirebaseGameManager : MonoBehaviour
         else if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;
-            gameCamControl?.SwitchCamera(FREE_LOOK_CAM); // 수비 턴에는 기본 시점 카메라로 전환
             stoneManager?.SpawnStoneForTurn(_currentGame);
             int stoneIdToLaunch = 
                 stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.bShotCount : stoneManager.aShotCount;
             Debug.Log($"상대 샷(ID: {stoneIdToLaunch}) 시뮬레이션 시작.");
             //float simulationSpeed = (_currentGame.TurnNumber > 1) ? 2.0f : timeMultiplier;
-            float simulationSpeed = timeMultiplier;
-            Time.timeScale = simulationSpeed;
-            Time.fixedDeltaTime = initialFixedDeltaTime / simulationSpeed;
+           
+            Time.timeScale = timeMultiplier;
+            Time.fixedDeltaTime = initialFixedDeltaTime / 2f;
             Rigidbody rb = stoneManager.GetDonutToLaunch(stoneIdToLaunch).GetComponent<Rigidbody>();
             inputController.SimulateStone(rb, _currentGame.LastShot, stoneIdToLaunch);
             //stoneManager?.LaunchStone(_currentGame.LastShot, stoneIdToLaunch);
@@ -266,10 +257,11 @@ public class FirebaseGameManager : MonoBehaviour
             {
                 { "CurrentTurnPlayerId", nextPlayerId }
             };
-            if (nextPlayerId == _currentGame.PlayerIds[0])
-            {
-                updates.Add("TurnNumber", FieldValue.Increment(1));
-            }
+            // if (nextPlayerId == _currentGame.PlayerIds[0])
+            // {
+            //     updates.Add("TurnNumber", FieldValue.Increment(1));
+            // }
+            updates.Add("TurnNumber", FieldValue.Increment(1));
             db.Collection("games").Document(gameId).UpdateAsync(updates);
             _localState = LocalGameState.Idle;
             _cachedPrediction = null;
@@ -294,7 +286,7 @@ public class FirebaseGameManager : MonoBehaviour
         var updates = new Dictionary<string, object>
         {
             { "LastShot", shotData },
-            { $"StonesUsed.{myUserId}", count } // 발사 횟수 올림
+            { $"DonutsIndex.{myUserId}", count } // 발사 횟수 올림
         };
         
         Debug.Log($"SubmitShot.count = {count}");
@@ -313,6 +305,11 @@ public class FirebaseGameManager : MonoBehaviour
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
 
+    public void ChangeFixedDeltaTime()
+    {
+        Time.fixedDeltaTime = initialFixedDeltaTime / 2f;
+    }
+
     /// <summary>
     /// 돌 시뮬레이션이 완료되면 호출됩니다.
     /// 예측 결과를 전송하거나, 상대의 예측 결과를 기다립니다.
@@ -323,8 +320,6 @@ public class FirebaseGameManager : MonoBehaviour
         Time.fixedDeltaTime = initialFixedDeltaTime;
         Debug.Log("시뮬레이션 완료.");
         
-        gameCamControl?.SwitchCamera(WIDE_VIEW_CAM); // 시뮬레이션 완료 후 시점 전환
-
         if (_localState == LocalGameState.SimulatingOpponentShot)
         {
             Debug.Log("예측 결과를 서버에 전송합니다.");
@@ -376,13 +371,6 @@ public class FirebaseGameManager : MonoBehaviour
     public void ChangeLocalStateToSimulatingMyShot()
     {
         _localState = LocalGameState.SimulatingMyShot;
-        
-        // 방금 쏜 돌을 추적하도록 카메라 설정
-        var stoneToFollow = stoneManager?.GetCurrentTurnStone();
-        if (stoneToFollow != null)
-        {
-            gameCamControl?.SwitchCamera(FOLLOW_STONE_CAM, stoneToFollow.transform, stoneToFollow.transform);
-        }
     }
 
     #endregion

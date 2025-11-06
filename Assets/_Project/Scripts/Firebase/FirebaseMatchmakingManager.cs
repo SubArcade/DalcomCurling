@@ -366,8 +366,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             TurnNumber = 1,
             DonutsIndex = new Dictionary<string, int>
             {
-                { room.PlayerIds[0], -1 },
-                { room.PlayerIds[1], -1 }
+                { room.PlayerIds[0], 0 },
+                { room.PlayerIds[1], 0 }
             },
             LastShot = null,
             PredictedResult = null
