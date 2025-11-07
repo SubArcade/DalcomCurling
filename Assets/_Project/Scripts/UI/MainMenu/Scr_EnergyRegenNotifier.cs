@@ -12,7 +12,7 @@ public class EnergyRegenNotifier : MonoBehaviour
 
     [Header("알림창에 보일 메시지")]
     [SerializeField] private string messageTitle = "에너지 가득!";
-    [SerializeField] private string messageText = $"에너지가 {DataManager.Instance.PlayerData.maxEnergy}까지 회복되었어요.";
+    [SerializeField] private string messageText = $"에너지가 회복되었어요.";
 
     // 알림 중복 방지용 (마지막 예약 ID 기억)
     private static int? _lastScheduledId;
