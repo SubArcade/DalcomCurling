@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public CanvasGroup arrowCanvasGroup;
     public CanvasGroup rotationAmountSliderCanvasGroup;
     public GameObject tapStartPointImage;
+    public TextMeshProUGUI aScoreText;
+    public TextMeshProUGUI bScoreText;
+    public TextMeshProUGUI roundText;
     void Update()
     {
         if (launchScript == null || arrowRectTransform == null || arrowCanvasGroup == null || rotationAmountSliderCanvasGroup == null) return;
@@ -82,6 +86,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         {
             arrowRectTransform.position = pos;
         }
+    }
+
+    public void RoundChanged(int round, int aScore, int bScore)
+    {
+        aScoreText.text = $"A Score : {aScore}";
+        bScoreText.text = $"B Score : {bScore}";
+        roundText.text = $"Round : {round}";
     }
     
 }

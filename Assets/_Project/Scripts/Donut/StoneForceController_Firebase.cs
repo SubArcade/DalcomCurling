@@ -92,12 +92,19 @@ public class StoneForceController_Firebase : MonoBehaviour
             //float forceAmount = spinForce * sidewaysForceFactor * velocityCalc * 0.5f;
             float forceAmount = spinForce * sidewaysForceFactor;
             rigid.AddForce(
-                Vector3.right * forceAmount * Time.fixedDeltaTime,
-                ForceMode.Acceleration); // ForceMode를 VelocityChange로 변경 
+                Vector3.right * forceAmount * Time.fixedDeltaTime * 0.01f,
+                ForceMode.VelocityChange); // ForceMode를 VelocityChange로 변경 
 
             // 스위핑으로 인한 꺾임 계산
             //rigid.AddForce(
             //    Vector3.right * velocityCalc * 0.5f * sweepSidewaysForce * sweepSidewaysForceFactor, ForceMode.Acceleration);
+        }
+        else if (isShooted == true && attackMoveFinished == false && rigid.isKinematic == false && sidewaysForceAddLimit <= sidewaysForceAddCount)
+        {
+            velocityCalc =
+                1f - (stoneForce - rigid.velocity.magnitude) / stoneForce; // 발사 파워와 현재 속도를 통해, 현재 속도의 비율을 0~1로 고정
+
+            rigid.angularVelocity = Vector3.up * spinForce * spinAmountFactor * velocityCalc; // 물체의 물리적 회전속도를 직접 조정
         }
     }
 
@@ -127,6 +134,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     public void MoveFinishedInTurn()
     {
         attackMoveFinished = true;
+        Debug.Log($"sidewaysForceAddCount = {sidewaysForceAddCount}");
     }
 
     public void PassedEndHogLine() // 엔드 호그라인 콜라이더가 자신과 충돌한 적이 있음을 알림 ( 최소로 넘어가야 할 선을 넘김 )
