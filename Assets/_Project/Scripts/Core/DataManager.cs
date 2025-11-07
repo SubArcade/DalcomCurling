@@ -25,7 +25,7 @@ public class PlayerData // DB클래스
     
     // 로컬 플레이어 데이터 (디비에 들어가지 않는 변수)
     [field: SerializeField, Tooltip("최대 에너지")] public int maxEnergy { get; set; }
-    [field: SerializeField, Tooltip("충전 시간(분)")] public float perminuteEnergy { get; set; }
+    [field: SerializeField, Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
     
 }
 
@@ -71,7 +71,7 @@ public class DataManager : MonoBehaviour
         exp = 0,
         lastAt = 0,
         maxEnergy = 20,
-        perminuteEnergy = 1,
+        perSecEnergy = 10,
         soloScore = 0,
         solotTier = GameTier.Bronze,
     };
@@ -86,6 +86,9 @@ public class DataManager : MonoBehaviour
     
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
+    
+    // 백그라운드 이벤트
+    public event Action PauseChanged;
     
     void Awake()
     {
@@ -117,8 +120,7 @@ public class DataManager : MonoBehaviour
         docId = uId;
         playerData.email = userEmail;
         int maxEnergy = playerData.maxEnergy;
-        float perminuteEnergy = playerData.perminuteEnergy;
-        // Debug.Log($"maxEnergy: {maxEnergy}, perminuteEnergy: {perminuteEnergy}");
+        int secEnergy = playerData.perSecEnergy;
         
         var docRef = db.Collection("user").Document(uId);
         var snap = await docRef.GetSnapshotAsync();
@@ -127,7 +129,7 @@ public class DataManager : MonoBehaviour
         {
             // 처음 로그인 시
             playerData.createAt = Timestamp.GetCurrentTimestamp();
-            BasePlayerData(maxEnergy,perminuteEnergy);
+            BasePlayerData(maxEnergy,secEnergy);
             await docRef.SetAsync(playerData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
         }
@@ -135,20 +137,20 @@ public class DataManager : MonoBehaviour
         {
             // 기존 유저 로드
             playerData = snap.ConvertTo<PlayerData>();  
-            BasePlayerData(maxEnergy,perminuteEnergy);
+            BasePlayerData(maxEnergy,secEnergy);
             Debug.Log($"[FS] 기존 유저 로드 완료: /{userCollection}/{uId}");
         }
         OnUserDataChanged?.Invoke(playerData);
     }
 
     // 기본 데이터 적용
-    private void BasePlayerData(int maxEnergy, float perminuteEnergy)
+    private void BasePlayerData(int maxEnergy, int secEnergy)
     {
         playerData.maxEnergy = maxEnergy;
-        playerData.perminuteEnergy = perminuteEnergy;
+        playerData.perSecEnergy = secEnergy;
     }
     
-    // 업데이트
+    // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
     public async Task UpdateUserDataAsync(
         string email = null,
@@ -320,6 +322,25 @@ public class DataManager : MonoBehaviour
         
         return GameTier.Challenger_IV;
     }
+    
+    // 시스템 백그라운드
+    void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            _ = SaveAllUserDataAsync();
+            PauseChanged?.Invoke();
+        }
+    }
+
+    // 포커스 잃을 떄
+    // void OnApplicationFocus(bool hasFocus)
+    // {
+    //     if (!hasFocus)
+    //     {
+    //         _ = SaveAllUserDataAsync();
+    //     }
+    // }
     
     // Util
     

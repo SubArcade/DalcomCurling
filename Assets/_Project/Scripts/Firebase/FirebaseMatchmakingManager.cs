@@ -111,6 +111,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     private ListenerRegistration roomListener; // 룸 문서의 변경사항을 감지하는 리스너
 
     public static string CurrentGameId { get; private set; }
+    public static string CurrentRoomId { get; private set; } // 게임 씬에 RoomId를 전달하기 위한 변수
 
     private const string RoomsCollection = "rooms"; // Firestore의 룸 컬렉션 이름
     private const string GamesCollection = "games"; // Firestore의 게임 컬렉션 이름
@@ -205,7 +206,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
         PlayerData playerData = userDoc.ConvertTo<PlayerData>();
         int playerSoloScore = playerData.soloScore;
-        string playerScoreBracket = GetScoreBracket(playerSoloScore);
+        string playerScoreBracket = GetScoreBracket(playerSoloScore);        
         Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
 
         // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
@@ -331,6 +332,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                     // GameId가 있으면 게임 씬으로 이동합니다.
                     Debug.Log($"게임({room.GameId}) 준비 완료! 씬을 로드합니다.");
                     CurrentGameId = room.GameId;
+                    CurrentRoomId = room.RoomId; // RoomId 전달
 
                     if (roomListener != null)
                     {
@@ -366,8 +368,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             TurnNumber = 1,
             DonutsIndex = new Dictionary<string, int>
             {
-                { room.PlayerIds[0], -1 },
-                { room.PlayerIds[1], -1 }
+                { room.PlayerIds[0], 0 },
+                { room.PlayerIds[1], 0 }
             },
             LastShot = null,
             PredictedResult = null
@@ -396,7 +398,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     private async void CancelMatchmaking()
     {
         Debug.Log("매치메이킹 시간 초과 또는 취소. 매칭을 중단합니다.");
-
+        UIManager.Instance.Close(PanelId.MatchingPopUp); //매칭팝업창 닫기
         // 리스너 중지
         if (roomListener != null)
         {
@@ -440,5 +442,3 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
     }
 }
-
-

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -154,7 +154,7 @@ public class StoneShoot : MonoBehaviour
     public bool isSweeping { get; private set; } = false;
     //[Header("현재 스위프 미터 값")]
     public float currentSweepValue { get; private set; } = 0f;
-    private float previousSweepValue = 0f;
+    //private float previousSweepValue = 0f;
     private const float MAX_VALUE = 1.0f;
     
     [Header("홀드시 증가할 값과 주기")]
@@ -249,7 +249,7 @@ public class StoneShoot : MonoBehaviour
         {
             if (rb != null) return;
             currentState =  LaunchState.WaitingForInitialDrag;
-            previousSweepValue = 0;
+            //previousSweepValue = 0;
             currentSweepValue = 0;
             
             shortPressCoroutine = null;
@@ -740,7 +740,7 @@ public class StoneShoot : MonoBehaviour
         makeDonutText.SetActive(true);
         currentState = LaunchState.AttackFinished;
         currentSweepValue = 0;
-        previousSweepValue = 0;
+        //previousSweepValue = 0;
         if (shortPressCoroutine != null)
         {
             StopCoroutine(shortPressCoroutine);

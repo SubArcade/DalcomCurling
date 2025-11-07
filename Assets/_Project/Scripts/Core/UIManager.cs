@@ -23,6 +23,7 @@ public enum PanelId
     NickNameChangePopup,
     Matching,
     EntryPopUp,
+    MatchingPopUp,
 }
 
 public class UIManager : MonoBehaviour
