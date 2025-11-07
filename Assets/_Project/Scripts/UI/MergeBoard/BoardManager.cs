@@ -29,9 +29,6 @@ public class BoardManager : MonoBehaviour
     [Header("도넛 스프라이트")]
     public Sprite donutSprite;
 
-    [Header("테스트 버튼")]
-    [SerializeField] private Button deleteButton;
-
     void Awake()
     {
         Instance = this;
@@ -42,10 +39,6 @@ public class BoardManager : MonoBehaviour
         selectionHighlight = GameObject.Find("Canvas/Main_Panel/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
         infoPopup = GameObject.Find("Canvas/Main_Panel/Bottom/Description");
         infoText = GameObject.Find("Canvas/Main_Panel/Bottom/Description/Text").GetComponent<TMP_Text>();
-
-        //저장내역 삭제 테스트용
-        deleteButton = GameObject.Find("Canvas/Delete_Button").GetComponent<Button>();
-        deleteButton.onClick.AddListener(BoardSaveManager.ClearMemory);
 
         GenerateBoard();
         UpdateBoardUnlock(1);

@@ -74,6 +74,18 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
         GameObject targetObj = eventData.pointerEnter;
 
+        if (targetObj != null && targetObj.CompareTag("TrashCan"))
+        {
+            Debug.Log($"{name} 휴지통으로 삭제됨");
+
+            // 셀 참조 초기화
+            if (currentCell != null)
+                currentCell.ClearItem();
+
+            Destroy(gameObject); // 오브젝트 삭제
+            return;
+        }
+
         // EntrySlot 우선 체크
         var entrySlot = targetObj ? targetObj.GetComponentInParent<EntrySlot>() : null;
         if (entrySlot != null)
