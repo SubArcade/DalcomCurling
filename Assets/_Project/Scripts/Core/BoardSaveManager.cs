@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,14 +19,15 @@ public class BoardData
 
 public static class BoardSaveManager
 {
-    private static string SavePath => Path.Combine(Application.persistentDataPath, "board.json");
+    // 메모리에 저장된 보드 데이터 (Firestore나 파일 대신)
+    private static BoardData currentBoardData;
 
-    // 저장
-    public static void Save(BoardManager board)
+    // 저장 (현재 보드 상태 → BoardData)
+    public static void SaveToMemory(BoardManager board)
     {
         if (board == null)
         {
-            Debug.LogWarning("BoardSaveManager.Save() : BoardManager가 null입니다.");
+            Debug.LogWarning("BoardSaveManager.SaveToMemory() : board가 null");
             return;
         }
 
@@ -43,7 +43,6 @@ public static class BoardSaveManager
                 itemID = ""
             };
 
-            // 도넛이 있는 셀만 ID 저장
             if (cell.occupant != null)
             {
                 Image img = cell.occupant.GetComponent<Image>();
@@ -56,30 +55,26 @@ public static class BoardSaveManager
             data.cells.Add(cd);
         }
 
-        string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(SavePath, json);
-        Debug.Log($"보드 저장 완료 ({SavePath})");
+        currentBoardData = data; // 메모리에 저장
+        Debug.Log($"[MEMORY] 보드 저장 완료 (칸 수: {data.cells.Count})");
     }
 
-    // 불러오기
-    public static void Load(BoardManager board)
+    // 불러오기 (BoardData → 실제 보드에 적용)
+    public static void LoadFromMemory(BoardManager board)
     {
         if (board == null)
         {
-            Debug.LogWarning("BoardSaveManager.Load() : BoardManager가 null입니다.");
+            Debug.LogWarning("BoardSaveManager.LoadFromMemory() : board가 null");
             return;
         }
 
-        if (!File.Exists(SavePath))
+        if (currentBoardData == null || currentBoardData.cells.Count == 0)
         {
-            Debug.Log("저장된 보드 파일이 없습니다.");
+            Debug.LogWarning("[MEMORY] 저장된 보드 데이터가 없습니다.");
             return;
         }
 
-        string json = File.ReadAllText(SavePath);
-        BoardData data = JsonUtility.FromJson<BoardData>(json);
-
-        foreach (CellData cd in data.cells)
+        foreach (CellData cd in currentBoardData.cells)
         {
             Cells cell = board.GetCell(cd.x, cd.y);
             if (cell == null) continue;
@@ -92,7 +87,7 @@ public static class BoardSaveManager
                 Sprite sprite = DonutDatabase.GetSpriteByID(cd.itemID);
                 if (sprite == null)
                 {
-                    Debug.LogWarning($"Sprite ID '{cd.itemID}'을(를) 찾을 수 없습니다.");
+                    Debug.LogWarning($"Sprite ID '{cd.itemID}'를 찾을 수 없습니다.");
                     continue;
                 }
 
@@ -108,16 +103,16 @@ public static class BoardSaveManager
                 cell.SetItem(item);
             }
         }
-
-        Debug.Log("보드 불러오기 완료");
+        Debug.Log($"[MEMORY] 보드 불러오기 완료 (칸 수: {currentBoardData.cells.Count})");
     }
 
-    public static void DeleteSave() 
+    // 메모리 데이터 비우기
+    public static void ClearMemory()
     {
-        if (File.Exists(SavePath))
-        {
-            File.Delete(SavePath);
-            Debug.Log("보드 저장파일 삭제 완료");
-        }
+        currentBoardData = null;
+        Debug.Log("[MEMORY] 보드 데이터 초기화 완료");
     }
+
+    // 현재 보드 데이터 접근용 (예: UI나 Debug용)
+    public static BoardData GetCurrentData() => currentBoardData;
 }

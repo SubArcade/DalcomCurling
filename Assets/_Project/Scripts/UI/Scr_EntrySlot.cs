@@ -4,44 +4,34 @@ using UnityEngine.UI;
 
 public class EntrySlot : MonoBehaviour, IDropHandler
 {
-    public Image slotImage;
+    [Header("현재 슬롯에 들어있는 도넛")]
     public MergeItemUI currentItem;
+
+    private Image slotImage;
 
     void Awake()
     {
-        if (slotImage == null)
-            slotImage = GetComponent<Image>();
+        slotImage = GetComponent<Image>();
     }
 
-    public bool IsEmpty
-    {
-        get
-        {
-            if (currentItem == null) return true;
-            if (currentItem.gameObject == null) return true;
-            return false;
-        }
-    }
+    // 슬롯이 비었는지 여부
+    public bool IsEmpty => currentItem == null || currentItem.gameObject == null;
 
     public void OnDrop(PointerEventData eventData)
     {
         var dragged = eventData.pointerDrag?.GetComponent<MergeItemUI>();
         if (dragged == null) return;
 
-        // 드래그 시작 슬롯
-        var originSlot = dragged.OriginalParent != null
-            ? dragged.OriginalParent.GetComponent<EntrySlot>()
-            : null;
-
-        // 같은 슬롯으로 드롭한 경우 → 무시
-        if (originSlot == this)
+        // 드래그된 오브젝트가 이미 내 자식이면 무시
+        if (dragged.transform.parent == transform)
         {
-            Debug.Log("같은 슬롯에 드롭 → 무시");
-            dragged.ResetPosition();
+            Debug.Log($"{name}: 이미 같은 슬롯에 있습니다. 드롭 무시");
             return;
         }
 
-        // 이미 도넛이 있으면 리셋
+        Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
+
+        // 이미 도넛이 있으면 거부
         if (!IsEmpty)
         {
             Debug.Log("이 슬롯은 이미 도넛이 들어있어요!");
@@ -49,19 +39,42 @@ public class EntrySlot : MonoBehaviour, IDropHandler
             return;
         }
 
-        // 정상 이동
-        MoveIn(dragged);
+        // 혹시 이전 슬롯이 자신이었다면 무시 (이중 드롭 방지)
+        if (dragged.OriginalParent == transform)
+        {
+            Debug.Log($"{name}: 이전 슬롯 == 현재 슬롯, 중복 드롭 방지");
+            return;
+        }
 
-        // 원래 슬롯 비우기
-        if (originSlot != null)
-            originSlot.currentItem = null;
+
+        // 보드에서 왔다면 보드 점유 해제
+        dragged.DetachFromCurrentCell();
+
+        // 슬롯에 배치
+        MoveIn(dragged);
     }
 
     private void MoveIn(MergeItemUI dragged)
     {
+        // 기존 슬롯의 currentItem 초기화
+        var oldSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
+        if (oldSlot != null && oldSlot != this)
+            oldSlot.Clear();
+
         dragged.transform.SetParent(transform, false);
-        dragged.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        var rt = dragged.GetComponent<RectTransform>();
+        rt.anchoredPosition = Vector2.zero;
         currentItem = dragged;
-        Debug.Log("도넛이 엔트리 슬롯으로 이동됨");
+
+        Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
+        Debug.Log($"currentItem: {currentItem?.name}");
+        Debug.Log($"IsEmpty: {IsEmpty}");
+    }
+
+    // 슬롯을 비우는 함수
+    public void Clear()
+    {
+        if (currentItem != null)
+            currentItem = null;
     }
 }

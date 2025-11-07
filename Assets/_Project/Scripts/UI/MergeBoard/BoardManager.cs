@@ -45,7 +45,7 @@ public class BoardManager : MonoBehaviour
 
         //저장내역 삭제 테스트용
         deleteButton = GameObject.Find("Canvas/Delete_Button").GetComponent<Button>();
-        deleteButton.onClick.AddListener(BoardSaveManager.DeleteSave);
+        deleteButton.onClick.AddListener(BoardSaveManager.ClearMemory);
 
         GenerateBoard();
         UpdateBoardUnlock(1);
@@ -54,7 +54,7 @@ public class BoardManager : MonoBehaviour
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
         if (infoPopup != null) infoPopup.SetActive(false);
 
-        BoardSaveManager.Load(this);
+        BoardSaveManager.LoadFromMemory(this);
     }
 
     //void OnApplicationQuit()
@@ -85,7 +85,7 @@ public class BoardManager : MonoBehaviour
             if (isSameCell)
             {
                 SpawnDonutToEmptyCell();
-                BoardSaveManager.Save(this); // 저장
+                BoardSaveManager.SaveToMemory(this); // 저장
             }
         }
         else if (cell.occupant != null)

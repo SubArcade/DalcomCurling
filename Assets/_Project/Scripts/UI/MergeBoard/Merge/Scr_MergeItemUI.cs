@@ -31,6 +31,15 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         transform.SetParent(cell.transform, false);
     }
 
+    public void DetachFromCurrentCell()
+    {
+        if (currentCell != null)
+        {
+            currentCell.ClearItem();  // Cells 측에서 occupant = null 해주는 함수여야 함
+            currentCell = null;
+        }
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalPos = rectTransform.anchoredPosition;
@@ -108,7 +117,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         TryPlaceOrMerge(targetCell);
-        BoardSaveManager.Save(BoardManager.Instance);
+        BoardSaveManager.SaveToMemory(BoardManager.Instance);
         BoardManager.Instance.selectedCell = null; //선택 초기화
     }
 
@@ -158,6 +167,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         target.SetItem(this);
         transform.SetParent(target.transform, false);
         rectTransform.anchoredPosition = Vector2.zero;
+        rectTransform.localScale = Vector3.one;
     }
 
     public void ResetPosition()
