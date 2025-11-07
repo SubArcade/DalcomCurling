@@ -398,7 +398,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     private async void CancelMatchmaking()
     {
         Debug.Log("매치메이킹 시간 초과 또는 취소. 매칭을 중단합니다.");
-
+        UIManager.Instance.Close(PanelId.MatchingPopUp); //매칭팝업창 닫기
         // 리스너 중지
         if (roomListener != null)
         {

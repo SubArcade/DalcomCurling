@@ -22,6 +22,8 @@ public enum PanelId
     RewardCheckPopup,
     NickNameChangePopup,
     Matching,
+    EntryPopUp,
+    MatchingPopUp,
 }
 
 public class UIManager : MonoBehaviour
@@ -60,7 +62,12 @@ public class UIManager : MonoBehaviour
     {
         StartCoroutine(OpenRoutine(id, onOpen ));
     }
-    
+
+    public void Close(PanelId id, Action onClose = null) 
+    {
+        StartCoroutine(CloseRoutine(id, onClose));
+    }
+
     private IEnumerator OpenRoutine(PanelId id, Action onOpen)
     {
         if (currentPanel == null || currentPanel.Count == 0)
@@ -106,6 +113,21 @@ public class UIManager : MonoBehaviour
         // 열림 완료 콜백
         onOpen?.Invoke();
     }
+    private IEnumerator CloseRoutine(PanelId id, Action onClose) 
+    {
+        if (currentPanel.ContainsKey(id) && currentPanel[id] != null)
+        {
+            currentPanel[id].SetActive(false);
+            yield return new WaitForSeconds(1f);
+        }
+        else 
+        {
+            yield return null;
+        }
+            onClose?.Invoke();
+
+    }
+
     
     public void HideAllPanels()
     {
