@@ -49,10 +49,10 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     {
        // AccountLink = transform.Find("UIBackground/settingUI/account/AccountLink")?.GetComponent<Button>();
        // AccountExit = transform.Find("UIBackground/settingUI/account/AccountExit")?.GetComponent<Button>();
-        accountIdText = transform.Find("UIBackground/settingUI/account/accountIDText")?.GetComponent<TextMeshProUGUI>();
+        accountIdText = transform.Find("UIBackground/settingUI/account/accountID_Text")?.GetComponent<TextMeshProUGUI>();
 
-        BGMsliderBar = transform.Find("UIBackground/settingUI/setting/BGMsliderBar")?.GetComponent<Scrollbar>();
-        SFXsliderBar = transform.Find("UIBackground/settingUI/setting/SFXsliderBar")?.GetComponent<Scrollbar>();
+        BGMsliderBar = transform.Find("UIBackground/settingUI/setting/BGM/BGMsliderBar")?.GetComponent<Scrollbar>();
+        SFXsliderBar = transform.Find("UIBackground/settingUI/setting/SFX/SFXsliderBar")?.GetComponent<Scrollbar>();
 
         OFFBGM = transform.Find("UIBackground/settingUI/setting/optionGroup/OFFBGM")?.GetComponent<Button>();
         OFFSFX = transform.Find("UIBackground/settingUI/setting/optionGroup/OFFSFX")?.GetComponent<Button>();
@@ -63,14 +63,14 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         ONvibration = transform.Find("UIBackground/settingUI/setting/optionGroup/ONvibration")?.GetComponent<Button>();
         ONquestion = transform.Find("UIBackground/settingUI/setting/optionGroup/ONquestion")?.GetComponent<Button>();
 
-        LanguageDropDown = transform.Find("UIBackground/settingUI/setting/LanguageText/LanguageDropDown")?.GetComponent<TMP_Dropdown>();
+        LanguageDropDown = transform.Find("UIBackground/settingUI/setting/Language_Text/LanguageDropDown")?.GetComponent<TMP_Dropdown>();
         
-        energyONbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/energyAlarm/EnergyOnButton")?.GetComponent<Button>();
-        energyOFFbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/energyAlarm/EnergyOffButton")?.GetComponent<Button>();
-        eventOnbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/eventAlarm/EventOnButton")?.GetComponent<Button>();
-        eventOffbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/eventAlarm/EventOffButton")?.GetComponent<Button>();
-        nightOnbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/MidnightAlarm/NightOnButton")?.GetComponent<Button>();
-        nightOffbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/MidnightAlarm/NightOffButton")?.GetComponent<Button>();
+        energyONbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/energyAlarm_Text/EnergyOnButton")?.GetComponent<Button>();
+        energyOFFbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/energyAlarm_Text/EnergyOffButton")?.GetComponent<Button>();
+        eventOnbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/eventAlarm_Text/EventOnButton")?.GetComponent<Button>();
+        eventOffbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/eventAlarm_Text/EventOffButton")?.GetComponent<Button>();
+        nightOnbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/MidnightAlarm_Text/NightOnButton")?.GetComponent<Button>();
+        nightOffbutton = transform.Find("UIBackground/settingUI/alarm/alarmGroup/MidnightAlarm_Text/NightOffButton")?.GetComponent<Button>();
 
         CloseButton = transform.Find("CloseButton")?.GetComponent<Button>();
     }

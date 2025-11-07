@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Cinemachine;
+using UnityEngine.Playables;
 
 /// <summary>
 /// 게임 내 가상 카메라(Cinemachine)를 배열로 관리하고 제어하는 스크립트입니다.
@@ -10,6 +11,9 @@ public class Src_GameCamControl : MonoBehaviour
     [Header("관리할 가상 카메라 배열")]
     [SerializeField] private CinemachineVirtualCamera[] virtualCameras;
 
+    [Header("게임 시작 타임라인")]
+    [SerializeField] private PlayableDirector startTimeline;
+
     private const int ACTIVE_PRIORITY = 15;
     private const int INACTIVE_PRIORITY = 10;
 
@@ -17,6 +21,21 @@ public class Src_GameCamControl : MonoBehaviour
     {
         // 시작 시 첫 번째 카메라를 기본 활성 카메라로 설정
         SwitchCamera(0);
+    }
+
+    /// <summary>
+    /// 게임 시작 타임라인을 재생합니다. (콜백 없음)
+    /// </summary>
+    public void PlayStartTimeline()
+    {
+        if (startTimeline != null)
+        {
+            startTimeline.Play();
+        }
+        else
+        {
+            Debug.LogWarning("시작 타임라인이 할당되지 않았습니다.");
+        }
     }
 
     /// <summary>
@@ -45,6 +64,8 @@ public class Src_GameCamControl : MonoBehaviour
             if (virtualCameras[i] != null)
             {
                 virtualCameras[i].Priority = INACTIVE_PRIORITY;
+                virtualCameras[i].Follow = null;
+                virtualCameras[i].LookAt = null;
             }
         }
 

@@ -122,15 +122,4 @@ public class Scr_Main_Panel : MonoBehaviour
         entry.callback.AddListener((_) => action());
         trigger.triggers.Add(entry);
     }
-
-    //드래그앤 드랍 삭제!
-    public void OnDrop(PointerEventData eventData)
-    {
-        GameObject dropped = eventData.pointerDrag;
-        if (dropped != null)
-        {
-            Destroy(dropped);
-        }
-    }
-
 }

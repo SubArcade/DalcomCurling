@@ -16,7 +16,7 @@ public class Game_Manager
     [Header("게임 시스템")]
     [SerializeField] private GameObject[] teamStonePrefabs = new GameObject[2]; // 0: 1P, 1: 2P 스톤 프리팹
     [SerializeField] private Transform stoneSpawnPoint; // 스톤 생성 위치
-    [SerializeField] private int stoneCameraIndex = 1; // 스톤 추적 카메라의 인덱스
+    //[SerializeField] private int stoneCameraIndex = 1; // 스톤 추적 카메라의 인덱스
 
 
 
