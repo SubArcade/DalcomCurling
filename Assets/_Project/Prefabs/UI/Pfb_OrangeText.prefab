@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2130567157740843728}
   - component: {fileID: 3709520764564807504}
   m_Layer: 5
-  m_Name: Pfb_Text
+  m_Name: Pfb_OrangeText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,15 +67,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uD3F0\uD2B8\uB9CC \uAC19\uC740 \uD504\uB9AC\uD339"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3a8950cf431b80d4c9f1333abf211479, type: 2}
-  m_sharedMaterial: {fileID: 6606096559815983105, guid: 3a8950cf431b80d4c9f1333abf211479, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c8efa17f8729c3b45934fa39053dc255, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 660f190b27433b94f94042a6e492cb73, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

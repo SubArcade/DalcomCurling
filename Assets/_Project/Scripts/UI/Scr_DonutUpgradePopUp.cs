@@ -67,16 +67,16 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         MoistUpgradeMax = transform.Find("MoistUpgradePanel/MoistUpgradeMax")?.gameObject;
         SoftUpgradeMax = transform.Find("SoftUpgradePanel/SoftUpgradeMax")?.gameObject;
 
-        HardDonutCreatText = transform.Find("HardUpgradePanel/HardDonutCreateText")?.GetComponent<TextMeshProUGUI>();
-        MoistDonutCreatText = transform.Find("MoistUpgradePanel/MoistDonutCreateText")?.GetComponent<TextMeshProUGUI>();
-        SoftDonutCreatText = transform.Find("SoftUpgradePanel/SoftDonutCreateText")?.GetComponent<TextMeshProUGUI>();
+        HardDonutCreatText = transform.Find("HardUpgradePanel/HardDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
+        MoistDonutCreatText = transform.Find("MoistUpgradePanel/MoistDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
+        SoftDonutCreatText = transform.Find("SoftUpgradePanel/SoftDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
 
-        HardDonutOptionText = transform.Find("HardUpgradePanel/UpgradeOptionLabel/HardDonutOptionText")?.GetComponent<TextMeshProUGUI>();
-        MoistDonutOptionText = transform.Find("MoistUpgradePanel/UpgradeOptionLabel/MoistDonutOptionText")?.GetComponent<TextMeshProUGUI>();
-        SoftDonutOptionText = transform.Find("SoftUpgradePanel/UpgradeOptionLabel/SoftDonutOptionText")?.GetComponent<TextMeshProUGUI>();
+        HardDonutOptionText = transform.Find("HardUpgradePanel/UpgradeOptionLabel/HardDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
+        MoistDonutOptionText = transform.Find("MoistUpgradePanel/UpgradeOptionLabel/MoistDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
+        SoftDonutOptionText = transform.Find("SoftUpgradePanel/UpgradeOptionLabel/SoftDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
 
-        AskUpgradePopUp = canvas.Find("AskUpgradePopUp")?.gameObject;
-        FailUpgradePopUp = canvas.Find("FailUpgradePopUp")?.gameObject;     
+        AskUpgradePopUp = canvas.Find("AskUpgradePopup")?.gameObject;
+        FailUpgradePopUp = canvas.Find("FailUpgradePopup")?.gameObject;     
     }
     void Startzip() 
     {
@@ -128,6 +128,6 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     }
     void OnClickClosePopUp() 
     {
-        UIManager.Instance.Open(PanelId.MainPanel);
+        UIManager.Instance.Close(PanelId.DonutUpgradePopup);
     }
 }
