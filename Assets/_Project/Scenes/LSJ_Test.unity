@@ -259,8 +259,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb0c72f73ae8ff469e7c1a3ee68c311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stonePrefabA: {fileID: 5772773718666850567, guid: b927f38da464a3847a1cfa5de53f6e8f, type: 3}
-  stonePrefabB: {fileID: 5772773718666850567, guid: b927f38da464a3847a1cfa5de53f6e8f, type: 3}
+  stonePrefabA: {fileID: 8981461065803206208, guid: 754a67bbb3acf904296a8021f058a792, type: 3}
+  stonePrefabB: {fileID: 8981461065803206208, guid: 624761d8addb29342aa46959ec784abf, type: 3}
   spawnPosition: {fileID: 2010081595}
 --- !u!114 &48117304
 MonoBehaviour:
@@ -2790,7 +2790,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 100
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -2816,8 +2816,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22224423, y: 0, z: 0, w: 0.974991}
-  m_LocalPosition: {x: 0.0149383545, y: 1.5723915, z: -55.119335}
+  m_LocalRotation: {x: 0.6714505, y: 0, z: 0, w: 0.74104947}
+  m_LocalPosition: {x: -0.02406311, y: 5.0443916, z: -16.273335}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
