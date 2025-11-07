@@ -259,8 +259,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb0c72f73ae8ff469e7c1a3ee68c311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stonePrefabA: {fileID: 8981461065803206208, guid: 754a67bbb3acf904296a8021f058a792, type: 3}
-  stonePrefabB: {fileID: 8981461065803206208, guid: 624761d8addb29342aa46959ec784abf, type: 3}
+  stonePrefabA: {fileID: 5772773718666850567, guid: b927f38da464a3847a1cfa5de53f6e8f, type: 3}
+  stonePrefabB: {fileID: 5772773718666850567, guid: b927f38da464a3847a1cfa5de53f6e8f, type: 3}
   spawnPosition: {fileID: 2010081595}
 --- !u!114 &48117304
 MonoBehaviour:
