@@ -286,7 +286,7 @@ MonoBehaviour:
     <soloScore>k__BackingField: 0
     <solotTier>k__BackingField: 0
     <maxEnergy>k__BackingField: 20
-    <perminuteEnergy>k__BackingField: 1
+    <perSecEnergy>k__BackingField: 10
   Season: 2025
 --- !u!1001 &469480491
 PrefabInstance:
@@ -676,9 +676,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f654d560d5895341bd4b702084a001f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: LSJ_Test
-  matchmakingButton: {fileID: 0}
-  matchmakingStatusText: {fileID: 0}
 --- !u!1 &1182476506
 GameObject:
   m_ObjectHideFlags: 0
@@ -810,6 +807,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c06de9ac4b69b104d8197a9564ddc569, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  messageTitle: "\uC5D0\uB108\uC9C0 \uAC00\uB4DD!"
+  messageText: "\uC5D0\uB108\uC9C0"
 --- !u!1 &1478617187
 GameObject:
   m_ObjectHideFlags: 0

@@ -53,12 +53,12 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     {
         Transform canvas = GameObject.FindGameObjectWithTag("MainCanvas")?.transform;
         Level_Text = canvas.Find("Main_Panel/Top/Level/Level_Text")?.GetComponent<TextMeshProUGUI>();
-        LevelText = transform.Find("LevelBox/LevelCount")?.GetComponent<TextMeshProUGUI>();
+        LevelText = transform.Find("LevelBox/LevelCount_Text")?.GetComponent<TextMeshProUGUI>();
         PlayerExp = transform.Find("ExpBackground")?.GetComponent<Image>();
-        ExpView = transform.Find("ExpBackground/ExpText")?.GetComponent<TextMeshProUGUI>();
+        ExpView = transform.Find("ExpBackground/Exp_Text")?.GetComponent<TextMeshProUGUI>();
         CloseButton = transform.Find("CloseButton")?.GetComponent<Button>();
         LevelReward = transform.Find("GiftBoxHouse")?.GetComponent<Button>();
-        RewardLabel = transform.Find("RewardNameLabel/RewardText")?.GetComponent<TextMeshProUGUI>();
+        RewardLabel = transform.Find("RewardNameLabel/Reward_Text")?.GetComponent<TextMeshProUGUI>();
         
         GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
         foreach (GameObject obj in allObjects)
@@ -169,7 +169,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     void OnClickCloseButton() 
     {
        //this.gameObject.SetActive(false);
-       UIManager.Instance.Open(PanelId.MainPanel);
+       UIManager.Instance.Close(PanelId.PlayerLevelInfoPopup);
     }
     void OnClickCloseRewardPopUp()
     {

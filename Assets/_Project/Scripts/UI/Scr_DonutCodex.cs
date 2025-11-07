@@ -50,9 +50,9 @@ public class Scr_DonutCodex : MonoBehaviour
         Transform toggleGroup = transform.Find("DonutValueList");
         if (toggleGroup != null)
         {
-            hardDonutToggle = toggleGroup.Find("HardTap")?.GetComponent<Toggle>();
-            softDonutToggle = toggleGroup.Find("SoftTap")?.GetComponent<Toggle>();
-            MoistDonutToggle = toggleGroup.Find("MoistTap")?.GetComponent<Toggle>();
+            hardDonutToggle = toggleGroup.Find("HardTap_Text")?.GetComponent<Toggle>();
+            softDonutToggle = toggleGroup.Find("SoftTap_Text")?.GetComponent<Toggle>();
+            MoistDonutToggle = toggleGroup.Find("MoistTap_Text")?.GetComponent<Toggle>();
         }
 
         hardPanel = transform.Find("HardPanel")?.gameObject;
@@ -66,6 +66,6 @@ public class Scr_DonutCodex : MonoBehaviour
     }
     void CloseCollectionPopUp() 
     {
-        UIManager.Instance.Open(PanelId.MainPanel);
+        UIManager.Instance.Close(PanelId.DonutCodexPopup);
     }
 }
