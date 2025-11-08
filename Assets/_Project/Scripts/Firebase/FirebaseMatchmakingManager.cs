@@ -52,6 +52,10 @@ public class Game
 
     [FirestoreProperty]
     public int TurnNumber { get; set; } // 현재 턴 번호 (1~8)
+    
+    [FirestoreProperty]
+    public int RoundNumber { get; set; } // 현재 라운드 정보 ( 1 ~ 3 )
+    
 
     [FirestoreProperty]
     public Dictionary<string, int> DonutsIndex { get; set; } // 플레이어별 사용한 돌 개수
@@ -365,7 +369,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             CurrentTurnPlayerId = room.PlayerIds[0], // 첫 번째 플레이어부터 시작
             GameState = "Initializing",
             ReadyPlayers = new List<string>(),
-            TurnNumber = 1,
+            TurnNumber = 0,
+            RoundNumber = 1,
             DonutsIndex = new Dictionary<string, int>
             {
                 { room.PlayerIds[0], 0 },

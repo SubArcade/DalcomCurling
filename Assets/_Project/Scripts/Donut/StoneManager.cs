@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -21,15 +22,22 @@ public class StoneManager : MonoBehaviour
         new Dictionary<int, StoneForceController_Firebase>();
 
     private StoneForceController_Firebase _currentTurnStone;
+    public Scr_Collider_House  _scr_Collider_House;
+    private UI_LaunchIndicator_Firebase _uilaunchIndicator;
     public StoneForceController_Firebase.Team _currentTurnStoneTeam { get; private set; }
     public StoneForceController_Firebase.Team myTeam { get; private set; } = StoneForceController_Firebase.Team.None;
+    private List<StonePosition> lastStonePosition = new List<StonePosition>();
     private string myUserId; // 현재 플레이어의 ID
     public int aShotCount { get; private set; } = -1;
     public int bShotCount { get; private set; }= -1;
+    public int aScore { get; private set; }
+    public int bScore { get; private set; }
+    public int roundCount { get; private set; }
 
     void Awake()
     {
         myUserId = FirebaseAuthManager.Instance.UserId; // Firebase 인증에서 ID 가져오기
+        _uilaunchIndicator = transform.GetComponent<UI_LaunchIndicator_Firebase>();
     }
 
     // 새 턴이 시작될 때 돌을 생성하고 초기화합니다.
@@ -37,6 +45,15 @@ public class StoneManager : MonoBehaviour
     {
         Vector3 startPos = spawnPosition.position;
         gameReference = game;
+        if (game.RoundNumber != 1 && game.TurnNumber == 0)
+        {
+            aShotCount = -1;
+            bShotCount = -1;
+            roundCount = game.RoundNumber;
+            aScore = FirebaseGameManager.Instance.aTeamScore;
+            bScore = FirebaseGameManager.Instance.bTeamScore;
+            _uilaunchIndicator.RoundChanged(roundCount, aScore, bScore);
+        }
 
         if (myTeam == StoneForceController_Firebase.Team.None)
         {
@@ -127,6 +144,7 @@ public class StoneManager : MonoBehaviour
         {
             Debug.Log("팀 설정 오류");
         }
+        
 
         return newStone.GetComponent<Rigidbody>();
     }
@@ -260,6 +278,7 @@ public class StoneManager : MonoBehaviour
     public void SyncPositions(List<StonePosition> serverPositions)
     {
         Debug.Log("서버의 최종 위치로 모든 돌을 동기화합니다.");
+        lastStonePosition = serverPositions; //지금 받아온 포지션 정보를 로컬에 저장해둠
         StoneForceController_Firebase fc;
         Rigidbody rb;
         Vector3 newPosition;
@@ -398,6 +417,7 @@ public class StoneManager : MonoBehaviour
             }
         }
 
+        lastStonePosition = positions; // 지금 만들어둔 포지션정보를 로컬에도 저장 
         return positions;
     }
 
@@ -437,5 +457,57 @@ public class StoneManager : MonoBehaviour
 
 
         return donutToLaunch;
+    }
+
+    public void CalculateScore(out StoneForceController_Firebase.Team team, out int score)
+    {
+        
+        
+        Vector3 housePosition = _scr_Collider_House.transform.position; // 하우스(점수중심점) 의 포지션
+
+        //하우스 콜라이더로부터 닿아있는 도넛들을 가져옴
+        List<StoneForceController_Firebase> inHouseDonutList = _scr_Collider_House.GetInHouseDonutList(); 
+
+        if (inHouseDonutList.Count == 0) // 만약 아무도 하우스에 도넛을 못올렸으면 무승부
+        {
+            team = StoneForceController_Firebase.Team.None;
+            score = 0;
+            return;
+        }
+        
+        List<StoneForceController_Firebase> sortedDonutList = inHouseDonutList
+            .OrderBy(donut => Vector3.Distance(housePosition, donut.transform.position)) // 거리 오름차순 정렬
+            .ToList();
+            //LinQ를 이용해서 하우스에 올라간 도넛들의 거리를 측정하여 그 거리별로 오름차순으로 정렬
+        
+        team = sortedDonutList[0].team; // out으로 보낼 승리팀
+        score = 1;
+        for (int i = 1; i < sortedDonutList.Count; i++)
+        {
+            if (sortedDonutList[i].team == team) // 승리팀의 연속된 득점 계산.
+            {
+                score++; // out으로 보낼 점수
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    public void ClearOldDonutsInNewRound() // 새 라운드가 시작하기 전에, 기존에 생성되었던 모든 도넛들을 지움
+    {
+        foreach (KeyValuePair<int, StoneForceController_Firebase> force in _stoneControllers_A)
+        {
+            Destroy(force.Value.gameObject);
+        }
+
+        foreach (KeyValuePair<int, StoneForceController_Firebase> force in _stoneControllers_B)
+        {
+            Destroy(force.Value.gameObject);
+        }
+        _stoneControllers_A.Clear();
+        _stoneControllers_B.Clear();
+        lastStonePosition.Clear();
     }
 }
