@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,8 +8,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {
     [Header("References")]
     // 발사 로직 스크립트를 드래그 앤 드롭으로 연결
-    public StoneShoot_Firebase launchScript; 
-    
+    public StoneShoot_Firebase launchScript;
+
     // UI Slider 컴포넌트를 드래그 앤 드롭으로 연결
     [Header("UI오브젝트들")]
     public Slider forceSlider;
@@ -22,6 +22,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public TextMeshProUGUI aScoreText;
     public TextMeshProUGUI bScoreText;
     public TextMeshProUGUI roundText;
+    [Header("Debug")]
+    public TextMeshProUGUI debugStateText;
     void Update()
     {
         if (launchScript == null || arrowRectTransform == null || arrowCanvasGroup == null || rotationAmountSliderCanvasGroup == null) return;
@@ -31,10 +33,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         // 1. UI 표시/숨김 처리
         // 드래그 중이 아니거나 힘이 거의 0일 때는 UI를 숨깁니다.
-        arrowCanvasGroup.alpha = isCurrentlyDragging && (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForInitialDrag)? 1f : 0f;
+        arrowCanvasGroup.alpha = isCurrentlyDragging && (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForInitialDrag) ? 1f : 0f;
         arrowCanvasGroup.blocksRaycasts = isCurrentlyDragging;
-        
-        rotationAmountSliderCanvasGroup. alpha = isCurrentlyDragging && (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForRotationInput)? 1f : 0f;
+
+        rotationAmountSliderCanvasGroup.alpha = isCurrentlyDragging && (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForRotationInput) ? 1f : 0f;
 
         if (isCurrentlyDragging && launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForInitialDrag)
         {
@@ -43,7 +45,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             {
                 forceSlider.value = launchScript.CurrentDragRatio;
             }
-            
+
             // 3. 화살표 회전 업데이트 (핵심 로직)
             // Z축 회전만 변경하여 화살표가 방향을 가리키도록 합니다.
             // RectTransform의 localEulerAngles 속성을 사용합니다.
@@ -61,8 +63,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             {
                 rotationSlider.value = launchScript.FinalRotationValue;
             }
-            
-            
+
+
         }
         else if (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.Launched)
         {
@@ -75,6 +77,14 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         else
         {
             forceSlider.value = 0;
+        }
+
+        // 디버그용 상태 텍스트 업데이트
+        if (debugStateText != null && FirebaseGameManager.Instance != null)
+        {
+            string localState = FirebaseGameManager.Instance.CurrentLocalState;
+            string gameState = FirebaseGameManager.Instance.CurrentGameState;
+            debugStateText.text = $"Local State: {localState}\nGame State: {gameState}";
         }
     }
 
@@ -94,5 +104,21 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         bScoreText.text = $"B Score : {bScore}";
         roundText.text = $"Round : {round}";
     }
-    
+    /// <summary>
+    /// 화살표 관련 UI의 활성화 여부를 설정합니다.
+    /// </summary>
+    public void SetArrowUIVisibility(bool isVisible)
+    {
+        if (arrowCanvasGroup == null || rotationAmountSliderCanvasGroup == null) return;
+
+        // isVisible 값에 따라 UI 그룹의 alpha 값을 변경하여 보여주거나 숨깁니다.
+        arrowCanvasGroup.alpha = isVisible ? 1f : 0f;
+        arrowCanvasGroup.interactable = isVisible;
+        arrowCanvasGroup.blocksRaycasts = isVisible;
+
+        rotationAmountSliderCanvasGroup.alpha = isVisible ? 1f : 0f;
+        rotationAmountSliderCanvasGroup.interactable = isVisible;
+        rotationAmountSliderCanvasGroup.blocksRaycasts = isVisible;
+    }
+
 }

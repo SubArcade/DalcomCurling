@@ -40,7 +40,75 @@ public class StoneManager : MonoBehaviour
         _uilaunchIndicator = transform.GetComponent<UI_LaunchIndicator_Firebase>();
     }
 
-    // 새 턴이 시작될 때 돌을 생성하고 초기화합니다.
+    // 새 라운드가 시작될 때 돌을 생성하고 초기화합니다.
+    public Rigidbody SpawnStoneForPlayer(string playerId, Game game)
+    {
+        Vector3 startPos = spawnPosition.position;
+        gameReference = game;
+
+        if (game.RoundNumber != 1 && game.TurnNumber == 0)
+        {
+            aShotCount = -1;
+            bShotCount = -1;
+            roundCount = game.RoundNumber;
+            aScore = FirebaseGameManager.Instance.aTeamScore;
+            bScore = FirebaseGameManager.Instance.bTeamScore;
+            _uilaunchIndicator.RoundChanged(roundCount, aScore, bScore);
+        }
+
+        if (myTeam == StoneForceController_Firebase.Team.None)
+        {
+            myTeam = (game.PlayerIds[0] == myUserId) ? StoneForceController_Firebase.Team.A : StoneForceController_Firebase.Team.B;
+        }
+
+        GameObject selectedPrefab;
+        int currentDonutId;
+
+        // 파라미터로 받은 playerId를 기준으로 돌을 생성합니다.
+        if (game.PlayerIds[0] == playerId)
+        {
+            selectedPrefab = stonePrefabA;
+            _currentTurnStoneTeam = StoneForceController_Firebase.Team.A;
+            aShotCount++;
+            currentDonutId = aShotCount;
+        }
+        else
+        {
+            selectedPrefab = stonePrefabB;
+            _currentTurnStoneTeam = StoneForceController_Firebase.Team.B;
+            bShotCount++;
+            currentDonutId = bShotCount;
+        }
+
+        if (selectedPrefab == null)
+        {
+            Debug.LogError("돌 프리팹이 할당되지 않았습니다! 인스펙터에서 할당해주세요.");
+            return null;
+        }
+
+        GameObject newStone = Instantiate(selectedPrefab, startPos, spawnPosition.rotation);
+        _currentTurnStone = newStone.GetComponent<StoneForceController_Firebase>();
+
+        if (_currentTurnStone == null)
+        {
+            Debug.LogError("생성된 돌 프리팹에 StoneForceController_Firebase 컴포넌트가 없습니다!");
+            Destroy(newStone);
+            return null;
+        }
+
+        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId);
+        if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.A)
+        {
+            _stoneControllers_A[currentDonutId] = _currentTurnStone;
+        }
+        else if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.B)
+        {
+            _stoneControllers_B[currentDonutId] = _currentTurnStone;
+        }
+        
+        return newStone.GetComponent<Rigidbody>();
+    }
+
     public Rigidbody SpawnStoneForTurn(Game game)
     {
         Vector3 startPos = spawnPosition.position;
