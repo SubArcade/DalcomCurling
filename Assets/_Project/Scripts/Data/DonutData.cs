@@ -12,20 +12,20 @@ public enum DonutType
 }
 public class DonutData
 {
-    // 도넛 종류 넣기
-    [field: SerializeField, Tooltip("무게")][FirestoreProperty] public int Weight { get; set; }
-    [field: SerializeField, Tooltip("반발력")][FirestoreProperty] public int Resilience { get; set; }
-    [field: SerializeField, Tooltip("마찰력")][FirestoreProperty] public int Friction { get; set; }
+    
+    [field: SerializeField, Tooltip("무게")][FirestoreProperty] private int Weight { get; set; }
+    [field: SerializeField, Tooltip("반발력")][FirestoreProperty] private int Resilience { get; set; }
+    [field: SerializeField, Tooltip("마찰력")][FirestoreProperty] private int Friction { get; set; }
     //인게임에 진입할때 호출할 데이터
 
-    [field: SerializeField, Tooltip("도넛레벨")][FirestoreProperty] private string Hard01 { get; set; }
-    //메인메뉴에서 정보를 호출하기위한 키
+    [field: SerializeField, Tooltip("도넛종류")][FirestoreProperty] private DonutType DonutType { get; set; }
+    [field: SerializeField, Tooltip("단단한 도넛 레벨")][FirestoreProperty] public Dictionary<int, string> HardLevels { get; private set; } = new();
 
+    [field: SerializeField, Tooltip("말랑한 도넛 레벨")][FirestoreProperty] public Dictionary<int, string> SoftLevels { get; private set; } = new();
 
-
-    // 1 도넛 이름 -            2 도넛 종류                 
-    // name= StarDonut 01~30 /  type = hard , soft, moist/
-    //  ㄴ 스펙 마찰 무게 반발력
-
-
+    [field: SerializeField, Tooltip("촉촉한 도넛 레벨")][FirestoreProperty] public Dictionary<int, string> MoistLevels { get; private set; } = new();
 }
+
+    
+
+
