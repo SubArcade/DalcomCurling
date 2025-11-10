@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Threading.Tasks;
 
 public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    public string donutID;
+
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Canvas canvas;
@@ -29,6 +32,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         currentCell = cell;
         transform.SetParent(cell.transform, false);
+        
+        // 셀과 도넛ID 연결
+        cell.donutID = donutID;
+        cell.occupant = this;
     }
 
     public void DetachFromCurrentCell()
@@ -67,7 +74,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         rectTransform.anchoredPosition = pos;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public async void OnEndDrag(PointerEventData eventData)
     {
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
@@ -83,6 +90,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 currentCell.ClearItem();
 
             Destroy(gameObject); // 오브젝트 삭제
+            await AutoSaveAsync();
             return;
         }
 
@@ -129,21 +137,26 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         TryPlaceOrMerge(targetCell);
-        BoardSaveManager.SaveToMemory(BoardManager.Instance);
-        BoardManager.Instance.selectedCell = null; //선택 초기화
-    }
 
-    private void TryPlaceOrMerge(Cells targetCell)
+        BoardManager.Instance.SelectCell(targetCell);
+
+        BoardManager.Instance.selectedCell = null;
+    }
+        
+    private async void TryPlaceOrMerge(Cells targetCell)
     {
         if (targetCell == currentCell)
         {
             ResetPosition();
+            BoardManager.Instance.SelectCell(targetCell);
             return;
         }
 
         if (targetCell.IsEmpty())
         {
             MoveToCell(targetCell);
+            BoardManager.Instance.SelectCell(targetCell);
+            await AutoSaveAsync();
             return;
         }
 
@@ -154,20 +167,32 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        var otherItem = targetCell.occupant;
-        if (otherItem != null)
-        {
-            Sprite mySprite = image.sprite;
-            Sprite otherSprite = otherItem.GetComponent<Image>().sprite;
-            Sprite result = RecipeManager.Instance.GetMergeResult(mySprite, otherSprite);
 
-            if (result != null)
+        var otherItem = targetCell.occupant;
+        // ID 같을 때만 머지 가능
+        if (otherItem.donutID == donutID)
+        {
+            string nextID = DonutDatabase.GetNextID(donutID);
+            if (string.IsNullOrEmpty(nextID))
             {
-                otherItem.GetComponent<Image>().sprite = result;
-                currentCell.ClearItem();
-                Destroy(gameObject);
+                Debug.LogWarning($"[MERGE] 다음 ID 없음 ({donutID})");
+                ResetPosition();
                 return;
             }
+
+            // 머지 성공
+            Sprite nextSprite = DonutDatabase.GetSpriteByID(nextID);
+            otherItem.GetComponent<Image>().sprite = nextSprite;
+            otherItem.donutID = nextID;
+
+            // 현재 도넛 삭제
+            currentCell.ClearItem();
+            Destroy(gameObject);
+
+            Debug.Log($"[MERGE] {donutID} → {nextID} 머지 성공");
+
+            await AutoSaveAsync(); // 머지 후 저장
+            return;
         }
 
         ResetPosition();
@@ -186,6 +211,24 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         transform.SetParent(originalParent, false);
         rectTransform.anchoredPosition = originalPos;
+
+        if (originalCell != null)
+            BoardManager.Instance.SelectCell(originalCell); //격자 원위치
+    }
+
+    // Firestore 자동 저장
+    private async Task AutoSaveAsync()
+    {
+        try
+        {
+            string userId = FirebaseAuthManager.Instance.UserId;
+            await BoardSaveManager.SaveToFirestore(BoardManager.Instance, userId);
+            Debug.Log("[FS] 자동 저장 완료 (머지/이동/삭제)");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[FS] 자동 저장 실패: {e.Message}");
+        }
     }
 
     // 나중에 이펙트 추가할거
