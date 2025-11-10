@@ -469,6 +469,11 @@ public class StoneShoot_Firebase : MonoBehaviour
             CurrentState = LaunchState.MovingToHogLine;
             MoveDonutToHogLine(shotData);
             _needToTap = true;
+
+            //카운트다운 제거
+            FirebaseGameManager.Instance.ControlCountdown(false);
+
+
         }
     }
 

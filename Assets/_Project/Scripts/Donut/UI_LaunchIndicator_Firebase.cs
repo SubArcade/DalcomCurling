@@ -22,6 +22,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public TextMeshProUGUI aScoreText;
     public TextMeshProUGUI bScoreText;
     public TextMeshProUGUI roundText;
+    public GameObject CountDownText;
     [Header("Debug")]
     public TextMeshProUGUI debugStateText;
     void Update()
@@ -121,4 +122,18 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         rotationAmountSliderCanvasGroup.blocksRaycasts = isVisible;
     }
 
+    /// <summary>
+    /// 카운트 다운 UI의 활성화 여부를 설정합니다.
+    /// </summary>
+    public void SetCountDown(bool IsturnWaitingForInput)
+    {
+        if (IsturnWaitingForInput)
+        {
+            CountDownText.SetActive(true);
+        }
+        else
+        {
+            CountDownText.SetActive(false);
+        }
+    }
 }

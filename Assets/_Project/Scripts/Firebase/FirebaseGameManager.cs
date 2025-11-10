@@ -47,6 +47,7 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private StoneShoot_Firebase inputController; // 돌 조작(입력)을 담당하는 스크립트
     [SerializeField] private StoneManager stoneManager; // 돌 생성 및 움직임 관리 스크립트
     [SerializeField] private Src_GameCamControl gameCamControl; // 카메라 연출을 제어하는 스크립트
+    [SerializeField] private UI_LaunchIndicator_Firebase UI_LaunchIndicator_Firebase; // UI제어 스크립트
 
     // --- 카메라 인덱스 상수 --- (카메라 추가하고 명칭도 다시 명명해야함)
     private const int START_VIEW_CAM = 0; // 기본 뷰 카메라
@@ -199,12 +200,12 @@ public class FirebaseGameManager : MonoBehaviour
 
                     if (isFirstTurn)
                     {
-                        Debug.Log("[플레이어1 VS 플레이어2] 연출 시작 (5.83초)");
+                        Debug.Log("[플레이어1 VS 플레이어2] 연출 시작 (8.5초)");
                         isFirstTurn = false;
                         gameCamControl?.PlayStartTimeline(); // 긴 타임라인 재생
 
-                        // 5.83초의 긴 연출이 끝난 후, 짧은 연출 로직을 실행합니다.
-                        DOVirtual.DelayedCall(5.83f, () =>
+                        // 8.5초의 긴 연출이 끝난 후, 짧은 연출 로직을 실행합니다.
+                        DOVirtual.DelayedCall(8.5f, () =>
                         {
                             playShortTimelineAndStartGame();
                         });
@@ -319,6 +320,10 @@ public class FirebaseGameManager : MonoBehaviour
                     // 준비된 샷이 없었음. StoneShoot가 스스로 입력 상태로 전환했으므로,
                     // GameManager도 상태를 동기화해준다
                     _localState = LocalGameState.WaitingForInput;
+                    //카운트다운 활성화
+                    ControlCountdown(true);
+
+
                 }
             }
             // 옵션이 꺼져 있거나, 게임 시작 등 일반적인 턴 시작의 경우
@@ -326,6 +331,10 @@ public class FirebaseGameManager : MonoBehaviour
             {
                 Debug.Log("내 턴 시작. 입력을 준비합니다.");
                 _localState = LocalGameState.WaitingForInput;
+
+                //카운트다운 활성화
+                ControlCountdown(true);
+
                 inputController?.EnableInput(stoneManager?.SpawnStoneForTurn(_currentGame));
             }
         }
@@ -629,8 +638,7 @@ public class FirebaseGameManager : MonoBehaviour
     }
     #endregion
 
-    #region Change Private Variables
-
+    #region 상태전환용 메서드
     public void ChangeLocalStateToSimulatingMyShot()
     {
         _localState = LocalGameState.SimulatingMyShot;
@@ -653,6 +661,11 @@ public class FirebaseGameManager : MonoBehaviour
         gameCamControl?.SwitchCamera(FOLLOW_STONE_CAM1, stoneToFollow.transform, stoneToFollow.transform);
     }
 
+    public void ControlCountdown(bool con) //카운트다운 컨트롤
+    {
+        UI_LaunchIndicator_Firebase.SetCountDown(con);
+    }
     #endregion
+
 
 }
