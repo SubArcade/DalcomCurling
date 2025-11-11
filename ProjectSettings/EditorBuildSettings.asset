@@ -17,4 +17,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/LSJ_Test.unity
     guid: dff3a15a051ef54408ccbb7c52e7f6e3
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 199fbfdc07ddc674a92e8323dd0e6a67, type: 2}
