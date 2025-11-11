@@ -65,17 +65,13 @@ public class FirebaseGameManager : MonoBehaviour
 
     // --- 게임 내부 변수 ---
     private float initialFixedDeltaTime;
-    private bool needToUpdateRound = false;
-    private bool updatedRoundByMe = false;
-    private bool updatedNewRoundData = false;
     private bool isFirstTurn = true;
     private int currentRound = 1;
-    private string roundStartingPlayer;
 
     // --- 공유 가능한 게임 변수 ---
     public int aTeamScore { get; private set; } = 0;
     public int bTeamScore { get; private set; } = 0;
-    public int shotsPerRound  { get; private set; } = 4;
+    public int shotsPerRound  { get; private set; } = 4; // 이 변수값 조절하여 1라운드당 각각 몇번씩 던지게 할 것인지 조절 가능
 
 
     // --- 디버그용 ---
@@ -420,7 +416,7 @@ public class FirebaseGameManager : MonoBehaviour
         DOVirtual.DelayedCall(1f, () =>
         {
             // 8턴(0~7)이 끝나면 라운드 전환 상태로 변경
-            if (_currentGame.TurnNumber >= 6 && !IsStartingPlayer()) // 7로 올라가기 전, 미리 계산을 하기에 -1을 더 해줌
+            if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer()) 
             {
                 Debug.Log("게임 종료를 위한 계산 시작");
                 // 호스트가 점수를 기반으로 다음 라운드 시작 플레이어를 결정하고 DB를 업데이트합니다.
@@ -592,15 +588,26 @@ public class FirebaseGameManager : MonoBehaviour
                 //
                 //
                 // 라운드 끝나면 안만들어지게
-                Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, myUserId);
-                if (donutRigid != null)
+                if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
+                    && stoneManager.aShotIndex >= shotsPerRound - 1) 
+                    ||(stoneManager.myTeam == StoneForceController_Firebase.Team.B
+                    && stoneManager.bShotIndex >= shotsPerRound - 1))
                 {
-                    inputController?.EnableInput(donutRigid);
+                    //이미 발사횟수를 모두 소진함
                 }
                 else
                 {
-                    Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
+                    Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, myUserId);
+                    if (donutRigid != null)
+                    {
+                        inputController?.EnableInput(donutRigid);
+                    }
+                    else
+                    {
+                        Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
+                    }
                 }
+                
                 //inputController?.EnableInput(stoneManager?.SpawnStone(_currentGame, myUserId));
             }
             else if (_localState == LocalGameState.SimulatingMyShot)
@@ -650,7 +657,6 @@ public class FirebaseGameManager : MonoBehaviour
             { "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
         };
         db.Collection("games").Document(gameId).UpdateAsync(updates);
-        updatedNewRoundData = false;
 
     }
 
@@ -699,7 +705,6 @@ public class FirebaseGameManager : MonoBehaviour
 
         //db.Collection("games").Document(gameId).UpdateAsync("PredictedResult", result);
         
-        updatedRoundByMe = true;
         currentRound++;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame, currentRound);
     }
