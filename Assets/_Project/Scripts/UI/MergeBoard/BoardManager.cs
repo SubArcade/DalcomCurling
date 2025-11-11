@@ -48,7 +48,7 @@ public class BoardManager : MonoBehaviour
         if (infoPopup != null) infoPopup.SetActive(false);
 
         // Firestore에서 보드 불러오기
-        await BoardSaveManager.LoadToBoard(this, FirebaseAuthManager.Instance.UserId);
+        
     }
 
     //void OnApplicationQuit()
@@ -122,7 +122,7 @@ public class BoardManager : MonoBehaviour
     }
 
     void CreateDonutButtonAtCenter()
-    {
+    { 
         int center = boardSize / 2;
         generatorCell = cells[center, center]; // 중앙 칸 기억해두기
 
@@ -179,7 +179,7 @@ public class BoardManager : MonoBehaviour
         Debug.Log($"도넛 생성 완료 ({target.gridX},{target.gridY})");
 
         // 생성 후 자동 저장
-        await BoardSaveManager.SaveToFirestore(this, FirebaseAuthManager.Instance.UserId);
+        
     }
 
     // 도넛 찾기

@@ -90,7 +90,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 currentCell.ClearItem();
 
             Destroy(gameObject); // 오브젝트 삭제
-            await AutoSaveAsync();
+            // 기존 firestore저장함수 있던곳
             return;
         }
 
@@ -156,7 +156,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         {
             MoveToCell(targetCell);
             BoardManager.Instance.SelectCell(targetCell);
-            await AutoSaveAsync();
+            //await AutoSaveAsync();
             return;
         }
 
@@ -191,7 +191,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
             Debug.Log($"[MERGE] {donutID} → {nextID} 머지 성공");
 
-            await AutoSaveAsync(); // 머지 후 저장
+            //await AutoSaveAsync(); // 머지 후 저장
             return;
         }
 
@@ -215,21 +215,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         if (originalCell != null)
             BoardManager.Instance.SelectCell(originalCell); //격자 원위치
     }
-
-    // Firestore 자동 저장
-    private async Task AutoSaveAsync()
-    {
-        try
-        {
-            string userId = FirebaseAuthManager.Instance.UserId;
-            await BoardSaveManager.SaveToFirestore(BoardManager.Instance, userId);
-            Debug.Log("[FS] 자동 저장 완료 (머지/이동/삭제)");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[FS] 자동 저장 실패: {e.Message}");
-        }
-    }
+    
 
     // 나중에 이펙트 추가할거
     /*
