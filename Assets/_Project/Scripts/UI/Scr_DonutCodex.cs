@@ -25,15 +25,21 @@ public class Scr_DonutCodex : MonoBehaviour
 
     void Awake()
     {
-        AwakeGetInspector();//awake에서 추가로 넣을 코드 있으면 메서드 안에 작성
+        Transform toggleGroup = transform.Find("rectangle626/DonutValueList");
+        if (toggleGroup != null)
+        {
+            hardDonutToggle = toggleGroup.Find("HardTap_Text")?.GetComponent<Toggle>();
+            softDonutToggle = toggleGroup.Find("SoftTap_Text")?.GetComponent<Toggle>();
+            MoistDonutToggle = toggleGroup.Find("MoistTap_Text")?.GetComponent<Toggle>();
+        }
+
+        hardPanel = transform.Find("HardPanel")?.gameObject;
+        softPanel = transform.Find("SoftPanel")?.gameObject;
+        moistPanel = transform.Find("MoistPanel")?.gameObject;
+        closeButton = transform.Find("rectangle625/CloseButton")?.GetComponent<Button>();
     }
 
     void Start()
-    {
-        startZip(); //start에서 추가로 넣을 코드 있으면 해당 메서드 안에 작성
-    }
-
-    void startZip() 
     {
         hardDonutToggle.onValueChanged.AddListener((isOn) => TogglePanel(hardPanel, isOn));
         softDonutToggle.onValueChanged.AddListener((isOn) => TogglePanel(softPanel, isOn));
@@ -45,21 +51,7 @@ public class Scr_DonutCodex : MonoBehaviour
 
         closeButton.onClick.AddListener(CloseCollectionPopUp);
     }
-    void AwakeGetInspector() 
-    {
-        Transform toggleGroup = transform.Find("DonutValueList");
-        if (toggleGroup != null)
-        {
-            hardDonutToggle = toggleGroup.Find("HardTap_Text")?.GetComponent<Toggle>();
-            softDonutToggle = toggleGroup.Find("SoftTap_Text")?.GetComponent<Toggle>();
-            MoistDonutToggle = toggleGroup.Find("MoistTap_Text")?.GetComponent<Toggle>();
-        }
 
-        hardPanel = transform.Find("HardPanel")?.gameObject;
-        softPanel = transform.Find("SoftPanel")?.gameObject;
-        moistPanel = transform.Find("MoistPanel")?.gameObject;
-        closeButton = transform.Find("CloseButton")?.GetComponent<Button>();
-    }
     void TogglePanel(GameObject panel, bool isOn)
     {
       panel.SetActive(isOn);
