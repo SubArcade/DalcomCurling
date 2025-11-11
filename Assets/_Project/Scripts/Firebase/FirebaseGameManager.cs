@@ -65,12 +65,16 @@ public class FirebaseGameManager : MonoBehaviour
 
     // --- 게임 내부 변수 ---
     private float initialFixedDeltaTime;
-    private bool isRoundUpdated = false;
+    private bool needToUpdateRound = false;
+    private bool updatedRoundByMe = false;
+    private bool updatedNewRoundData = false;
     private bool isFirstTurn = true;
+    private int currentRound = 1;
 
     // --- 공유 가능한 게임 변수 ---
     public int aTeamScore { get; private set; } = 0;
     public int bTeamScore { get; private set; } = 0;
+    public int shotsPerRound  { get; private set; } = 4;
 
 
     // --- 디버그용 ---
@@ -156,7 +160,17 @@ public class FirebaseGameManager : MonoBehaviour
         bool isFirstSnapshot = (_currentGame == null);
         bool turnChanged = !isFirstSnapshot && _currentGame.CurrentTurnPlayerId != newGameData.CurrentTurnPlayerId;
         bool newShotFired = _currentGame?.LastShot?.Timestamp != newGameData.LastShot?.Timestamp;
-        bool newPredictionReceived = _currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber;
+        //bool newPredictionReceived = _currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber;
+        bool newPredictionReceived = false;
+        if (_currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber)
+        {
+            newPredictionReceived = true;
+        }
+        else if (newGameData.PredictedResult?.TurnNumber == 0 &&
+                 newGameData.RoundNumber != 1 && newGameData.PredictedResult.FinalStonePositions.Count != 0)
+        {
+            newPredictionReceived = true;
+        }
         bool roundFinished = _currentGame?.RoundNumber != newGameData.RoundNumber;
 
         _currentGame = newGameData;
@@ -219,10 +233,10 @@ public class FirebaseGameManager : MonoBehaviour
                 break;
             case "InProgress":
                 // 라운드 변경 감지를 독립적으로 처리하여 모든 플레이어가 돌을 정리하도록 합니다.
-                if (roundFinished)
-                {
-                    OnRoundEnd();
-                }
+                // if (roundFinished)
+                // {
+                //     OnRoundEnd();
+                // }
 
                 // 첫 턴 시작 조건을 _localState == InTimeline일 때도 포함
                 if (turnChanged || (_currentGame.GameState == "InProgress" && _isMyTurn && (_localState == LocalGameState.Idle || _localState == LocalGameState.InTimeline)))
@@ -240,17 +254,23 @@ public class FirebaseGameManager : MonoBehaviour
                 break;
 
             case "RoundChanging":
+                if (roundFinished && updatedRoundByMe == false) 
+                {
+                    OnRoundEnd();
+                    //updatedNewRoundData = true;
+                }
+                
                 if (_localState != LocalGameState.Idle && _localState != LocalGameState.PreparingShot) break; //중복 방지
-
+                if (updatedRoundByMe == true) break;
                 Debug.Log($"라운드 {_currentGame.RoundNumber} 종료. 다음 라운드를 준비합니다.");
                 _localState = LocalGameState.Idle; // 상태 초기화
-                OnRoundEnd(); // 점수 계산 및 돌 정리
+               // OnRoundEnd(); // 점수 계산 및 돌 정리
 
                 if (IsHost())
                 {
                     // 호스트가 점수를 기반으로 다음 라운드 시작 플레이어를 결정하고 DB를 업데이트합니다.
                     stoneManager.CalculateScore(out StoneForceController_Firebase.Team winnerTeam, out int score);
-
+                    UpdateScoreInLocal(winnerTeam, score); // 계산된 점수를 로컬상에서 변경
                     string winnerId = null;
                     if (winnerTeam != StoneForceController_Firebase.Team.None)
                     {
@@ -336,6 +356,16 @@ public class FirebaseGameManager : MonoBehaviour
                 ControlCountdown(true);
 
                 inputController?.EnableInput(stoneManager?.SpawnStoneForTurn(_currentGame));
+                Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame);
+                if (donutRigid != null)
+                {
+                    inputController?.EnableInput(donutRigid);
+                }
+                else
+                {
+                    // 뭔가 작동을 막아주거나 다른 기능을 해야함.           
+                    Debug.Log("발사 기회를 모두 소진했을 가능성이 높음");
+                }
             }
         }
         else if (!_isMyTurn)
@@ -370,9 +400,9 @@ public class FirebaseGameManager : MonoBehaviour
 
             gameCamControl?.SwitchCamera(SIMULATING_VIEW_CAM); // 시뮬레이션 시작 카메라로 전환
 
-            stoneManager?.SpawnStoneForTurn(_currentGame);
+            stoneManager?.SpawnStone(_currentGame);
             int stoneIdToLaunch =
-                stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.bShotCount : stoneManager.aShotCount;
+                stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.bShotIndex : stoneManager.aShotIndex;
             Debug.Log($"상대 샷(ID: {stoneIdToLaunch}) 시뮬레이션 시작.");
             //float simulationSpeed = (_currentGame.TurnNumber > 1) ? 2.0f : timeMultiplier;
 
@@ -484,8 +514,8 @@ public class FirebaseGameManager : MonoBehaviour
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
         int count = stoneManager.myTeam == StoneForceController_Firebase.Team.A
-            ? stoneManager.aShotCount
-            : stoneManager.bShotCount;
+            ? stoneManager.aShotIndex
+            : stoneManager.bShotIndex;
 
 
         var updates = new Dictionary<string, object>
@@ -547,7 +577,16 @@ public class FirebaseGameManager : MonoBehaviour
                 _localState = LocalGameState.PreparingShot;
                 Debug.Log("상대 턴 시뮬레이션 완료. 내 샷을 미리 준비합니다.");
                 // 'myUserId'를 명시하여 '나'의 돌을 생성하도록 새 메서드 호출
-                inputController?.EnableInput(stoneManager?.SpawnStoneForPlayer(myUserId, _currentGame));
+                Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, myUserId);
+                if (donutRigid != null)
+                {
+                    inputController?.EnableInput(donutRigid);
+                }
+                else
+                {
+                    Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
+                }
+                //inputController?.EnableInput(stoneManager?.SpawnStone(_currentGame, myUserId));
             }
             else if (_localState == LocalGameState.SimulatingMyShot)
             {
@@ -565,10 +604,43 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void OnRoundEnd()//이번 라운드가 끝났을때.
     {
-        StoneForceController_Firebase.Team winner;
-        int score;
-        stoneManager.CalculateScore(out winner, out score);
-        stoneManager.ClearOldDonutsInNewRound();
+        // StoneForceController_Firebase.Team winner;
+        // int score;
+        // stoneManager.CalculateScore(out winner, out score);
+        // stoneManager.ClearOldDonutsInNewRound();
+        // if (winner == StoneForceController_Firebase.Team.A)
+        // {
+        //     aTeamScore += score;
+        // }
+        // else if (winner == StoneForceController_Firebase.Team.B)
+        // {
+        //     bTeamScore += score;
+        // }
+        // else
+        // {
+        //     Debug.Log("무승부");
+        // }
+        //
+        // needToUpdateRound = true;
+        // Debug.Log($"승리팀 : {winner}, 점수 : {score}");
+        //받아온 리턴값으로 여기서 결과를 처리한다.
+        
+        
+        aTeamScore = _currentGame.ATeamScore;
+        bTeamScore = _currentGame.BTeamScore;
+        stoneManager?.ClearOldDonutsInNewRound(_currentGame);
+        var updates = new Dictionary<string, object>
+        {
+           
+            { "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
+        };
+        db.Collection("games").Document(gameId).UpdateAsync(updates);
+        updatedNewRoundData = false;
+
+    }
+
+    public void UpdateScoreInLocal(StoneForceController_Firebase.Team  winner, int score)
+    {
         if (winner == StoneForceController_Firebase.Team.A)
         {
             aTeamScore += score;
@@ -582,21 +654,23 @@ public class FirebaseGameManager : MonoBehaviour
             Debug.Log("무승부");
         }
 
-        isRoundUpdated = true;
         Debug.Log($"승리팀 : {winner}, 점수 : {score}");
-        //받아온 리턴값으로 여기서 결과를 처리한다.
     }
 
     private void ResetGameDatas(string nextPlayerId) // 다음 라운드 시작 플레이어를 파라미터로 받음
     {
+        currentRound = _currentGame.RoundNumber;
         var updates = new Dictionary<string, object>
         {
             { "CurrentTurnPlayerId", nextPlayerId }, // 다음 라운드 시작 플레이어 업데이트
+            { "RoundStartingPlayerId", nextPlayerId},
             { "TurnNumber", 0},
             { $"DonutsIndex.{_currentGame.PlayerIds[0]}", 0 },
             { $"DonutsIndex.{_currentGame.PlayerIds[1]}", 0 },
             { "RoundNumber", FieldValue.Increment(1) },
-            { "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
+            { "ATeamScore", aTeamScore},
+            { "BTeamScore", bTeamScore},
+            //{ "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
         };
         db.Collection("games").Document(gameId).UpdateAsync(updates);
 
@@ -607,6 +681,10 @@ public class FirebaseGameManager : MonoBehaviour
             FinalStonePositions = new List<StonePosition>()
         };
         db.Collection("games").Document(gameId).UpdateAsync("PredictedResult", result);
+
+        updatedRoundByMe = true;
+        currentRound++;
+        stoneManager?.ClearOldDonutsInNewRound(_currentGame, currentRound);
     }
 
     #endregion

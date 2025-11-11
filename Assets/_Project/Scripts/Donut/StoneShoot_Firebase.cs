@@ -442,6 +442,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         return new LastShot
         {
             Force = finalForce * calculatedRandomValue, // 최종 힘
+            PlayerId = stoneManager.myUserId,
             Team = stoneManager.myTeam, // 발사하는 팀
             Spin = FinalRotationValue * calculatedRandomValue, // 최종 스핀 값
             Direction = directionDict, // 발사 방향
@@ -507,7 +508,7 @@ public class StoneShoot_Firebase : MonoBehaviour
 
                 FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot(); // 로컬 상태를 시뮬레이션 중으로 변경               
                 FirebaseGameManager.Instance.ChangeFixedDeltaTime(); // FixedDeltaTime 변경 (시뮬레이션 속도 조절)
-                stoneManager.LaunchStone(shotData, stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.aShotCount : stoneManager.bShotCount); // 돌 발사
+                stoneManager.LaunchStone(shotData, stoneManager.myTeam == StoneForceController_Firebase.Team.A ? stoneManager.aShotIndex : stoneManager.bShotIndex); // 돌 발사
 
                 DisableInput(); // 입력 비활성화
             });
