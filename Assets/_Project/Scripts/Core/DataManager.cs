@@ -44,8 +44,13 @@ public class UserDataRoot
         soloTier = GameTier.Bronze,
     };
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
-    [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData();
-    [field: SerializeField] [FirestoreProperty] public DonutData donut { get; set; } = new DonutData();
+    [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
+    {
+        cellMax = 49,
+        cellWidth = 7,
+        cellLength = 7,
+    };
+    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData();
 }
 
 public class DataManager : MonoBehaviour
@@ -63,7 +68,10 @@ public class DataManager : MonoBehaviour
     public PlayerData PlayerData => userData.player;
     public InventoryData InventoryData => userData.inventory;
     public MergeBoardData MergeBoardData => userData.mergeBoard;
-    public DonutData DonutData => userData.donut;
+    public QuestData QuestData => userData.quest;
+    
+    // 도넛 기본 데이터 SO
+    private readonly Dictionary<DonutType, DonutTypeSO> _donutTypeDB = new();
     
     // 랭크
     private string rankCollection = "rank";
@@ -81,6 +89,7 @@ public class DataManager : MonoBehaviour
     {
         Instance = this;
         //DontDestroyOnLoad(this);
+        LoadAllDonutData();
     }
 
     async void Start() 
@@ -245,6 +254,36 @@ public class DataManager : MonoBehaviour
         return ModeDoc(targetMode).Collection("leaders");
     }
 
+    
+    // 도넛 SO 데이터 불러오기
+    
+    // SO를 불러와 캐싱
+    private void LoadAllDonutData()
+    {
+        var allSO = Resources.LoadAll<DonutTypeSO>("DonutData");
+
+        foreach (var so in allSO)
+        {
+            if (!_donutTypeDB.ContainsKey(so.type))
+            {
+                _donutTypeDB.Add(so.type, so);
+                //Debug.Log($"[DonutDB] Loaded {so.type} ({so.levels.Count} levels)");
+            }
+        }
+    }
+   
+    // DonutData 가져오기
+    public DonutData GetDonutData(DonutType type, int level)
+    {
+        if (_donutTypeDB.TryGetValue(type, out var so))
+        {
+            return so.GetLevelData(level);
+        }
+
+        //Debug.LogWarning($"[DonutDB] No data found for {type} level {level}");
+        return null;
+    }
+    
     
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
