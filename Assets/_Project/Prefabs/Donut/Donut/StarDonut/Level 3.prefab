@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 2902965994499384901, guid: bbcb53d21d5f8ef41b7799c4f3c0f9ba, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 73d5772262ec6054bbb14823ebc4ca23, type: 2}
+      objectReference: {fileID: 2100000, guid: bb7d3d80c93c417439f3e314d40546f0, type: 2}
     - target: {fileID: 3695647977059321744, guid: bbcb53d21d5f8ef41b7799c4f3c0f9ba, type: 3}
       propertyPath: m_Name
       value: Star_Choco_3 1

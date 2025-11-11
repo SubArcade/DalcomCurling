@@ -62,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3327944817592106568, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
       propertyPath: m_Name
-      value: 14 Variant
+      value: Level 14
       objectReference: {fileID: 0}
     - target: {fileID: 3327944817592106568, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
       propertyPath: m_IsActive
@@ -92,7 +92,7 @@ PrefabInstance:
     - target: {fileID: 7736489618304421544, guid: 0ed30663e7bc2b74c9b0af4697d4d2bb, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c1067d08488aa2643a00d3c16aa9a720, type: 2}
+      objectReference: {fileID: 2100000, guid: 571d81803ad82aa4a8cf68cc31eeea7d, type: 2}
     - target: {fileID: 8096755391325007741, guid: 0ed30663e7bc2b74c9b0af4697d4d2bb, type: 3}
       propertyPath: m_Name
       value: Standart_Choco_1
