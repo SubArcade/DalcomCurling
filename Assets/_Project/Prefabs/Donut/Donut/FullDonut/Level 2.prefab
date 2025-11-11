@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 3357807431028812307, guid: 50837f1d804ca3b4f9f03f1fcfdb69df, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 73d5772262ec6054bbb14823ebc4ca23, type: 2}
+      objectReference: {fileID: 2100000, guid: bb7d3d80c93c417439f3e314d40546f0, type: 2}
     - target: {fileID: 3862303291489389510, guid: 50837f1d804ca3b4f9f03f1fcfdb69df, type: 3}
       propertyPath: m_Name
       value: Filled_Choco_4 1
