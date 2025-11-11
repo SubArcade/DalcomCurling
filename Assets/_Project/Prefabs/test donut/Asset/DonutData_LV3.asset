@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2272952ceb08f5340ae6b8851d664cef, type: 3}
+  m_Name: DonutData_LV3
+  m_EditorClassIdentifier: 
+  donutLevel: 3
+  prefab: {fileID: 489532144365968965, guid: 1f02b56d650a97c4884696394a11bc7f, type: 3}
+  requiredStrength: 15
+  requiredAgility: 15
+  requiredIntelligence: 15
