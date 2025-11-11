@@ -45,7 +45,7 @@ public class Test_MainMenu : MonoBehaviour
     
     void Awake()
     {
-        DataManager.Instance.PlayerData.energy = 0;
+        //DataManager.Instance.PlayerData.energy = 0;
         energyButton.onClick.AddListener(()=> testAdd());
         loginButton.onClick.AddListener(TestLogin);
         dropdown.ClearOptions();
@@ -67,7 +67,7 @@ public class Test_MainMenu : MonoBehaviour
     // 에너지 추가
     void testAdd()
     {
-        DataManager.Instance.PlayerData.energy++;
+        //DataManager.Instance.PlayerData.energy++;
         //DataManager.Instance.UpdateUserDataAsync(energy: energy);
         energyText.text = $"{ DataManager.Instance.PlayerData.energy}/{DataManager.Instance.PlayerData.maxEnergy}";
     }

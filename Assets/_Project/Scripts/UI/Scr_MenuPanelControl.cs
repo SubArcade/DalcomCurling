@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,6 +31,13 @@ public class Scr_PanelControl : MonoBehaviour
     [SerializeField] private Button detailedSettingsButton;
     [SerializeField] private Button testBattle;
     
+    
+    [Header("플레이어 데이터 값")]
+    [SerializeField] private TMP_Text levelText;
+    [SerializeField] private TMP_Text energyText;
+    [SerializeField] private TMP_Text goldText;
+    [SerializeField] private TMP_Text gemText;
+    
     void Awake()
     {
         UIManager.Instance.RegisterPanel(PanelId.StartPanel,startPanel);    
@@ -50,6 +58,15 @@ public class Scr_PanelControl : MonoBehaviour
         detailedSettingsButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DetailedSettingsPanel));
         testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
     }
-
+    
+    private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
+    
+    public void SetPlayerText(PlayerData playerData)
+    {
+        levelText.text = $"{playerData.level}";
+        energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        goldText.text = $"{playerData.gold}";
+        gemText.text = $"{playerData.gem}";
+    }
 
 }

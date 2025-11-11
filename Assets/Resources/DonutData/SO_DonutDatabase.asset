@@ -18,13 +18,16 @@ MonoBehaviour:
     displayName: "1\uB819\uB3C4\uB11B"
     description: "\uAE30\uBCF8 \uB3C4\uB11B"
     returnCoin: 0
+    nextID: 2
   - id: 2
     sprite: {fileID: 21300000, guid: b02c71a37a54d9544a3ecd243e1adbcc, type: 2}
     displayName: "2\uB819\uB3C4\uB11B"
     description: "2\uB819 \uB3C4\uB11B\uC784"
     returnCoin: 0
+    nextID: 3
   - id: 3
     sprite: {fileID: 21300000, guid: e2aae1bedee327e4fa183d6ebcf07e45, type: 2}
     displayName: "3\uB819\uB3C4\uB11B"
     description: "3\uB819 \uB3C4\uB11B\uC784"
     returnCoin: 0
+    nextID: 
