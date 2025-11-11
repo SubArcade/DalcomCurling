@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: SO_DonutDatabase
   m_EditorClassIdentifier: 
   donuts:
-  - id: 1
+  - id: hard_1
     sprite: {fileID: 21300000, guid: c4b43f0107ab756458db8a627c5aa6c8, type: 2}
     displayName: "1\uB819\uB3C4\uB11B"
     description: "\uAE30\uBCF8 \uB3C4\uB11B"
-    returnCoin: 0
-    nextID: 2
-  - id: 2
+    donutType: hard
+    level: 1
+  - id: hard_2
     sprite: {fileID: 21300000, guid: b02c71a37a54d9544a3ecd243e1adbcc, type: 2}
     displayName: "2\uB819\uB3C4\uB11B"
     description: "2\uB819 \uB3C4\uB11B\uC784"
-    returnCoin: 0
-    nextID: 3
-  - id: 3
+    donutType: hard
+    level: 2
+  - id: hard_3
     sprite: {fileID: 21300000, guid: e2aae1bedee327e4fa183d6ebcf07e45, type: 2}
     displayName: "3\uB819\uB3C4\uB11B"
     description: "3\uB819 \uB3C4\uB11B\uC784"
-    returnCoin: 0
-    nextID: 
+    donutType: hard
+    level: 3

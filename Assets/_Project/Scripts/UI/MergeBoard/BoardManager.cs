@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 public class BoardManager : MonoBehaviour
 {
-    public static BoardManager Instance;
+    public static BoardManager Instance { get; set; }
 
     [Header("보드 설정")]
     [SerializeField] private GameObject cellPrefab; // 칸 프리팹 
@@ -137,19 +137,19 @@ public class BoardManager : MonoBehaviour
         generatorCell.SetActive(true);
     }
 
-    private MergeItemUI CreateDonutInCell(Cells cell, Sprite sprite)
-    {
-        GameObject itemObj = Instantiate(donutPrefab, cell.transform);
-        RectTransform rt = itemObj.GetComponent<RectTransform>();
-        rt.anchoredPosition = Vector2.zero;
-        rt.localScale = Vector3.one;
+    //private MergeItemUI CreateDonutInCell(Cells cell, Sprite sprite)
+    //{
+    //    GameObject itemObj = Instantiate(donutPrefab, cell.transform);
+    //    RectTransform rt = itemObj.GetComponent<RectTransform>();
+    //    rt.anchoredPosition = Vector2.zero;
+    //    rt.localScale = Vector3.one;
 
-        var item = itemObj.GetComponent<MergeItemUI>();
-        item.GetComponent<Image>().sprite = sprite;
-        item.donutID = DonutDatabase.GetIDBySprite(sprite);
-        cell.SetItem(item);
-        return item;
-    }
+    //    var item = itemObj.GetComponent<MergeItemUI>();
+    //    item.GetComponent<Image>().sprite = sprite;
+    //    item.donutID = DonutDatabase.GetIDBySprite(sprite);
+    //    cell.SetItem(item);
+    //    return item;
+    //}
 
     private Cells FindEmptyActiveCell()
     {
@@ -163,7 +163,7 @@ public class BoardManager : MonoBehaviour
         return available.Count > 0 ? available[Random.Range(0, available.Count)] : null;
     }
 
-    public async void SpawnDonutToEmptyCell()
+    private void SpawnDonutToEmptyCell()
     {
         Cells target = FindEmptyActiveCell();
         if (target == null)
@@ -172,15 +172,33 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
-        int randomIndex = Random.Range(0, donutSprites.Length);
-        Sprite selectedSprite = donutSprites[randomIndex];
-        CreateDonutInCell(target, selectedSprite);
+        // 생성기에서 도넛 정보 랜덤 선택 (DonutGenerator 내부 확률 계산)
+        var generator = generatorCell.GetComponentInChildren<DonutGenerator>();
+        var donutData = generator.GetRandomDonut();
+        if (donutData == null)
+        {
+            Debug.LogWarning("도넛 데이터가 없습니다.");
+            return;
+        }
 
-        Debug.Log($"도넛 생성 완료 ({target.gridX},{target.gridY})");
+        // 공용 도넛 프리팹으로 생성
+        GameObject donutObj = Instantiate(donutPrefab, target.transform);
+        RectTransform rt = donutObj.GetComponent<RectTransform>();
+        rt.anchoredPosition = Vector2.zero;
+        rt.localScale = Vector3.one;
 
-        // 생성 후 자동 저장
-        
+        // 스프라이트, ID, 기타 정보 적용
+        var item = donutObj.GetComponent<MergeItemUI>();
+        var img = donutObj.GetComponent<Image>();
+        img.sprite = donutData.sprite;
+        item.donutID = donutData.id;
+
+        // 셀에 등록
+        target.SetItem(item);
+
+        Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
     }
+
 
     // 도넛 찾기
     public Cells FindCellByDonutID(string targetID)
@@ -209,13 +227,6 @@ public class BoardManager : MonoBehaviour
 
         target.ClearItem();
         Debug.Log($"도넛 '{targetID}' 삭제 완료");
-    }
-
-    public void SpawnItemAt(int x, int y, Sprite sprite)
-    {
-        Cells cell = GetCell(x, y);
-        if (cell == null || !cell.isActive || !cell.IsEmpty()) return;
-        CreateDonutInCell(cell, sprite);
     }
 
     // 레벨 활성영역 업데이트

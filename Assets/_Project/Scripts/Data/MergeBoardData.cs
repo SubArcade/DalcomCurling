@@ -13,7 +13,7 @@ public class CellData
 }
 
 [System.Serializable, FirestoreData]
-public class MergeBoardData : MonoBehaviour
+public class MergeBoardData
 {
     [field: SerializeField, Tooltip("보드칸 정보")][FirestoreProperty] public List<CellData> cells { get; set; } = new();
 }
