@@ -46,6 +46,7 @@ public class UserDataRoot
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData();
     [field: SerializeField] [FirestoreProperty] public DonutData donut { get; set; } = new DonutData();
+    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData();
 }
 
 public class DataManager : MonoBehaviour
@@ -64,6 +65,7 @@ public class DataManager : MonoBehaviour
     public InventoryData InventoryData => userData.inventory;
     public MergeBoardData MergeBoardData => userData.mergeBoard;
     public DonutData DonutData => userData.donut;
+    public QuestData QuestData => userData.quest;
     
     // 랭크
     private string rankCollection = "rank";

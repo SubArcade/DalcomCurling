@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 public class BoardManager : MonoBehaviour
 {
-    public static BoardManager Instance;
+    public static BoardManager Instance { get; set; }
 
     [Header("보드 설정")]
     [SerializeField] private GameObject cellPrefab; // 칸 프리팹 
