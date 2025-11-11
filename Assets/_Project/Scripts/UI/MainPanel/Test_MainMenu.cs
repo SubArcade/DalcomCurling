@@ -77,7 +77,8 @@ public class Test_MainMenu : MonoBehaviour
     {
         //FirebaseAuthManager.Instance.Login("asd@asd.asd", "asdasd");
         FirebaseAuthManager.Instance.Login(id, pw);
-        UIManager.Instance.Open(PanelId.MainPanel);
+        UIManager.Instance.Open(PanelId.StartPanel);
+        //UIManager.Instance.Open(PanelId.MainPanel);
     }
     
     void OnDropdownChanged(int index)
