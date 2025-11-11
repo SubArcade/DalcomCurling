@@ -37,4 +37,9 @@ public class Scr_Collider_House : MonoBehaviour
     {
         return inHouseDonutList;
     }
+
+    public void ClearDonutList()
+    {
+        inHouseDonutList.Clear();
+    }
 }

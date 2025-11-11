@@ -697,6 +697,7 @@ public class StoneManager : MonoBehaviour
         //roundCount = newGame.RoundNumber;
         aScore = FirebaseGameManager.Instance.aTeamScore;
         bScore = FirebaseGameManager.Instance.bTeamScore;
+        _scr_Collider_House.ClearDonutList();
         _uilaunchIndicator.RoundChanged(roundCount, aScore, bScore);
     }
 }

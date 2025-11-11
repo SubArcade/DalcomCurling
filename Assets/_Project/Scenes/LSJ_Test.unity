@@ -266,7 +266,7 @@ MonoBehaviour:
   stonePrefabA: {fileID: 8981461065803206208, guid: 754a67bbb3acf904296a8021f058a792, type: 3}
   stonePrefabB: {fileID: 8981461065803206208, guid: 624761d8addb29342aa46959ec784abf, type: 3}
   spawnPosition: {fileID: 2010081595}
-  _scr_Collider_House: {fileID: 0}
+  _scr_Collider_House: {fileID: 1878140752}
 --- !u!114 &48117304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4699,6 +4699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPoint: {fileID: 2010081595}
   mainCamera: {fileID: 963194227}
+  drageSensitivity: 100
   maxLength: 6
   curveStrength: 1
   lineResolution: 30
