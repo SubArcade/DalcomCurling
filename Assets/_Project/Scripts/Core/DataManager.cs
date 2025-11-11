@@ -47,6 +47,7 @@ public class UserDataRoot
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData();
     [field: SerializeField] [FirestoreProperty] public DonutData donut { get; set; } = new DonutData();
 }
+
 public class DataManager : MonoBehaviour
 {
     public static DataManager Instance { get; private set; }
@@ -63,7 +64,7 @@ public class DataManager : MonoBehaviour
     public InventoryData InventoryData => userData.inventory;
     public MergeBoardData MergeBoardData => userData.mergeBoard;
     public DonutData DonutData => userData.donut;
-
+    
     // 랭크
     private string rankCollection = "rank";
     [Header("랭크")]
@@ -94,10 +95,6 @@ public class DataManager : MonoBehaviour
         FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;
         db = FirebaseFirestore.DefaultInstance;
         Debug.Log("[FS] Firestore instance OK");
-        // await SeedRankAsync(GameMode.SOLO);
-        // await SeedRankAsync(GameMode.DUO);
-        // await SeedRankAsync(GameMode.TRIO);
-        // await SeedSummaryAsync();
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
