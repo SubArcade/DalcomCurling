@@ -19,22 +19,6 @@ public class PlayerData
     [field: SerializeField, Tooltip("솔로 티어")] [FirestoreProperty] public GameTier soloTier { get; set; }
 
     // 로컬 플레이어 데이터 (디비에 들어가지 않는 변수)
-    [field: SerializeField, Tooltip("최대 에너지")] public int maxEnergy { get; set; }
-    [field: SerializeField, Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
-    
-    // public PlayerData()
-    // {
-    //     email = "test@test.com";
-    //     nickname = "test";
-    //     gold = 250;
-    //     gem = 7;
-    //     energy = 10;
-    //     level = 1;
-    //     exp = 0;
-    //     lastAt = 0;
-    //     maxEnergy = 20;
-    //     perSecEnergy = 10;
-    //     soloScore = 0;
-    //     soloTier = GameTier.Bronze;
-    // }
+    [Tooltip("최대 에너지")] public int maxEnergy { get; set; }
+    [Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
 }
