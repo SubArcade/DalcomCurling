@@ -39,18 +39,6 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
 
     void Awake()
     {
-      awakeGetInspector();//awake에서 추가로 넣을 코드 있으면 메서드 안에 작성
-        //인스펙터 자동연결 싹다 다시해야합니다
-    }
-
-    void Start()
-    {
-      startZip(); //start에서 추가로 넣을 코드 있으면 해당 메서드 안에 작성
-                  ////스타트도 겸사겸사 연결보십시오
-    }
- 
-    void awakeGetInspector() 
-    {
         Transform canvas = GameObject.FindGameObjectWithTag("MainCanvas")?.transform;
         Level_Text = canvas.Find("Main_Panel/Top/Level/Level_Text")?.GetComponent<TextMeshProUGUI>();
         LevelText = transform.Find("LevelBox/LevelCount_Text")?.GetComponent<TextMeshProUGUI>();
@@ -59,7 +47,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         CloseButton = transform.Find("CloseButton")?.GetComponent<Button>();
         LevelReward = transform.Find("GiftBoxHouse")?.GetComponent<Button>();
         RewardLabel = transform.Find("RewardNameLabel/Reward_Text")?.GetComponent<TextMeshProUGUI>();
-        
+
         GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
         foreach (GameObject obj in allObjects)
         {
@@ -75,8 +63,9 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             }
         }
     }
-    void startZip() 
-    {      
+
+    void Start()
+    {
         //버튼 이벤트 연결
         LevelReward.onClick.AddListener(LevelUpRewardPickUp);
         CloseButton.onClick.AddListener(OnClickCloseButton);
@@ -88,11 +77,12 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         ExpView.text = $"{currentExp}/{maxExp}Exp";
 
 
-        if (getExpButton != null) 
+        if (getExpButton != null)
         {
             getExpButton.onClick.AddListener(() => LevelUp(50));
         }//테스트용 경험치 획득용
     }
+ 
     void PlayerProfile()
     {
        //유저의 프로필 사진.데이터 저장해서 다른사람에게 보이도록 해야함
