@@ -532,7 +532,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         else
         {
             Debug.LogWarning("미리 준비된 샷이 없어 일반 입력 모드로 전환됩니다.");
-            EnableInput(this._currentStoneRb); // 준비된 샷 없으면 일반 입력 활성화
+            //EnableInput(this._currentStoneRb); // 준비된 샷 없으면 일반 입력 활성화
             return false; // 샷 실행 안됨
         }
     }
