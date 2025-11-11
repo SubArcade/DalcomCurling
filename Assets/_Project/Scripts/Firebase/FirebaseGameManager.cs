@@ -355,7 +355,6 @@ public class FirebaseGameManager : MonoBehaviour
                 //카운트다운 활성화
                 ControlCountdown(true);
 
-                inputController?.EnableInput(stoneManager?.SpawnStoneForTurn(_currentGame));
                 Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame);
                 if (donutRigid != null)
                 {
