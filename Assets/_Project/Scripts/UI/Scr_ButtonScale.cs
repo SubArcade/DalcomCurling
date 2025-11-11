@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Scr_Main_Panel : MonoBehaviour
+public class Scr_ButtonScale : MonoBehaviour
 {
     [Header("휴지통 관련")]
     [SerializeField] private GameObject TrashCan;

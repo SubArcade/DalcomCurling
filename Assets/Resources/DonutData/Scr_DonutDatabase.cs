@@ -16,6 +16,8 @@ public class DonutDatabase : ScriptableObject
         [Header("설명, 수치")]
         [TextArea(2, 3)] public string description; //설명
         [Tooltip("")]public int returnCoin; // 휴지통 반환 금액
+        [Header("상위 도넛")]
+        public string nextID; // 머지 상위
     }
 
     public List<DonutInfo> donuts = new List<DonutInfo>();
@@ -49,6 +51,12 @@ public class DonutDatabase : ScriptableObject
                 return item.id;
         }
         return "";
+    }
+
+    public static string GetNextID(string currentID)
+    {
+        var donut = Instance.donuts.Find(d => d.id == currentID);
+        return donut?.nextID;
     }
 
     public static DonutInfo GetDonutBySprite(Sprite sprite)
