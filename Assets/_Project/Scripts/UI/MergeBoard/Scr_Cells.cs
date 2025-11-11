@@ -10,8 +10,9 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public Image lockOverlay; // 이 이미지는 CellPrefab 안에 자식 오브젝트로 둔다
 
     public bool isActive { get; private set; }
-    public MergeItemUI occupant { get; private set; }
+    public MergeItemUI occupant { get; set; }
     public int gridX, gridY;
+    public string donutID;
 
     public void Init(int x, int y)
     {
@@ -32,10 +33,15 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public void SetItem(MergeItemUI item)
     {
         occupant = item;
+        donutID = item.donutID;
         if (item) item.BindToCell(this);
     }
 
-    public void ClearItem() => occupant = null;
+    public void ClearItem()
+    {
+        occupant = null;
+        donutID = null; // 연결해제
+    }
     
     public void OnPointerClick(PointerEventData eventData)
     {

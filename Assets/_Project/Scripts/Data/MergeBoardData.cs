@@ -1,10 +1,10 @@
-using Firebase.Firestore;
+﻿using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class CellData1
+public class CellData
 {
     public int x;
     public int y;
@@ -15,5 +15,5 @@ public class CellData1
 [System.Serializable, FirestoreData]
 public class MergeBoardData : MonoBehaviour
 {
-    [field: SerializeField, Tooltip("보드칸 정보")][FirestoreProperty] public List<CellData1> cells { get; set; } = new();
+    [field: SerializeField, Tooltip("보드칸 정보")][FirestoreProperty] public List<CellData> cells { get; set; } = new();
 }
