@@ -1,8 +1,8 @@
-using Firebase.Firestore;
+﻿using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable, FirestoreData]
 
 public enum DonutType 
 {
@@ -10,11 +10,9 @@ public enum DonutType
     Soft, //말랑
     Moist //촉촉
 }
-
-[System.Serializable, FirestoreData]
 public class DonutData
 {
-
+    
     [field: SerializeField, Tooltip("무게")][FirestoreProperty] private int Weight { get; set; }
     [field: SerializeField, Tooltip("반발력")][FirestoreProperty] private int Resilience { get; set; }
     [field: SerializeField, Tooltip("마찰력")][FirestoreProperty] private int Friction { get; set; }
@@ -27,3 +25,7 @@ public class DonutData
 
     [field: SerializeField, Tooltip("촉촉한 도넛 레벨")][FirestoreProperty] public Dictionary<int, string> MoistLevels { get; private set; } = new();
 }
+
+    
+
+
