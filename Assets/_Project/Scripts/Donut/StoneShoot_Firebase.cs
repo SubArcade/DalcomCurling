@@ -50,7 +50,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     public float maxDragDistance = 0.5f; // 초기 드래그의 최대 거리 (정규화된 화면 높이 기준)
     public float maxRotationDragDistance = 1f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준)
     public float maxRotationValue = 5f; // 스핀의 최대 값
-    public float autoMoveToHogLineSpeed = 6f; // 돌이 호그 라인까지 자동 이동하는 속도
+    public float autoMoveToHogLineSpeed = 6f; // 도넛이 호그 라인까지 자동 이동하는 속도
     public float maxUIDirectionAngle = 60f; // UI 화살표가 표시할 수 있는 최대 각도
 
     [Header("퍼펙트존 확률 조정 가능 변수")] // 확률 구역별 가중치 변수 헤더
@@ -115,7 +115,9 @@ public class StoneShoot_Firebase : MonoBehaviour
     private Vector3 _actualDragStartScreenPos; // 초기 드래그 시작 화면 좌표
     private Vector3 _rotationDragStartScreenPos; // 회전 드래그 시작 화면 좌표
     private Vector3 _finalLaunchDirection; // 최종 발사 방향
+    private Vector3 _finalLaunchDirectionForTrajectory; // 궤적 계산을 위한 최종 발사 방향
     private float _finalLaunchForce; // 최종 발사 힘
+    private float _finalLaunchForceForTrajectory; // 궤적 계산을 위한 최종 발사 힘
     private float _releaseRandomValue = -99f; // 릴리즈 타이밍에 따른 랜덤 값
     private bool _needToTap = false; // 호그 라인까지 이동 중 탭이 필요한지 여부
     private bool _isTrajectoryPreviewActive = false; // 궤적 미리보기 활성화 여부
@@ -205,18 +207,33 @@ public class StoneShoot_Firebase : MonoBehaviour
             if (CurrentState == LaunchState.WaitingForInitialDrag)
             {
                 // 힘/방향 실시간 계산 및 멤버 변수 업데이트
-                Vector3 dragVector2D = currentScreenPos - _actualDragStartScreenPos;
-                dragVector2D.x *= horizontalDragSensitivity;
+                Vector3 dragVector2D = currentScreenPos - _actualDragStartScreenPos; //발사를 위한
+                Vector3 dragVector2DForTrajectory = new Vector3(dragVector2D.x * horizontalDragSensitivity, dragVector2D.y); //궤적 표시를 위한
+                //dragVector2D.x *= horizontalDragSensitivity;
 
                 float dragDistance = dragVector2D.magnitude / _mainCamera.pixelHeight;
+                float dragDistanceForTrajectory = dragVector2DForTrajectory.magnitude / _mainCamera.pixelWidth;
+                
                 float clampedDistance = Mathf.Min(dragDistance, maxDragDistance);
+                float clampedDistanceForTrajectory = Mathf.Min(dragDistanceForTrajectory, maxDragDistance);
+                
                 _finalLaunchForce = clampedDistance * launchForceMultiplier; // 멤버 변수 업데이트
+                _finalLaunchForceForTrajectory = clampedDistanceForTrajectory * launchForceMultiplier;
 
+                // 발사를 위한 방향 계산
                 Vector2 launchDirection2D = -dragVector2D.normalized;
                 _finalLaunchDirection = (launchDirection2D.y < 0)
                     ? new Vector3(launchDirection2D.x, 0f, 0f)
                     : new Vector3(launchDirection2D.x, 0f, launchDirection2D.y);
                 _finalLaunchDirection.Normalize(); // 멤버 변수 업데이트
+                
+                
+                // 궤적을 위한 방향 계산
+                Vector2 launchDirection2DForTrajectory = -dragVector2DForTrajectory.normalized;
+                _finalLaunchDirectionForTrajectory = (launchDirection2DForTrajectory.y < 0)
+                    ? new Vector3(launchDirection2DForTrajectory.x, 0f, 0f)
+                    : new Vector3(launchDirection2DForTrajectory.x, 0f, launchDirection2DForTrajectory.y);
+                _finalLaunchDirectionForTrajectory.Normalize();
 
                 // UI 화살표 업데이트
                 UpdateDragVisual(currentScreenPos);
@@ -418,8 +435,8 @@ public class StoneShoot_Firebase : MonoBehaviour
     {
         if (trajectoryLine == null || _currentStoneRb == null) return; // LineRenderer 또는 돌 Rigidbody 없으면 리턴
                 
-        float currentForce = _finalLaunchForce;
-        Vector3 currentDirection = _finalLaunchDirection;
+        float currentForce = _finalLaunchForceForTrajectory;
+        Vector3 currentDirection = _finalLaunchDirectionForTrajectory;
         float currentSpin = FinalRotationValue;
 
         Vector3 finalDirectionForSim = currentDirection;  // 발사 방향
@@ -428,10 +445,11 @@ public class StoneShoot_Firebase : MonoBehaviour
 
         List<Vector3> points = new List<Vector3>(); // 궤적을 그릴 포인트 저장 리스트
         points.Add(_currentStoneRb.transform.position); // A지점 (돌이 놓여있는 위치 )
-        points.Add(startHogLine.position);  // B 지점 (호그 라인)    
+        //points.Add(startHogLine.position);  // B 지점 (호그 라인)    
 
         //B지점 (호그라인) 부터 시뮬레이션
-        Vector3 currentPos = startHogLine.position; // 시작 위치
+        //Vector3 currentPos = startHogLine.position; // 시작 위치
+        Vector3 currentPos = _currentStoneRb.transform.position; // 시작 위치를 최초 생성 지점으로 변환
         Vector3 currentVel = launchVelocity; // 돌의 초기 속도
         float friction = 0.98f; // 각 스텝마다 속도가 줄어드는 비율 (마찰력) 물리 예측을 위한 단순화된 파라미터 (실제 물리와 맞추려면 튜닝 필요)
 
