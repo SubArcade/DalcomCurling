@@ -6,7 +6,7 @@ using UnityEngine;
 [System.Serializable, FirestoreData]
 public class QuestList
 {
-    [Tooltip("도넛 고유 아이디")] [FirestoreProperty] public string donutid { get; set; }    
+    [Tooltip("도넛 고유 아이디")] [FirestoreProperty] public string donutId { get; set; }    
     [Tooltip("새로고침 횟수")] [FirestoreProperty] public int refreshCount { get; set; }
     [Tooltip("보상 골드")] [FirestoreProperty] public int rewardGold { get; set; }
 }
