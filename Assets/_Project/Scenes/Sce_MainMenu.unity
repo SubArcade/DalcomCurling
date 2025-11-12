@@ -33475,8 +33475,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 411703606}
   - {fileID: 73807111}
+  - {fileID: 411703606}
   m_Father: {fileID: 2825641546466311587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -47127,7 +47127,6 @@ MonoBehaviour:
   OrderClearBtn3: {fileID: 0}
   CompleteObject3: {fileID: 0}
   RefreshCountText: {fileID: 0}
-  DonutList: []
 --- !u!1001 &8788206544631554240
 PrefabInstance:
   m_ObjectHideFlags: 0
