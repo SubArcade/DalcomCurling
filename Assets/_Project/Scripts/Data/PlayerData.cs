@@ -1,6 +1,12 @@
 using Firebase.Firestore;
 using UnityEngine;
 
+public enum AuthProviderType
+{
+    Guest,  // 게스트
+    GooglePlay, // 구글 플레이
+}
+
 [System.Serializable, FirestoreData]
 public class PlayerData
 {
@@ -13,6 +19,8 @@ public class PlayerData
     [field: SerializeField, Tooltip("경험치")] [FirestoreProperty] public int exp { get; set; }
     [field: SerializeField, Tooltip("처음 접속 시간")] [FirestoreProperty] public Timestamp createAt { get; set; }
     [field: SerializeField, Tooltip("마지막 접속 시간")] [FirestoreProperty] public long lastAt { get; set; }
+    
+    [field: SerializeField, Tooltip("마지막 접속 시간")] [FirestoreProperty] public AuthProviderType AuthProviderType { get; set; }
 
     // 랭크 데이터
     [field: SerializeField, Tooltip("솔로 점수")] [FirestoreProperty] public int soloScore { get; set; }
