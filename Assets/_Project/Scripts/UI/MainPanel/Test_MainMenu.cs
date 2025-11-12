@@ -15,6 +15,8 @@ public class Test_MainMenu : MonoBehaviour
     public string id;
     public string pw;
 
+    public Button testDBSaveButton;
+
     private Dictionary<string, string> idDictionary = new Dictionary<string, string>
     {
         { "오민호", "omh@test.com" },
@@ -53,6 +55,8 @@ public class Test_MainMenu : MonoBehaviour
         OnDropdownChanged(0);
         // 값 변경 시 호출될 이벤트 등록
         dropdown.onValueChanged.AddListener(OnDropdownChanged);
+        testDBSaveButton.onClick.AddListener(async () => await DataManager.Instance.SaveAllUserDataAsync());
+
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
@@ -77,7 +81,8 @@ public class Test_MainMenu : MonoBehaviour
     {
         //FirebaseAuthManager.Instance.Login("asd@asd.asd", "asdasd");
         FirebaseAuthManager.Instance.Login(id, pw);
-        UIManager.Instance.Open(PanelId.MainPanel);
+        UIManager.Instance.Open(PanelId.StartPanel);
+        //UIManager.Instance.Open(PanelId.MainPanel);
     }
     
     void OnDropdownChanged(int index)

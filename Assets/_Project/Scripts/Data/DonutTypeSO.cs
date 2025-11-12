@@ -25,6 +25,8 @@ public class DonutData
     [Tooltip("무게")] public int weight;
     [Tooltip("반발력")] public int resilience;
     [Tooltip("마찰력")] public int friction;
+
+    [Header("보상")] [Tooltip("젬 보상")] public int rewardGem = 1;
 }
 
 [CreateAssetMenu(fileName = "DonutTypeSO", menuName = "Game/Donut/DonutTypeSO")]
