@@ -1,4 +1,6 @@
 ﻿using System;
+using Firebase;
+using Firebase.Auth;
 using Firebase.Firestore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,6 +26,33 @@ public enum GameTier
     Challenger_IV,
 }
 
+[System.Serializable, FirestoreData]
+public class UserDataRoot
+{
+    [field: SerializeField] [FirestoreProperty] public PlayerData player { get; set; } = new PlayerData(){
+        email = "test@test.com",
+        nickname = "test",
+        gold = 250,
+        gem = 7,
+        energy = 10,
+        level = 1,
+        exp = 0,
+        lastAt = 0,
+        maxEnergy = 20,
+        perSecEnergy = 10,
+        soloScore = 0,
+        soloTier = GameTier.Bronze,
+    };
+    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
+    [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
+    {
+        cellMax = 49,
+        cellWidth = 7,
+        cellLength = 7,
+    };
+    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData();
+}
+
 public class DataManager : MonoBehaviour
 {
     public static DataManager Instance { get; private set; }
@@ -33,10 +62,16 @@ public class DataManager : MonoBehaviour
     private string userCollection = "user";   // 컬랙션(테이블) 이름
     [Header("플레이어 데이터 (신규 생성 시 초기 저장, 기존 계정은 불러와 갱신)")]
     [SerializeField, Tooltip("프리미어키(PK)")] private string docId = "ZflvQAZZmYj1SKj8mZKZ";
-
-    [SerializeField] private PlayerData playerData = new PlayerData();
     
-    public PlayerData PlayerData => playerData;
+    [SerializeField]private UserDataRoot userData = new UserDataRoot();
+
+    public PlayerData PlayerData => userData.player;
+    public InventoryData InventoryData => userData.inventory;
+    public MergeBoardData MergeBoardData => userData.mergeBoard;
+    public QuestData QuestData => userData.quest;
+    
+    // 도넛 기본 데이터 SO
+    private readonly Dictionary<DonutType, DonutTypeSO> _donutTypeDB = new();
     
     // 랭크
     private string rankCollection = "rank";
@@ -54,6 +89,7 @@ public class DataManager : MonoBehaviour
     {
         Instance = this;
         //DontDestroyOnLoad(this);
+        LoadAllDonutData();
     }
 
     async void Start() 
@@ -68,48 +104,83 @@ public class DataManager : MonoBehaviour
         FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;
         db = FirebaseFirestore.DefaultInstance;
         Debug.Log("[FS] Firestore instance OK");
-        // await SeedRankAsync(GameMode.SOLO);
-        // await SeedRankAsync(GameMode.DUO);
-        // await SeedRankAsync(GameMode.TRIO);
-        // await SeedSummaryAsync();
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
     public async Task EnsureUserDocAsync(string uId, string userEmail)
     {
         docId = uId;
-        playerData.email = userEmail;
-        int maxEnergy = playerData.maxEnergy;
-        int secEnergy = playerData.perSecEnergy;
+        PlayerData.email = userEmail;
         
-        var docRef = db.Collection("user").Document(uId);
+        int maxEnergy = userData.player.maxEnergy;
+        int secEnergy = userData.player.perSecEnergy;
+        
+        int cellMax = MergeBoardData.cellMax;
+        int cellWidth = MergeBoardData.cellWidth;
+        int cellLength = MergeBoardData.cellLength;
+        
+        int baseGold = QuestData.baseGold;
+        
+        var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
         
         if (!snap.Exists)
         {
             // 처음 로그인 시
-            playerData.createAt = Timestamp.GetCurrentTimestamp();
-            BasePlayerData(maxEnergy,secEnergy);
-            await docRef.SetAsync(playerData, SetOptions.MergeAll);
+            PlayerData.createAt = Timestamp.GetCurrentTimestamp();
+            
+            BasePlayerData(maxEnergy, secEnergy);
+            BaseInventoryData();
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold);
+
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
         }
         else
         {
             // 기존 유저 로드
-            playerData = snap.ConvertTo<PlayerData>();  
-            BasePlayerData(maxEnergy,secEnergy);
-            Debug.Log($"[FS] 기존 유저 로드 완료: /{userCollection}/{uId}");
-        }
-        OnUserDataChanged?.Invoke(playerData);
-    }
+            userData = snap.ConvertTo<UserDataRoot>();
 
+            PlayerData.email = userEmail;
+            
+            BasePlayerData(maxEnergy, secEnergy);
+            BaseInventoryData();
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold);
+
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            Debug.Log($"[FS] 기존 유저 로드/갱신 완료: /{userCollection}/{uId}");
+        }
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+    
     // 기본 데이터 적용
     private void BasePlayerData(int maxEnergy, int secEnergy)
     {
-        playerData.maxEnergy = maxEnergy;
-        playerData.perSecEnergy = secEnergy;
+        PlayerData.maxEnergy = maxEnergy;
+        PlayerData.perSecEnergy = secEnergy;
+    }
+
+    // 기본 인벤토리 데이터
+    private void BaseInventoryData()
+    {
+        
     }
     
+    // 기본 머지보드 데이터
+    private void BaseMergeBoardData(int cellMax, int cellWidth, int cellLength)
+    {
+        MergeBoardData.cellMax = cellMax;
+        MergeBoardData.cellWidth = cellWidth;
+        MergeBoardData.cellLength = cellLength;
+    }
+    
+    // 기본 퀘스트 데이터
+    private void BaseQuestData(int baseGold)
+    {
+        QuestData.baseGold = baseGold;
+    }
     // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
     public async Task UpdateUserDataAsync(
@@ -130,21 +201,21 @@ public class DataManager : MonoBehaviour
             var patch = new Dictionary<string, object>();
 
             // 플레이어 데이터
-            PatchUtil.SetIfNotNullOrEmpty(patch, "email", email, v => playerData.email = v);
-            PatchUtil.SetIfNotNullOrEmpty(patch, "nickname", nickname, v => playerData.nickname = v);
-            PatchUtil.SetIfHasValue(patch, "gold",   gold,   v => playerData.gold = v);
-            PatchUtil.SetIfHasValue(patch, "gem",    gem,    v => playerData.gem = v);
+            PatchUtil.SetIfNotNullOrEmpty(patch, "email", email, v => PlayerData.email = v);
+            PatchUtil.SetIfNotNullOrEmpty(patch, "nickname", nickname, v => PlayerData.nickname = v);
+            PatchUtil.SetIfHasValue(patch, "gold",   gold,   v => PlayerData.gold = v);
+            PatchUtil.SetIfHasValue(patch, "gem",    gem,    v => PlayerData.gem = v);
             PatchUtil.SetIfHasValue(
                 patch, "energy", energy,
-                v => playerData.energy = v//,
+                v => PlayerData.energy = v//,
                 //onChanged: () => Scr_EnergyRegenNotifier.Instance?.RescheduleNotification()
             );
-            PatchUtil.SetIfHasValue(patch, "level",  level,  v => playerData.level = v);
-            PatchUtil.SetIfHasValue(patch, "exp",    exp,    v => playerData.exp = v);
+            PatchUtil.SetIfHasValue(patch, "level",  level,  v => PlayerData.level = v);
+            PatchUtil.SetIfHasValue(patch, "exp",    exp,    v => PlayerData.exp = v);
             
             // 랭크 데이터
-            PatchUtil.SetIfHasValue(patch, "soloScore", soloScore, v => playerData.soloScore = v);
-            PatchUtil.SetIfHasValue(patch, "soloTier", soloTier, v => playerData.solotTier = v);
+            PatchUtil.SetIfHasValue(patch, "soloScore", soloScore, v => PlayerData.soloScore = v);
+            PatchUtil.SetIfHasValue(patch, "soloTier", soloTier, v => PlayerData.soloTier = v);
             
             // 로컬 데이터 변경
             
@@ -164,11 +235,11 @@ public class DataManager : MonoBehaviour
             bool rankChanged = patch.ContainsKey("soloScore") || patch.ContainsKey("soloTier");
             if (rankChanged)
             {
-                await UpsertLeader(playerData.soloScore, playerData.solotTier);
+                await UpsertLeader(PlayerData.soloScore, PlayerData.soloTier);
                 Debug.Log($"[FS] Rank 동기화 완료: /{Season}_{gameMode.ToString().ToLower()}/{docId}");
             }
 
-            OnUserDataChanged?.Invoke(playerData);
+            OnUserDataChanged?.Invoke(PlayerData);
         }
         catch (System.Exception e)
         {
@@ -181,23 +252,11 @@ public class DataManager : MonoBehaviour
     {
         try
         {
-            var patch = new Dictionary<string, object>
-            {
-                ["email"]   = playerData.email,
-                ["nickname"]   = playerData.nickname,
-                ["gold"]    = playerData.gold,
-                ["gem"]     = playerData.gem,
-                ["energy"]  = playerData.energy,
-                ["level"]   = playerData.level,
-                ["exp"]     = playerData.exp,
-                ["lastAt"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                ["soloScore"]   = playerData.soloScore,
-                ["soloTier"] = playerData.solotTier
-            };
-
+            PlayerData.lastAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            
             var docRef = db.Collection(userCollection).Document(docId);
-            await docRef.SetAsync(patch, SetOptions.MergeAll);
-
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            
             Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
         }
         catch (System.Exception e)
@@ -223,6 +282,73 @@ public class DataManager : MonoBehaviour
     }
 
     
+    // 도넛 SO 데이터 불러오기
+    
+    // SO를 불러와 캐싱
+    private void LoadAllDonutData()
+    {
+        var allSO = Resources.LoadAll<DonutTypeSO>("DonutData");
+
+        foreach (var so in allSO)
+        {
+            if (!_donutTypeDB.ContainsKey(so.type))
+            {
+                _donutTypeDB.Add(so.type, so);
+                //Debug.Log($"[DonutDB] Loaded {so.type} ({so.levels.Count} levels)");
+            }
+        }
+    }
+   
+    // DonutData 가져오기
+    public DonutData GetDonutData(DonutType type, int level)
+    {
+        if (_donutTypeDB.TryGetValue(type, out var so))
+        {
+            return so.GetLevelData(level);
+        }
+
+        //Debug.LogWarning($"[DonutDB] No data found for {type} level {level}");
+        return null;
+    }
+
+    // ID 기반으로 DonutData 가져오기 (ex: "Hard_3")
+    public DonutData GetDonutByID(string id)
+    {
+        string[] parts = id.Split('_');
+        if (parts.Length != 2) return null;
+
+        if (System.Enum.TryParse(parts[0], out DonutType type) &&
+            int.TryParse(parts[1], out int level))
+        {
+            return GetDonutData(type, level);
+        }
+        return null;
+    }
+
+    // 다음 단계 도넛 자동 가져오기 (머지 시 사용)
+    public DonutData GetNextDonut(DonutData current)
+    {
+        if (current == null) return null;
+
+        var next = GetDonutData(current.donutType, current.level + 1);
+        return next;
+    }
+
+    // 특정 레벨의 모든 도넛 가져오기 (랜덤 생성용)
+    public List<DonutData> GetDonutsByLevel(int level)
+    {
+        List<DonutData> result = new();
+
+        foreach (var so in _donutTypeDB.Values)
+        {
+            var data = so.GetLevelData(level);
+            if (data != null)
+                result.Add(data);
+        }
+        return result;
+    }
+
+
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
     {
@@ -237,7 +363,7 @@ public class DataManager : MonoBehaviour
     {
         mode = mode ?? gameMode;
         docid = null ?? docId;
-        nickname = null ?? playerData.nickname;
+        nickname = null ?? PlayerData.nickname;
         var doc = LeadersCol(mode).Document(docid);
         await doc.SetAsync(new Dictionary<string, object> {
             { "nickname", nickname }, 

@@ -1,0 +1,327 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9131ab756f7c3c64c8d59160212952d8, type: 3}
+  m_Name: HardDonut
+  m_EditorClassIdentifier: Assembly-CSharp::DonutTypeSO
+  type: 0
+  levels:
+  - id: Hard_1
+    level: 1
+    sprite: {fileID: 21300000, guid: 2b1b8517b6cd78c4597556ada6b321bc, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "1\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 2597265814505318722, guid: fc70b4ba79a8d9041b12db38d5e0ef78, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_2
+    level: 2
+    sprite: {fileID: 21300000, guid: 874a5481f6eccc94b9ddb4addda010aa, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "2\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 7900394160393950511, guid: 783f7ea98ade13a419ab6125b69ee61c, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_3
+    level: 3
+    sprite: {fileID: 21300000, guid: 2c9251641e6b1584083d297b400b2b64, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "3\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 1137461938813743791, guid: 25e4d11f22e352343af99fab3a5b27c8, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_4
+    level: 4
+    sprite: {fileID: 21300000, guid: a221c1890bc9edc4d8e7faa0179a361c, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "4\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 261525210805885852, guid: 124882c11b2dcf144aa121abdd380692, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_5
+    level: 5
+    sprite: {fileID: 21300000, guid: 6eb9b62f24deb194fa9b991b0c5c6b7a, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "5\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 6445028099075440933, guid: f63157cf1993d6d47813089665d2a10e, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_6
+    level: 6
+    sprite: {fileID: 21300000, guid: dff7cc1e8f3dbb844913afd1a1439d59, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "6\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 3155365270216695315, guid: 211d279218470a7468cc441881e597d5, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_7
+    level: 7
+    sprite: {fileID: 21300000, guid: ba8177e86d55c2f4990f93522af6f9e3, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "7\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 3236729454526056374, guid: 7c58068d3e0ac2840993739fb3619492, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_8
+    level: 8
+    sprite: {fileID: 21300000, guid: 0070017372b9d774f8a769bfc357f975, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "8\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 8205037022449328153, guid: b0054d69013f8e84281ec34299070070, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_9
+    level: 9
+    sprite: {fileID: 21300000, guid: 11c0078677b772c44838eb1cbbc6f48e, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "9\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 391599478734653683, guid: c7c8a4cfe45cf014d917f91ddda80b5e, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_10
+    level: 10
+    sprite: {fileID: 21300000, guid: a71a5cc2ebc96204eac1468e4ec33c8b, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "10\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 2699431526638874547, guid: 75991027ac825094e9632b698de8dade, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_11
+    level: 11
+    sprite: {fileID: 21300000, guid: 0e9b6fb72e6a85549a939b873fd7deca, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "11\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 2842434098831317319, guid: 6ff9aa899b561584780046f17d98d7ba, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_12
+    level: 12
+    sprite: {fileID: 21300000, guid: 0456ef2da4eae4f43b09898f692f64b6, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "12\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 9077602723689384204, guid: 99bda90fe59e2874a90220a57e665d7b, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_13
+    level: 13
+    sprite: {fileID: 21300000, guid: eb5aec1c7adb858488abe9c6f04befaf, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "13\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 2833794702056176726, guid: 3e5eaff559a723d4a8df1f25829f782a, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_14
+    level: 14
+    sprite: {fileID: 21300000, guid: 8374f4320db36e74c91010d174eb7cbf, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "14\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 8572371565415322048, guid: cb48f50ae1343d94797ab459015b18c0, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_15
+    level: 15
+    sprite: {fileID: 21300000, guid: 6ed6b94d7f0bfc14b9761dda86244747, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "15\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 8524025464012063370, guid: c0c0e58177abc8a4aacad87d410020de, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_16
+    level: 16
+    sprite: {fileID: 21300000, guid: 681c68ffbbf0d794b85e15186129db0b, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "16\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 7170108337654049765, guid: e6a46dfe62c6aae4c95d2e857cc819c8, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_17
+    level: 17
+    sprite: {fileID: 21300000, guid: 2a3c4996efa4a504cb5a4902dfbdc8de, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "17\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 522797064487490305, guid: 63ba5d2776023f547bb5f1ead793555c, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_18
+    level: 18
+    sprite: {fileID: 21300000, guid: 4f695c4d55dd82945b3b39f8af825746, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "18\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 5408212569318122353, guid: 7ef5a3e0e345aef4991e96ab6b528fb1, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_19
+    level: 19
+    sprite: {fileID: 21300000, guid: 35fddfb2378aaff48b030472dfd5b565, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "19\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 1543019899719729822, guid: a23a47c6c3d11e84bb161e860aaec422, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_20
+    level: 20
+    sprite: {fileID: 21300000, guid: 97815d487ecc8924fbea48e9a40ad722, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "20\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 471941666418078271, guid: abcf1dacc1cba904ca07e95b2e55fc65, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_21
+    level: 21
+    sprite: {fileID: 21300000, guid: 746396714d70fec48b142424e819b1ec, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "21\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 5606041854586271238, guid: 624164004bdb5d34dbf978bb093bd62c, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_22
+    level: 22
+    sprite: {fileID: 21300000, guid: 167ffc6e0f2326f4dbe6bff41ce57f6a, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "22\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 7384990849747095317, guid: a675356920371bd4bbfde451ec71a1fe, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_23
+    level: 23
+    sprite: {fileID: 21300000, guid: da4cab5a883e4fd4a8ac018f6c677ca0, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "23\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 3320233247210760216, guid: 3a2918008f1555141b4bfbf1b2764b4c, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_24
+    level: 24
+    sprite: {fileID: 21300000, guid: 771f98deff952a94cb8a373b7007d11e, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "24\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 9219294064540376483, guid: 0f8643eaca709744fa60108f4523f73a, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_25
+    level: 25
+    sprite: {fileID: 21300000, guid: f23a1f2364776f341b001601b00dbe67, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "25\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 4604825596446124296, guid: 667154dcbfaf64f40a21125af2824a62, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_26
+    level: 26
+    sprite: {fileID: 21300000, guid: 4f3d46a66280413479a0cb5b54686571, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "26\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 2799952467545548971, guid: fae93479b0d03e1459e46edf954f5264, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_27
+    level: 27
+    sprite: {fileID: 21300000, guid: d520df74c7d037046a8759864b9a9cd0, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "27\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 4223800138205528548, guid: 562b0b77a7bf15b4aa62287c02645497, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_28
+    level: 28
+    sprite: {fileID: 21300000, guid: 84a7680aad7fc8b44bad32acbae8271e, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "28\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 7952853318217299515, guid: 05fa6c4bc0cd3924ca19b322c88f9a7f, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_29
+    level: 29
+    sprite: {fileID: 21300000, guid: 87fd358746b481f4b808f4767b2e188e, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "29\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 5061809917775603787, guid: 11d9491ee4516014baaa6cbaffc0453a, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  - id: Hard_30
+    level: 30
+    sprite: {fileID: 21300000, guid: 1f27f320d970d5d4ba3443baed53d72a, type: 3}
+    displayName: "\uB2E8\uB2E8"
+    description: "30\uB2E8\uACC4"
+    donutType: 0
+    prefab: {fileID: 3121586377220058036, guid: 56ef8c5088b0c8b49a245ac9d9f4d080, type: 3}
+    weight: 0
+    resilience: 0
+    friction: 0
+  donutData:
+    id: 
+    level: 0
+    sprite: {fileID: 0}
+    displayName: 
+    description: 
+    donutType: 0
+    prefab: {fileID: 0}
+    weight: 0
+    resilience: 0
+    friction: 0
