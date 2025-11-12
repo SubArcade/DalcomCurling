@@ -17,8 +17,6 @@ public class BoardManager : MonoBehaviour
 
     [Header("UI 요소")]
     public Image selectionHighlight;  // 선택격자 이미지
-    [SerializeField] private GameObject infoPopup;      // 정보 팝업 패널
-    [SerializeField] private TMP_Text infoText;             // 팝업 내부 텍스트
 
     private Cells[,] cells;
     private Cells generatorCell; // 도넛 생성기가 위치한 셀
@@ -37,24 +35,13 @@ public class BoardManager : MonoBehaviour
     async void Start()
     {
         selectionHighlight = GameObject.Find("Canvas/Main_Panel/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
-        infoPopup = GameObject.Find("Canvas/Main_Panel/Bottom/Description");
-        infoText = GameObject.Find("Canvas/Main_Panel/Bottom/Description/Text").GetComponent<TMP_Text>();
 
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
 
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
-        if (infoPopup != null) infoPopup.SetActive(false);
-
-        // Firestore에서 보드 불러오기
-        
     }
-
-    //void OnApplicationQuit()
-    //{
-    //    BoardSaveManager.Save(this);
-    //}
 
     public async Task OnCellClicked(Cells cell)
     {
@@ -65,23 +52,10 @@ public class BoardManager : MonoBehaviour
         if (cell == generatorCell)
         {
             // 도넛 생성기
-            infoPopup.SetActive(true);
-            infoText.text = "도넛 생성기에요!\n다시 터치 시 도넛을 생성합니다.";
-
             if (isSameCell)
             {
                 SpawnDonutToEmptyCell();
             }
-        }
-        else if (cell.occupant != null)
-        {
-            // 도넛 있는 셀
-            infoPopup.SetActive(true);
-            infoText.text = $"도넛: {cell.occupant.GetComponent<Image>().sprite.name}";
-        }
-        else
-        {
-            infoPopup.SetActive(false);  // 빈칸 팝업 끄기
         }
     }
 
@@ -133,23 +107,9 @@ public class BoardManager : MonoBehaviour
         btnRect.pivot = new Vector2(0.5f, 0.5f);
         btnRect.anchoredPosition = Vector2.zero;
 
-        // 중앙 칸은 항상 활성화하지만 아이템은 못 들어오게 잠금 표시 꺼둠
+        // 중앙 칸은 항상 활성화하지만 도넛은 못 들어오게 잠금 표시 꺼둠
         generatorCell.SetActive(true);
     }
-
-    //private MergeItemUI CreateDonutInCell(Cells cell, Sprite sprite)
-    //{
-    //    GameObject itemObj = Instantiate(donutPrefab, cell.transform);
-    //    RectTransform rt = itemObj.GetComponent<RectTransform>();
-    //    rt.anchoredPosition = Vector2.zero;
-    //    rt.localScale = Vector3.one;
-
-    //    var item = itemObj.GetComponent<MergeItemUI>();
-    //    item.GetComponent<Image>().sprite = sprite;
-    //    item.donutID = DonutDatabase.GetIDBySprite(sprite);
-    //    cell.SetItem(item);
-    //    return item;
-    //}
 
     private Cells FindEmptyActiveCell()
     {
@@ -235,7 +195,8 @@ public class BoardManager : MonoBehaviour
         int activeSize = GetActiveSize(level);
         int center = boardSize / 2;
 
-        int start = center - (activeSize - 1) / 2;
+        // 짝수 크기일 때 좌상단으로 한 칸 치우치도록 계산
+        int start = Mathf.Clamp(center - activeSize / 2, 0, boardSize - activeSize);
         int end = start + activeSize;
 
         for (int x = 0; x < boardSize; x++)
@@ -249,7 +210,7 @@ public class BoardManager : MonoBehaviour
     }
 
     // 각 레벨별 보드 크기 반환
-    private int GetActiveSize(int level)
+    private int GetActiveSize(int level) //TODO: PlayerData에서 가져와야함.
     {
         if (level < 3) return 3;
         if (level < 5) return 4;

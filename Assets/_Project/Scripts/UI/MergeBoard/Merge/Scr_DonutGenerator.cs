@@ -7,7 +7,7 @@ public class DonutGenerator : MonoBehaviour
     [Range(1, 20)] public int generatorLevel = 1;
 
     [Header("도넛 데이터베이스 (자동 참조)")]
-    public DonutDatabase database;
+    public DataManager dataManager;
 
     // 1~5레벨 기준 확률표
     // 배열: [1단계, 2단계, 3단계, 4단계, 5단계]
@@ -22,16 +22,16 @@ public class DonutGenerator : MonoBehaviour
 
     private void Awake()
     {
-        if (database == null)
-            database = DonutDatabase.Instance;
+        if (dataManager == null)
+            dataManager = DataManager.Instance;
     }
 
     // 생성기 레벨에 따라 도넛 확률 기반으로 랜덤 도넛 선택
-    public DonutDatabase.DonutInfo GetRandomDonut()
+    public DonutData GetRandomDonut()
     {
-        if (database == null)
+        if (dataManager == null)
         {
-            Debug.LogError("DonutDatabase가 연결되지 않았습니다.");
+            Debug.LogError("DataManager가 초기화되지 않았습니다.");
             return null;
         }
 
@@ -42,6 +42,8 @@ public class DonutGenerator : MonoBehaviour
             Debug.LogWarning($"{generatorLevel}레벨 확률 데이터를 찾을 수 없습니다.");
             return null;
         }
+        
+        
 
         // 레벨별 범위 계산
         // 1~5레벨은 1단계부터 시작 / 6레벨 이상은 낮은 단계 제외
@@ -53,6 +55,14 @@ public class DonutGenerator : MonoBehaviour
         float cumulative = 0f;
         int chosenLevel = startLevel;
 
+        // 해당 레벨의 모든 도넛 목록 가져오기
+        List<DonutData> availableDonuts = dataManager.GetDonutsByLevel(chosenLevel);
+        if (availableDonuts == null || availableDonuts.Count == 0)
+        {
+            Debug.LogWarning($"{chosenLevel}레벨 도넛이 DataManager에서 비어있습니다.");
+            return null;
+        }
+
         for (int i = 0; i < activeChances.Length; i++)
         {
             cumulative += activeChances[i];
@@ -63,15 +73,8 @@ public class DonutGenerator : MonoBehaviour
             }
         }
 
-        // 해당 레벨의 도넛 중 랜덤 1개 선택
-        var donuts = DonutDatabase.GetDonutsByLevel(chosenLevel);
-        if (donuts == null || donuts.Count == 0)
-        {
-            Debug.LogWarning($"{chosenLevel}레벨 도넛 데이터 없음!");
-            return null;
-        }
-
-        var selected = donuts[Random.Range(0, donuts.Count)];
+        // 랜덤 타입 선택
+        DonutData selected = availableDonuts[Random.Range(0, availableDonuts.Count)];
         Debug.Log($"생성기 Lv.{generatorLevel} → 도넛 Lv.{chosenLevel} ({selected.displayName}) 생성됨");
 
         return selected;

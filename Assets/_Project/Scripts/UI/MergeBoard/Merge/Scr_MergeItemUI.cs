@@ -143,7 +143,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         BoardManager.Instance.selectedCell = null;
     }
 
-    private async void TryPlaceOrMerge(Cells targetCell)
+    private void TryPlaceOrMerge(Cells targetCell)
     {
         // 같은 칸이면 리셋
         if (targetCell == currentCell)
@@ -178,8 +178,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         // 서로 같은 타입·레벨인지 확인
-        var myData = DonutDatabase.GetDonutByID(donutID);
-        var otherData = DonutDatabase.GetDonutByID(otherItem.donutID);
+        var myData = DataManager.Instance.GetDonutByID(donutID);
+        var otherData = DataManager.Instance.GetDonutByID(otherItem.donutID);
 
         if (myData == null || otherData == null)
         {
@@ -192,7 +192,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         if (myData.donutType == otherData.donutType && myData.level == otherData.level)
         {
             // 다음 단계 도넛 찾기 (자동 계산)
-            var nextDonut = DonutDatabase.GetNextDonut(donutID);
+            var nextDonut = DataManager.Instance.GetNextDonut(myData);
 
             if (nextDonut == null)
             {

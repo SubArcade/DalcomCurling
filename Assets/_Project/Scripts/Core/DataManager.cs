@@ -283,8 +283,45 @@ public class DataManager : MonoBehaviour
         //Debug.LogWarning($"[DonutDB] No data found for {type} level {level}");
         return null;
     }
-    
-    
+
+    // ID 기반으로 DonutData 가져오기 (ex: "Hard_3")
+    public DonutData GetDonutByID(string id)
+    {
+        string[] parts = id.Split('_');
+        if (parts.Length != 2) return null;
+
+        if (System.Enum.TryParse(parts[0], out DonutType type) &&
+            int.TryParse(parts[1], out int level))
+        {
+            return GetDonutData(type, level);
+        }
+        return null;
+    }
+
+    // 다음 단계 도넛 자동 가져오기 (머지 시 사용)
+    public DonutData GetNextDonut(DonutData current)
+    {
+        if (current == null) return null;
+
+        var next = GetDonutData(current.donutType, current.level + 1);
+        return next;
+    }
+
+    // 특정 레벨의 모든 도넛 가져오기 (랜덤 생성용)
+    public List<DonutData> GetDonutsByLevel(int level)
+    {
+        List<DonutData> result = new();
+
+        foreach (var so in _donutTypeDB.Values)
+        {
+            var data = so.GetLevelData(level);
+            if (data != null)
+                result.Add(data);
+        }
+        return result;
+    }
+
+
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
     {
