@@ -111,37 +111,76 @@ public class DataManager : MonoBehaviour
     {
         docId = uId;
         PlayerData.email = userEmail;
-        int maxEnergy = PlayerData.maxEnergy;
-        int secEnergy = PlayerData.perSecEnergy;
         
-        var docRef = db.Collection("user").Document(uId);
+        int maxEnergy = userData.player.maxEnergy;
+        int secEnergy = userData.player.perSecEnergy;
+        
+        int cellMax = MergeBoardData.cellMax;
+        int cellWidth = MergeBoardData.cellWidth;
+        int cellLength = MergeBoardData.cellLength;
+        
+        int baseGold = QuestData.baseGold;
+        
+        var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
         
         if (!snap.Exists)
         {
             // 처음 로그인 시
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
-            BasePlayerData(maxEnergy,secEnergy);
-            await docRef.SetAsync(PlayerData, SetOptions.MergeAll);
+            
+            BasePlayerData(maxEnergy, secEnergy);
+            BaseInventoryData();
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold);
+
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
         }
         else
         {
             // 기존 유저 로드
-            userData.player = snap.ConvertTo<PlayerData>();  
-            BasePlayerData(maxEnergy,secEnergy);
-            Debug.Log($"[FS] 기존 유저 로드 완료: /{userCollection}/{uId}");
+            userData = snap.ConvertTo<UserDataRoot>();
+
+            PlayerData.email = userEmail;
+            
+            BasePlayerData(maxEnergy, secEnergy);
+            BaseInventoryData();
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold);
+
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            Debug.Log($"[FS] 기존 유저 로드/갱신 완료: /{userCollection}/{uId}");
         }
         OnUserDataChanged?.Invoke(PlayerData);
     }
-
+    
     // 기본 데이터 적용
     private void BasePlayerData(int maxEnergy, int secEnergy)
     {
         PlayerData.maxEnergy = maxEnergy;
         PlayerData.perSecEnergy = secEnergy;
     }
+
+    // 기본 인벤토리 데이터
+    private void BaseInventoryData()
+    {
+        
+    }
     
+    // 기본 머지보드 데이터
+    private void BaseMergeBoardData(int cellMax, int cellWidth, int cellLength)
+    {
+        MergeBoardData.cellMax = cellMax;
+        MergeBoardData.cellWidth = cellWidth;
+        MergeBoardData.cellLength = cellLength;
+    }
+    
+    // 기본 퀘스트 데이터
+    private void BaseQuestData(int baseGold)
+    {
+        QuestData.baseGold = baseGold;
+    }
     // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
     public async Task UpdateUserDataAsync(
@@ -213,23 +252,11 @@ public class DataManager : MonoBehaviour
     {
         try
         {
-            var patch = new Dictionary<string, object>
-            {
-                ["email"]   = PlayerData.email,
-                ["nickname"]   = PlayerData.nickname,
-                ["gold"]    = PlayerData.gold,
-                ["gem"]     = PlayerData.gem,
-                ["energy"]  = PlayerData.energy,
-                ["level"]   = PlayerData.level,
-                ["exp"]     = PlayerData.exp,
-                ["lastAt"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                ["soloScore"]   = PlayerData.soloScore,
-                ["soloTier"] = PlayerData.soloTier
-            };
-
+            PlayerData.lastAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            
             var docRef = db.Collection(userCollection).Document(docId);
-            await docRef.SetAsync(patch, SetOptions.MergeAll);
-
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            
             Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
         }
         catch (System.Exception e)
