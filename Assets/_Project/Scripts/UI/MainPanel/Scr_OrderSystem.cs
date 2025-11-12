@@ -206,8 +206,8 @@ public class Scr_OrderSystem : MonoBehaviour
 
         foreach (var cell in boardCells)
         {
-            if (!cell.isActive || string.IsNullOrEmpty(cell.donutID)) continue;
-            boardDonutIDs.Add(cell.donutID);
+            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
+            boardDonutIDs.Add(cell.donutId);
         }
 
         bool allMatched = true;
