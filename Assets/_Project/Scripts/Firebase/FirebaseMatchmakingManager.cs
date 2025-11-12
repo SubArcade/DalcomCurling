@@ -43,6 +43,9 @@ public class Game
 
     [FirestoreProperty]
     public string CurrentTurnPlayerId { get; set; }
+    
+    [FirestoreProperty]
+    public string RoundStartingPlayerId { get; set; }
 
     [FirestoreProperty]
     public string GameState { get; set; } // "Initializing", "Timeline", "InProgress", "Finished"
@@ -52,6 +55,16 @@ public class Game
 
     [FirestoreProperty]
     public int TurnNumber { get; set; } // 현재 턴 번호 (1~8)
+    
+    [FirestoreProperty]
+    public int RoundNumber { get; set; } // 현재 라운드 정보 ( 1 ~ 3 )
+    
+    [FirestoreProperty]
+    public int ATeamScore { get; set; } //A 팀의 현재 점수
+    
+    [FirestoreProperty]
+    public int BTeamScore { get; set; } //B 팀의 현재 점수
+    
 
     [FirestoreProperty]
     public Dictionary<string, int> DonutsIndex { get; set; } // 플레이어별 사용한 돌 개수
@@ -363,9 +376,13 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         {
             PlayerIds = room.PlayerIds,
             CurrentTurnPlayerId = room.PlayerIds[0], // 첫 번째 플레이어부터 시작
+            RoundStartingPlayerId = room.PlayerIds[0], // 첫 번째 플레이어가 이 라운드의 시작 플레이어임을 기록
             GameState = "Initializing",
             ReadyPlayers = new List<string>(),
-            TurnNumber = 1,
+            TurnNumber = 0,
+            RoundNumber = 1,
+            ATeamScore = 0,
+            BTeamScore = 0,
             DonutsIndex = new Dictionary<string, int>
             {
                 { room.PlayerIds[0], 0 },

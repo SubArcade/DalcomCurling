@@ -1,6 +1,8 @@
-using System;
+﻿using System;
 using UnityEngine;
+#if UNITY_ANDROID
 using Unity.Notifications.Android;
+#endif
 
 public class EnergyRegenNotifier : MonoBehaviour
 {
@@ -15,8 +17,10 @@ public class EnergyRegenNotifier : MonoBehaviour
     [SerializeField] private string messageText = $"에너지가 회복되었어요.";
 
     // 알림 중복 방지용 (마지막 예약 ID 기억)
+#if UNITY_ANDROID
     private static int? _lastScheduledId;
     private static bool _channelRegistered;
+#endif
 
     // 프로젝트의 싱글톤/데이터 접근은 여기에 맞춰주세요
     private PlayerData playerData => DataManager.Instance.PlayerData;
@@ -28,7 +32,9 @@ public class EnergyRegenNotifier : MonoBehaviour
 
     private void Awake()
     {
+#if UNITY_ANDROID
         EnsureChannel();
+#endif
     }
 
     private void Start()
@@ -99,6 +105,7 @@ public class EnergyRegenNotifier : MonoBehaviour
     // 가득 차는 시간 계산 → 알림 예약
     private void RescheduleNotification()
     {
+#if UNITY_ANDROID
         // 기존 예약 취소(이 채널에서 보낸 마지막 알림만 취소)
         if (_lastScheduledId.HasValue)
         {
@@ -130,6 +137,7 @@ public class EnergyRegenNotifier : MonoBehaviour
         _lastScheduledId = id;
 
         Debug.Log($"[EnergyRegen] Full at {fireLocal} (local) / {fullUtc.Value} (UTC). NotiId={id}");
+#endif
     }
 
     // 가득 도달 시각(UTC) 계산
@@ -154,6 +162,7 @@ public class EnergyRegenNotifier : MonoBehaviour
 
     private void EnsureChannel()
     {
+#if UNITY_ANDROID
         if (_channelRegistered) return;
 
         var ch = new AndroidNotificationChannel(
@@ -161,6 +170,7 @@ public class EnergyRegenNotifier : MonoBehaviour
         );
         AndroidNotificationCenter.RegisterNotificationChannel(ch);
         _channelRegistered = true;
+#endif
     }
 
     private long NowUtcSeconds() => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
