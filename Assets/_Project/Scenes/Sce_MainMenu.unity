@@ -4886,6 +4886,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &767184375 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3709520764564807504, guid: 946271c18b0620445b1d606535df58b4, type: 3}
+  m_PrefabInstance: {fileID: 984080953165575113}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &768597662
 GameObject:
   m_ObjectHideFlags: 0
@@ -4901,7 +4912,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &768597663
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6224,7 +6235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startPanel: {fileID: 743854375}
-  loginPanel: {fileID: 964621348}
+  loginPanel: {fileID: 768597662}
   mainPanel: {fileID: 2916679745113047451}
   detailedSettigsPanel: {fileID: 132189096946759212}
   giftboxPopup: {fileID: 0}
@@ -6434,7 +6445,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &964621349
 RectTransform:
   m_ObjectHideFlags: 0
@@ -35158,6 +35169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Level_Text: {fileID: 0}
   LevelText: {fileID: 0}
+  nicknameText: {fileID: 767184375}
   PlayerExp: {fileID: 0}
   ExpView: {fileID: 0}
   CloseButton: {fileID: 0}
@@ -41245,7 +41257,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!222 &7013913599625050463
 CanvasRenderer:
   m_ObjectHideFlags: 0

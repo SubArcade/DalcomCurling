@@ -46,18 +46,18 @@ public class FirebaseAuthManager
         // 초기 상태 강제 확인
         OnChanged(this, null);
         
-        // await FirebaseApp.CheckAndFixDependenciesAsync();
-        //
-        // if (auth.CurrentUser != null)
-        // {
-        //     Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
-        //     UIManager.Instance.Open(PanelId.StartPanel);
-        // }
-        // else
-        // {
-        //     Debug.Log("로그인 필요 (게스트 또는 계정 로그인)");
-        //     UIManager.Instance.Open(PanelId.LoginPanel);
-        // }
+        await FirebaseApp.CheckAndFixDependenciesAsync();
+        
+        if (auth.CurrentUser != null)
+        {
+            Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
+            UIManager.Instance.Open(PanelId.StartPanel);
+        }
+        else
+        {
+            Debug.Log("로그인 필요 (게스트 또는 계정 로그인)");
+            UIManager.Instance.Open(PanelId.LoginPanel);
+        }
     }
 
     private void OnChanged(object sender, EventArgs e)

@@ -11,6 +11,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
 
     [Header("플레이어 레벨 텍스트")]
     [SerializeField] private TextMeshProUGUI LevelText;
+    
+    [SerializeField] private TextMeshProUGUI nicknameText;
 
     [Header("플레이어 경험치 이미지")]
     [SerializeField] private Image PlayerExp;
