@@ -15,6 +15,8 @@ public class Test_MainMenu : MonoBehaviour
     public string id;
     public string pw;
 
+    public Button testDBSaveButton;
+
     private Dictionary<string, string> idDictionary = new Dictionary<string, string>
     {
         { "오민호", "omh@test.com" },
@@ -53,6 +55,8 @@ public class Test_MainMenu : MonoBehaviour
         OnDropdownChanged(0);
         // 값 변경 시 호출될 이벤트 등록
         dropdown.onValueChanged.AddListener(OnDropdownChanged);
+        testDBSaveButton.onClick.AddListener(async () => await DataManager.Instance.SaveAllUserDataAsync());
+
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
