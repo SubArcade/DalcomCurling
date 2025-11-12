@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerData
 {
     [field: SerializeField, Tooltip("이메일")] [FirestoreProperty] public string email { get; set; }
-    [field: SerializeField, Tooltip("이메일")] [FirestoreProperty] public string nickname { get; set; }
+    [field: SerializeField, Tooltip("닉네임")] [FirestoreProperty] public string nickname { get; set; }
     [field: SerializeField, Tooltip("골드")] [FirestoreProperty] public int gold { get; set; }
     [field: SerializeField, Tooltip("잼")] [FirestoreProperty] public int gem { get; set; }
     [field: SerializeField, Tooltip("에너지")] [FirestoreProperty] public int energy { get; set; }
