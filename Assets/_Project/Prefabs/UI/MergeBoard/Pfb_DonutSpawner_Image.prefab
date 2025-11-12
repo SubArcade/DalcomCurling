@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7817632838649478949}
   - component: {fileID: 6135651899119101767}
   - component: {fileID: 7706535323891441447}
+  - component: {fileID: 4220737906824540302}
   m_Layer: 5
   m_Name: Pfb_DonutSpawner_Image
   m_TagString: Untagged
@@ -75,3 +76,17 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4220737906824540302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3830763277699481910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26cd53bfef1621442a8dd814a5aa2abe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generatorLevel: 2
+  database: {fileID: 11400000, guid: 5e668c652419034428f65732dd565d2e, type: 2}
