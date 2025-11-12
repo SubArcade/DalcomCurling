@@ -45,7 +45,10 @@ public class UserDataRoot
         soloScore = 0,
         soloTier = GameTier.Bronze,
     };
-    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
+    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData() 
+    {
+
+    };
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
         cellMax = 49,

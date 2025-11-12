@@ -3,9 +3,9 @@ using UnityEngine;
 
 public enum DonutType
 {
-    Hard, //단단
-    Soft, //말랑
-    Moist //촉촉
+    Hard, //단단 0
+    Soft, //말랑 1
+    Moist //촉촉 2
 }
 
 [System.Serializable]
@@ -15,10 +15,10 @@ public class DonutData
     [Tooltip("고유ID")] public string id;        // 고유 ID   donutType_Level
     [Range(1, 30), Tooltip("레벨")] public int level;
     [Tooltip("이미지")] public Sprite sprite;    // 스프라이트 참조
-    [Tooltip("자세한 도넛 이름")] public string displayName; // UI 표시명
+    [Tooltip("자세한 도넛 이름")] public string displayName; // UI 표시명 hard
     
     [Header("설명, 수치")]
-    [Tooltip("설명")] public string description; //설명
+    [Tooltip("설명")] public string description; //설명7단계
     [Tooltip("도넛 타입")] public DonutType donutType;
     [Tooltip("도넛 프리팹")] public GameObject prefab;
 

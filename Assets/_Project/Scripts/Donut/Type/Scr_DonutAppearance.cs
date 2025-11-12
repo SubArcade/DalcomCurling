@@ -10,7 +10,7 @@ public class DonutAppearance : MonoBehaviour
     public int friction; // 마찰력
     
     [Header("레벨 설정")]
-    [Range(1, 30)] public int PlayerLevel = 1;
+    [Range(1, 30)] public int level = 1;
 
     private Transform fullDonut;
     private Transform holeDonut;
@@ -69,7 +69,7 @@ public class DonutAppearance : MonoBehaviour
         
         int maxState = Mathf.Max(weight, resilience, friction);
 
-        Debug.Log($"스탯 분석 - W:{weight}, R:{resilience}, F:{friction}, 최대값:{maxState}, 레벨:{PlayerLevel}");
+        Debug.Log($"스탯 분석 - W:{weight}, R:{resilience}, F:{friction}, 최대값:{maxState}, 레벨:{level}");
 
         // 1. 모든 도넛을 비활성화 하고
         SetAllDonutsActive(false);
@@ -151,9 +151,9 @@ public class DonutAppearance : MonoBehaviour
             }
 
             // 플레이어 레벨에 해당하는 인덱스 계산 (1~30 → 0~29)
-            int targetIndex = Mathf.Clamp(PlayerLevel - 1, 0, childCount - 1);
+            int targetIndex = Mathf.Clamp(level - 1, 0, childCount - 1);
 
-            Debug.Log($"활성화할 인덱스: {targetIndex} (레벨 {PlayerLevel} → 인덱스 {targetIndex})");
+            Debug.Log($"활성화할 인덱스: {targetIndex} (레벨 {level} → 인덱스 {targetIndex})");
 
             // 해당 인덱스의 자식 활성화
             if (targetIndex >= 0 && targetIndex < childCount)
@@ -190,5 +190,15 @@ public class DonutAppearance : MonoBehaviour
         // 새 콜라이더 활성화
         if (currentCollider != null)
             currentCollider.enabled = true;
+    }
+
+    public void ApplyDonutData(DonutData data)
+    {
+        weight = data.weight;
+        resilience = data.resilience;
+        friction = data.friction;
+        level = data.level;
+
+        UpdateDonutAppearance();
     }
 }
