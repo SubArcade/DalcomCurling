@@ -24,12 +24,16 @@ public class BoardManager : MonoBehaviour
 
     public Cells selectedCell; // 선택한 셀
 
+
+
     [Header("도넛 스프라이트")]
     public Sprite[] donutSprites;
 
     void Awake()
     {
         Instance = this;
+
+        
     }
 
     async void Start()
@@ -77,20 +81,50 @@ public class BoardManager : MonoBehaviour
         selectionHighlight.rectTransform.anchoredPosition = Vector2.zero;
     }
 
+    //void GenerateBoard()
+    //{
+    //    cells = new Cells[boardSize, boardSize];  // 7x7칸 저장할 배열
+    //    float offset = (boardSize - 1) / 2f;      // 중앙 맞추기용 위치 조정
+
+    //    for (int x = 0; x < boardSize; x++)
+    //    {
+    //        for (int y = 0; y < boardSize; y++)
+    //        {
+    //            GameObject obj = Instantiate(cellPrefab, transform);
+    //            obj.transform.localPosition = new Vector3(x - offset, 0, y - offset);
+
+    //            cells[x, y] = obj.GetComponent<Cells>();
+    //            cells[x, y].Init(x, y);
+    //        }
+    //    }
+    //}
+
     void GenerateBoard()
     {
-        cells = new Cells[boardSize, boardSize];  // 7x7칸 저장할 배열
-        float offset = (boardSize - 1) / 2f;      // 중앙 맞추기용 위치 조정
+        cells = new Cells[boardSize, boardSize];
+        float offset = (boardSize - 1) / 2f;
 
         for (int x = 0; x < boardSize; x++)
         {
             for (int y = 0; y < boardSize; y++)
             {
                 GameObject obj = Instantiate(cellPrefab, transform);
-                obj.transform.localPosition = new Vector3(x - offset, 0, y - offset);
+                Cells cell = obj.GetComponent<Cells>();
+                cells[x, y] = cell;
 
-                cells[x, y] = obj.GetComponent<Cells>();
-                cells[x, y].Init(x, y);
+                // 중앙 거리 기반 잠금 레벨 설정 (예: 1,3,5,7,10)
+                int distance = Mathf.Max(Mathf.Abs(x - boardSize / 2), Mathf.Abs(y - boardSize / 2));
+                int requiredLevel = distance switch
+                {
+                    0 => 1,
+                    1 => 3,
+                    2 => 5,
+                    3 => 7,
+                    _ => 10
+                };
+
+                cell.SetLockLevel(requiredLevel);
+                cell.UpdateLockState(); // 현재 플레이어 레벨 기준으로 표시
             }
         }
     }
@@ -151,12 +185,14 @@ public class BoardManager : MonoBehaviour
         var item = donutObj.GetComponent<MergeItemUI>();
         var img = donutObj.GetComponent<Image>();
         img.sprite = donutData.sprite;
-        item.donutID = donutData.id;
+        item.donutId = donutData.id;
+
 
         // 셀에 등록
         target.SetItem(item);
 
         Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
+        AutoSaveBoardLocal();
     }
 
 
@@ -166,7 +202,7 @@ public class BoardManager : MonoBehaviour
         foreach (var cell in GetAllCells())
         {
             if (!cell.isActive) continue;
-            if (cell.donutID == targetID)
+            if (cell.donutId == targetID)
                 return cell;
         }
         return null;
@@ -187,6 +223,19 @@ public class BoardManager : MonoBehaviour
 
         target.ClearItem();
         Debug.Log($"도넛 '{targetID}' 삭제 완료");
+
+        // MergeBoardData에서 동일한 셀 데이터 제거
+        var boardData = DataManager.Instance.MergeBoardData;
+        var cellData = boardData.cells.Find(c => c.donutId == targetID);
+        if (cellData != null)
+            boardData.cells.Remove(cellData);
+
+        AutoSaveBoardLocal();
+    }
+    public void RefreshBoardUnlock() // 플레이어 레벨로 보드 갱신
+    {
+        int playerLevel = DataManager.Instance.PlayerData.level;
+        UpdateBoardUnlock(playerLevel);
     }
 
     // 레벨 활성영역 업데이트
@@ -230,4 +279,26 @@ public class BoardManager : MonoBehaviour
         if (x < 0 || y < 0 || x >= boardSize || y >= boardSize) return null;
         return cells[x, y];
     }
+
+    public void AutoSaveBoardLocal()
+    {
+        var boardData = DataManager.Instance.MergeBoardData;
+        if (boardData == null) return;
+
+        boardData.cells.Clear();
+
+        foreach (var cell in GetAllCells())
+        {
+            if (cell.occupant == null) continue;
+            boardData.cells.Add(new CellData
+            {
+                x = cell.gridX,
+                y = cell.gridY,
+                donutId = cell.donutId
+            });
+        }
+
+        Debug.Log($"[AutoSaveBoardLocal] 현재 보드 상태를 MergeBoardData에 로컬 저장 ({boardData.cells.Count}개)");
+    }
+
 }

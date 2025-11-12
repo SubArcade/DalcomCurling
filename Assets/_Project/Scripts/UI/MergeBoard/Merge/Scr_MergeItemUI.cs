@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public string donutID;
+    public string donutId;
 
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
@@ -34,7 +34,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         transform.SetParent(cell.transform, false);
         
         // 셀과 도넛ID 연결
-        cell.donutID = donutID;
+        cell.donutId = donutId;
         cell.occupant = this;
     }
 
@@ -178,12 +178,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         // 서로 같은 타입·레벨인지 확인
-        var myData = DataManager.Instance.GetDonutByID(donutID);
-        var otherData = DataManager.Instance.GetDonutByID(otherItem.donutID);
+        var myData = DataManager.Instance.GetDonutByID(donutId);
+        var otherData = DataManager.Instance.GetDonutByID(otherItem.donutId);
 
         if (myData == null || otherData == null)
         {
-            Debug.LogWarning($"[MERGE] 도넛 데이터가 존재하지 않습니다. ({donutID})");
+            Debug.LogWarning($"[MERGE] 도넛 데이터가 존재하지 않습니다. ({donutId})");
             ResetPosition();
             return;
         }
@@ -196,7 +196,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
             if (nextDonut == null)
             {
-                Debug.LogWarning($"[MERGE] 다음 단계 도넛 없음 ({donutID})");
+                Debug.LogWarning($"[MERGE] 다음 단계 도넛 없음 ({donutId})");
                 ResetPosition();
                 return;
             }
@@ -204,14 +204,19 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             // 머지 성공 → 상위 스프라이트로 교체
             Sprite nextSprite = nextDonut.sprite;
             otherItem.GetComponent<Image>().sprite = nextSprite;
-            otherItem.donutID = nextDonut.id;
+            otherItem.donutId = nextDonut.id;
+            
+            // 셀의 donutID도 갱신
+            if (otherItem.currentCell != null)
+                otherItem.currentCell.donutId = nextDonut.id;
 
             // 현재 도넛 제거
             currentCell.ClearItem();
             Destroy(gameObject);
 
-            Debug.Log($"[MERGE] {donutID} → {nextDonut.id} 머지 성공");
-            //await AutoSaveAsync();
+            Debug.Log($"[MERGE] {donutId} → {nextDonut.id} 머지 성공");
+
+            BoardManager.Instance.AutoSaveBoardLocal(); //로컬 저장
             return;
         }
 
