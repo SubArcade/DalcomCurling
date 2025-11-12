@@ -41,9 +41,9 @@ public class DonutManager : MonoBehaviour
         GameObject newDonut = Instantiate(donutMasterPrefab, spawnPosition, Quaternion.identity);
         DonutAppearance appearance = newDonut.GetComponent<DonutAppearance>();
 
-        appearance.Weight = Weight;
-        appearance.Resilience = Resilience;
-        appearance.Friction = Friction;
+        appearance.weight = Weight;
+        appearance.resilience = Resilience;
+        appearance.friction = Friction;
         appearance.PlayerLevel = DonutLevel;
         appearance.UpdateDonutAppearance();
         spawnedDonuts.Add(newDonut);
@@ -59,9 +59,9 @@ public class DonutManager : MonoBehaviour
             if (donut != null)
             {
                 DonutAppearance appearance = donut.GetComponent<DonutAppearance>();
-                appearance.Weight = Weight;
-                appearance.Resilience = Resilience;
-                appearance.Friction = Friction;
+                appearance.weight = Weight;
+                appearance.resilience = Resilience;
+                appearance.friction = Friction;
                 appearance.PlayerLevel = DonutLevel;
                 appearance.UpdateDonutAppearance();
             }

@@ -1,12 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 public class DonutAppearance : MonoBehaviour
 {
     [Header("현재 스탯")]
-    public int Weight; // 무게
-    public int Resilience; // 반탄력
-    public int Friction; // 마찰력
+    public int weight; // 무게
+    public int resilience; // 반탄력
+    public int friction; // 마찰력
     
     [Header("레벨 설정")]
     [Range(1, 30)] public int PlayerLevel = 1;
@@ -25,6 +26,21 @@ public class DonutAppearance : MonoBehaviour
     {
         InitializeDonutShapes();
         UpdateDonutAppearance();
+        
+        // 예시 --- 나중에 삭제하기 
+        //Weight = DataManager.Instance.InventoryData.donutEntries.Count;
+        //Resilience = DataManager.Instance.InventoryData.donutEntries.Count;
+        //Friction = DataManager.Instance.InventoryData.donutEntries.Count;
+        //// 리시트에 도넛 Moist의 레벨 30까지 담기
+        //List<DonutData> donutDataList;
+        //donutDataList = new List<DonutData>();
+        //for (int i = 1; i < 31; i++)
+        //{
+        //    donutDataList.Add(DataManager.Instance.GetDonutData(DonutType.Moist, i));
+        //}
+
+        //DonutData donutData = DataManager.Instance.GetDonutData(DonutType.Moist, 10);
+        //int dfdf = donutData.level;
     }
     private void InitializeDonutShapes()
     {
@@ -51,9 +67,9 @@ public class DonutAppearance : MonoBehaviour
             InitializeDonutShapes();
         }
         
-        int maxState = Mathf.Max(Weight, Resilience, Friction);
+        int maxState = Mathf.Max(weight, resilience, friction);
 
-        Debug.Log($"스탯 분석 - W:{Weight}, R:{Resilience}, F:{Friction}, 최대값:{maxState}, 레벨:{PlayerLevel}");
+        Debug.Log($"스탯 분석 - W:{weight}, R:{resilience}, F:{friction}, 최대값:{maxState}, 레벨:{PlayerLevel}");
 
         // 1. 모든 도넛을 비활성화 하고
         SetAllDonutsActive(false);
@@ -61,17 +77,17 @@ public class DonutAppearance : MonoBehaviour
         Transform selectedDonut = null;
 
         // 2. 가장 높은 스탯에 해당하는 도넛 타입 활성화
-        if (Weight == maxState)
+        if (weight == maxState)
         {
             Debug.Log("FullDonut 활성화");
             selectedDonut = fullDonut;
         }
-        else if (Resilience == maxState)
+        else if (resilience == maxState)
         {
             Debug.Log("HoleDonut 활성화");
             selectedDonut = holeDonut;
         }
-        else if (Friction == maxState)
+        else if (friction == maxState)
         {
             Debug.Log("StarDonut 활성화");
             selectedDonut = starDonut;
