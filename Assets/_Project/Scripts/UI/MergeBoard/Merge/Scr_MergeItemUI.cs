@@ -237,7 +237,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private void MoveToCell(Cells target)
     {
         currentCell?.ClearItem();
-        target.SetItem(this, donutData);
+        target.SetItem(this, donutData); 
         transform.SetParent(target.transform, false);
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.localScale = Vector3.one;

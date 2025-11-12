@@ -6,10 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Scr_OrderSystem : MonoBehaviour
-{
-    //추가해야할 변수 : 도넛레벨마다 잡을 보상값 200~250
-    //도넷 레벨, 도넛 이미지, 도넛 타입, 도넛 설명
-    //
+{ 
     [Header("1번 주문서")]
     [SerializeField] private GameObject orderGroup1; //주문서 그룹
     [SerializeField] private List<Image> orderDonuts1; //주문서 이미지
@@ -37,7 +34,7 @@ public class Scr_OrderSystem : MonoBehaviour
     [Header("갱신된 새로고침 횟수 텍스트")]
     [SerializeField] private TextMeshProUGUI refreshCountText;
 
-
+    
     private int refreshCount = 5; //새로고침 횟수
     private const int maxRefreshCount = 5; //최대 새로고침 횟수
 
@@ -108,7 +105,6 @@ public class Scr_OrderSystem : MonoBehaviour
         donutVisuals1 = FindCheckMark(orderDonuts1);
         donutVisuals2 = FindCheckMark(orderDonuts2);
         donutVisuals3 = FindCheckMark(orderDonuts3);
-
     }
     void Start()
     {     
@@ -127,18 +123,29 @@ public class Scr_OrderSystem : MonoBehaviour
         RefreshOrderDonut(orderDonuts2, donutTextInfos2, orderDonutIDs2,costText2);
         RefreshOrderDonut(orderDonuts3, donutTextInfos3, orderDonutIDs3,costText3);
 
+        //시작 시 퀘스트 완료 판떼기 비활성화
         completeObject1.SetActive(false);
         completeObject2.SetActive(false);
         oompleteObject3.SetActive(false);
+
+        //시작 할때 버튼색 흐리게
+        SetButtonFade(orderClearBtn1);
+        SetButtonFade(orderClearBtn2);
+        SetButtonFade(orderClearBtn3);
     }
 
     void Update()
     {
-        IsOrderCompleted(orderDonutIDs1, donutVisuals1);
-        IsOrderCompleted(orderDonutIDs2, donutVisuals2);
-        IsOrderCompleted(orderDonutIDs3, donutVisuals3);
+        bool isOrder1Complete = IsOrderCompleted(orderDonutIDs1, donutVisuals1);
+        bool isOrder2Complete = IsOrderCompleted(orderDonutIDs2, donutVisuals2);
+        bool isOrder3Complete = IsOrderCompleted(orderDonutIDs3, donutVisuals3);
 
         FindCheckMarkBoard();
+
+        // ✅ 보상 버튼 활성화 조건
+        orderClearBtn1.interactable = isOrder1Complete;
+        orderClearBtn2.interactable = isOrder2Complete;
+        orderClearBtn3.interactable = isOrder3Complete;
     }
 
     //새로고침 버튼 상호작용
@@ -231,8 +238,23 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 완료시 버튼 상호작용
     public void OnClickClearButton(GameObject completeObject, List<string> orderDonutIDs)
     {
-        //해당하는 보상 수령 로직도 넣기      
+        // ✅ 보드에서 주문서 도넛 제거
+        foreach (var cell in BoardManager.Instance.GetAllCells())
+        {
+            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
+
+            if (orderDonutIDs.Contains(cell.donutId))
+            {
+                if (cell.occupant != null)
+                    Destroy(cell.occupant.gameObject); // 도넛 오브젝트 제거
+
+                cell.ClearItem(); // 셀 정보 초기화
+            }
+        }
+        // ✅ 완료 UI 표시
+        //보상골드도 넣어야할걸
         completeObject.SetActive(true);
+
     }
 
     //도넛레벨별 가격 책정하기
@@ -288,7 +310,7 @@ public class Scr_OrderSystem : MonoBehaviour
         return result;
     }
 
-    //머지보드판 체크마크 띄우기
+    //머지보드판 체크마크 띄우기, 체크마크 삭제는 entryslot 스크립트에 추가함.
     private void FindCheckMarkBoard()
     {
         // 주문서에 있는 모든 도넛 ID를 하나의 집합으로 통합
@@ -307,13 +329,24 @@ public class Scr_OrderSystem : MonoBehaviour
             var checkMark = item.transform.Find("CheckMark")?.gameObject;
             //checkmark찾기
             
-            bool isInEntrySlot = item.transform.parent.GetComponent<EntrySlot>() != null;
-            //엔트리슬롯이면 체크마크 끄기
+
             if (checkMark != null)
-            { 
-                checkMark.SetActive(allOrderIDs.Contains(id)&& !isInEntrySlot);
+            {
+                checkMark.SetActive(allOrderIDs.Contains(id));
             }
         }
+    }
+
+    //주문서 퀘스트클리어 버튼 비활성화 상태일경우 버튼의 색
+    void SetButtonFade(Button button)
+    {
+        ColorBlock cb = button.colors;
+        cb.disabledColor = new Color(0.6f, 0.6f, 0.6f, 1f);
+        cb.normalColor = Color.white;
+        cb.highlightedColor = new Color(1f, 1f, 1f, 0.8f);
+        cb.pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f);
+        cb.selectedColor = Color.white;
+        button.colors = cb;
     }
 
     //사용하는 함수 아님니다 나중에 쓰던가 버리던가 할겁니댱
@@ -322,11 +355,13 @@ public class Scr_OrderSystem : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             QuestList quest = new QuestList();
-            quest.rewardGold = rewardGolds[i];
-           
+            quest.rewardGold = rewardGolds[i];        
             quest.donutId = donutIds[i];
 
-            DataManager.Instance.QuestData.questList.Add(quest);
+            //DataManager.Instance.QuestData.questList[i];
         }
     }
 }
+//1.퀘스트가 클리어 되면 일정 시간후에 횟수차감없이 그 퀘스트칸만 새로고침
+//2.골드 보상 실제로 받아서 위의 상황판에 적용
+//데이터 파이어스토어 넘기기

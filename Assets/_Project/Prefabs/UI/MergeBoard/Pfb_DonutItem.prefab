@@ -135,7 +135,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b07d15072c196144aad4c26d21deda5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  donutID: 
+  donutId: 
+  donutData:
+    id: 
+    level: 0
+    sprite: {fileID: 0}
+    displayName: 
+    description: 
+    donutType: 0
+    prefab: {fileID: 0}
+    weight: 0
+    resilience: 0
+    friction: 0
+    rewardGem: 1
 --- !u!225 &7407012077420254979
 CanvasGroup:
   m_ObjectHideFlags: 0
