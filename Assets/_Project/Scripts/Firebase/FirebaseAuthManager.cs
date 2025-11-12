@@ -1,6 +1,7 @@
 ﻿using Firebase.Auth;
 using UnityEngine;
 using System;
+using System.Threading.Tasks;
 using Firebase;
 using Google; 
 
@@ -52,12 +53,14 @@ public class FirebaseAuthManager
         {
             Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
             UIManager.Instance.Open(PanelId.StartPanel);
+            await DataManager.Instance.EnsureUserDocAsync(auth.CurrentUser.UserId, isAutoLogin: true);
         }
         else
         {
             Debug.Log("로그인 필요 (게스트 또는 계정 로그인)");
             UIManager.Instance.Open(PanelId.LoginPanel);
         }
+        
     }
 
     private void OnChanged(object sender, EventArgs e)
@@ -130,6 +133,7 @@ public class FirebaseAuthManager
             await DataManager.Instance.EnsureUserDocAsync(user.UserId, user.Email ?? "guest");
             
             LoginState?.Invoke(true);
+            UIManager.Instance.Open(PanelId.StartPanel);
         }
         catch (Exception e)
         {
@@ -178,5 +182,24 @@ public class FirebaseAuthManager
         auth.SignOut();
         Debug.Log("로그아웃");
         LoginState?.Invoke(false);
+        UIManager.Instance.Open(PanelId.LoginPanel);
+    }
+
+    public async Task ConnectAccountAsync(string email, string password)
+    {
+        var cred = EmailAuthProvider.GetCredential(email, password);
+
+        try
+        {
+            // UID 유지한 채 게스트 → 정식 계정 승격
+            await auth.CurrentUser.LinkWithCredentialAsync(cred);
+            
+            DataManager.Instance.PlayerData.email = email;
+            Debug.Log($"[Auth] 게스트 계정이 {email}로 연동 완료");
+        }
+        catch (FirebaseException e)
+        {
+            Debug.LogError($"[Auth] 연동 실패: {e.Message}");
+        }
     }
 }

@@ -24,6 +24,7 @@ public enum PanelId
     Matching,
     EntryPopUp,
     MatchingPopUp,
+    TestLoginPanel
 }
 
 public class UIManager : MonoBehaviour
@@ -101,6 +102,7 @@ public class UIManager : MonoBehaviour
             case PanelId.StartPanel:
             case PanelId.LoginPanel:
             case PanelId.MainPanel:
+            case PanelId.TestLoginPanel:
                 break;
             default:
                 //Debug.Log("vkvkvkvkvkvkvk");

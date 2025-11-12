@@ -15,7 +15,8 @@ public enum PanelId_Test
     Giftbox,
     Info,
     DonutInfo,
-    Matching
+    Matching,
+    TestLogin
 }
 
 public class UIManager_Test : MonoBehaviour

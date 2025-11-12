@@ -39,6 +39,11 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [Header("임시용 경험치주는버튼 삭제예정")]
     public Button getExpButton;
 
+    private void OnEnable()
+    {
+        TextSetUp();
+    }
+    
     void Awake()
     {
         Transform canvas = GameObject.FindGameObjectWithTag("MainCanvas")?.transform;
@@ -166,6 +171,12 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     void OnClickCloseRewardPopUp()
     {
         RewardCheckPanel.SetActive(false);
+    }
+
+    public void TextSetUp()
+    {
+        //Debug.Log("텍스트 셋업");
+        nicknameText.text = DataManager.Instance.PlayerData.nickname;
     }
 }
 

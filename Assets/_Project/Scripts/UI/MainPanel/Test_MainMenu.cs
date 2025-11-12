@@ -16,6 +16,7 @@ public class Test_MainMenu : MonoBehaviour
     public string pw;
 
     public Button testDBSaveButton;
+    public Button testLogoutButton;
 
     private Dictionary<string, string> idDictionary = new Dictionary<string, string>
     {
@@ -56,6 +57,7 @@ public class Test_MainMenu : MonoBehaviour
         // 값 변경 시 호출될 이벤트 등록
         dropdown.onValueChanged.AddListener(OnDropdownChanged);
         testDBSaveButton.onClick.AddListener(async () => await DataManager.Instance.SaveAllUserDataAsync());
+        testLogoutButton.onClick.AddListener(FirebaseAuthManager.Instance.Logout);
 
     }
     
@@ -65,6 +67,7 @@ public class Test_MainMenu : MonoBehaviour
     // 데이터 UI 노출
     public void see(PlayerData playerData)
     {
+        Debug.Log("에너지 셋업");
         energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
     }
     

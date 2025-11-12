@@ -81,6 +81,7 @@ public class DataManager : MonoBehaviour
     
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
+    public event Action<UserDataRoot> OnUserDataRootChanged;
     
     // 백그라운드 이벤트
     public event Action PauseChanged;
@@ -107,10 +108,11 @@ public class DataManager : MonoBehaviour
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
-    public async Task EnsureUserDocAsync(string uId, string userEmail)
+    public async Task EnsureUserDocAsync(string uId, string userEmail= null, bool isAutoLogin = false)
     {
         docId = uId;
-        PlayerData.email = userEmail;
+        if (userEmail == "guest")
+            PlayerData.AuthProviderType = AuthProviderType.Guest;
         
         int maxEnergy = userData.player.maxEnergy;
         int secEnergy = userData.player.perSecEnergy;
@@ -123,10 +125,24 @@ public class DataManager : MonoBehaviour
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
+
+        if (isAutoLogin)
+        {
+            userData = snap.ConvertTo<UserDataRoot>();
+            
+            BasePlayerData(maxEnergy, secEnergy);
+            BaseInventoryData();
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold);
+
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            Debug.Log($"자동 로그인: /{userCollection}/{uId}");
+        }
         
         if (!snap.Exists)
         {
             // 처음 로그인 시
+            PlayerData.email = userEmail;
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
             
             BasePlayerData(maxEnergy, secEnergy);
@@ -140,9 +156,8 @@ public class DataManager : MonoBehaviour
         else
         {
             // 기존 유저 로드
-            userData = snap.ConvertTo<UserDataRoot>();
-
             PlayerData.email = userEmail;
+            userData = snap.ConvertTo<UserDataRoot>();
             
             BasePlayerData(maxEnergy, secEnergy);
             BaseInventoryData();
