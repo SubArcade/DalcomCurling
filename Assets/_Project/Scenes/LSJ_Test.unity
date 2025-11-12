@@ -266,7 +266,7 @@ MonoBehaviour:
   stonePrefabA: {fileID: 8981461065803206208, guid: 754a67bbb3acf904296a8021f058a792, type: 3}
   stonePrefabB: {fileID: 8981461065803206208, guid: 624761d8addb29342aa46959ec784abf, type: 3}
   spawnPosition: {fileID: 2010081595}
-  _scr_Collider_House: {fileID: 0}
+  _scr_Collider_House: {fileID: 1878140752}
 --- !u!114 &48117304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,10 +286,7 @@ MonoBehaviour:
   releaseButton: {fileID: 1643677546}
   trajectoryLine: {fileID: 1656189766}
   trajectoryPoints: 100
-  trajectoryTimeStep: 0.5
-  trajectoryForceMultiplier: 1
-  trajectoryCurlFactor: 0.001
-  horizontalDragSensitivity: 0.1
+  trajectoryTimeStep: 0.1
   launchForceMultiplier: 4
   maxDragDistance: 0.5
   maxRotationDragDistance: 1
@@ -4680,6 +4677,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1656189767}
   - component: {fileID: 1656189766}
+  - component: {fileID: 1656189765}
   m_Layer: 0
   m_Name: LineRenderer
   m_TagString: Untagged
@@ -4687,6 +4685,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1656189765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1656189764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 964a60fbe67ec9649924119594488295, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startPoint: {fileID: 2010081595}
+  mainCamera: {fileID: 963194227}
+  drageSensitivity: 100
+  maxLength: 6
+  curveStrength: 1
+  lineResolution: 30
 --- !u!120 &1656189766
 LineRenderer:
   serializedVersion: 2
@@ -4739,31 +4755,22 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.0056156325
-        value: 0.30309483
+        time: 0.028064728
+        value: 0.5216503
         inSlope: 0
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.98737127
-        value: 0.10824743
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
       key0: {r: 1, g: 1, b: 1, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 0.6109826}
-      key2: {r: 0, g: 0, b: 0, a: 0.36182672}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
@@ -4778,17 +4785,17 @@ LineRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 25554
-      atime2: 41669
-      atime3: 65535
+      atime1: 65535
+      atime2: 0
+      atime3: 0
       atime4: 0
       atime5: 0
       atime6: 0
       atime7: 0
       m_Mode: 0
-      m_ColorSpace: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
-      m_NumAlphaKeys: 4
+      m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
