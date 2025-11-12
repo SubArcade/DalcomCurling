@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.Threading.Tasks;
 
 public class BoardManager : MonoBehaviour
 {
@@ -185,11 +186,11 @@ public class BoardManager : MonoBehaviour
         var item = donutObj.GetComponent<MergeItemUI>();
         var img = donutObj.GetComponent<Image>();
         img.sprite = donutData.sprite;
+        item.donutData = donutData;
         item.donutId = donutData.id;
+        target.SetItem(item, donutData);
 
 
-        // 셀에 등록
-        target.SetItem(item);
 
         Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
         AutoSaveBoardLocal();

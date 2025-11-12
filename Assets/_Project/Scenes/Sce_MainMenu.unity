@@ -2646,7 +2646,7 @@ GameObject:
   - component: {fileID: 400782239}
   - component: {fileID: 400782238}
   m_Layer: 5
-  m_Name: CheckMarck
+  m_Name: CheckMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2721,7 +2721,7 @@ GameObject:
   - component: {fileID: 404302407}
   - component: {fileID: 404302406}
   m_Layer: 5
-  m_Name: CheckMarck
+  m_Name: CheckMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2936,7 +2936,7 @@ GameObject:
   - component: {fileID: 431168451}
   - component: {fileID: 431168450}
   m_Layer: 5
-  m_Name: CheckMarck
+  m_Name: CheckMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5467,7 +5467,7 @@ GameObject:
   - component: {fileID: 828091943}
   - component: {fileID: 828091942}
   m_Layer: 5
-  m_Name: CheckMarck
+  m_Name: CheckMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6813,7 +6813,7 @@ GameObject:
   - component: {fileID: 1046997409}
   - component: {fileID: 1046997408}
   m_Layer: 5
-  m_Name: CheckMarck
+  m_Name: CheckMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6888,7 +6888,7 @@ GameObject:
   - component: {fileID: 1050863925}
   - component: {fileID: 1050863924}
   m_Layer: 5
-  m_Name: CheckMarck
+  m_Name: CheckMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7995,7 +7995,7 @@ GameObject:
   - component: {fileID: 1283133281}
   - component: {fileID: 1283133280}
   m_Layer: 5
-  m_Name: CheckMarck
+  m_Name: CheckMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48133,22 +48133,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eabd218f66367341b5876e3b65814c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OrderGroup1: {fileID: 0}
-  OrderDonuts1: []
-  RefreshBtn1: {fileID: 0}
-  OrderClearBtn1: {fileID: 0}
-  CompleteObject1: {fileID: 0}
-  OrderGroup2: {fileID: 0}
-  OrderDonuts2: []
-  RefreshBtn2: {fileID: 0}
-  OrderClearBtn2: {fileID: 0}
-  CompleteObject2: {fileID: 0}
-  OrderGroup3: {fileID: 0}
-  OrderDonuts3: []
-  RefreshBtn3: {fileID: 0}
-  OrderClearBtn3: {fileID: 0}
-  CompleteObject3: {fileID: 0}
-  RefreshCountText: {fileID: 0}
+  orderGroup1: {fileID: 0}
+  orderDonuts1: []
+  refreshBtn1: {fileID: 0}
+  costText1: {fileID: 0}
+  orderClearBtn1: {fileID: 0}
+  completeObject1: {fileID: 0}
+  orderGroup2: {fileID: 0}
+  orderDonuts2: []
+  refreshBtn2: {fileID: 0}
+  costText2: {fileID: 0}
+  orderClearBtn2: {fileID: 0}
+  completeObject2: {fileID: 0}
+  orderGroup3: {fileID: 0}
+  orderDonuts3: []
+  refreshBtn3: {fileID: 0}
+  costText3: {fileID: 0}
+  orderClearBtn3: {fileID: 0}
+  oompleteObject3: {fileID: 0}
+  refreshCountText: {fileID: 0}
 --- !u!1001 &8788206544631554240
 PrefabInstance:
   m_ObjectHideFlags: 0

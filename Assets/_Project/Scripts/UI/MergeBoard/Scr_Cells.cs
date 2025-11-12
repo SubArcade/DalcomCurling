@@ -62,12 +62,14 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     }
 
     public bool IsEmpty() => occupant == null;
-    public void SetItem(MergeItemUI item)
+
+    public void SetItem(MergeItemUI item, DonutData data)
     {
         occupant = item;
-        donutId = item.donutId;
+        donutId = data.id;
         if (item) item.BindToCell(this);
     }
+
 
     public void ClearItem()
     {

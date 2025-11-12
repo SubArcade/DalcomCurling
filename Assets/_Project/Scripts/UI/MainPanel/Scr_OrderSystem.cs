@@ -137,6 +137,8 @@ public class Scr_OrderSystem : MonoBehaviour
         IsOrderCompleted(orderDonutIDs1, donutVisuals1);
         IsOrderCompleted(orderDonutIDs2, donutVisuals2);
         IsOrderCompleted(orderDonutIDs3, donutVisuals3);
+
+        FindCheckMarkBoard();
     }
 
     //새로고침 버튼 상호작용
@@ -248,6 +250,7 @@ public class Scr_OrderSystem : MonoBehaviour
             return Random.Range(4100, 8001);
         else
             return 0;
+        
     }
 
     //orderdonuts1~3에서 자식체크마크를 찾아주는 함수
@@ -285,14 +288,45 @@ public class Scr_OrderSystem : MonoBehaviour
         return result;
     }
 
-    public void SendQuest(int rewardGold, int refreshCount, string id)
+    //머지보드판 체크마크 띄우기
+    private void FindCheckMarkBoard()
     {
-        QuestList quest = new();
-        quest.rewardGold = 1;
-        quest.refreshCount = 2;
-        quest.donutId = "d";
+        // 주문서에 있는 모든 도넛 ID를 하나의 집합으로 통합
+        HashSet<string> allOrderIDs = new();
+        allOrderIDs.UnionWith(orderDonutIDs1); //각각의 주문서 1,2,3에 있는 도넛id리스트 합치기
+        allOrderIDs.UnionWith(orderDonutIDs2); //unionwith는 중복없이 합쳐수는 메서드라고함.
+        allOrderIDs.UnionWith(orderDonutIDs3); //모든 주문서에 존재하는 도넛을 하나의 집합으로 저장
+
+        foreach (var cell in BoardManager.Instance.GetAllCells()) //모든 셀 검사
+        {
+            if (!cell.isActive || cell.occupant == null) continue; //도넛이 존재하는 셀만 검사
+
+            var item = cell.occupant;  //셀에 들어잇는 도넛을 변수에 저장
+            string id = item.donutData?.id; //donutdata가 존재하면 id를 변수에 저장
+
+            var checkMark = item.transform.Find("CheckMark")?.gameObject;
+            //checkmark찾기
+            
+            bool isInEntrySlot = item.transform.parent.GetComponent<EntrySlot>() != null;
+            //엔트리슬롯이면 체크마크 끄기
+            if (checkMark != null)
+            { 
+                checkMark.SetActive(allOrderIDs.Contains(id)&& !isInEntrySlot);
+            }
+        }
+    }
+
+    //사용하는 함수 아님니다 나중에 쓰던가 버리던가 할겁니댱
+    public void SendQuest(List<int> rewardGolds, List<int> refreshCounts, List<string> donutIds)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            QuestList quest = new QuestList();
+            quest.rewardGold = rewardGolds[i];
            
-        DataManager.Instance.QuestData.questList.Add(quest);
-               
+            quest.donutId = donutIds[i];
+
+            DataManager.Instance.QuestData.questList.Add(quest);
+        }
     }
 }

@@ -7,6 +7,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 {
     public string donutId;
 
+    public DonutData donutData;
+
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Canvas canvas;
@@ -32,9 +34,9 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         currentCell = cell;
         transform.SetParent(cell.transform, false);
-        
+
         // 셀과 도넛ID 연결
-        cell.donutId = donutId;
+        cell.donutId = donutData != null ? donutData.id : null;
         cell.occupant = this;
     }
 
@@ -205,10 +207,17 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             Sprite nextSprite = nextDonut.sprite;
             otherItem.GetComponent<Image>().sprite = nextSprite;
             otherItem.donutId = nextDonut.id;
-            
+
             // 셀의 donutID도 갱신
             if (otherItem.currentCell != null)
+            { 
                 otherItem.currentCell.donutId = nextDonut.id;
+
+                otherItem.donutData = nextDonut; // ✅ 머지된 도넛 데이터 저장
+                otherItem.donutId = nextDonut.id; // ✅ 유지 가능
+                otherItem.currentCell.donutId = nextDonut.id; // ✅ 셀에도 반영
+
+            }
 
             // 현재 도넛 제거
             currentCell.ClearItem();
@@ -228,7 +237,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private void MoveToCell(Cells target)
     {
         currentCell?.ClearItem();
-        target.SetItem(this);
+        target.SetItem(this, donutData);
         transform.SetParent(target.transform, false);
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.localScale = Vector3.one;
