@@ -19,11 +19,5 @@ public class DonutInfoPopup : MonoBehaviour
         }
     }
 
-    public void Show(DonutDatabase.DonutInfo info)
-    {
-        gameObject.SetActive(true);
-        donutInfo.text = $"이름 : {info.displayName}\n{info.description};";
-    }
-
     public void Hide() => gameObject.SetActive(false);
 }
