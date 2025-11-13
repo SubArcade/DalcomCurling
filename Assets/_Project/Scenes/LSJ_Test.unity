@@ -288,7 +288,7 @@ MonoBehaviour:
   trajectoryLine: {fileID: 1656189766}
   trajectoryPoints: 100
   trajectoryTimeStep: 0.1
-  trajectoryForceMultiplier: 1.6
+  trajectoryForceMultiplier: 1.8
   trajectoryCurlFactor: 0.001
   horizontalDragSensitivity: 0.1
   launchForceMultiplier: 4
@@ -2555,7 +2555,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 55
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -2581,8 +2581,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2748778, y: 0, z: 0, w: 0.9614792}
-  m_LocalPosition: {x: 0.0069274902, y: 5.1043916, z: -41.563335}
+  m_LocalRotation: {x: 0.22224423, y: 0, z: 0, w: 0.974991}
+  m_LocalPosition: {x: 0.0149383545, y: 1.5723915, z: -55.119335}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3760,6 +3760,7 @@ GameObject:
   - component: {fileID: 1602987423}
   - component: {fileID: 1602987422}
   - component: {fileID: 1602987421}
+  - component: {fileID: 1602987425}
   m_Layer: 0
   m_Name: rightWall
   m_TagString: Untagged
@@ -3853,6 +3854,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1731386802}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1602987425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1602987420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6329676d2f87284409f35b69cf8bd726, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1634414616 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4334872300754723259, guid: f56c6af517c59b54ab8517c6d3ea47c7, type: 3}
@@ -4982,94 +4995,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7720d49d84e79764a94ca1a3d1dc9a3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigid: {fileID: 0}
-  uiLaunch: {fileID: 1970583203}
-  perfectZoneRandomWeights:
-  - value: -5
-    weight: 2
-  - value: -4
-    weight: 4
-  - value: -3
-    weight: 6
-  - value: -2
-    weight: 11
-  - value: -1
-    weight: 17
-  - value: 0
-    weight: 20
-  - value: 1
-    weight: 17
-  - value: 2
-    weight: 11
-  - value: 3
-    weight: 6
-  - value: 4
-    weight: 4
-  - value: 5
-    weight: 2
-  earlyZoneRandomWeights:
-  - value: -10
-    weight: 0.5
-  - value: -9
-    weight: 1
-  - value: -8
-    weight: 1.5
-  - value: -7
-    weight: 2
-  - value: -6
-    weight: 3
-  - value: -5
-    weight: 4
-  - value: -4
-    weight: 6
-  - value: -3
-    weight: 7
-  - value: -2
-    weight: 9
-  - value: -1
-    weight: 10
-  - value: 0
-    weight: 12
-  - value: 1
-    weight: 10
-  - value: 2
-    weight: 9
-  - value: 3
-    weight: 7
-  - value: 4
-    weight: 6
-  - value: 5
-    weight: 4
-  - value: 6
-    weight: 3
-  - value: 7
-    weight: 2
-  - value: 8
-    weight: 1.5
-  - value: 9
-    weight: 1
-  - value: 10
-    weight: 0.5
-  maxUIDirectionAngle: 60
-  currentState: 0
-  makeDonutText: {fileID: 717066829}
-  powerAndDirectionText: {fileID: 660654041}
-  rotationText: {fileID: 736816423}
-  sweepingPanel: {fileID: 0}
-  releaseButton: {fileID: 0}
-  frontSweepButton: {fileID: 0}
-  leftSweepButton: {fileID: 0}
-  rightSweepButton: {fileID: 0}
-  outText: {fileID: 0}
-  stone: {fileID: 8981461065803206208, guid: 5828bee2d4692b043bcf22412526b54b, type: 3}
-  spawnPos: {fileID: 2010081595}
-  startHogLine: {fileID: 1964964876}
-  endHogLine: {fileID: 159821090}
-  endHackLine: {fileID: 0}
-  earlyZoneLine: {fileID: 1267973038}
-  perfectZoneLine: {fileID: 1750921521}
-  leftWall: {fileID: 2121591688}
-  rightWall: {fileID: 1602987424}
 --- !u!114 &1970583203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5082,14 +5007,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c71597e473d8d9348be80c2c82dceac7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  launchScript: {fileID: 1970583202}
-  forceSlider: {fileID: 744719645}
-  rotationSlider: {fileID: 2115899177}
-  sweepValueSlider: {fileID: 0}
-  arrowRectTransform: {fileID: 1466011499}
-  arrowCanvasGroup: {fileID: 1466011498}
-  rotationAmountSliderCanvasGroup: {fileID: 2115899176}
-  tapStartPointImage: {fileID: 1337017068}
 --- !u!114 &2000870506 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8230142118752197346, guid: 648407446a069594a9c07b0f6ad1edf6, type: 3}
@@ -5725,6 +5642,7 @@ GameObject:
   - component: {fileID: 2121591687}
   - component: {fileID: 2121591686}
   - component: {fileID: 2121591685}
+  - component: {fileID: 2121591689}
   m_Layer: 0
   m_Name: leftWall
   m_TagString: Untagged
@@ -5818,6 +5736,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1731386802}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2121591689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121591684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6329676d2f87284409f35b69cf8bd726, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2132941379
 GameObject:
   m_ObjectHideFlags: 0

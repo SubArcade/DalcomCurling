@@ -38,6 +38,13 @@ public class StoneShoot_Firebase : MonoBehaviour
         Rotation,
         Launch // 발사 제스처
     }
+    
+    [System.Serializable]
+     public struct WeightedItem
+     {
+         public int value;      // 결과로 얻을 정수 값
+         public float weight;     // 가중치 (0~100 사이의 퍼센트)
+     }
 
     [Header("스크립트 및 UI 참조")] // Unity Inspector에서 UI 분류를 위한 헤더
     public UI_LaunchIndicator_Firebase uiLaunch; // UI 인디케이터 스크립트 참조
@@ -70,45 +77,45 @@ public class StoneShoot_Firebase : MonoBehaviour
 
     [Header("퍼펙트존 확률 조정 가능 변수")] // 확률 구역별 가중치 변수 헤더
     
-    private List<StoneShoot.WeightedItem> perfectZoneRandomWeights = new List<StoneShoot.WeightedItem>
+    private List<WeightedItem> perfectZoneRandomWeights = new List<WeightedItem>
     {
-        new StoneShoot.WeightedItem { value = -5, weight = 2f },
-        new StoneShoot.WeightedItem { value = -4, weight = 4f },
-        new StoneShoot.WeightedItem { value = -3, weight = 6f },
-        new StoneShoot.WeightedItem { value = -2, weight = 11f },
-        new StoneShoot.WeightedItem { value = -1, weight = 17f },
-        new StoneShoot.WeightedItem { value = 0, weight = 20f },
-        new StoneShoot.WeightedItem { value = 1, weight = 17f },
-        new StoneShoot.WeightedItem { value = 2, weight = 11f },
-        new StoneShoot.WeightedItem { value = 3, weight = 6f },
-        new StoneShoot.WeightedItem { value = 4, weight = 4f },
-        new StoneShoot.WeightedItem { value = 5, weight = 2f }
+        new WeightedItem { value = -5, weight = 2f },
+        new WeightedItem { value = -4, weight = 4f },
+        new WeightedItem { value = -3, weight = 6f },
+        new WeightedItem { value = -2, weight = 11f },
+        new WeightedItem { value = -1, weight = 17f },
+        new WeightedItem { value = 0, weight = 20f },
+        new WeightedItem { value = 1, weight = 17f },
+        new WeightedItem { value = 2, weight = 11f },
+        new WeightedItem { value = 3, weight = 6f },
+        new WeightedItem { value = 4, weight = 4f },
+        new WeightedItem { value = 5, weight = 2f }
     };
 
     
-    private List<StoneShoot.WeightedItem> earlyZoneRandomWeights = new List<StoneShoot.WeightedItem>
+    private List<WeightedItem> earlyZoneRandomWeights = new List<WeightedItem>
     {
-        new StoneShoot.WeightedItem { value = -10, weight = 0.5f },
-        new StoneShoot.WeightedItem { value = -9, weight = 1f },
-        new StoneShoot.WeightedItem { value = -8, weight = 1.5f },
-        new StoneShoot.WeightedItem { value = -7, weight = 2f },
-        new StoneShoot.WeightedItem { value = -6, weight = 3f },
-        new StoneShoot.WeightedItem { value = -5, weight = 4f },
-        new StoneShoot.WeightedItem { value = -4, weight = 6f },
-        new StoneShoot.WeightedItem { value = -3, weight = 7f },
-        new StoneShoot.WeightedItem { value = -2, weight = 9f },
-        new StoneShoot.WeightedItem { value = -1, weight = 10f },
-        new StoneShoot.WeightedItem { value = 0, weight = 12f },
-        new StoneShoot.WeightedItem { value = 1, weight = 10f },
-        new StoneShoot.WeightedItem { value = 2, weight = 9f },
-        new StoneShoot.WeightedItem { value = 3, weight = 7f },
-        new StoneShoot.WeightedItem { value = 4, weight = 6f },
-        new StoneShoot.WeightedItem { value = 5, weight = 4f },
-        new StoneShoot.WeightedItem { value = 6, weight = 3f },
-        new StoneShoot.WeightedItem { value = 7, weight = 2f },
-        new StoneShoot.WeightedItem { value = 8, weight = 1.5f },
-        new StoneShoot.WeightedItem { value = 9, weight = 1f },
-        new StoneShoot.WeightedItem { value = 10, weight = 0.5f }
+        new WeightedItem { value = -10, weight = 0.5f },
+        new WeightedItem { value = -9, weight = 1f },
+        new WeightedItem { value = -8, weight = 1.5f },
+        new WeightedItem { value = -7, weight = 2f },
+        new WeightedItem { value = -6, weight = 3f },
+        new WeightedItem { value = -5, weight = 4f },
+        new WeightedItem { value = -4, weight = 6f },
+        new WeightedItem { value = -3, weight = 7f },
+        new WeightedItem { value = -2, weight = 9f },
+        new WeightedItem { value = -1, weight = 10f },
+        new WeightedItem { value = 0, weight = 12f },
+        new WeightedItem { value = 1, weight = 10f },
+        new WeightedItem { value = 2, weight = 9f },
+        new WeightedItem { value = 3, weight = 7f },
+        new WeightedItem { value = 4, weight = 6f },
+        new WeightedItem { value = 5, weight = 4f },
+        new WeightedItem { value = 6, weight = 3f },
+        new WeightedItem { value = 7, weight = 2f },
+        new WeightedItem { value = 8, weight = 1.5f },
+        new WeightedItem { value = 9, weight = 1f },
+        new WeightedItem { value = 10, weight = 0.5f }
     };
 
     [Header("씬 참조 오브젝트")] // 씬 내 특정 오브젝트 참조 헤더
@@ -551,6 +558,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         FirebaseGameManager.Instance.ChangeCameraRelease(); // 스톤에 카메라 부착
         LastShot shotData = CalculateShotData();
         Debug.Log(FirebaseGameManager.Instance.CurrentLocalState);
+        FirebaseGameManager.Instance.Change_SuccessfullyShotInTime_To_True();
 
         if (FirebaseGameManager.Instance.CurrentLocalState == "WaitingForInput" && FirebaseGameManager.Instance._isMyTurn == false)
         {
@@ -660,7 +668,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (!_needToTap || _currentStoneRb == null) return; // 탭이 필요 없거나 돌 없으면 리턴
 
         float zPos = _currentStoneRb.transform.position.z; // 돌의 현재 Z-위치
-        List<StoneShoot.WeightedItem> weights = null; // 가중치 리스트 초기화
+        List<WeightedItem> weights = null; // 가중치 리스트 초기화
 
         // 돌의 위치에 따라 퍼펙트존 또는 얼리존 판정
         if (zPos >= perfectZoneLine.position.z && zPos <= startHogLine.position.z)
@@ -694,4 +702,6 @@ public class StoneShoot_Firebase : MonoBehaviour
         }
     }
     #endregion
+    
+    
 }
