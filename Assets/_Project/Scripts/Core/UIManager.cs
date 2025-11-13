@@ -98,11 +98,12 @@ public class UIManager : MonoBehaviour
 
         switch (id) 
         {
+            case PanelId.StartPanel:
             case PanelId.LoginPanel:
             case PanelId.MainPanel:
                 break;
             default:
-                Debug.Log("vkvkvkvkvkvkvk");
+                //Debug.Log("vkvkvkvkvkvkvk");
                 currentPanel[PanelId.MainPanel].SetActive(true);
                 break;
         }

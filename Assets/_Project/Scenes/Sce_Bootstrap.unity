@@ -274,19 +274,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   docId: ZflvQAZZmYj1SKj8mZKZ
-  playerData:
-    <email>k__BackingField: test@test.com
-    <nickname>k__BackingField: test
-    <gold>k__BackingField: 250
-    <gem>k__BackingField: 7
-    <energy>k__BackingField: 10
-    <level>k__BackingField: 1
-    <exp>k__BackingField: 0
-    <lastAt>k__BackingField: 0
-    <soloScore>k__BackingField: 0
-    <solotTier>k__BackingField: 0
-    <maxEnergy>k__BackingField: 20
-    <perSecEnergy>k__BackingField: 10
+  userData:
+    <player>k__BackingField:
+      <email>k__BackingField: test@test.com
+      <nickname>k__BackingField: test
+      <gold>k__BackingField: 250
+      <gem>k__BackingField: 7
+      <energy>k__BackingField: 10
+      <level>k__BackingField: 1
+      <exp>k__BackingField: 0
+      <lastAt>k__BackingField: 0
+      <soloScore>k__BackingField: 0
+      <soloTier>k__BackingField: 0
+    <inventory>k__BackingField:
+      <donutEntries>k__BackingField: []
+    <mergeBoard>k__BackingField:
+      <cells>k__BackingField: []
+      cellMax: 49
+      cellWidth: 7
+      cellLength: 7
+    <quest>k__BackingField:
+      <questList>k__BackingField: []
   Season: 2025
 --- !u!1001 &469480491
 PrefabInstance:
@@ -722,7 +730,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadingPanel: {fileID: 469480493}
   settingsPanel: {fileID: 261535949}
-  currentPanelId: 0
+  currentPanelId: 1
   settingsBackBtn: {fileID: 0}
 --- !u!1 &1294903636
 GameObject:
