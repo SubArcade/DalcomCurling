@@ -19,7 +19,6 @@ public class Scr_PanelControl : MonoBehaviour
     [SerializeField] private GameObject donutUpgradePopup;
     [SerializeField] private GameObject donutCodexClickPopup;
     [SerializeField] private GameObject rewardCheckPopup;
-    [SerializeField] private GameObject nickNameChangePopup;
     [SerializeField] private GameObject EntryPopUp;
     [SerializeField] private GameObject MatchingPopUp;
     

@@ -3,180 +3,208 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class Scr_PlayerLevelPopUp : MonoBehaviour
 {
-    [Header("로비화면에서의 플레이어 레벨 텍스트")]
-    [SerializeField] private TextMeshProUGUI Level_Text;
-
-    [Header("플레이어 레벨 텍스트")]
-    [SerializeField] private TextMeshProUGUI LevelText;
+    [Header("팝업 판넬")]    
+    [SerializeField, Tooltip("칭호")] private GameObject namePlateListPopup;
+    [SerializeField, Tooltip("닉네임 변경")] private GameObject nickNameChangePopup;
     
-    [SerializeField] private TextMeshProUGUI nicknameText;
-
-    [Header("플레이어 경험치 이미지")]
-    [SerializeField] private Image PlayerExp;
-    //지금은 이미지타입을 Filled로 경험치 연결인데 슬라이더로 바꿔도됩니다
-
-    [Header("플레이어 경험치 텍스트")]
-    [SerializeField] private TextMeshProUGUI ExpView;
-
-    [Header("창닫기 버튼")]
-    [SerializeField] private Button CloseButton;
-
-    [Header("수령확인 팝업")]
-    [SerializeField] private GameObject RewardCheckPanel;
-
-    [Header("수령확인 팝업 닫기버튼")]
-    [SerializeField] private Button CloseReward;
-
-    [Header("보상버튼")]
-    [SerializeField] private Button LevelReward;
-
-    [Header("단계보상 텍스트")]
-    [SerializeField] private TextMeshProUGUI RewardLabel;
-   
-    [Header("임시용 경험치주는버튼 삭제예정")]
-    public Button getExpButton;
-
+    [Header("기본창 전환")]
+    [SerializeField, Tooltip("프로필 변경")] private GameObject profilePanel;
+    [SerializeField, Tooltip("랭킹 변경")] private GameObject rankPanel;
+    
+    [SerializeField, Tooltip("프로필 토글")] private Toggle profileToggle;
+    [SerializeField, Tooltip("랭킹 토글")] private Toggle rankToggle;
+    
+    [Header("기본창")]
+    [SerializeField, Tooltip("레벨")] private TMP_Text levelText;
+    [SerializeField, Tooltip("닉네임")] private TMP_Text nicknameText;
+    [SerializeField, Tooltip("경험치")] private TMP_Text expText;
+    [SerializeField, Tooltip("칭호")] private TMP_Text nameTitleText;
+    [SerializeField, Tooltip("칭호 버튼")] private Button nameTitleButton;
+    [SerializeField, Tooltip("환생 토글")] private Toggle reincarnationToggle;
+    [SerializeField, Tooltip("환생 설명 버튼")] private Button explanationButton;
+    [SerializeField, Tooltip("경험치 게이지")] private Image expFillImage;
+    
+    [Header("닉네임 변경 기능")]
+    [SerializeField, Tooltip("닉네임 변경 창 버튼")] private Button renameButton;
+    [SerializeField, Tooltip("인풋 필드")] private TMP_InputField changeNicknameInputField;
+    [SerializeField, Tooltip("닉네임 변경 버튼")] private Button changeNicknameButton;
+    [SerializeField, Tooltip("닉네임 변경 버튼")] private Button gemchangeNicknameButton;
+    [SerializeField, Tooltip("텍스트 숫자")] private TMP_Text changeNicknameText;
+    [SerializeField, Tooltip("잼 개수")] private string gemText = "100";
+    
+    [Header("칭호 on/off 기능")]
+    [SerializeField, Tooltip("프리팹 들어갈 곳")] private Transform inputTransform;
+    [SerializeField, Tooltip("칭호 라벨 텍스트")] private GameObject noneNameTiltleLabel;
+    [SerializeField] private List<GameObject> nameTitleList = new List<GameObject>();
+    
+    [Header("닫기")] 
+    [SerializeField, Tooltip("닫기 버튼")] private Button closeButton;
+    [SerializeField, Tooltip("팝업창 닫기 버튼")] private Button platePopupCloseButton;
+    [SerializeField, Tooltip("팝업창 닫기 버튼")] private Button nickPopupCloseButton;
+    
+    
     private void OnEnable()
     {
         TextSetUp();
     }
     
-    void Awake()
-    {
-        Transform canvas = GameObject.FindGameObjectWithTag("MainCanvas")?.transform;
-        Level_Text = canvas.Find("Main_Panel/Top/Level/Level_Text")?.GetComponent<TextMeshProUGUI>();
-        LevelText = transform.Find("LevelBox/LevelCount_Text")?.GetComponent<TextMeshProUGUI>();
-        PlayerExp = transform.Find("ExpBackground")?.GetComponent<Image>();
-        ExpView = transform.Find("ExpBackground/Exp_Text")?.GetComponent<TextMeshProUGUI>();
-        CloseButton = transform.Find("CloseButton")?.GetComponent<Button>();
-        LevelReward = transform.Find("GiftBoxHouse")?.GetComponent<Button>();
-        RewardLabel = transform.Find("RewardNameLabel/Reward_Text")?.GetComponent<TextMeshProUGUI>();
-
-        GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-        foreach (GameObject obj in allObjects)
-        {
-            if (obj.name == "RewardCheckPanel")
-            {
-                RewardCheckPanel = obj;
-                Transform closeTransform = RewardCheckPanel.transform.Find("Close");
-                if (closeTransform != null)
-                {
-                    CloseReward = closeTransform.GetComponent<Button>();
-                }
-                break;
-            }
-        }
-    }
-
-    void Start()
-    {
-        //버튼 이벤트 연결
-        LevelReward.onClick.AddListener(LevelUpRewardPickUp);
-        CloseButton.onClick.AddListener(OnClickCloseButton);
-        //CloseReward.onClick.AddListener(OnClickCloseRewardPopUp);
-
-        //레벨과 경험치 초기값 설정
-        LevelText.text = $"{currentLevel}";
-        PlayerExp.fillAmount = (float)currentExp / maxExp;
-        ExpView.text = $"{currentExp}/{maxExp}Exp";
-
-
-        if (getExpButton != null)
-        {
-            getExpButton.onClick.AddListener(() => LevelUp(50));
-        }//테스트용 경험치 획득용
-    }
- 
-    void PlayerProfile()
-    {
-       //유저의 프로필 사진.데이터 저장해서 다른사람에게 보이도록 해야함
-    }
-
-    //레벨 및 경험치
-    private int currentExp = 0;
-    private int maxExp = 100;
-    private int currentLevel = 1;
-    void LevelUp(int gainExp) 
-    { 
-        // 갱신된 레벨과 경험치 데이터 저장
-        // 레벨업 했으면 레벨업 효과음이나 이펙트를 나오게해야합니다
-        currentExp += gainExp;
-        while (currentExp >= maxExp)
-        {
-            currentExp -= maxExp;
-            currentLevel++;
-            maxExp += maxExp / 10;
-        }
-
-        if (LevelText != null)
-        {
-            LevelText.text = $"{currentLevel}";
-        }
-
-        if (Level_Text != null)
-        {
-            Level_Text.text = $"{currentLevel}";
-        }
-
-        if (PlayerExp != null)
-        {
-            PlayerExp.fillAmount = (float)currentExp / maxExp;
-            ExpView.text = $"{currentExp}/{maxExp}Exp";
-        }
-        LevelUpReward();
-        SaveLevelData();
-    }
-
-    private HashSet<int> receivedLevel = new HashSet<int>(); //보상수령 기록
-    void LevelUpReward() 
-    {
-        //레벨별 levelreward와 rewardtext 갱신
-        //보상수령기록,보상 데이터 저장
-        if (currentLevel == 1) return;
-        if (currentLevel % 2 == 1 && !receivedLevel.Contains(currentLevel))
-        {
-            LevelReward.interactable = true;
-            RewardLabel.text = $"Lv{currentLevel}수령가능!!";
-        }
-        else 
-        {
-            LevelReward.interactable = false;
-        }
-    }
-    void LevelUpRewardPickUp()
-    {
-        if (currentLevel == 1) return;
-        if (currentLevel % 2 ==1 && !receivedLevel.Contains(currentLevel)) 
-        {
-            RewardCheckPanel.SetActive(true);
-            receivedLevel.Add(currentLevel);
-            LevelReward.interactable = false;
-        }
-        //기프트박스 수령시 머지칸으로 보내도록 코드 추가하셔야합니다
-    }
-
-    //레벨 및 경험치 파이어베이스에 저장하기 위한 메서드
-    async void SaveLevelData() 
-    {        
-        await DataManager.Instance.UpdateUserDataAsync(level: currentLevel, exp: currentExp);
-    }
-    void OnClickCloseButton() 
-    {
-       //this.gameObject.SetActive(false);
-       UIManager.Instance.Close(PanelId.PlayerLevelInfoPopup);
-    }
-    void OnClickCloseRewardPopUp()
-    {
-        RewardCheckPanel.SetActive(false);
-    }
-
+    // 텍스트 셋업
     public void TextSetUp()
     {
         //Debug.Log("텍스트 셋업");
+        levelText.text = DataManager.Instance.PlayerData.level.ToString();
         nicknameText.text = DataManager.Instance.PlayerData.nickname;
+        expText.text = $"{DataManager.Instance.PlayerData.exp}/{DataManager.Instance.PlayerData.levelMax} EXP";
+        nameTitleText.text = DataManager.Instance.PlayerData.curNamePlateType.ToString();
+        
+    }
+    
+    private void Awake()
+    {
+        noneNameTiltleLabel.SetActive(false);
+        changeNicknameButton.gameObject.SetActive(false);
+        gemchangeNicknameButton.gameObject.SetActive(false);
+        
+        nameTitleList.Clear();
+        foreach (Transform child in inputTransform)
+        {
+            nameTitleList.Add(child.gameObject);
+            child.gameObject.SetActive(false);
+        }
+    }
+    
+    private void Start()
+    {
+        UpdateBasePanels();
+        
+        profileToggle.onValueChanged.AddListener(_ => UpdateBasePanels());
+        rankToggle.onValueChanged.AddListener(_ => UpdateBasePanels());
+        reincarnationToggle.onValueChanged.AddListener(_ => IsreincarnationToggle());
+        nameTitleButton.onClick.AddListener(() => NamaTitleOpen());
+        platePopupCloseButton.onClick.AddListener(() => PopupPanelClose());
+        nickPopupCloseButton.onClick.AddListener(() => PopupPanelClose());
+        closeButton.onClick.AddListener(()=> UIManager.Instance.Open(PanelId.MainPanel));
+        renameButton.onClick.AddListener(IsChangeNickname);
+        changeNicknameButton.onClick.AddListener(()=>DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text);
+        changeNicknameButton.onClick.AddListener(()=>DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text);
+    }
+
+    // 기본판넬 토글 on/off
+    private void UpdateBasePanels()
+    {
+        profilePanel.SetActive(profileToggle.isOn);
+        rankPanel.SetActive(rankToggle.isOn);
+    }
+
+    // 환생 토글버튼 on/off
+    private void IsreincarnationToggle()
+    {
+        if(DataManager.Instance.PlayerData.level == DataManager.Instance.PlayerData.levelMax)
+            reincarnationToggle.isOn = true;
+        else
+            reincarnationToggle.isOn = false;
+    }
+
+    // 팝업창 전체 닫기
+    private void PopupPanelClose()
+    {
+        namePlateListPopup.SetActive(false);
+        nickNameChangePopup.SetActive(false);
+    }
+
+    private void NamaTitleOpen()
+    {
+        namePlateListPopup.SetActive(true);
+        NameTitleOnList();
+    }
+    
+    // 칭호 있는지 여부와 프리팹 활성화
+    private void NameTitleOnList()
+    {
+        int stack = 0;
+        foreach (var type in DataManager.Instance.PlayerData.gainNamePlateType)
+        {
+            // NONE 스킵
+            if (type == NamePlateType.NONE)
+                continue;
+
+            stack++;
+
+            // 리스트에서 해당 칭호를 가진 프리팹 찾아서 활성화
+            foreach (var obj in nameTitleList)
+            {
+                var ui = obj.GetComponent<Scr_NameTitle>();
+                if (ui.namePlateType == type)
+                {
+                    obj.SetActive(true);
+
+                    // 토글 이벤트 추가
+                    obj.GetComponentInChildren<Toggle>().onValueChanged.AddListener(_ => OnSelectNameTitle(obj, type));
+                    
+                    if (type == DataManager.Instance.PlayerData.curNamePlateType)
+                        obj.GetComponentInChildren<Toggle>().isOn = true;
+                }
+            }
+        }
+        
+        if(stack == 0)
+            noneNameTiltleLabel.SetActive(true);
+    }
+    
+    // 선택된 토글만 활성화
+    public void OnSelectNameTitle(GameObject selectedObj, NamePlateType type)
+    {
+        var selectedToggle = selectedObj.GetComponentInChildren<Toggle>();
+        
+        if (DataManager.Instance.PlayerData.curNamePlateType == type)
+        {
+            selectedToggle.isOn = false;
+            DataManager.Instance.PlayerData.curNamePlateType = NamePlateType.NONE;
+            return;
+        }
+        
+        foreach (var obj in nameTitleList)
+        {
+            var toggle = obj.GetComponentInChildren<Toggle>();
+            if (toggle == null) continue;
+
+            // 선택된 토글은 ON
+            toggle.isOn = (obj == selectedObj);
+        }
+
+        DataManager.Instance.PlayerData.curNamePlateType = type;
+        nameTitleText.text = type.ToString();
+        Debug.Log($"선택된 칭호 변경됨: {type}");
+    }
+
+
+    
+    // 추후 기획후에 개발 진행
+    // 경험치 계산식
+    private void ExpCalcu()
+    {
+        
+    }
+
+
+    // 닉네임 버튼 활성화
+    private void IsChangeNickname()
+    {
+        nickNameChangePopup.SetActive(true);
+        if (DataManager.Instance.PlayerData.changeNicknameCount == 0)
+        {
+            changeNicknameButton.gameObject.SetActive(true);
+            gemchangeNicknameButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            changeNicknameButton.gameObject.SetActive(false);
+            gemchangeNicknameButton.gameObject.SetActive(true);
+        }
     }
 }
 

@@ -58,7 +58,7 @@ public class Test_MainMenu : MonoBehaviour
         dropdown.onValueChanged.AddListener(OnDropdownChanged);
         testDBSaveButton.onClick.AddListener(async () => await DataManager.Instance.SaveAllUserDataAsync());
         testLogoutButton.onClick.AddListener(FirebaseAuthManager.Instance.Logout);
-
+        //testLogoutButton.onClick.AddListener(addNameTitle);
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
@@ -94,5 +94,14 @@ public class Test_MainMenu : MonoBehaviour
         id = idDictionary[display];
         pw = pwDictionary[display];
         
+    }
+
+    void addNameTitle()
+    {
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP1);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP2);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP3);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP5);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP6);
     }
 }

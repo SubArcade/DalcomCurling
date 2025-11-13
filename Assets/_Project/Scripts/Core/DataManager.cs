@@ -42,6 +42,7 @@ public class UserDataRoot
         perSecEnergy = 10,
         soloScore = 0,
         soloTier = GameTier.Bronze,
+        levelMax = 20,
     };
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
@@ -108,14 +109,13 @@ public class DataManager : MonoBehaviour
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
-    public async Task EnsureUserDocAsync(string uId, string userEmail= null, bool isAutoLogin = false)
+    public async Task EnsureUserDocAsync(string uId, string userEmail= null, bool isAutoLogin = false, AuthProviderType authProviderType = AuthProviderType.Guest)
     {
         docId = uId;
-        if (userEmail == "guest")
-            PlayerData.AuthProviderType = AuthProviderType.Guest;
         
         int maxEnergy = userData.player.maxEnergy;
         int secEnergy = userData.player.perSecEnergy;
+        int maxLevel = userData.player.levelMax;
         
         int cellMax = MergeBoardData.cellMax;
         int cellWidth = MergeBoardData.cellWidth;
@@ -130,7 +130,7 @@ public class DataManager : MonoBehaviour
         {
             userData = snap.ConvertTo<UserDataRoot>();
             
-            BasePlayerData(maxEnergy, secEnergy);
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -145,7 +145,7 @@ public class DataManager : MonoBehaviour
             PlayerData.email = userEmail;
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
             
-            BasePlayerData(maxEnergy, secEnergy);
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -159,7 +159,7 @@ public class DataManager : MonoBehaviour
             PlayerData.email = userEmail;
             userData = snap.ConvertTo<UserDataRoot>();
             
-            BasePlayerData(maxEnergy, secEnergy);
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -171,10 +171,11 @@ public class DataManager : MonoBehaviour
     }
     
     // 기본 데이터 적용
-    private void BasePlayerData(int maxEnergy, int secEnergy)
+    private void BasePlayerData(int maxEnergy, int secEnergy, int maxLevel)
     {
         PlayerData.maxEnergy = maxEnergy;
         PlayerData.perSecEnergy = secEnergy;
+        PlayerData.levelMax = maxLevel;
     }
 
     // 기본 인벤토리 데이터

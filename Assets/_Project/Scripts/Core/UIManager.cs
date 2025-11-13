@@ -20,7 +20,6 @@ public enum PanelId
     DonutUpgradePopup,
     DonutCodexClickPopup,
     RewardCheckPopup,
-    NickNameChangePopup,
     Matching,
     EntryPopUp,
     MatchingPopUp,
@@ -91,7 +90,8 @@ public class UIManager : MonoBehaviour
 
             if (go.activeSelf != active)
             {
-                Debug.Log($"Panelid : {go}");
+                //
+                //Debug.Log($"Panelid : {go}");
                 go.SetActive(active);
             }
             
