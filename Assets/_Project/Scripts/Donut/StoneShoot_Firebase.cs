@@ -543,27 +543,34 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     private void ReleaseShot() 
     {
+        Debug.Log($"RElesase clicked, myTurn = {FirebaseGameManager.Instance._isMyTurn}");
         //미리 보기 궤적 비활성화
         _isTrajectoryPreviewActive = false;
         if (trajectoryLine != null) trajectoryLine.enabled = false;
 
         FirebaseGameManager.Instance.ChangeCameraRelease(); // 스톤에 카메라 부착
         LastShot shotData = CalculateShotData();
+        Debug.Log(FirebaseGameManager.Instance.CurrentLocalState);
 
-        if (FirebaseGameManager.Instance.CurrentLocalState == "PreparingShot")
+        if (FirebaseGameManager.Instance.CurrentLocalState == "WaitingForInput" && FirebaseGameManager.Instance._isMyTurn == false)
         {
             _preparedShotData = shotData;
             Debug.Log("샷 준비 완료. 턴 시작을 기다립니다.");
             DisableInput();
+            //카운트다운 제거
+            //FirebaseGameManager.Instance.ControlCountdown(false);
+            FirebaseGameManager.Instance.CountDownStop();
         }
-        else
+        else if (FirebaseGameManager.Instance.CurrentLocalState == "WaitingForInput" && FirebaseGameManager.Instance._isMyTurn == true)
         {
+            Debug.Log("여기까지는 옴");
             CurrentState = LaunchState.MovingToHogLine;
             MoveDonutToHogLine(shotData);
             _needToTap = true;
 
             //카운트다운 제거
-            FirebaseGameManager.Instance.ControlCountdown(false);
+            //FirebaseGameManager.Instance.ControlCountdown(false);
+            FirebaseGameManager.Instance.CountDownStop();
 
         }
     }
