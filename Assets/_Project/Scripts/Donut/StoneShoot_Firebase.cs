@@ -23,11 +23,20 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     public enum LaunchState
     {
-        WaitingForInitialDrag, // 초기 드래그 시작을 기다리는 상태 (방향 및 힘 결정)
-        WaitingForRotationInput, // 스핀 입력 조작을 기다리는 상태
-        WaitingForPressRelease, // 릴리즈 버튼 클릭 대기 (발사 최종 확정)
+        Aiming, // 조준 중 (힘, 방향, 스핀 입력 가능)
         MovingToHogLine, // 돌이 호그 라인으로 자동으로 이동하는 중
         Launched // 돌이 발사되어 움직이는 중
+    }
+
+    /// <summary>
+    /// 현재 드래그 중인 입력의 종류를 나타내는 열거형
+    /// </summary>
+    public enum DragType
+    {
+        None,
+        PowerDirection,
+        Rotation,
+        Launch // 발사 제스처
     }
 
     [Header("스크립트 및 UI 참조")] // Unity Inspector에서 UI 분류를 위한 헤더
@@ -35,7 +44,12 @@ public class StoneShoot_Firebase : MonoBehaviour
     public StoneManager stoneManager; // 돌 관리를 담당하는 스크립트 참조
     public GameObject powerAndDirectionText; // 힘과 방향을 표시하는 텍스트 UI
     public GameObject rotationText; // 회전 값을 표시하는 텍스트 UI
-    public Button releaseButton; // 발사 확정 버튼 참조
+    public Button releaseButton; // 발사 버튼은 이제 사용되지 않지만, 다른 스크립트에서의 참조 오류를 막기 위해 필드는 유지합니다.
+
+    [Header("조작 영역")]
+    public RectTransform powerDirectionArea; // 힘/방향 입력을 위한 UI 영역
+    public RectTransform rotationArea; // 회전 입력을 위한 UI 영역
+    public RectTransform launchArea; // 발사를 위한 UI 영역
 
     [Header("궤적 미리보기")] // 궤적 미리보기 관련 변수 헤더
     public LineRenderer trajectoryLine; // 궤적을 그릴 라인 렌더러
@@ -52,9 +66,10 @@ public class StoneShoot_Firebase : MonoBehaviour
     public float maxRotationValue = 5f; // 스핀의 최대 값
     public float autoMoveToHogLineSpeed = 6f; // 도넛이 호그 라인까지 자동 이동하는 속도
     public float maxUIDirectionAngle = 60f; // UI 화살표가 표시할 수 있는 최대 각도
+    public float minLaunchDragDistance = 50f; // 발사로 인정할 최소 드래그 거리 (픽셀)
 
     [Header("퍼펙트존 확률 조정 가능 변수")] // 확률 구역별 가중치 변수 헤더
-    // StoneShoot 스크립트의 WeightedItem 구조체를 재사용합니다.
+    
     private List<StoneShoot.WeightedItem> perfectZoneRandomWeights = new List<StoneShoot.WeightedItem>
     {
         new StoneShoot.WeightedItem { value = -5, weight = 2f },
@@ -70,7 +85,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         new StoneShoot.WeightedItem { value = 5, weight = 2f }
     };
 
-    // StoneShoot 스크립트의 WeightedItem 구조체를 재사용합니다.
+    
     private List<StoneShoot.WeightedItem> earlyZoneRandomWeights = new List<StoneShoot.WeightedItem>
     {
         new StoneShoot.WeightedItem { value = -10, weight = 0.5f },
@@ -102,11 +117,12 @@ public class StoneShoot_Firebase : MonoBehaviour
     public Transform earlyZoneLine; // 얼리 존의 Z-위치
 
     // --- 상태 및 출력 변수 ---
-    public LaunchState CurrentState { get; private set; } = LaunchState.WaitingForInitialDrag; // 현재 발사 상태
+    public LaunchState CurrentState { get; private set; } = LaunchState.Aiming; // 현재 발사 상태
     public float FinalRotationValue { get; private set; } = 0f; // 최종 스핀 값
     public float CurrentDragRatio { get; private set; } // 힘 조작을 위한 드래그 비율 (0~1)
     public float CurrentLaunchAngle { get; private set; } // 방향 조작을 위한 발사 각도
     public bool IsDragging { get; private set; } = false; // 현재 드래그 중인지 여부
+    public DragType CurrentDragType { get; private set; } = DragType.None; // 현재 드래그 타입
 
     // --- 내부 변수 ---
     private bool _inputEnabled = false; // 현재 입력을 받을 수 있는지 여부
@@ -114,13 +130,15 @@ public class StoneShoot_Firebase : MonoBehaviour
     [SerializeField] private Camera _mainCamera; // 메인 카메라 참조 (시리얼라이즈 필드로 Inspector에서 설정 가능)
     private Vector3 _actualDragStartScreenPos; // 초기 드래그 시작 화면 좌표
     private Vector3 _rotationDragStartScreenPos; // 회전 드래그 시작 화면 좌표
-    private Vector3 _finalLaunchDirection; // 최종 발사 방향
-    private Vector3 _finalLaunchDirectionForTrajectory; // 궤적 계산을 위한 최종 발사 방향
+    private Vector3 _launchDragStartScreenPos; // 발사 드래그 시작 화면 좌표
+    private Vector3 _finalLaunchDirection = Vector3.forward; // 최종 발사 방향
+    private Vector3 _finalLaunchDirectionForTrajectory = Vector3.forward; // 궤적 계산을 위한 최종 발사 방향
     private float _finalLaunchForce; // 최종 발사 힘
     private float _finalLaunchForceForTrajectory; // 궤적 계산을 위한 최종 발사 힘
     private float _releaseRandomValue = -99f; // 릴리즈 타이밍에 따른 랜덤 값
     private bool _needToTap = false; // 호그 라인까지 이동 중 탭이 필요한지 여부
     private bool _isTrajectoryPreviewActive = false; // 궤적 미리보기 활성화 여부
+    private bool _isPowerDirectionSet = false; // 힘/방향이 한 번이라도 설정되었는지 여부
 
     // --- 미리 준비한 샷 데이터 저장용 ---
     private LastShot _preparedShotData = null; // 'PreparingShot' 상태에서 미리 입력된 샷 데이터
@@ -131,8 +149,13 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        // _mainCamera = Camera.main; // 메인 카메라 자동 할당 (필요 시 주석 해제)
-        releaseButton.onClick.AddListener(ReleaseButtonClicked);
+        // releaseButton.onClick.AddListener(ReleaseButtonClicked); // 버튼 리스너는 이제 사용하지 않습니다.
+        _mainCamera = Camera.main; // 메인 카메라 자동 할당
+        if (_mainCamera == null)
+        {
+            Debug.LogError("메인 카메라를 찾을 수 없습니다. 카메라에 'MainCamera' 태그가 설정되어 있는지 확인해주세요.");
+        }
+        // if (releaseButton != null) releaseButton.onClick.AddListener(ReleaseShot);
         if (trajectoryLine != null) trajectoryLine.enabled = false; // 궤적 라인 렌더러 초기에는 비활성화
         DisableInput(); // 컴포넌트 시작 시 입력 비활성화
     }
@@ -145,13 +168,25 @@ public class StoneShoot_Firebase : MonoBehaviour
     {
         _inputEnabled = true; // 입력 활성화 플래그
         _currentStoneRb = stoneRb; // 현재 조작할 돌 설정
-        CurrentState = LaunchState.WaitingForInitialDrag; // 초기 드래그 대기 상태로 변경
-        powerAndDirectionText.SetActive(true); // 힘/방향 UI 활성화
+        CurrentState = LaunchState.Aiming; // 조준 상태로 변경
         _releaseRandomValue = -99f; // 릴리즈 랜덤 값 초기화
+        _isPowerDirectionSet = false; // 힘/방향 설정 여부 플래그 초기화
 
-        FinalRotationValue = 0f; //스핀값 초기화
+        // 조준 값들 초기화
+        FinalRotationValue = 0f;
+        _finalLaunchForce = 0f;
+        _finalLaunchForceForTrajectory = 0f;
+        _finalLaunchDirection = Vector3.forward;
+        _finalLaunchDirectionForTrajectory = Vector3.forward;
+        CurrentDragRatio = 0f;
+        CurrentLaunchAngle = 0f;
 
-        Debug.Log("InputController: 입력 활성화됨.");
+        if(releaseButton != null) releaseButton.interactable = false; // 발사 버튼 비활성화
+
+        _isTrajectoryPreviewActive = true; // 궤적 미리보기 활성화
+        if (trajectoryLine != null) trajectoryLine.enabled = true;
+
+        Debug.Log("InputController: 입력 활성화됨 (Aiming state).");
     }
 
     /// <summary>
@@ -162,11 +197,11 @@ public class StoneShoot_Firebase : MonoBehaviour
         _inputEnabled = false; // 입력 비활성화 플래그
         powerAndDirectionText.SetActive(false); // 힘/방향 UI 비활성화
         rotationText.SetActive(false); // 회전 UI 비활성화
-        releaseButton.interactable = false; // 발사 버튼 비활성화
+        if(releaseButton != null) releaseButton.interactable = false; // 발사 버튼 비활성화
         if (uiLaunch != null) uiLaunch.ActivateTapStartPointImage(false); // 탭 시작점 이미지 비활성화
 
+        _isTrajectoryPreviewActive = false; // 궤적 미리보기 비활성화
         if (trajectoryLine != null) trajectoryLine.enabled = false; // 궤적 라인 렌더러 비활성화
-        _isTrajectoryPreviewActive = false; // 상태 변수도 비활성화 
         Debug.Log("InputController: 입력 비활성화됨.");
     }
 
@@ -178,38 +213,101 @@ public class StoneShoot_Firebase : MonoBehaviour
     {
         if (!_inputEnabled) return; // 입력이 비활성화 상태면 아무것도 하지 않음
 
-        // 힘, 방향, 스핀 입력을 받습니다.
-        if (CurrentState == LaunchState.WaitingForInitialDrag)
+        // 상태에 따라 입력 처리 분기
+        if (CurrentState == LaunchState.Aiming)
         {
-            HandleLaunchInput();
+            HandleAimingInput();
         }
-        else if (CurrentState == LaunchState.WaitingForRotationInput)
-        {
-            HandleRotationInput();
-        }
-
-        if (CurrentState == LaunchState.MovingToHogLine && _needToTap)
+        else if (CurrentState == LaunchState.MovingToHogLine && _needToTap)
         {
             HandleTapInput();
         }
 
-        // 시작적 업데이트 (UI 조작 화살표 용)
-        //if (IsDragging && CurrentState == LaunchState.WaitingForInitialDrag)
-        //{
-        //    Vector3 currentPos = Input.touchCount > 0 ? (Vector3)Input.GetTouch(0).position : Input.mousePosition;
-        //    UpdateDragVisual(currentPos);
-        //}
-
-        if (IsDragging)
+        // 궤적 미리보기 업데이트
+        if (CurrentState == LaunchState.Aiming && _isTrajectoryPreviewActive)
         {
-            Vector3 currentScreenPos = Input.touchCount > 0 ? (Vector3)Input.GetTouch(0).position : Input.mousePosition;
-
-            if (CurrentState == LaunchState.WaitingForInitialDrag)
+            UpdateTrajectoryPreview();
+        }
+        else
+        {
+            if (trajectoryLine != null && trajectoryLine.enabled)
             {
-                // 힘/방향 실시간 계산 및 멤버 변수 업데이트
-                Vector3 dragVector2D = currentScreenPos - _actualDragStartScreenPos; //발사를 위한
-                Vector3 dragVector2DForTrajectory = new Vector3(dragVector2D.x * horizontalDragSensitivity, dragVector2D.y); //궤적 표시를 위한
-                //dragVector2D.x *= horizontalDragSensitivity;
+                trajectoryLine.enabled = false;
+            }
+        }
+    }
+
+    #region 입력 처리 (Input Handling)
+    /// <summary>
+    /// 조준 상태(Aiming)에서 모든 입력을 처리합니다.
+    /// 터치/마우스 위치에 따라 힘, 방향, 회전, 발사 입력을 구분하여 받습니다.
+    /// </summary>
+    private void HandleAimingInput()
+    {
+        // 카메라가 파괴되었는지 확인하고 다시 찾아봅니다.
+        if (_mainCamera == null)
+        {
+            _mainCamera = Camera.main;
+            // 없으면 이번 프레임 입력 처리를 건너뜁니다.
+            if (_mainCamera == null)
+            {
+                Debug.LogWarning("조준 입력 처리 중 메인 카메라를 찾을 수 없습니다.");
+                return;
+            }
+        }
+
+        Vector2 touchPosition = Vector2.zero;
+        bool isTouchBegan = false;
+        bool isTouchMoved = false;
+        bool isTouchEnded = false;
+
+        // 터치 및 마우스 입력 통합 처리
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            touchPosition = touch.position;
+            isTouchBegan = touch.phase == TouchPhase.Began;
+            isTouchMoved = touch.phase == TouchPhase.Moved;
+            isTouchEnded = touch.phase == TouchPhase.Ended;
+        }
+        else
+        {
+            touchPosition = Input.mousePosition;
+            isTouchBegan = Input.GetMouseButtonDown(0);
+            isTouchMoved = Input.GetMouseButton(0); // GetMouseButton(0)은 누르고 있는 동안 true
+            isTouchEnded = Input.GetMouseButtonUp(0);
+        }
+
+        // 입력 시작
+        if (isTouchBegan)
+        {
+            // Screen Space - Overlay 캔버스에서는 카메라 파라미터에 null을 전달해야 정확한 좌표 계산 가능.
+
+            // 힘/방향 영역 터치 확인
+            if (powerDirectionArea != null && RectTransformUtility.RectangleContainsScreenPoint(powerDirectionArea, touchPosition, null))
+            {
+                StartDrag(touchPosition, DragType.PowerDirection);
+            }
+            // 회전 영역 터치 확인
+            else if (rotationArea != null && RectTransformUtility.RectangleContainsScreenPoint(rotationArea, touchPosition, null))
+            {
+                StartDrag(touchPosition, DragType.Rotation);
+            }
+            // 발사 영역 터치 확인
+            else if (launchArea != null && RectTransformUtility.RectangleContainsScreenPoint(launchArea, touchPosition, null))
+            {
+                StartDrag(touchPosition, DragType.Launch);
+            }
+        }
+        
+        // 드래그 중
+        if (IsDragging && isTouchMoved)
+        {
+            if (CurrentDragType == DragType.PowerDirection)
+            {
+                // 힘/방향 실시간 계산
+                Vector3 dragVector2D = (Vector3)touchPosition - _actualDragStartScreenPos;
+                Vector3 dragVector2DForTrajectory = new Vector3(dragVector2D.x * horizontalDragSensitivity, dragVector2D.y);
 
                 float dragDistance = dragVector2D.magnitude / _mainCamera.pixelHeight;
                 float dragDistanceForTrajectory = dragVector2DForTrajectory.magnitude / _mainCamera.pixelWidth;
@@ -217,94 +315,52 @@ public class StoneShoot_Firebase : MonoBehaviour
                 float clampedDistance = Mathf.Min(dragDistance, maxDragDistance);
                 float clampedDistanceForTrajectory = Mathf.Min(dragDistanceForTrajectory, maxDragDistance);
                 
-                _finalLaunchForce = clampedDistance * launchForceMultiplier; // 멤버 변수 업데이트
+                _finalLaunchForce = clampedDistance * launchForceMultiplier;
                 _finalLaunchForceForTrajectory = clampedDistanceForTrajectory * launchForceMultiplier;
 
-                // 발사를 위한 방향 계산
                 Vector2 launchDirection2D = -dragVector2D.normalized;
                 _finalLaunchDirection = (launchDirection2D.y < 0)
                     ? new Vector3(launchDirection2D.x, 0f, 0f)
                     : new Vector3(launchDirection2D.x, 0f, launchDirection2D.y);
-                _finalLaunchDirection.Normalize(); // 멤버 변수 업데이트
+                _finalLaunchDirection.Normalize();
                 
-                
-                // 궤적을 위한 방향 계산
                 Vector2 launchDirection2DForTrajectory = -dragVector2DForTrajectory.normalized;
                 _finalLaunchDirectionForTrajectory = (launchDirection2DForTrajectory.y < 0)
                     ? new Vector3(launchDirection2DForTrajectory.x, 0f, 0f)
                     : new Vector3(launchDirection2DForTrajectory.x, 0f, launchDirection2DForTrajectory.y);
                 _finalLaunchDirectionForTrajectory.Normalize();
 
-                // UI 화살표 업데이트
-                UpdateDragVisual(currentScreenPos);
+                UpdateDragVisual(touchPosition);
             }
-            else if (CurrentState == LaunchState.WaitingForRotationInput)
+            else if (CurrentDragType == DragType.Rotation)
             {
-                // 회전값 실시간 계산 및 업데이트
-                UpdateRotationValue(currentScreenPos);
+                // 회전값 실시간 계산
+                UpdateRotationValue(touchPosition);
             }
         }
 
-        // --- 궤적 미리보기 로직 ---
-               
-        // TODO : PreparingShot 에서 WaitingForInput로 넘어갈때 정보 초기화됨
-        // PreparingShot에서 입력한 정보를 릴리즈 버튼을 눌러야만 넘기는 상태라 조정해야함
-        
-        if (_isTrajectoryPreviewActive) // 궤적 미리보기가 활성화 상태일 때만 업데이트
+        // 입력 종료
+        if (isTouchEnded && IsDragging)
         {
-            if (trajectoryLine != null && !trajectoryLine.enabled)
+            // 발사 제스처 확인
+            if (CurrentDragType == DragType.Launch)
             {
-                trajectoryLine.enabled = true; // 혹시라도 비활성화되어 있다면 다시 활성화
+                // 힘/방향 조작이 한 번이라도 있었는지 확인
+                if (!_isPowerDirectionSet)
+                {
+                    Debug.Log("힘/방향을 먼저 설정해야 발사할 수 있습니다.");
+                }
+                else
+                {
+                    Vector3 dragVector = (Vector3)touchPosition - _launchDragStartScreenPos;
+                    // 위로 일정 거리 이상 드래그했는지 확인
+                    if (dragVector.y > minLaunchDragDistance)
+                    {
+                        ReleaseShot(); // 발사!
+                    }
+                }
             }
-            UpdateTrajectoryPreview();
-        }
-        else // 궤적  미리보기가 비활성화 상태일 때
-        {
-            if (trajectoryLine != null && trajectoryLine.enabled)
-            {
-                trajectoryLine.enabled = false; // 라인 렌더러 비활성화
-            }
-        }
-
-    }
-
-    #region 입력 처리 (Input Handling)
-    /// <summary>
-    /// 초기 드래그(방향 및 힘) 입력을 처리합니다.
-    /// 마우스/터치 다운 시 드래그 시작, 업 시 드래그 종료.
-    /// </summary>
-    private void HandleLaunchInput()
-    {
-        if (Input.GetMouseButtonDown(0)) StartDrag_Launch(Input.mousePosition);
-        //else if (Input.GetMouseButtonUp(0) && IsDragging) EndDrag_Launch(Input.mousePosition);
-        else if (Input.GetMouseButtonUp(0) && IsDragging) EndDrag_Launch();
-
-        // 터치 입력 지원
-        else if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began) StartDrag_Launch(touch.position);
-            //else if (touch.phase == TouchPhase.Ended && IsDragging) EndDrag_Launch(touch.position);
-            else if (touch.phase == TouchPhase.Ended && IsDragging) EndDrag_Launch();
-        }
-    }
-
-    /// <summary>
-    /// 회전(스핀) 입력을 처리합니다.
-    /// 마우스/터치 다운 시 드래그 시작, 드래그 중 값 업데이트, 업 시 드래그 종료.
-    /// </summary>
-    private void HandleRotationInput()
-    {
-        if (Input.GetMouseButtonDown(0)) StartDrag_Rotation(Input.mousePosition);
-        else if (Input.GetMouseButton(0) && IsDragging) UpdateRotationValue(Input.mousePosition);
-        else if (Input.GetMouseButtonUp(0) && IsDragging) EndDrag_Rotation();
-        // 터치 입력 지원
-        else if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began) StartDrag_Rotation(touch.position);
-            else if (touch.phase == TouchPhase.Moved && IsDragging) UpdateRotationValue(touch.position);
-            else if (touch.phase == TouchPhase.Ended && IsDragging) EndDrag_Rotation();
+            EndDrag();
         }
     }
 
@@ -313,84 +369,55 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     private void HandleTapInput()
     {
-        if (Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)) TapBeforeHogLine();
+        if (Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
+        {
+            TapBeforeHogLine();
+        }
     }
     #endregion
 
     #region 드래그 로직 (Drag Logic)
     /// <summary>
-    /// 초기 드래그 시작 시 호출됩니다.
+    /// 드래그 시작 시 호출됩니다.
     /// </summary>
     /// <param name="screenPosition">드래그 시작 화면 좌표.</param>
-    private void StartDrag_Launch(Vector3 screenPosition)
+    /// <param name="dragType">드래그 종류 (힘/방향 또는 회전).</param>
+    private void StartDrag(Vector3 screenPosition, DragType dragType)
     {
-        IsDragging = true; // 드래그 중 플래그 활성화
-        _actualDragStartScreenPos = screenPosition; // 드래그 시작 위치 기록
-        if (_currentStoneRb != null) _currentStoneRb.isKinematic = true; // 돌의 물리 움직임 일시 정지
-        uiLaunch.ActivateTapStartPointImage(true, _actualDragStartScreenPos); // 탭 시작점 UI 활성화
-        powerAndDirectionText.SetActive(true); // 힘/방향 UI 활성화
+        IsDragging = true;
+        CurrentDragType = dragType;
 
-        _isTrajectoryPreviewActive = true;
-        if (trajectoryLine != null) trajectoryLine.enabled = true; // 라인 렌더러 활성화
+        if (dragType == DragType.PowerDirection)
+        {
+            _actualDragStartScreenPos = screenPosition;
+            if (_currentStoneRb != null) _currentStoneRb.isKinematic = true;
+            uiLaunch.ActivateTapStartPointImage(true, _actualDragStartScreenPos);
+        }
+        else if (dragType == DragType.Rotation)
+        {
+            _rotationDragStartScreenPos = screenPosition;
+        }
+        else if (dragType == DragType.Launch)
+        {
+            _launchDragStartScreenPos = screenPosition;
+        }
     }
 
     /// <summary>
-    /// 초기 드래그 종료 시 호출됩니다.
-    /// 발사 방향과 힘을 계산하고 상태를 전환합니다.
+    /// 드래그 종료 시 호출됩니다.
     /// </summary>
-    /// <param name="screenPosition">드래그 종료 화면 좌표.</param>
-    private void EndDrag_Launch() //파라미터 Vector3 screenPosition <- 삭제 했음
+    private void EndDrag()
     {
-        if (!IsDragging) return; // 드래그 중이 아니면 아무것도 하지 않음
-        
-        // 궤적 계산에 영향을 끼쳐 일단 제거
-        /* 
-        Vector3 dragVector2D = screenPosition - _actualDragStartScreenPos; // 드래그 벡터 계산
-        float dragDistance = dragVector2D.magnitude / _mainCamera.pixelHeight; // 화면 높이에 비례한 드래그 거리
-        float clampedDistance = Mathf.Min(dragDistance, maxDragDistance); // 최대 드래그 거리 클램프
-        Vector2 launchDirection2D = -dragVector2D.normalized; // 발사 방향 (역방향)
-
-        // UI 표시 방향을 실제 월드 방향으로 변환 (z-축을 기준으로)
-        _finalLaunchDirection = (launchDirection2D.y < 0)
-            ? new Vector3(launchDirection2D.x, 0f, 0f) // 역방향 드래그는 x축 움직임에만 영향
-            : new Vector3(launchDirection2D.x, 0f, launchDirection2D.y);
-        _finalLaunchDirection.Normalize(); // 방향 벡터 정규화
-        _finalLaunchForce = clampedDistance * launchForceMultiplier; // 최종 발사 힘 계산
-        */
-        
-        IsDragging = false; // 드래그 종료
-        CurrentState = LaunchState.WaitingForRotationInput; // 회전 입력 대기 상태로 전환
-
-        // PreparingShot 상태에서는 화살표 UI를 사용하지 않으므로, 시각적 업데이트 로직은 건너뜁니다.
-        if (FirebaseGameManager.Instance.CurrentLocalState != "PreparingShot")
+        // 힘/방향 조작이 끝났다면 플래그를 true로 설정
+        if (CurrentDragType == DragType.PowerDirection)
         {
-            uiLaunch.ActivateTapStartPointImage(false); // 탭 시작점 이미지 비활성화
+            _isPowerDirectionSet = true;
         }
 
-        powerAndDirectionText.SetActive(false); // 힘/방향 UI 비활성화
-        rotationText.SetActive(true); // 회전 UI 활성화 (스핀 조작 시작)
-    }
-
-    /// <summary>
-    /// 회전 드래그 시작 시 호출됩니다.
-    /// </summary>
-    /// <param name="screenPosition">드래그 시작 화면 좌표.</param>
-    private void StartDrag_Rotation(Vector3 screenPosition)
-    {
-        IsDragging = true; // 드래그 중 플래그 활성화
-        _rotationDragStartScreenPos = screenPosition; // 회전 드래그 시작 위치 기록
-    }
-
-    /// <summary>
-    /// 회전 드래그 종료 시 호출됩니다.
-    /// </summary>
-    private void EndDrag_Rotation()
-    {
-        if (!IsDragging) return; // 드래그 중이 아니면 아무것도 하지 않음
-        IsDragging = false; // 드래그 종료
-        rotationText.SetActive(false); // 회전 UI 비활성화
-        releaseButton.interactable = true; // 발사 버튼 활성화
-        CurrentState = LaunchState.WaitingForPressRelease; // 릴리즈 대기 상태로 전환
+        IsDragging = false;
+        CurrentDragType = DragType.None;
+        // 드래그 시작점 UI만 비활성화하고, 다른 UI(화살표, 슬라이더)는 UI 스크립트에서 관리
+        uiLaunch.ActivateTapStartPointImage(false);
     }
     #endregion
 
@@ -429,55 +456,44 @@ public class StoneShoot_Firebase : MonoBehaviour
 
     /// <summary>
     /// 현재 입력값을 기반으로 단순화된 물리 모델을 사용하여 예상 궤적을 계산하고 LineRenderer를 업데이트합니다.
-    /// /// (실시간 드래그 반영을 위해 수정된 버전)
     /// </summary>
     private void UpdateTrajectoryPreview()
     {
         if (trajectoryLine == null || _currentStoneRb == null) return; // LineRenderer 또는 돌 Rigidbody 없으면 리턴
                 
+        // 현재 설정된 힘, 방향, 스핀 값을 사용
         float currentForce = _finalLaunchForceForTrajectory;
         Vector3 currentDirection = _finalLaunchDirectionForTrajectory;
         float currentSpin = FinalRotationValue;
 
-        Vector3 finalDirectionForSim = currentDirection;  // 발사 방향
-        float finalForceForSim = currentForce;  // 발사 속도
+        Vector3 finalDirectionForSim = currentDirection;
+        float finalForceForSim = currentForce;
         Vector3 launchVelocity = finalDirectionForSim.normalized * finalForceForSim * trajectoryForceMultiplier;
 
-        List<Vector3> points = new List<Vector3>(); // 궤적을 그릴 포인트 저장 리스트
-        points.Add(_currentStoneRb.transform.position); // A지점 (돌이 놓여있는 위치 )
-        //points.Add(startHogLine.position);  // B 지점 (호그 라인)    
+        List<Vector3> points = new List<Vector3>();
+        points.Add(_currentStoneRb.transform.position);
 
-        //B지점 (호그라인) 부터 시뮬레이션
-        //Vector3 currentPos = startHogLine.position; // 시작 위치
-        Vector3 currentPos = _currentStoneRb.transform.position; // 시작 위치를 최초 생성 지점으로 변환
-        Vector3 currentVel = launchVelocity; // 돌의 초기 속도
-        float friction = 0.98f; // 각 스텝마다 속도가 줄어드는 비율 (마찰력) 물리 예측을 위한 단순화된 파라미터 (실제 물리와 맞추려면 튜닝 필요)
+        Vector3 currentPos = _currentStoneRb.transform.position;
+        Vector3 currentVel = launchVelocity;
+        float friction = 0.98f;
 
-        for (int i = 0; i < trajectoryPoints; i++) // 지정된 포인트 수만큼 시뮬레이션
+        for (int i = 0; i < trajectoryPoints; i++)
         {
-            float spinForPreview = 0f;
-            if (CurrentState == LaunchState.WaitingForRotationInput) //첫번째 드래그에서는 스핀값 안들어가게
-            {
-                spinForPreview = currentSpin;
-            }
-
-            // 결정된 스핀 값으로 컬 힘을 계산합니다. (힘/방향 단계에서는 spinForPreview가 0이므로 컬이 없음)
-            Vector3 curlForce = Vector3.right * spinForPreview * trajectoryCurlFactor * currentVel.magnitude * trajectoryTimeStep;
+            // 컬 힘 계산 시 항상 현재 스핀 값을 사용
+            Vector3 curlForce = Vector3.right * currentSpin * trajectoryCurlFactor * currentVel.magnitude * trajectoryTimeStep;
             currentVel += curlForce;
-            currentVel *= Mathf.Pow(friction, trajectoryTimeStep); // 마찰력 적용 (속도를 점차 줄임)
+            currentVel *= Mathf.Pow(friction, trajectoryTimeStep); // 마찰력 적용
             currentPos += currentVel * trajectoryTimeStep; // 위치 업데이트
-            points.Add(currentPos); // 계산된 위치 추가
+            points.Add(currentPos);
 
-            // 돌이 거의 멈추면 계산 중단
             if (currentVel.magnitude < 0.1f)
             {
                 break;
             }
         }
 
-        // LineRenderer 업데이트
-        trajectoryLine.positionCount = points.Count; // 포인트 수 설정
-        trajectoryLine.SetPositions(points.ToArray()); // 계산된 포인트들로 선 그리기
+        trajectoryLine.positionCount = points.Count;
+        trajectoryLine.SetPositions(points.ToArray());
     }
     #endregion
 
@@ -523,10 +539,9 @@ public class StoneShoot_Firebase : MonoBehaviour
     }
 
     /// <summary>
-    /// 발사(릴리즈) 버튼 클릭 시 호출됩니다.
-    /// 현재 게임 상태에 따라 미리 준비한 샷을 저장하거나 돌을 발사합니다.
+    /// 샷을 최종 확정하고 발사 절차를 시작합니다.
     /// </summary>
-    private void ReleaseButtonClicked()
+    private void ReleaseShot() 
     {
         //미리 보기 궤적 비활성화
         _isTrajectoryPreviewActive = false;

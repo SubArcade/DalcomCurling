@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {
+    //UI의 표시(활성화) 여부를 제어하는 스크립트
+    // TODO : 미리보기 궤적이 완성되면 기존에 있던 조작 UI는 삭제해야함
+    
     [Header("References")]
     // 발사 로직 스크립트를 드래그 앤 드롭으로 연결
     public StoneShoot_Firebase launchScript;
@@ -14,7 +17,6 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [Header("UI오브젝트들")]
     public Slider forceSlider;
     public Slider rotationSlider;
-    public Slider sweepValueSlider;
     public RectTransform arrowRectTransform;
     public CanvasGroup arrowCanvasGroup;
     public CanvasGroup rotationAmountSliderCanvasGroup;
@@ -27,58 +29,62 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public TextMeshProUGUI debugStateText;
     void Update()
     {
-        if (launchScript == null || arrowRectTransform == null || arrowCanvasGroup == null || rotationAmountSliderCanvasGroup == null) return;
+        if (launchScript == null) return;
 
-        // 드래그 상태 확인
-        bool isCurrentlyDragging = launchScript.IsDragging && launchScript.CurrentDragRatio > 0.01f;
+        var currentState = launchScript.CurrentState;
+        var currentDragType = launchScript.CurrentDragType;
 
-        // 1. UI 표시/숨김 처리
-        // 드래그 중이 아니거나 힘이 거의 0일 때는 UI를 숨깁니다.
-        arrowCanvasGroup.alpha = isCurrentlyDragging && (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForInitialDrag) ? 1f : 0f;
-        arrowCanvasGroup.blocksRaycasts = isCurrentlyDragging;
-
-        rotationAmountSliderCanvasGroup.alpha = isCurrentlyDragging && (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForRotationInput) ? 1f : 0f;
-
-        if (isCurrentlyDragging && launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForInitialDrag)
+        // 조준 상태일 때만 조작 관련 UI를 업데이트합니다.
+        if (currentState == StoneShoot_Firebase.LaunchState.Aiming)
         {
-            // 2. 힘(거리) 슬라이더 업데이트
+            // 1. UI 가시성 제어
+            // 힘/방향을 드래그할 때만 화살표 UI 그룹을 표시합니다.
+            if (arrowCanvasGroup != null)
+            {
+                arrowCanvasGroup.alpha = currentDragType == StoneShoot_Firebase.DragType.PowerDirection ? 1f : 0f;
+            }
+
+            // 회전을 드래그할 때만 회전량 슬라이더 UI 그룹을 표시합니다.
+            if (rotationAmountSliderCanvasGroup != null)
+            {
+                rotationAmountSliderCanvasGroup.alpha = currentDragType == StoneShoot_Firebase.DragType.Rotation ? 1f : 0f;
+            }
+
+            // 2. 슬라이더 및 화살표 값 업데이트
+            // 힘 슬라이더는 항상 현재 설정된 힘의 비율을 표시합니다.
             if (forceSlider != null)
             {
                 forceSlider.value = launchScript.CurrentDragRatio;
             }
 
-            // 3. 화살표 회전 업데이트 (핵심 로직)
-            // Z축 회전만 변경하여 화살표가 방향을 가리키도록 합니다.
-            // RectTransform의 localEulerAngles 속성을 사용합니다.
-            Vector3 rotation = arrowRectTransform.localEulerAngles;
-            rotation.z = launchScript.CurrentLaunchAngle;
-            arrowRectTransform.localEulerAngles = rotation;
-
-            // 추가: 화살표의 크기를 드래그 비율에 따라 변경하여 피드백 강화
-            float scale = Mathf.Lerp(0.5f, 1f, launchScript.CurrentDragRatio);
-            arrowRectTransform.localScale = Vector3.one * scale;
-        }
-        else if (isCurrentlyDragging && launchScript.CurrentState == StoneShoot_Firebase.LaunchState.WaitingForRotationInput)
-        {
+            // 회전 슬라이더는 항상 현재 설정된 회전 값을 표시합니다.
             if (rotationSlider != null)
             {
                 rotationSlider.value = launchScript.FinalRotationValue;
             }
 
+            // 화살표는 항상 현재 설정된 방향과 힘을 시각적으로 표시합니다.
+            if (arrowRectTransform != null)
+            {
+                // Z축 회전만 변경하여 화살표가 방향을 가리키도록 합니다.
+                Vector3 rotation = arrowRectTransform.localEulerAngles;
+                rotation.z = launchScript.CurrentLaunchAngle;
+                arrowRectTransform.localEulerAngles = rotation;
 
+                // 화살표의 크기를 드래그 비율에 따라 변경하여 피드백 강화
+                float scale = Mathf.Lerp(0.5f, 1f, launchScript.CurrentDragRatio);
+                arrowRectTransform.localScale = Vector3.one * scale;
+            }
         }
-        else if (launchScript.CurrentState == StoneShoot_Firebase.LaunchState.Launched)
+        else // 조준 상태가 아닐 때 (예: 돌이 굴러갈 때)
         {
-            // 스위핑 로직이 제거되었으므로 sweepValueSlider는 더 이상 업데이트하지 않습니다.
-            // if (sweepValueSlider != null)
-            // {
-            //     sweepValueSlider.value = launchScript.currentSweepValue;
-            // }
+            // 모든 조작 관련 UI를 숨깁니다.
+            if (arrowCanvasGroup != null) arrowCanvasGroup.alpha = 0f;
+            if (rotationAmountSliderCanvasGroup != null) rotationAmountSliderCanvasGroup.alpha = 0f;
+            if (forceSlider != null) forceSlider.value = 0;
+            if (rotationSlider != null) rotationSlider.value = 0;
         }
-        else
-        {
-            forceSlider.value = 0;
-        }
+
 
         // 디버그용 상태 텍스트 업데이트
         if (debugStateText != null && FirebaseGameManager.Instance != null)
@@ -91,6 +97,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
     public void ActivateTapStartPointImage(bool activate, Vector3 pos = default(Vector3))
     {
+        if (tapStartPointImage == null) return;
         tapStartPointImage.transform.position = pos;
         tapStartPointImage.SetActive(activate);
         if (activate == true)
