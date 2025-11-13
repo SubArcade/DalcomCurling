@@ -25,16 +25,23 @@ public class BoardManager : MonoBehaviour
 
     public Cells selectedCell; // 선택한 셀
 
-
-
     [Header("도넛 스프라이트")]
     public Sprite[] donutSprites;
+
+    private readonly int[,] requiredLevelMap =
+    {   
+        { 7, 7, 7, 7, 7, 7,10 },
+        { 7, 3, 3, 3, 3, 5,10 },
+        { 7, 3, 0, 0, 0, 5,10 },
+        { 7, 3, 0, 0, 0, 5,10 },
+        { 7, 3, 0, 0, 0, 5,10 },
+        { 7, 5, 5, 5, 5, 5,10 },
+        {10,10,10,10,10,10,10 }
+    };
 
     void Awake()
     {
         Instance = this;
-
-        
     }
 
     async void Start()
@@ -62,6 +69,22 @@ public class BoardManager : MonoBehaviour
                 SpawnDonutToEmptyCell();
             }
         }
+
+        // 기프트박스인지 확인
+        var item = cell.occupant;
+        if (item != null)
+        {
+            var data = DataManager.Instance.GetDonutByID(item.donutId);
+
+            if (data.donutType == DonutType.Gift)
+            {
+                if (isSameCell)
+                {
+                    ClaimGiftReward(data, cell);
+                }
+                return;
+            }
+        }
     }
 
     //격자 표시
@@ -82,50 +105,21 @@ public class BoardManager : MonoBehaviour
         selectionHighlight.rectTransform.anchoredPosition = Vector2.zero;
     }
 
-    //void GenerateBoard()
-    //{
-    //    cells = new Cells[boardSize, boardSize];  // 7x7칸 저장할 배열
-    //    float offset = (boardSize - 1) / 2f;      // 중앙 맞추기용 위치 조정
-
-    //    for (int x = 0; x < boardSize; x++)
-    //    {
-    //        for (int y = 0; y < boardSize; y++)
-    //        {
-    //            GameObject obj = Instantiate(cellPrefab, transform);
-    //            obj.transform.localPosition = new Vector3(x - offset, 0, y - offset);
-
-    //            cells[x, y] = obj.GetComponent<Cells>();
-    //            cells[x, y].Init(x, y);
-    //        }
-    //    }
-    //}
-
     void GenerateBoard()
     {
         cells = new Cells[boardSize, boardSize];
-        float offset = (boardSize - 1) / 2f;
 
-        for (int x = 0; x < boardSize; x++)
+        for (int y = 0; y < boardSize; y++)
         {
-            for (int y = 0; y < boardSize; y++)
+            for (int x = 0; x < boardSize; x++)
             {
                 GameObject obj = Instantiate(cellPrefab, transform);
                 Cells cell = obj.GetComponent<Cells>();
                 cells[x, y] = cell;
 
-                // 중앙 거리 기반 잠금 레벨 설정 (예: 1,3,5,7,10)
-                int distance = Mathf.Max(Mathf.Abs(x - boardSize / 2), Mathf.Abs(y - boardSize / 2));
-                int requiredLevel = distance switch
-                {
-                    0 => 1,
-                    1 => 3,
-                    2 => 5,
-                    3 => 7,
-                    _ => 10
-                };
-
-                cell.SetLockLevel(requiredLevel);
-                cell.UpdateLockState(); // 현재 플레이어 레벨 기준으로 표시
+                int reqLevel = requiredLevelMap[y, x];
+                cell.SetLockLevel(reqLevel);
+                cell.UpdateLockState();
             }
         }
     }
@@ -158,6 +152,7 @@ public class BoardManager : MonoBehaviour
         return available.Count > 0 ? available[Random.Range(0, available.Count)] : null;
     }
 
+    //빈칸 도넛생성 함수
     private void SpawnDonutToEmptyCell()
     {
         Cells target = FindEmptyActiveCell();
@@ -194,6 +189,52 @@ public class BoardManager : MonoBehaviour
 
         Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
         AutoSaveBoardLocal();
+    }
+
+    public void SpawnGiftBox()
+    {
+        // 빈 활성 셀 찾기
+        var cell = FindEmptyActiveCell();
+        if (cell == null)
+        {
+            Debug.Log("빈 칸 없음 → 기프트박스 생성 불가");
+            return;
+        }
+
+        // GiftBox Level 1 데이터 가져오기
+        var giftData = DataManager.Instance.GetDonutData(DonutType.Gift, 1);
+        if (giftData == null)
+        {
+            Debug.LogError("GiftBox 데이터 없음! DonutGiftSO를 확인하세요.");
+            return;
+        }
+
+        // 프리팹 생성
+        GameObject obj = Instantiate(donutPrefab, cell.transform);
+        var item = obj.GetComponent<MergeItemUI>();
+        var img = obj.GetComponent<Image>();
+
+        // GiftBox 아이콘/ID 설정
+        img.sprite = giftData.sprite;
+        item.donutId = giftData.id;
+        item.donutData = giftData;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
+
+        // 셀에 등록
+        cell.SetItem(item, giftData);
+    }
+
+    //기프트박스 보상 함수
+    void ClaimGiftReward(DonutData gift, Cells cell)
+    {
+        Debug.Log($"기프트 박스 보상 지급: {gift.displayName}");
+
+        //// 예시 보상
+        //DataManager.Instance.PlayerData.gold += gift.rewardGold;
+        //DataManager.Instance.PlayerData.energy += gift.rewardEnergy;
+
+        // 보상 후 기프트 박스 삭제
+        cell.ClearItem();
+        Destroy(cell.occupant.gameObject);
     }
 
 

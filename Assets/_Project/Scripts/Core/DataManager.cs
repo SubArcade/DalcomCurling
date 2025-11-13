@@ -341,10 +341,15 @@ public class DataManager : MonoBehaviour
 
         foreach (var so in _donutTypeDB.Values)
         {
+            // Gift 타입이면 건너뛰기
+            if (so.type == DonutType.Gift)
+                continue;
+
             var data = so.GetLevelData(level);
             if (data != null)
                 result.Add(data);
         }
+
         return result;
     }
 
