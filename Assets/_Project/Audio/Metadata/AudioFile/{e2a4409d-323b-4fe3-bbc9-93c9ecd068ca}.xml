@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{e2a4409d-323b-4fe3-bbc9-93c9ecd068ca}">
+		<property name="assetPath">
+			<value>시간을 달리는 소녀 時をかける少女 OST   변하지 않는 것 (変わらないもの) Piano cover 피아노 커버 - Reynah (youtube).mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>275.2522448979592</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{3f45b1be-42a0-4197-9619-10d1f1e853db}</destination>
+		</relationship>
+	</object>
+</objects>
