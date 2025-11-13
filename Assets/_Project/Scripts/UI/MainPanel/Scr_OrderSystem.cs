@@ -8,12 +8,12 @@ using UnityEngine.UI;
 public class Scr_OrderSystem : MonoBehaviour
 { 
     [Header("1번 주문서")]
-    [SerializeField] private GameObject orderGroup1; //주문서 그룹
-    [SerializeField] private List<Image> orderDonuts1; //주문서 이미지
-    [SerializeField] private Button refreshBtn1; //새로고침 버튼
-    [SerializeField] private TextMeshProUGUI costText1; //주문서 도넛 합계가격텍스트
-    [SerializeField] private Button orderClearBtn1; //완료 버튼(보상수령)
-    [SerializeField] private GameObject completeObject1; //완료됨을 알려는 판떼기
+    [SerializeField, Tooltip("주문서 그룹")] private GameObject orderGroup1;
+    [SerializeField, Tooltip("주문서 안의 이미지들")] private List<Image> orderDonuts1;
+    [SerializeField, Tooltip("새로고침 버튼")] private Button refreshBtn1;
+    [SerializeField, Tooltip("주문도넛 가격합계")] private TextMeshProUGUI costText1;
+    [SerializeField, Tooltip("주문완료 버튼")] private Button orderClearBtn1;
+    [SerializeField, Tooltip("주문서 완료확인용오브젝트")] private GameObject completeObject1; 
 
     [Header("2번 주문서")]
     [SerializeField] private GameObject orderGroup2;
@@ -66,6 +66,64 @@ public class Scr_OrderSystem : MonoBehaviour
     private List<DonutVisualInfo> donutVisuals2 = new();
     private List<DonutVisualInfo> donutVisuals3 = new();
 
+    //주문서별로 계산되는 최종 보상골드
+    private int rewardGold1 = 0;
+    private int rewardGold2 = 0;
+    private int rewardGold3 = 0;
+
+    //일정 시간마다 새로고침 횟수 회복 코루틴
+    private Coroutine refreshCoroutine;
+
+    //저장된퀘스트가 있는지 없는지 판단용도 변수
+    private bool isRestored = false;
+    
+    //도넛당 가격 범위 최소값,최대값
+    public class DonutRewardRange
+    {
+        public int minReward;
+        public int maxReward;
+    }
+
+    //도넛당 레벨별 보상테이블 생성
+    private Dictionary<int, DonutRewardRange> levelRewardTable = new();
+    //가격들....
+    private void DonutRewardTable()
+    {
+        levelRewardTable = new Dictionary<int, DonutRewardRange>
+    {
+        { 1,  new DonutRewardRange { minReward = 100,  maxReward = 150 } },
+        { 2,  new DonutRewardRange { minReward = 200,  maxReward = 250 } },
+        { 3,  new DonutRewardRange { minReward = 300,  maxReward = 350 } },
+        { 4,  new DonutRewardRange { minReward = 400,  maxReward = 450 } },
+        { 5,  new DonutRewardRange { minReward = 500,  maxReward = 550 } },
+        { 6,  new DonutRewardRange { minReward = 600,  maxReward = 650 } },
+        { 7,  new DonutRewardRange { minReward = 700,  maxReward = 750 } },
+        { 8,  new DonutRewardRange { minReward = 800,  maxReward = 850 } },
+        { 9,  new DonutRewardRange { minReward = 900,  maxReward = 950 } },
+        { 10, new DonutRewardRange { minReward = 1000, maxReward = 1100 } },
+        { 11, new DonutRewardRange { minReward = 1200, maxReward = 1300 } },
+        { 12, new DonutRewardRange { minReward = 1400, maxReward = 1500 } },
+        { 13, new DonutRewardRange { minReward = 1600, maxReward = 1700 } },
+        { 14, new DonutRewardRange { minReward = 1800, maxReward = 1900 } },
+        { 15, new DonutRewardRange { minReward = 2000, maxReward = 2100 } },
+        { 16, new DonutRewardRange { minReward = 2200, maxReward = 2300 } },
+        { 17, new DonutRewardRange { minReward = 2400, maxReward = 2500 } },
+        { 18, new DonutRewardRange { minReward = 2600, maxReward = 2700 } },
+        { 19, new DonutRewardRange { minReward = 2800, maxReward = 2900 } },
+        { 20, new DonutRewardRange { minReward = 3000, maxReward = 3100 } },
+        { 21, new DonutRewardRange { minReward = 3500, maxReward = 3800 } },
+        { 22, new DonutRewardRange { minReward = 4000, maxReward = 4300 } },
+        { 23, new DonutRewardRange { minReward = 4500, maxReward = 4800 } },
+        { 24, new DonutRewardRange { minReward = 5000, maxReward = 5300 } },
+        { 25, new DonutRewardRange { minReward = 5500, maxReward = 5800 } },
+        { 26, new DonutRewardRange { minReward = 6000, maxReward = 6300 } },
+        { 27, new DonutRewardRange { minReward = 6500, maxReward = 6800 } },
+        { 28, new DonutRewardRange { minReward = 7000, maxReward = 7300 } },
+        { 29, new DonutRewardRange { minReward = 7500, maxReward = 7800 } },
+        { 30, new DonutRewardRange { minReward = 8000, maxReward = 8300 } },
+    };
+    }
+
 
     void Awake()
     {
@@ -109,19 +167,14 @@ public class Scr_OrderSystem : MonoBehaviour
     void Start()
     {     
         //새로고침버튼 연결
-        refreshBtn1.onClick.AddListener(() => OnclickRefreshOrderButton(refreshBtn1));
-        refreshBtn2.onClick.AddListener(() => OnclickRefreshOrderButton(refreshBtn2));
-        refreshBtn3.onClick.AddListener(() => OnclickRefreshOrderButton(refreshBtn3));
+        refreshBtn1.onClick.AddListener(() => OnclickRefreshOrderBtn(refreshBtn1));
+        refreshBtn2.onClick.AddListener(() => OnclickRefreshOrderBtn(refreshBtn2));
+        refreshBtn3.onClick.AddListener(() => OnclickRefreshOrderBtn(refreshBtn3));
 
         //주문서 완료 연결
-        orderClearBtn1.onClick.AddListener(() => OnClickClearButton(completeObject1, orderDonutIDs1));
-        orderClearBtn2.onClick.AddListener(() => OnClickClearButton(completeObject2, orderDonutIDs2));
-        orderClearBtn3.onClick.AddListener(() => OnClickClearButton(oompleteObject3, orderDonutIDs3));
-
-        //게임 시작 시 전체 주문서 자동 새로고침 (횟수 차감 없음)
-        RefreshOrderDonut(orderDonuts1, donutTextInfos1, orderDonutIDs1,costText1);
-        RefreshOrderDonut(orderDonuts2, donutTextInfos2, orderDonutIDs2,costText2);
-        RefreshOrderDonut(orderDonuts3, donutTextInfos3, orderDonutIDs3,costText3);
+        orderClearBtn1.onClick.AddListener(() => OnClickClearBtn(completeObject1, orderDonutIDs1));
+        orderClearBtn2.onClick.AddListener(() => OnClickClearBtn(completeObject2, orderDonutIDs2));
+        orderClearBtn3.onClick.AddListener(() => OnClickClearBtn(oompleteObject3, orderDonutIDs3));  
 
         //시작 시 퀘스트 완료 판떼기 비활성화
         completeObject1.SetActive(false);
@@ -129,9 +182,23 @@ public class Scr_OrderSystem : MonoBehaviour
         oompleteObject3.SetActive(false);
 
         //시작 할때 버튼색 흐리게
-        SetButtonFade(orderClearBtn1);
-        SetButtonFade(orderClearBtn2);
-        SetButtonFade(orderClearBtn3);
+        SetBtnColor(orderClearBtn1);
+        SetBtnColor(orderClearBtn2);
+        SetBtnColor(orderClearBtn3);
+
+        // 새로고침 회복 코루틴
+        refreshCoroutine = StartCoroutine(RecoveryRefreshCount());
+
+        // 저장된 주문서 복원 시도
+        bool isRestored = TryRestoreQuest();
+        // 저장된게 없다면 새로고침으로 초기화
+        if (!isRestored)
+        {
+            RefreshOrderDonut(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1);
+            RefreshOrderDonut(orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2);
+            RefreshOrderDonut(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3);
+        }
+
     }
 
     void Update()
@@ -148,131 +215,14 @@ public class Scr_OrderSystem : MonoBehaviour
         orderClearBtn3.interactable = isOrder3Complete;
     }
 
-    //새로고침 버튼 상호작용
-    public void OnclickRefreshOrderButton(Button ClickedButton)
-    {
-        if (refreshCount <= 0)
-        {
-            print("남은 새로고침 횟수가 없습니다!");
-            return;
-        }
-
-        refreshCount--;
-        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
-
-        // 해당 주문서의 CompleteObject 비활성화
-        if (ClickedButton == refreshBtn1)
-        {
-            RefreshOrderDonut(orderDonuts1, donutTextInfos1, orderDonutIDs1,costText1);
-            completeObject1.SetActive(false);
-        }
-        else if (ClickedButton == refreshBtn2)
-        {
-            RefreshOrderDonut(orderDonuts2, donutTextInfos2, orderDonutIDs2,costText2);
-
-            completeObject2.SetActive(false);
-        }
-        else if (ClickedButton == refreshBtn3)
-        {
-            RefreshOrderDonut(orderDonuts3, donutTextInfos3, orderDonutIDs3,costText3);
-            oompleteObject3.SetActive(false);
-        }
-    }
-
-    //주문서 새로고침시 이미지, 이름.레벨,보상골드 갱신
-    public void RefreshOrderDonut(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
-    {
-        idList.Clear();
-        int count = Mathf.Min(orderImages.Count, textInfos.Count, 3); //도넛을 최대 3개까지만 새로고침
-        int totalReward = 0;
-
-        for (int i = 0; i < count; i++)
-        {
-            //도넛 타입과 레벨을 랜덤으로 고름
-            DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
-            int randomLevel = Random.Range(1, 31);
-
-            DonutData donut = DataManager.Instance.GetDonutData(randomType, randomLevel);
-            
-            //이미지, 타입, 단계 설명표시
-            orderImages[i].sprite = donut.sprite;
-            textInfos[i].typeText.text = donut.displayName;
-            textInfos[i].levelText.text = donut.description;
-            //저장
-            idList.Add(donut.id);
-
-            int reward = GetRewardByLevel(donut.level);
-            totalReward += reward;
-        }
-        costText.text = $"{totalReward}";
-    }
-
-    //머지보드판에서 도넛 검색후 주문서 클리어 여부 결정
-    public bool IsOrderCompleted(List<string> orderDonutIDs, List<DonutVisualInfo> visuals)
-    {
-        var boardCells = BoardManager.Instance.GetAllCells();
-        HashSet<string> boardDonutIDs = new();
-
-        foreach (var cell in boardCells)
-        {
-            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
-            boardDonutIDs.Add(cell.donutId);
-        }
-
-        bool allMatched = true;
-
-        for (int i = 0; i < orderDonutIDs.Count && i < visuals.Count; i++)
-        {
-            bool matched = boardDonutIDs.Contains(orderDonutIDs[i]);
-
-            if (visuals[i].checkMark != null)
-                visuals[i].checkMark.SetActive(matched);
-
-            if (!matched)
-                allMatched = false;
-        }
-
-        return allMatched;
-    }
-
-    //주문서 완료시 버튼 상호작용
-    public void OnClickClearButton(GameObject completeObject, List<string> orderDonutIDs)
-    {
-        // ✅ 보드에서 주문서 도넛 제거
-        foreach (var cell in BoardManager.Instance.GetAllCells())
-        {
-            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
-
-            if (orderDonutIDs.Contains(cell.donutId))
-            {
-                if (cell.occupant != null)
-                    Destroy(cell.occupant.gameObject); // 도넛 오브젝트 제거
-
-                cell.ClearItem(); // 셀 정보 초기화
-            }
-        }
-        // ✅ 완료 UI 표시
-        //보상골드도 넣어야할걸
-        completeObject.SetActive(true);
-
-    }
-
     //도넛레벨별 가격 책정하기
-    private int GetRewardByLevel(int level)
+    private int GetRewardByDonutLevel(int level)
     {
-        if (level >= 1 && level <= 5)
-            return Random.Range(300, 501);
-        else if (level >= 6 && level <= 10)
-            return Random.Range(600, 1001);
-        else if (level >= 11 && level <= 15)
-            return Random.Range(1100, 2001);
-        else if (level >= 16 && level <= 20)
-            return Random.Range(2100, 4001);
-        else if (level >= 21 && level <= 30)
-            return Random.Range(4100, 8001);
-        else
-            return 0;
-        
+        if (levelRewardTable.TryGetValue(level, out var range))
+        {
+            return UnityEngine.Random.Range(range.minReward, range.maxReward + 1);
+        }
+        return 0;
     }
 
     //orderdonuts1~3에서 자식체크마크를 찾아주는 함수
@@ -337,8 +287,133 @@ public class Scr_OrderSystem : MonoBehaviour
         }
     }
 
+    //새로고침 버튼 상호작용
+    public void OnclickRefreshOrderBtn(Button ClickedButton)
+    {
+        if (refreshCount <= 0)
+        {
+            print("남은 새로고침 횟수가 없습니다!");
+            return;
+        }
+
+        refreshCount--;
+        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
+
+        // 해당 주문서의 CompleteObject 비활성화
+        if (ClickedButton == refreshBtn1)
+        {
+            RefreshOrderDonut(orderDonuts1, donutTextInfos1, orderDonutIDs1,costText1);
+            completeObject1.SetActive(false);
+        }
+        else if (ClickedButton == refreshBtn2)
+        {
+            RefreshOrderDonut(orderDonuts2, donutTextInfos2, orderDonutIDs2,costText2);
+
+            completeObject2.SetActive(false);
+        }
+        else if (ClickedButton == refreshBtn3)
+        {
+            RefreshOrderDonut(orderDonuts3, donutTextInfos3, orderDonutIDs3,costText3);
+            oompleteObject3.SetActive(false);
+        }
+    }
+
+    //주문서 새로고침시 이미지, 이름.레벨,보상골드 갱신
+    public void RefreshOrderDonut(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
+    {
+        idList.Clear();
+
+        int count = Mathf.Min(orderImages.Count, textInfos.Count, 3); //도넛을 최대 3개까지만 새로고침
+        int totalReward = 0;
+        var questList = new List<QuestList>();
+
+        for (int i = 0; i < count; i++)
+        {
+            //도넛 타입과 레벨을 랜덤으로 고름
+            DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
+            int randomLevel = Random.Range(1, 31);
+
+            DonutData donut = DataManager.Instance.GetDonutData(randomType, randomLevel);
+
+            //이미지, 타입, 단계 설명표시
+            orderImages[i].sprite = donut.sprite;
+            textInfos[i].typeText.text = donut.displayName;
+            textInfos[i].levelText.text = donut.description;
+            //저장
+            idList.Add(donut.id);
+
+            int reward = GetRewardByDonutLevel(donut.level);
+            totalReward += reward;
+
+            // 퀘스트 정보 저장
+            questList.Add(new QuestList
+            {
+                donutId = donut.id,
+                rewardGold = reward
+            });
+
+        }
+        costText.text = $"{totalReward}";
+
+        // 퀘스트 저장
+        if (orderImages == orderDonuts1)
+        {
+            DataManager.Instance.QuestData.questList1 = questList;
+        }
+        else if (orderImages == orderDonuts2)
+        {
+            DataManager.Instance.QuestData.questList2 = questList;
+        }
+        else if (orderImages == orderDonuts3)
+        {
+            DataManager.Instance.QuestData.questList3 = questList;
+        }
+
+        // 주문서별 보상 저장
+        if (orderImages == orderDonuts1)
+        {
+            rewardGold1 = totalReward; 
+        }
+        else if (orderImages == orderDonuts2)
+        {
+            rewardGold2 = totalReward;
+        }
+        else if (orderImages == orderDonuts3)
+        {
+            rewardGold3 = totalReward;
+        }
+    }
+
+    //머지보드판에서 도넛 검색후 주문서 클리어 여부 결정
+    public bool IsOrderCompleted(List<string> orderDonutIDs, List<DonutVisualInfo> visuals)
+    {
+        var boardCells = BoardManager.Instance.GetAllCells();
+        HashSet<string> boardDonutIDs = new();
+
+        foreach (var cell in boardCells)
+        {
+            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
+            boardDonutIDs.Add(cell.donutId);
+        }
+
+        bool allMatched = true;
+
+        for (int i = 0; i < orderDonutIDs.Count && i < visuals.Count; i++)
+        {
+            bool matched = boardDonutIDs.Contains(orderDonutIDs[i]);
+
+            if (visuals[i].checkMark != null)
+                visuals[i].checkMark.SetActive(matched);
+
+            if (!matched)
+                allMatched = false;
+        }
+
+        return allMatched;
+    }
+
     //주문서 퀘스트클리어 버튼 비활성화 상태일경우 버튼의 색
-    void SetButtonFade(Button button)
+    void SetBtnColor(Button button)
     {
         ColorBlock cb = button.colors;
         cb.disabledColor = new Color(0.6f, 0.6f, 0.6f, 1f);
@@ -349,19 +424,115 @@ public class Scr_OrderSystem : MonoBehaviour
         button.colors = cb;
     }
 
-    //사용하는 함수 아님니다 나중에 쓰던가 버리던가 할겁니댱
-    public void SendQuest(List<int> rewardGolds, List<int> refreshCounts, List<string> donutIds)
+    //주문서 완료시 버튼 상호작용
+    public async void OnClickClearBtn(GameObject completeObject, List<string> orderDonutIDs)
     {
-        for (int i = 0; i < 3; i++)
+        //보드에서 주문서 도넛 제거
+        foreach (var cell in BoardManager.Instance.GetAllCells())
         {
-            QuestList quest = new QuestList();
-            quest.rewardGold = rewardGolds[i];        
-            quest.donutId = donutIds[i];
+            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
 
-            //DataManager.Instance.QuestData.questList[i];
+            if (orderDonutIDs.Contains(cell.donutId))
+            {
+                if (cell.occupant != null)
+                    Destroy(cell.occupant.gameObject); // 도넛 오브젝트 제거
+
+                cell.ClearItem(); // 셀 정보 초기화
+            }
+        }
+        // 완료 UI 표시
+        completeObject.SetActive(true);
+
+        //보상골드 지급
+        int reward = 0;
+        if (completeObject == completeObject1) reward = rewardGold1;
+        else if (completeObject == completeObject2) reward = rewardGold2;
+        else if (completeObject == oompleteObject3) reward = rewardGold3;
+        //보상골드 데이터 저장
+        int newGold = DataManager.Instance.PlayerData.gold + reward;
+        await DataManager.Instance.UpdateUserDataAsync(gold: newGold);
+
+        //  주문서별 자동 새로고침 코루틴 시작
+        if (completeObject == completeObject1)
+            StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));
+        else if (completeObject == completeObject2)
+            StartCoroutine(RefreshAfterOrderClear(orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2, completeObject2, 1.5f));
+        else if (completeObject == oompleteObject3)
+            StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, oompleteObject3, 1.5f));
+    }
+
+    //주문서 완료 후 퀘스트 알아서 새로고침
+    private IEnumerator RefreshAfterOrderClear(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText, GameObject completeObject, float delaySeconds) 
+    {
+        yield return new WaitForSeconds(delaySeconds);
+
+        RefreshOrderDonut(orderImages, textInfos, idList, costText); // 새로고침
+        completeObject.SetActive(false); // 완료 UI 숨김
+    }
+
+    //새로고침횟수 회복 코루틴
+    private IEnumerator RecoveryRefreshCount()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(10f);
+
+            if (refreshCount < maxRefreshCount)
+            {
+                refreshCount++;
+                refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
+            }
         }
     }
+
+    //게임 시작할때 이전 퀘스트정보 불러오기
+    private void CallFromSavedQuest(List<QuestList> savedQuests, List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
+    {
+        
+        idList.Clear();
+        int totalReward = 0;
+
+        for (int i = 0; i < savedQuests.Count && i < orderImages.Count && i < textInfos.Count; i++)
+        {
+            var quest = savedQuests[i];
+            DonutData donut = DataManager.Instance.GetDonutByID(quest.donutId);
+            if (donut == null) continue;
+
+            orderImages[i].sprite = donut.sprite;
+            textInfos[i].typeText.text = donut.displayName;
+            textInfos[i].levelText.text = donut.description;
+
+            idList.Add(donut.id);
+            totalReward += quest.rewardGold;
+        }
+        costText.text = $"{totalReward}";
+    }
+
+    //주문서1~3 각각 퀘스트 불러오기
+    private bool TryRestoreQuest()
+    {
+        bool restored = false;
+
+        var q1 = DataManager.Instance.QuestData.questList1;
+        var q2 = DataManager.Instance.QuestData.questList2;
+        var q3 = DataManager.Instance.QuestData.questList3;
+
+        if (q1 != null && q1.Count > 0)
+        {
+            CallFromSavedQuest(q1, orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1);
+            restored = true;
+        }
+        if (q2 != null && q2.Count > 0)
+        {
+            CallFromSavedQuest(q2, orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2);
+            restored = true;
+        }
+        if (q3 != null && q3.Count > 0)
+        {
+            CallFromSavedQuest(q3, orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3);
+            restored = true;
+        }
+        return restored;
+    }
+
 }
-//1.퀘스트가 클리어 되면 일정 시간후에 횟수차감없이 그 퀘스트칸만 새로고침
-//2.골드 보상 실제로 받아서 위의 상황판에 적용
-//데이터 파이어스토어 넘기기
