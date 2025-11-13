@@ -13,8 +13,10 @@ public class QuestList
 [System.Serializable, FirestoreData]
 public class QuestData
 {
-    [field: SerializeField, Tooltip("도넛 앤트리")][FirestoreProperty] public List<QuestList> questList { get; set; } = new();
-    
+    [field: SerializeField, Tooltip("주문서1번")][FirestoreProperty] public List<QuestList> questList1 { get; set; } = new();
+    [field: SerializeField, Tooltip("주문서2번")][FirestoreProperty] public List<QuestList> questList2 { get; set; } = new();
+    [field: SerializeField, Tooltip("주문서3번")][FirestoreProperty] public List<QuestList> questList3 { get; set; } = new();
+
     // 로컬 퀘스트 데이터 (디비에 들어가지 않는 변수)
     public int refreshCount { get; set; }
     public int baseGold { get; set; }
