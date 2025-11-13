@@ -25,9 +25,7 @@ public class BoardManager : MonoBehaviour
 
     public Cells selectedCell; // 선택한 셀
 
-    [Header("도넛 스프라이트")]
-    public Sprite[] donutSprites;
-
+    // 보드판 잠금이미지 용도
     private readonly int[,] requiredLevelMap =
     {   
         { 7, 7, 7, 7, 7, 7,10 },

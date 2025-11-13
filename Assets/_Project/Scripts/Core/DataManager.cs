@@ -338,18 +338,16 @@ public class DataManager : MonoBehaviour
         return next;
     }
 
-    // 특정 레벨의 모든 도넛 가져오기 (랜덤 생성용)
-    public List<DonutData> GetDonutsByLevel(int level)
+    public List<DonutData> GetDonutsByTypeAndLevel(DonutType type, int level)
     {
         List<DonutData> result = new();
 
-        foreach (var so in _donutTypeDB.Values)
+        // 타입 DB가 있는지 확인
+        if (_donutTypeDB.TryGetValue(type, out var typeDB))
         {
-            // Gift 타입이면 건너뛰기
-            if (so.type == DonutType.Gift)
-                continue;
+            // 해당 타입에서 레벨 데이터 가져오기
+            var data = typeDB.GetLevelData(level);
 
-            var data = so.GetLevelData(level);
             if (data != null)
                 result.Add(data);
         }
@@ -357,6 +355,19 @@ public class DataManager : MonoBehaviour
         return result;
     }
 
+    //생성기 레벨 받아오기
+    public int GetGeneratorLevel(DonutType type)
+    {
+        var board = userData.mergeBoard;
+
+        return type switch
+        {
+            DonutType.Hard => board.generatorLevelHard,
+            DonutType.Soft => board.generatorLevelSoft,
+            DonutType.Moist => board.generatorLevelMoist,
+            _ => 1
+        };
+    }
 
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)

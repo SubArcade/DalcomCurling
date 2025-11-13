@@ -124,6 +124,7 @@ public class Scr_OrderSystem : MonoBehaviour
     };
     }
 
+    private readonly DonutType[] orderDonutTypes = { DonutType.Hard, DonutType.Soft, DonutType.Moist };
 
     void Awake()
     {
@@ -330,7 +331,8 @@ public class Scr_OrderSystem : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             //도넛 타입과 레벨을 랜덤으로 고름
-            DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
+            //DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
+            DonutType randomType = orderDonutTypes[Random.Range(0, orderDonutTypes.Length)];
             int randomLevel = Random.Range(1, 31);
 
             DonutData donut = DataManager.Instance.GetDonutData(randomType, randomLevel);

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -48,7 +48,7 @@ public class Test_MainMenu : MonoBehaviour
     void Awake()
     {
         //DataManager.Instance.PlayerData.energy = 0;
-        energyButton.onClick.AddListener(()=> testAdd());
+        //energyButton.onClick.AddListener(()=> testAdd());
         loginButton.onClick.AddListener(TestLogin);
         dropdown.ClearOptions();
         dropdown.AddOptions(new List<string>(idDictionary.Keys));
@@ -90,6 +90,5 @@ public class Test_MainMenu : MonoBehaviour
         string display = dropdown.options[index].text;
         id = idDictionary[display];
         pw = pwDictionary[display];
-        
     }
 }

@@ -38,7 +38,7 @@ MonoBehaviour:
     rewardGem: 0
   - id: Gift_3
     level: 3
-    sprite: {fileID: 0}
+    sprite: {fileID: 21300000, guid: f9b8c699c1e03864f98761d15dd4fe8b, type: 3}
     displayName: "Lv3 \uC120\uBB3C\uC0C1\uC790"
     description: "Lv3 \uC120\uBB3C\uC0C1\uC790\uC785\uB2C8\uB2E4."
     donutType: 3
