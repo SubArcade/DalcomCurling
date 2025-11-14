@@ -33,6 +33,8 @@ public class StoneForceController_Firebase : MonoBehaviour
 
     public float sweepFrictionValue;
 
+    //public bool isStartingTeam { get; private set; }
+
     // StoneShoot.Team 대신 사용할 Team enum (또는 FirebaseGameManager에서 관리)
     public enum Team
     {
@@ -128,6 +130,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     {
         this.team = team;
         this.donutId = donutId;
+        //this.isStartingTeam = isStartingTeam;
     }
 
 
