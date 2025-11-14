@@ -16,8 +16,8 @@ public class Scr_Collider_DonutSideOutCheck : MonoBehaviour
         if (other.gameObject.CompareTag("InGameDonut"))
         {
             StoneForceController_Firebase sfc = other.transform.GetComponent<StoneForceController_Firebase>();
-            stoneManager.DonutContactedSideWall(sfc.team, sfc.donutId);
-            Debug.Log("ff");
+            stoneManager.DonutOut(sfc);
+            Debug.Log("옆쪽 벽과 충돌함");
         }
     }
 }

@@ -253,6 +253,8 @@ MonoBehaviour:
   stonePrefabB: {fileID: 8981461065803206208, guid: 624761d8addb29342aa46959ec784abf, type: 3}
   spawnPosition: {fileID: 2010081595}
   _scr_Collider_House: {fileID: 1878140752}
+  endHogLine: {fileID: 159821090}
+  backLine: {fileID: 484471462}
 --- !u!114 &48117304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -784,7 +786,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -1554,7 +1556,7 @@ GameObject:
   - component: {fileID: 484471464}
   - component: {fileID: 484471463}
   m_Layer: 0
-  m_Name: "\uD575\uB77C\uC778"
+  m_Name: "\uBC31\uB77C\uC778"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4855,6 +4857,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1602987424}
   - component: {fileID: 1602987423}
+  - component: {fileID: 1602987425}
   - component: {fileID: 1602987422}
   - component: {fileID: 1602987421}
   m_Layer: 0
@@ -4950,6 +4953,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1731386802}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1602987425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1602987420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6329676d2f87284409f35b69cf8bd726, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1630029310
 GameObject:
   m_ObjectHideFlags: 0
@@ -6755,94 +6770,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7720d49d84e79764a94ca1a3d1dc9a3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigid: {fileID: 0}
-  uiLaunch: {fileID: 1970583203}
-  perfectZoneRandomWeights:
-  - value: -5
-    weight: 2
-  - value: -4
-    weight: 4
-  - value: -3
-    weight: 6
-  - value: -2
-    weight: 11
-  - value: -1
-    weight: 17
-  - value: 0
-    weight: 20
-  - value: 1
-    weight: 17
-  - value: 2
-    weight: 11
-  - value: 3
-    weight: 6
-  - value: 4
-    weight: 4
-  - value: 5
-    weight: 2
-  earlyZoneRandomWeights:
-  - value: -10
-    weight: 0.5
-  - value: -9
-    weight: 1
-  - value: -8
-    weight: 1.5
-  - value: -7
-    weight: 2
-  - value: -6
-    weight: 3
-  - value: -5
-    weight: 4
-  - value: -4
-    weight: 6
-  - value: -3
-    weight: 7
-  - value: -2
-    weight: 9
-  - value: -1
-    weight: 10
-  - value: 0
-    weight: 12
-  - value: 1
-    weight: 10
-  - value: 2
-    weight: 9
-  - value: 3
-    weight: 7
-  - value: 4
-    weight: 6
-  - value: 5
-    weight: 4
-  - value: 6
-    weight: 3
-  - value: 7
-    weight: 2
-  - value: 8
-    weight: 1.5
-  - value: 9
-    weight: 1
-  - value: 10
-    weight: 0.5
-  maxUIDirectionAngle: 60
-  currentState: 0
-  makeDonutText: {fileID: 0}
-  powerAndDirectionText: {fileID: 0}
-  rotationText: {fileID: 0}
-  sweepingPanel: {fileID: 0}
-  releaseButton: {fileID: 0}
-  frontSweepButton: {fileID: 0}
-  leftSweepButton: {fileID: 0}
-  rightSweepButton: {fileID: 0}
-  outText: {fileID: 0}
-  stone: {fileID: 8981461065803206208, guid: 5828bee2d4692b043bcf22412526b54b, type: 3}
-  spawnPos: {fileID: 2010081595}
-  startHogLine: {fileID: 1964964876}
-  endHogLine: {fileID: 159821090}
-  endHackLine: {fileID: 0}
-  earlyZoneLine: {fileID: 1267973038}
-  perfectZoneLine: {fileID: 1750921521}
-  leftWall: {fileID: 2121591688}
-  rightWall: {fileID: 1602987424}
 --- !u!114 &1970583203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6855,14 +6782,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c71597e473d8d9348be80c2c82dceac7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  launchScript: {fileID: 1970583202}
-  forceSlider: {fileID: 0}
-  rotationSlider: {fileID: 0}
-  sweepValueSlider: {fileID: 0}
-  arrowRectTransform: {fileID: 0}
-  arrowCanvasGroup: {fileID: 0}
-  rotationAmountSliderCanvasGroup: {fileID: 0}
-  tapStartPointImage: {fileID: 0}
 --- !u!1 &2009635032
 GameObject:
   m_ObjectHideFlags: 0
@@ -7479,6 +7398,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2121591688}
   - component: {fileID: 2121591687}
+  - component: {fileID: 2121591689}
   - component: {fileID: 2121591686}
   - component: {fileID: 2121591685}
   m_Layer: 0
@@ -7574,6 +7494,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1731386802}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2121591689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121591684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6329676d2f87284409f35b69cf8bd726, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2143880416
 GameObject:
   m_ObjectHideFlags: 0
@@ -7798,7 +7730,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6840985115576919254, guid: f56c6af517c59b54ab8517c6d3ea47c7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8069302322581220442, guid: f56c6af517c59b54ab8517c6d3ea47c7, type: 3}
       propertyPath: m_IsActive

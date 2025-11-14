@@ -27,6 +27,10 @@ public class StoneManager : MonoBehaviour
     public StoneForceController_Firebase.Team _currentTurnStoneTeam { get; private set; }
     public StoneForceController_Firebase.Team myTeam { get; private set; } = StoneForceController_Firebase.Team.None;
     private List<StonePosition> lastStonePosition = new List<StonePosition>();
+
+    [Header("아웃 판정을 위한 라인 오브젝트 참조")]
+    public Transform endHogLine;
+    public Transform backLine;
     public string myUserId { get; private set; } // 현재 플레이어의 ID
     public int aShotIndex { get; private set; } = -1; // 인덱스를 정하기 위함이라 0부터 시작, 진짜 발사 개수는 +1
     public int bShotIndex { get; private set; }= -1;
@@ -34,12 +38,48 @@ public class StoneManager : MonoBehaviour
     public int bScore { get; private set; }
     public int roundCount { get; private set; }
     
+    public float donutColliderRadius { get; private set; }
+    
     
 
     void Awake()
     {
         myUserId = FirebaseAuthManager.Instance.UserId; // Firebase 인증에서 ID 가져오기
         _uilaunchIndicator = transform.GetComponent<UI_LaunchIndicator_Firebase>();
+    }
+
+    private void Start()
+    {
+        // 아웃판정에 사용될 값(도넛의 반지름)을 미리 계산해둠
+        donutColliderRadius = CalculateDonutColliderRadius(stonePrefabA); //A 도넛이나 B도넛이나 콜라이더는 같을것이므로.
+    }
+
+    private float CalculateDonutColliderRadius(GameObject donut)
+    {
+        MeshCollider meshCollider = donut.GetComponent<MeshCollider>();
+
+        if (meshCollider == null)
+        {
+            Debug.LogError("MeshCollider를 찾을 수 없습니다.");
+            return 0f;
+        }
+
+        // 1. 콜라이더의 바운딩 박스 가져오기 (월드 좌표 기준)
+        Bounds bounds = meshCollider.bounds;
+
+        // 2. 바운딩 박스의 절반 크기 (Extent) 가져오기
+        Vector3 extents = bounds.extents;
+
+        // 3. 좌우 반지름은 보통 X축이나 Z축의 절반 크기(Extent)와 같습니다.
+        // 실린더가 Y축을 따라 세워져 있다고 가정하고, X와 Z 중 큰 값을 반지름으로 사용합니다.
+        // (스케일이 균일하지 않을 수 있으므로 Max를 사용해 안전하게 처리)
+        float radiusApproximation = Mathf.Max(extents.x, extents.z);
+        
+        // extents는 이미 바운딩 박스의 절반 크기(중앙에서 끝까지의 거리)이므로, 
+        // 이것이 곧 월드 좌표 기준의 반지름 근사치입니다.
+        
+        return radiusApproximation;
+        
     }
 
     // 새 라운드가 시작될 때 돌을 생성하고 초기화합니다.
@@ -358,8 +398,15 @@ public class StoneManager : MonoBehaviour
                 controller.MoveFinishedInTurn();
             }
         }
-        
-        FirebaseGameManager.Instance.OnSimulationComplete(GetAllStonePositions());
+
+        if (FirebaseGameManager.Instance._isMyTurn && FirebaseGameManager.Instance.CurrentLocalState == "SimulatingMyShot")
+        {
+            FirebaseGameManager.Instance.ChangeState_To_WaitingForPrediction();
+        }
+        else
+        {
+            FirebaseGameManager.Instance.OnSimulationComplete(GetAllStonePositions());
+        }
         
     }
 
@@ -403,7 +450,7 @@ public class StoneManager : MonoBehaviour
                 // StoneId를 불러와 딕셔너리에서 키값으로 넣어 밸류값(stoneforcecontrolller)을 찾는다.
                 fc = _stoneControllers_A[serverPositions[i].StoneId]; 
             }
-            else
+            else // B 팀이면
             {
                 fc = _stoneControllers_B[serverPositions[i].StoneId];
             }
@@ -429,6 +476,15 @@ public class StoneManager : MonoBehaviour
             //     fc = _stoneControllers_A[i / 2];
             //     Debug.Log("계산 오류");
             // }
+            newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
+                serverPositions[i].Position["z"]);
+
+            if (CheckDonutPassedOutLine(newPosition.z))
+            {
+                DonutOut(fc);
+                Debug.Log("도넛이 이동될 위치가 아웃될 위치라서 별도의 계산 없이 아웃시킴");
+                continue; // 다음 i 값으로 이동
+            }
 
             rb = fc.GetComponent<Rigidbody>();
             rb.isKinematic = true;
@@ -436,8 +492,6 @@ public class StoneManager : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
             fc.transform.GetComponent<MeshCollider>().isTrigger = true;
 
-            newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-                serverPositions[i].Position["z"]);
             float distance = Vector3.Distance(fc.transform.position, newPosition);
             if (distance > 0.1f)
             {
@@ -477,6 +531,7 @@ public class StoneManager : MonoBehaviour
     {
         //if (_currentTurnStoneTeam == myTeam) return null;
         var positions = new List<StonePosition>();
+        var toDestroyDonuts = new List<StoneForceController_Firebase>();
         //int maxLength = Math.Max(_stoneControllers_A.Count, _stoneControllers_B.Count);
         int maxLength = Math.Max(aShotIndex + 1, bShotIndex + 1);
         StoneForceController_Firebase sfc;
@@ -486,6 +541,10 @@ public class StoneManager : MonoBehaviour
             if (_stoneControllers_A.ContainsKey(i))
             {
                 sfc = _stoneControllers_A[i];
+                if (CheckDonutPassedOutLine(sfc.transform.position.z)) // 아웃라인 확인해보고
+                {
+                    toDestroyDonuts.Add(sfc); // 아웃라인을 넘겼으면 삭제를 위한 리스트에 담아둔다
+                }
                 positions.Add(new StonePosition
                 {
                     StoneId = sfc.donutId,
@@ -504,6 +563,10 @@ public class StoneManager : MonoBehaviour
             if (_stoneControllers_B.ContainsKey(i))
             {
                 sfc = _stoneControllers_B[i];
+                if (CheckDonutPassedOutLine(sfc.transform.position.z)) // 아웃라인 확인해보고
+                {
+                    toDestroyDonuts.Add(sfc); // 아웃라인을 넘겼으면 삭제를 위한 리스트에 담아둔다
+                }
                 positions.Add(new StonePosition
                 {
                     StoneId = sfc.donutId,
@@ -520,6 +583,11 @@ public class StoneManager : MonoBehaviour
             }
         }
 
+        for (int i = 0; i < toDestroyDonuts.Count; i++)
+        {
+            // 아웃처리할 도넛 리스트를 순회하며 해당 도넛을 아웃처리한다
+            DonutOut(toDestroyDonuts[i]);
+        }
         lastStonePosition = positions; // 지금 만들어둔 포지션정보를 로컬에도 저장 
         return positions;
     }
@@ -719,7 +787,7 @@ public class StoneManager : MonoBehaviour
         // }
     }
     
-    public void DonutOut(StoneForceController_Firebase donut, bool deleteInDict = false) //도넛의 아웃 판정
+    public void DonutOut(StoneForceController_Firebase donut) //도넛의 아웃 판정
     {
         // outText.SetActive(true);
         // DOVirtual.DelayedCall(3f, () =>
@@ -727,17 +795,16 @@ public class StoneManager : MonoBehaviour
         //     outText.SetActive(false);
         // });
         //donut.gameObject.SetActive(false);
-        if (deleteInDict)
+
+        if (donut.team == StoneForceController_Firebase.Team.A)
         {
-            if (donut.team == StoneForceController_Firebase.Team.A)
-            {
-                _stoneControllers_A.Remove(donut.donutId);
-            }
-            else
-            {
-                _stoneControllers_B.Remove(donut.donutId);
-            }
+            _stoneControllers_A.Remove(donut.donutId);
         }
+        else
+        {
+            _stoneControllers_B.Remove(donut.donutId);
+        }
+        
         
         Destroy(donut.gameObject);
 
@@ -747,6 +814,20 @@ public class StoneManager : MonoBehaviour
         //rb.gameObject.SetActive(false);
         //forceController.enabled = false;
         //DonutAttackFinished();
+    }
+
+    public bool CheckDonutPassedOutLine(float positionZ) // 도넛이 엔드 호그라인보다 더 앞에 있거나, 백라인을 넘었을 경우 아웃처리를 위함
+    {
+        if ((positionZ > backLine.position.z + donutColliderRadius) || (positionZ < endHogLine.position.z - donutColliderRadius))
+        {
+            // 백라인과 엔드호그라인의 z좌표를 가져오고, 그 좌표에 도넛 콜라이더의 반지름을 더해서
+            // 도넛의 중심좌표와 위 계산의 결과값과 비교하여 아웃판정을 진행
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     #endregion
 }
