@@ -74,6 +74,15 @@ public class Game
 
     [FirestoreProperty]
     public PredictedResult PredictedResult { get; set; } // 예측 시뮬레이션 결과
+
+    [FirestoreProperty]
+    public Dictionary<string, Timestamp> PlayerHeartbeats { get; set; } // 각 플레이어의 마지막 접속 시간을 저장하는 속성
+
+    [FirestoreProperty]
+    public string WinnerId { get; set; } // 승자 ID를 저장하는 속성
+
+    [FirestoreProperty]
+    public string FinishReason { get; set; } // 게임 종료 사유를 저장하는 속성
 }
 
 [FirestoreData]
