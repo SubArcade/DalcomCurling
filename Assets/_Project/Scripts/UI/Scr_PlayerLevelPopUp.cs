@@ -36,6 +36,19 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("텍스트 숫자")] private TMP_Text changeNicknameText;
     [SerializeField, Tooltip("잼 개수")] private string gemText = "100";
     
+    [Header("닉네임 변경 확정 팝업 기능")]
+    [SerializeField, Tooltip("확인 팝업")] private GameObject nickNameAnswerPopup;
+    [SerializeField, Tooltip("무료")] private Button freeAnswerButton;
+    [SerializeField, Tooltip("젬 사용")] private Button gemAnswerButton;
+    [SerializeField, Tooltip("닫기")] private Button closeAnswerButton;
+    [SerializeField, Tooltip("닉네임 텍스트")] private TMP_Text nameAnswerText;
+    [SerializeField, Tooltip("닉네임 색깔")] private Color nicknameColor = Color.magenta;
+    
+    [Header("젬 부족")]
+    [SerializeField, Tooltip("젬 부족 팝업")] private GameObject notEnoughGemPopup;
+    [SerializeField, Tooltip("아니요")] private Button noButton;
+    [SerializeField, Tooltip("상점 가기")] private Button yesButton;
+    
     [Header("칭호 on/off 기능")]
     [SerializeField, Tooltip("프리팹 들어갈 곳")] private Transform inputTransform;
     [SerializeField, Tooltip("칭호 라벨 텍스트")] private GameObject noneNameTiltleLabel;
@@ -65,9 +78,12 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     
     private void Awake()
     {
+        PopupPanelClose();
         noneNameTiltleLabel.SetActive(false);
         changeNicknameButton.gameObject.SetActive(false);
         gemchangeNicknameButton.gameObject.SetActive(false);
+        nickNameAnswerPopup.gameObject.SetActive(false);
+        notEnoughGemPopup.SetActive(false);
         
         nameTitleList.Clear();
         foreach (Transform child in inputTransform)
@@ -89,8 +105,21 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         nickPopupCloseButton.onClick.AddListener(() => PopupPanelClose());
         closeButton.onClick.AddListener(()=> UIManager.Instance.Open(PanelId.MainPanel));
         renameButton.onClick.AddListener(IsChangeNickname);
-        changeNicknameButton.onClick.AddListener(()=>DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text);
-        changeNicknameButton.onClick.AddListener(()=>DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text);
+        changeNicknameButton.onClick.AddListener(OnAnswerPopup);
+        gemchangeNicknameButton.onClick.AddListener(OnAnswerPopup);
+        freeAnswerButton.onClick.AddListener(FreeChangeNickname);
+        gemAnswerButton.onClick.AddListener(GemChangeNickname);
+        closeAnswerButton.onClick.AddListener(() => nickNameAnswerPopup.SetActive(false));
+        noButton.onClick.AddListener(() =>
+        {
+            PopupPanelClose();
+        });
+        yesButton.onClick.AddListener(() =>
+        {
+            // 상정으로 이동해야함
+            Debug.Log("상점이동");
+            PopupPanelClose();
+        });
     }
 
     // 기본판넬 토글 on/off
@@ -114,6 +143,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     {
         namePlateListPopup.SetActive(false);
         nickNameChangePopup.SetActive(false);
+        nickNameAnswerPopup.SetActive(false);
+        notEnoughGemPopup.SetActive(false);
     }
 
     private void NamaTitleOpen()
@@ -126,39 +157,56 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     private void NameTitleOnList()
     {
         int stack = 0;
+
         foreach (var type in DataManager.Instance.PlayerData.gainNamePlateType)
         {
-            // NONE 스킵
             if (type == NamePlateType.NONE)
                 continue;
 
             stack++;
 
-            // 리스트에서 해당 칭호를 가진 프리팹 찾아서 활성화
             foreach (var obj in nameTitleList)
             {
+                if (obj == null) continue;
+
                 var ui = obj.GetComponent<Scr_NameTitle>();
+                if (ui == null) continue;
+
                 if (ui.namePlateType == type)
                 {
                     obj.SetActive(true);
-
-                    // 토글 이벤트 추가
-                    obj.GetComponentInChildren<Toggle>().onValueChanged.AddListener(_ => OnSelectNameTitle(obj, type));
                     
+                    var toggle = ui.toggleButton;
+                    if (toggle == null) continue;
+                    
+                    toggle.onValueChanged.RemoveAllListeners();
+                    
+                    var capturedType = type;
+
+                    // isOn 이 true 될 때만 실행
+                    toggle.onValueChanged.AddListener(isOn =>
+                    {
+                        if (isOn)
+                            OnSelectNameTitle(obj, capturedType);
+                    });
+
+                    // 현재 선택된 칭호면 체크만 해두기
                     if (type == DataManager.Instance.PlayerData.curNamePlateType)
-                        obj.GetComponentInChildren<Toggle>().isOn = true;
+                        toggle.SetIsOnWithoutNotify(true);
                 }
             }
         }
-        
-        if(stack == 0)
+
+        if (stack == 0)
             noneNameTiltleLabel.SetActive(true);
     }
     
     // 선택된 토글만 활성화
     public void OnSelectNameTitle(GameObject selectedObj, NamePlateType type)
     {
-        var selectedToggle = selectedObj.GetComponentInChildren<Toggle>();
+        var ui = selectedObj.GetComponent<Scr_NameTitle>();
+        if (ui == null || ui.toggleButton == null) return;
+        var selectedToggle = ui.toggleButton;
         
         if (DataManager.Instance.PlayerData.curNamePlateType == type)
         {
@@ -169,11 +217,11 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         
         foreach (var obj in nameTitleList)
         {
-            var toggle = obj.GetComponentInChildren<Toggle>();
-            if (toggle == null) continue;
+            var otherUi = obj.GetComponent<Scr_NameTitle>();
+            if (otherUi == null || otherUi.toggleButton == null) continue;
 
-            // 선택된 토글은 ON
-            toggle.isOn = (obj == selectedObj);
+            bool isTarget = (obj == selectedObj);
+            otherUi.toggleButton.SetIsOnWithoutNotify(isTarget);
         }
 
         DataManager.Instance.PlayerData.curNamePlateType = type;
@@ -206,5 +254,60 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             gemchangeNicknameButton.gameObject.SetActive(true);
         }
     }
+
+    // 닉네임 변경 확정창 띄우기
+    private void OnAnswerPopup()
+    {
+        nickNameAnswerPopup.SetActive(true);
+        string hexColor = ColorUtility.ToHtmlStringRGB(nicknameColor);
+        nameAnswerText.text = $"<color=#{hexColor}>‘{changeNicknameInputField.text}’</color>로\n 변경하시겠습니까?";
+        
+        if (DataManager.Instance.PlayerData.changeNicknameCount == 0)
+        {
+            freeAnswerButton.gameObject.SetActive(true);
+            gemAnswerButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            freeAnswerButton.gameObject.SetActive(false);
+            gemAnswerButton.gameObject.SetActive(true);
+        }
+    }
+    
+    // 닉네임 변경 (무료)
+    private void FreeChangeNickname()
+    {
+        DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+        DataManager.Instance.PlayerData.changeNicknameCount++;
+        nickNameAnswerPopup.SetActive(false);
+        nickNameChangePopup.SetActive(false);
+        
+        nicknameText.text = DataManager.Instance.PlayerData.nickname;
+    }
+
+    // 닉네임 변경 (젬)
+    private void GemChangeNickname()
+    {
+        int gem = int.Parse(gemText);
+        
+        // 젬이 모자란 경우
+        if (DataManager.Instance.PlayerData.gem < gem)
+        {
+            notEnoughGemPopup.SetActive(true);
+        }
+        else
+        {
+            // 닉네임 변경
+            DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+            DataManager.Instance.PlayerData.changeNicknameCount++;
+            DataManager.Instance.PlayerData.gem -= int.Parse(gemText);
+            nickNameAnswerPopup.SetActive(false);
+            nickNameChangePopup.SetActive(false);
+            
+            nicknameText.text = DataManager.Instance.PlayerData.nickname;
+        }
+        
+    }
+    
 }
 
