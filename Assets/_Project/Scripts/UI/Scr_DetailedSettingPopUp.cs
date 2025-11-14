@@ -8,10 +8,10 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 {
     //계정 옵션
     [Header("계정연동")]
-    [SerializeField] private Button AccountLink;
+    [SerializeField] private Button accountLink;
 
     [Header("계정삭제")]
-    [SerializeField] private Button AccountExit;
+    [SerializeField] private Button accountExit;
 
     [Header("유저 ID 텍스트")]
     [SerializeField] private TextMeshProUGUI accountIdText;
@@ -20,6 +20,8 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     [Header("볼륨조절")]
     [SerializeField] private Scrollbar BGMsliderBar;
     [SerializeField] private Scrollbar SFXsliderBar;
+    [SerializeField] private TextMeshProUGUI BGMvolumeText;
+    [SerializeField] private TextMeshProUGUI SFXvolumeText;
 
     [Header("ON/OFF 기타설정")]
     [SerializeField] private Button OFFBGM;
@@ -32,7 +34,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     [SerializeField] private Button ONquestion;
 
     [Header("언어설정")]
-    [SerializeField] private TMP_Dropdown LanguageDropDown;
+    [SerializeField] private TMP_Dropdown languageDropDown;
 
     [Header("알림설정")]
     [SerializeField] private Button energyONbutton;
@@ -43,7 +45,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     [SerializeField] private Button nightOffbutton;
 
     [Header("닫기버튼")]
-    [SerializeField] private Button CloseButton;
+    [SerializeField] private Button closeButton;
 
     void Awake()
     {
@@ -53,6 +55,8 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 
         BGMsliderBar = transform.Find("rectangle625/UIBackground/settingUI/setting/BGMsliderBar")?.GetComponent<Scrollbar>();
         SFXsliderBar = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXsliderBar")?.GetComponent<Scrollbar>();
+        BGMvolumeText = transform.Find("rectangle625/UIBackground/settingUI/setting/BGMvolume_Text")?.GetComponent<TextMeshProUGUI>();
+        SFXvolumeText = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXvolume_Text")?.GetComponent<TextMeshProUGUI>();
 
         OFFBGM = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFBGM")?.GetComponent<Button>();
         OFFSFX = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFSFX")?.GetComponent<Button>();
@@ -63,7 +67,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         ONvibration = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/ONvibration")?.GetComponent<Button>();
         ONquestion = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/ONquestion")?.GetComponent<Button>();
 
-        LanguageDropDown = transform.Find("rectangle625/UIBackground/settingUI/LanguageDropDown")?.GetComponent<TMP_Dropdown>();
+        languageDropDown = transform.Find("rectangle625/UIBackground/settingUI/LanguageDropDown")?.GetComponent<TMP_Dropdown>();
         
         energyONbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/EnergyOnButton")?.GetComponent<Button>();
         energyOFFbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/EnergyOffButton")?.GetComponent<Button>();
@@ -72,7 +76,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         nightOnbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/NightOnButton")?.GetComponent<Button>();
         nightOffbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/NightOffButton")?.GetComponent<Button>();
 
-        CloseButton = transform.Find("rectangle625/CloseButton")?.GetComponent<Button>();
+        closeButton = transform.Find("rectangle625/CloseButton")?.GetComponent<Button>();
     }
     void Start()
     {
@@ -165,9 +169,44 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
             nightOnbutton.gameObject.SetActive(true);
         });
 
-        CloseButton.onClick.AddListener(() =>
+        closeButton.onClick.AddListener(() =>
         {
             UIManager.Instance.Close(PanelId.DetailedSettingsPanel);
         });
+
+        InitVolumeSettings();
     }
+    //사운드 조절 슬라이더와 텍스트 연결 및 저장 불러오기
+    private void InitVolumeSettings()
+    {
+        //저장된 값 불러오기
+        float savedBGM = PlayerPrefs.GetFloat("BGMVolume", 1f); // 기본값 100%
+        float savedSFX = PlayerPrefs.GetFloat("SFXVolume", 1f);
+
+        //슬라이더에 적용
+        BGMsliderBar.value = savedBGM;
+        SFXsliderBar.value = savedSFX;
+
+        //텍스트 초기화
+        BGMvolumeText.text = Mathf.RoundToInt(savedBGM * 100f).ToString();
+        SFXvolumeText.text = Mathf.RoundToInt(savedSFX * 100f).ToString();
+
+        //슬라이더 값 변경 시 저장 및 텍스트 갱신
+        BGMsliderBar.onValueChanged.AddListener((value) =>
+        {
+            int volume = Mathf.RoundToInt(value * 100f);
+            BGMvolumeText.text = volume.ToString();
+            PlayerPrefs.SetFloat("BGMVolume", value);
+            PlayerPrefs.Save();
+        });
+
+        SFXsliderBar.onValueChanged.AddListener((value) =>
+        {
+            int volume = Mathf.RoundToInt(value * 100f);
+            SFXvolumeText.text = volume.ToString();
+            PlayerPrefs.SetFloat("SFXVolume", value);
+            PlayerPrefs.Save();
+        });
+    }
+
 }
