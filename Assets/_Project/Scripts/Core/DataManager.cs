@@ -55,7 +55,11 @@ public class UserDataRoot
         cellWidth = 7,
         cellLength = 7,
     };
-    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData();
+    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData()
+    { 
+        refreshCount = 0,
+        baseGold = 0,
+    };
 }
 
 public class DataManager : MonoBehaviour
@@ -339,20 +343,36 @@ public class DataManager : MonoBehaviour
         return next;
     }
 
-    // 특정 레벨의 모든 도넛 가져오기 (랜덤 생성용)
-    public List<DonutData> GetDonutsByLevel(int level)
+    public List<DonutData> GetDonutsByTypeAndLevel(DonutType type, int level)
     {
         List<DonutData> result = new();
 
-        foreach (var so in _donutTypeDB.Values)
+        // 타입 DB가 있는지 확인
+        if (_donutTypeDB.TryGetValue(type, out var typeDB))
         {
-            var data = so.GetLevelData(level);
+            // 해당 타입에서 레벨 데이터 가져오기
+            var data = typeDB.GetLevelData(level);
+
             if (data != null)
                 result.Add(data);
         }
+
         return result;
     }
 
+    //생성기 레벨 받아오기
+    public int GetGeneratorLevel(DonutType type)
+    {
+        var board = userData.mergeBoard;
+
+        return type switch
+        {
+            DonutType.Hard => board.generatorLevelHard,
+            DonutType.Soft => board.generatorLevelSoft,
+            DonutType.Moist => board.generatorLevelMoist,
+            _ => 1
+        };
+    }
 
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)

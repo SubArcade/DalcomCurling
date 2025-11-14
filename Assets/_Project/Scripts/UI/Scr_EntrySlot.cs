@@ -66,6 +66,12 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         rt.anchoredPosition = Vector2.zero;
         currentItem = dragged;
 
+        // ✅ 체크마크 비활성화
+        var checkMark = dragged.transform.Find("CheckMark")?.gameObject;
+        if (checkMark != null)
+            checkMark.SetActive(false);
+
+
         Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
         Debug.Log($"currentItem: {currentItem?.name}");
         Debug.Log($"IsEmpty: {IsEmpty}");
