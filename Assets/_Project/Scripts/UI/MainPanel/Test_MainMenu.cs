@@ -59,13 +59,13 @@ public class Test_MainMenu : MonoBehaviour
 
     }
     
-    private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
-    private void Disable() =>  DataManager.Instance.OnUserDataChanged -= see;
+    //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
+    //private void Disable() =>  DataManager.Instance.OnUserDataChanged -= see;
     
     // 데이터 UI 노출
     public void see(PlayerData playerData)
     {
-        energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        //energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
     }
     
     // 에너지 추가
@@ -80,6 +80,7 @@ public class Test_MainMenu : MonoBehaviour
     void TestLogin()
     {
         //FirebaseAuthManager.Instance.Login("asd@asd.asd", "asdasd");
+        FirebaseAuthManager.Instance.Init();
         FirebaseAuthManager.Instance.Login(id, pw);
         UIManager.Instance.Open(PanelId.StartPanel);
         //UIManager.Instance.Open(PanelId.MainPanel);
