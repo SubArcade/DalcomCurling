@@ -589,11 +589,43 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleGameFinished()
     {
+        if (aTeamScore > bTeamScore)
+        {
+            if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+            {
+                Debug.Log("승리");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+            else
+            {
+                Debug.Log("패배");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+        }
+        else if (bTeamScore > aTeamScore)
+        {
+            if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+            {
+                Debug.Log("패배");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+            else
+            {
+                Debug.Log("승리");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+        }
+        else // 비겼을때 ( 연장전을 이때 시작하거나, 이미 연장전을 해서 이게 없어질 수도 있음 )
+        {
+            Debug.Log("비김");
+            UI_LaunchIndicator_Firebase.FinishedUI();
+        }
+        
         // 리스너를 즉시 중지하여 추가 데이터 변경 감지를 막습니다.
         gameListener?.Stop();
         gameListener = null;
 
-        Debug.Log("게임 종료! 3초 후 메뉴 씬으로 돌아갑니다.");
+        Debug.Log("게임 종료! 10초 후 메뉴 씬으로 돌아갑니다.");
 
         // 호스트인 경우에만 DB 문서를 정리합니다.
         if (IsHost())
@@ -602,7 +634,7 @@ public class FirebaseGameManager : MonoBehaviour
         }
 
         // 3초 후에 모든 플레이어를 메뉴 씬으로 보냅니다.
-        DOVirtual.DelayedCall(3f, () =>
+        DOVirtual.DelayedCall(10f, () =>
         {
             SceneLoader.Instance.LoadLocal(GameManager.Instance.menuSceneName); // 메뉴씬으로 이동
         });
@@ -764,7 +796,7 @@ public class FirebaseGameManager : MonoBehaviour
         }
         else
         {
-            nextState = "TimeLine";
+            nextState = "Timeline";
         }
         var updates = new Dictionary<string, object>
         {
