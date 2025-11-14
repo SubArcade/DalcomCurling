@@ -7,14 +7,13 @@ using UnityEngine.UI;
 public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {
     //UI의 표시(활성화) 여부를 제어하는 스크립트
-    // TODO : 미리보기 궤적이 완성되면 기존에 있던 조작 UI는 삭제해야함
     
     [Header("References")]
     // 발사 로직 스크립트를 드래그 앤 드롭으로 연결
     public StoneShoot_Firebase launchScript;
 
     // UI Slider 컴포넌트를 드래그 앤 드롭으로 연결
-    [Header("UI오브젝트들")]
+    [Header("RoundPanel 노출변수")]
     public TextMeshProUGUI aScoreText;
     public TextMeshProUGUI bScoreText;
     public TextMeshProUGUI roundText;
@@ -23,6 +22,12 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public GameObject CountDownText;
     [Header("Debug")]
     public TextMeshProUGUI debugStateText;
+    [Header("UI 제어 객체 (on/off)")]
+    [SerializeField] private GameObject roundPanel;
+    [SerializeField] private GameObject donutEntry;
+    [SerializeField] private GameObject minimap;
+    [SerializeField] private GameObject result;
+
     void Update()
     {
         if (launchScript == null) return;
@@ -80,5 +85,25 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         {
             CountDownText.SetActive(false);
         }
+    }
+
+    /// <summary>
+    /// UI 제어 메서드입니다.
+    /// AllcloseUI() 먼저 호출하고 필요한UI만 켜지는 메서드 생성하여 호출 하면됩니다.
+    /// </summary>
+
+
+    public void FinishedUI()
+    {
+        AllcloseUI();
+        result.SetActive(true);
+    }
+
+    public void AllcloseUI()
+    {
+        roundPanel.SetActive(false);
+        donutEntry.SetActive(false);
+        minimap.SetActive(false);
+        result.SetActive(false);
     }
 }

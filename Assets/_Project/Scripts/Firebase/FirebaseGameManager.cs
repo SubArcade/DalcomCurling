@@ -401,7 +401,6 @@ public class FirebaseGameManager : MonoBehaviour
                     Debug.Log("발사 기회를 모두 소진했을 가능성이 높음");
                 }
             }
-
         }
         else if (!_isMyTurn)
         {
@@ -409,7 +408,6 @@ public class FirebaseGameManager : MonoBehaviour
             SuccessfullyShotInTime = false;
             inputController?.DisableInput();
             _localState = LocalGameState.Idle;
-
         }
     }
 
@@ -869,9 +867,6 @@ public class FirebaseGameManager : MonoBehaviour
         };
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
-
-
-
 
     #endregion
 
