@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Scr_PanelControl : MonoBehaviour
+public class Scr_MenuPanelControl : MonoBehaviour
 {
     [Header("화면 전환 캔버스(판넬)")]
     [SerializeField] private GameObject startPanel;

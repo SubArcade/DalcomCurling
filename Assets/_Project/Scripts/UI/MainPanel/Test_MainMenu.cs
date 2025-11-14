@@ -93,7 +93,6 @@ public class Test_MainMenu : MonoBehaviour
         string display = dropdown.options[index].text;
         id = idDictionary[display];
         pw = pwDictionary[display];
-        
     }
 
     void addNameTitle()
