@@ -42,9 +42,6 @@ public class StoneShoot_Firebase : MonoBehaviour
     [Header("스크립트 및 UI 참조")] // Unity Inspector에서 UI 분류를 위한 헤더
     public UI_LaunchIndicator_Firebase uiLaunch; // UI 인디케이터 스크립트 참조
     public StoneManager stoneManager; // 돌 관리를 담당하는 스크립트 참조
-    public GameObject powerAndDirectionText; // 힘과 방향을 표시하는 텍스트 UI
-    public GameObject rotationText; // 회전 값을 표시하는 텍스트 UI
-    public Button releaseButton; // 발사 버튼은 이제 사용되지 않지만, 다른 스크립트에서의 참조 오류를 막기 위해 필드는 유지합니다.
 
     [Header("조작 영역")]
     public RectTransform powerDirectionArea; // 힘/방향 입력을 위한 UI 영역
@@ -181,8 +178,6 @@ public class StoneShoot_Firebase : MonoBehaviour
         CurrentDragRatio = 0f;
         CurrentLaunchAngle = 0f;
 
-        if(releaseButton != null) releaseButton.interactable = false; // 발사 버튼 비활성화
-
         _isTrajectoryPreviewActive = true; // 궤적 미리보기 활성화
         if (trajectoryLine != null) trajectoryLine.enabled = true;
 
@@ -195,10 +190,6 @@ public class StoneShoot_Firebase : MonoBehaviour
     public void DisableInput()
     {
         _inputEnabled = false; // 입력 비활성화 플래그
-        powerAndDirectionText.SetActive(false); // 힘/방향 UI 비활성화
-        rotationText.SetActive(false); // 회전 UI 비활성화
-        if(releaseButton != null) releaseButton.interactable = false; // 발사 버튼 비활성화
-        if (uiLaunch != null) uiLaunch.ActivateTapStartPointImage(false); // 탭 시작점 이미지 비활성화
 
         _isTrajectoryPreviewActive = false; // 궤적 미리보기 비활성화
         if (trajectoryLine != null) trajectoryLine.enabled = false; // 궤적 라인 렌더러 비활성화
@@ -390,8 +381,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (dragType == DragType.PowerDirection)
         {
             _actualDragStartScreenPos = screenPosition;
-            if (_currentStoneRb != null) _currentStoneRb.isKinematic = true;
-            uiLaunch.ActivateTapStartPointImage(true, _actualDragStartScreenPos);
+            if (_currentStoneRb != null) _currentStoneRb.isKinematic = true;           
         }
         else if (dragType == DragType.Rotation)
         {
@@ -416,8 +406,7 @@ public class StoneShoot_Firebase : MonoBehaviour
 
         IsDragging = false;
         CurrentDragType = DragType.None;
-        // 드래그 시작점 UI만 비활성화하고, 다른 UI(화살표, 슬라이더)는 UI 스크립트에서 관리
-        uiLaunch.ActivateTapStartPointImage(false);
+       
     }
     #endregion
 

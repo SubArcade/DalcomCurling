@@ -293,6 +293,9 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleTurnChange()
     {
+        // 턴이 변경될 때마다 UI에 현재 턴 번호를 업데이트합니다.
+        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
+
         // 일반적인 턴 시작일 때만 기본 카메라로 전환합니다.
         // bool isExecutingPreparedShot = usePreparedShot && _isMyTurn && _localState == LocalGameState.PreparingShot;
         // if (!isExecutingPreparedShot)
@@ -471,6 +474,7 @@ public class FirebaseGameManager : MonoBehaviour
         DOVirtual.DelayedCall(1f, () =>
         {
             // 8턴(0~7)이 끝나면 라운드 전환 상태로 변경
+            // 현재턴이 마지막 턴이고 선공플레이어가 아닐때 (후공 플레이이가 라운드 종료로직을 시작해야할때) true
             if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer()) 
             {
                 Debug.Log("게임 종료를 위한 계산 시작");
@@ -508,13 +512,13 @@ public class FirebaseGameManager : MonoBehaviour
                 // }
                 //db.Collection("games").Document(gameId).UpdateAsync("GameState", "RoundChanging");
             }
-            else
+            else // 일반적인 턴에서 다음턴으로 넘겨줌
             {
                 string nextPlayerId = GetNextPlayerId();
                 var updates = new Dictionary<string, object>
                 {
                     { "CurrentTurnPlayerId", nextPlayerId },
-                    { "TurnNumber", FieldValue.Increment(1) }
+                    { "TurnNumber", FieldValue.Increment(1) } //턴을 1씩 더해줌
                 };
                 db.Collection("games").Document(gameId).UpdateAsync(updates);
             }
