@@ -51,7 +51,11 @@ public class UserDataRoot
         cellWidth = 7,
         cellLength = 7,
     };
-    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData();
+    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData()
+    { 
+        refreshCount = 0,
+        baseGold = 0,
+    };
 }
 
 public class DataManager : MonoBehaviour
