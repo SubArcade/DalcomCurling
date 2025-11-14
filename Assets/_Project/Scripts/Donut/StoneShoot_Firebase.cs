@@ -591,8 +591,10 @@ public class StoneShoot_Firebase : MonoBehaviour
             {
                 if (_needToTap)
                 {
-                    // 탭을 못했으면 _releaseRandomValue가 -99이므로, CalculateShotData에서 100%로 처리됨
-                    // 이 경우 (탭을 놓쳤을 경우) 원래의 로직에 따라 랜덤값이 적용되지 않음.
+                    // 탭을 못했으면 아웃처리
+                    stoneManager.DonutOut(_currentStoneRb.transform.GetComponent<StoneForceController_Firebase>());
+                    Debug.Log("호그라인 전까지 탭하지 않았기에 아웃처리됩니다");
+                    return;
                 }
 
                 if (_currentStoneRb != null) _currentStoneRb.DOKill(); // DOTween 애니메이션 중지
