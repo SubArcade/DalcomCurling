@@ -42,6 +42,7 @@ public class UserDataRoot
         perSecEnergy = 10,
         soloScore = 0,
         soloTier = GameTier.Bronze,
+        levelMax = 20,
     };
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
@@ -85,6 +86,7 @@ public class DataManager : MonoBehaviour
     
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
+    public event Action<UserDataRoot> OnUserDataRootChanged;
     
     // 백그라운드 이벤트
     public event Action PauseChanged;
@@ -111,13 +113,13 @@ public class DataManager : MonoBehaviour
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
-    public async Task EnsureUserDocAsync(string uId, string userEmail)
+    public async Task EnsureUserDocAsync(string uId, string userEmail= null, bool isAutoLogin = false, AuthProviderType authProviderType = AuthProviderType.Guest)
     {
         docId = uId;
-        PlayerData.email = userEmail;
         
         int maxEnergy = userData.player.maxEnergy;
         int secEnergy = userData.player.perSecEnergy;
+        int maxLevel = userData.player.levelMax;
         
         int cellMax = MergeBoardData.cellMax;
         int cellWidth = MergeBoardData.cellWidth;
@@ -127,13 +129,27 @@ public class DataManager : MonoBehaviour
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
+
+        if (isAutoLogin)
+        {
+            userData = snap.ConvertTo<UserDataRoot>();
+            
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
+            BaseInventoryData();
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold);
+
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            Debug.Log($"자동 로그인: /{userCollection}/{uId}");
+        }
         
         if (!snap.Exists)
         {
             // 처음 로그인 시
+            PlayerData.email = userEmail;
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
             
-            BasePlayerData(maxEnergy, secEnergy);
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -144,11 +160,10 @@ public class DataManager : MonoBehaviour
         else
         {
             // 기존 유저 로드
-            userData = snap.ConvertTo<UserDataRoot>();
-
             PlayerData.email = userEmail;
+            userData = snap.ConvertTo<UserDataRoot>();
             
-            BasePlayerData(maxEnergy, secEnergy);
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -160,10 +175,11 @@ public class DataManager : MonoBehaviour
     }
     
     // 기본 데이터 적용
-    private void BasePlayerData(int maxEnergy, int secEnergy)
+    private void BasePlayerData(int maxEnergy, int secEnergy, int maxLevel)
     {
         PlayerData.maxEnergy = maxEnergy;
         PlayerData.perSecEnergy = secEnergy;
+        PlayerData.levelMax = maxLevel;
     }
 
     // 기본 인벤토리 데이터

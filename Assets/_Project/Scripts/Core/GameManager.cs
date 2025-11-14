@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
         
         if (SceneManager.GetActiveScene().name != menuSceneName)
             SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive);
+        
+        FirebaseAuthManager.Instance.Init();
     }
     
     public void EndGame()

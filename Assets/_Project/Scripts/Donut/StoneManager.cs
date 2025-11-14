@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -21,91 +22,117 @@ public class StoneManager : MonoBehaviour
         new Dictionary<int, StoneForceController_Firebase>();
 
     private StoneForceController_Firebase _currentTurnStone;
+    public Scr_Collider_House  _scr_Collider_House;
+    private UI_LaunchIndicator_Firebase _uilaunchIndicator;
     public StoneForceController_Firebase.Team _currentTurnStoneTeam { get; private set; }
     public StoneForceController_Firebase.Team myTeam { get; private set; } = StoneForceController_Firebase.Team.None;
-    private string myUserId; // 현재 플레이어의 ID
-    public int aShotCount { get; private set; } = -1;
-    public int bShotCount { get; private set; }= -1;
+    private List<StonePosition> lastStonePosition = new List<StonePosition>();
+    public string myUserId { get; private set; } // 현재 플레이어의 ID
+    public int aShotIndex { get; private set; } = -1; // 인덱스를 정하기 위함이라 0부터 시작, 진짜 발사 개수는 +1
+    public int bShotIndex { get; private set; }= -1;
+    public int aScore { get; private set; }
+    public int bScore { get; private set; }
+    public int roundCount { get; private set; }
+    
+    
 
     void Awake()
     {
         myUserId = FirebaseAuthManager.Instance.UserId; // Firebase 인증에서 ID 가져오기
+        _uilaunchIndicator = transform.GetComponent<UI_LaunchIndicator_Firebase>();
     }
 
-    // 새 턴이 시작될 때 돌을 생성하고 초기화합니다.
-    public Rigidbody SpawnStoneForTurn(Game game)
+    // 새 라운드가 시작될 때 돌을 생성하고 초기화합니다.
+    // playerId가 인자로 넘어오면, 현재 턴과 무관하게 해당 플레이어의 프리팹을 생성
+    // playerId가 인자로 넘어오지 않으면 현재 턴에 해당하는 프리팹을 생성
+    public Rigidbody SpawnStone(Game game, string playerId = null) 
     {
         Vector3 startPos = spawnPosition.position;
         gameReference = game;
 
+        // 내 턴이 왔지만, 이미 내가 지정된 횟수만큼 발사를 완료한 상태일때. 즉, 라운드가 끝나고 다시 자신의 턴이 돌아왔을때
+        if (myTeam == StoneForceController_Firebase.Team.A && aShotIndex >= FirebaseGameManager.Instance.shotsPerRound)
+        {
+            return null;
+        }
+        else if (myTeam == StoneForceController_Firebase.Team.B && bShotIndex >= FirebaseGameManager.Instance.shotsPerRound)
+        {
+            return null;
+        }
+        
+        // if (game.RoundNumber != 1 && game.TurnNumber == 0)
+        // {
+        //     aShotIndex = -1;
+        //     bShotIndex = -1;
+        //     roundCount = game.RoundNumber;
+        //     aScore = FirebaseGameManager.Instance.aTeamScore;
+        //     bScore = FirebaseGameManager.Instance.bTeamScore;
+        //     _uilaunchIndicator.RoundChanged(roundCount, aScore, bScore);
+        // }
+
         if (myTeam == StoneForceController_Firebase.Team.None)
         {
-            if (game.PlayerIds[0] == myUserId)
+            myTeam = (game.PlayerIds[0] == myUserId) ? StoneForceController_Firebase.Team.A : StoneForceController_Firebase.Team.B;
+        }
+
+        GameObject selectedPrefab;
+        int currentDonutId = 0;
+        string currentTurnPlayerId;
+
+        if (playerId == null)
+        {
+            currentTurnPlayerId = game.CurrentTurnPlayerId;
+            if (game.PlayerIds[0] == currentTurnPlayerId)
             {
-                myTeam = StoneForceController_Firebase.Team.A;
+                selectedPrefab = stonePrefabA;
+                _currentTurnStoneTeam = StoneForceController_Firebase.Team.A; // 현재 턴은 어느 팀의 차례인지 변수에 넣어줌, A팀 차례
+                aShotIndex++;
+                currentDonutId = aShotIndex;
             }
-            else if (game.PlayerIds[1] == myUserId)
+            else if (game.PlayerIds[1] == currentTurnPlayerId)
             {
-                myTeam = StoneForceController_Firebase.Team.B;
+                selectedPrefab = stonePrefabB;
+                _currentTurnStoneTeam = StoneForceController_Firebase.Team.B; // 현재 턴은 어느 팀의 차례인지 변수에 넣어줌, B팀 차례
+                bShotIndex++;
+                currentDonutId = bShotIndex;
             }
             else
             {
-                Debug.Log(" 유저의 ID값을 제대로 찾지 못함");
+                Debug.Log("currentTurnPlayerId 비교 관련 오류");
+                return null;
+                
             }
-        }
-
-        // 현재 턴의 플레이어가 누구인지 확인하여 프리팹과 팀 결정
-        string currentTurnPlayerId = game.CurrentTurnPlayerId;
-        GameObject selectedPrefab = null;
-
-        _currentTurnStoneTeam = StoneForceController_Firebase.Team.A; // 현재 턴이 어느 팀의 차례인지, 우선 그냥 초기화
-
-
-        int currentDonutId = 0;
-
-        if (game.PlayerIds[0] == currentTurnPlayerId)
-        {
-            selectedPrefab = stonePrefabA;
-            _currentTurnStoneTeam = StoneForceController_Firebase.Team.A; // 현재 턴은 어느 팀의 차례인지 변수에 넣어줌, A팀 차례
-            aShotCount++;
-            currentDonutId = aShotCount;
-            //game.StonesUsed[currentTurnPlayerId]++;
-            //currentDonutId = game.StonesUsed[currentTurnPlayerId];
-        }
-        else if (game.PlayerIds[1] == currentTurnPlayerId)
-        {
-            selectedPrefab = stonePrefabB;
-            _currentTurnStoneTeam = StoneForceController_Firebase.Team.B; // 현재 턴은 어느 팀의 차례인지 변수에 넣어줌, B팀 차례
-            bShotCount++;
-            currentDonutId = bShotCount;
-            //game.StonesUsed[currentTurnPlayerId]++;
-            //currentDonutId = game.StonesUsed[currentTurnPlayerId];
         }
         else
         {
-            Debug.Log("currentTurnPlayerId 비교 관련 오류");
-        }
-
-        // if (_currentTurnStoneTeam == myTeam)
-        // {
-        //     game.DonutsIndex[currentTurnPlayerId] = -100;
-        //     FirebaseGameManager.Instance.UpdateDonutIndexToDatabase(myUserId, game.DonutsIndex[currentTurnPlayerId]);
-        // }
+            currentTurnPlayerId = myUserId;
+            // 파라미터로 받은 playerId를 기준으로 돌을 생성합니다.
+            if (game.PlayerIds[0] == playerId)
+            {
+                selectedPrefab = stonePrefabA;
+                _currentTurnStoneTeam = StoneForceController_Firebase.Team.A;
+                aShotIndex++;
+                currentDonutId = aShotIndex;
+            }
+            else
+            {
+                selectedPrefab = stonePrefabB;
+                _currentTurnStoneTeam = StoneForceController_Firebase.Team.B;
+                bShotIndex++;
+                currentDonutId = bShotIndex;
+            }
         
-        
-
-        Debug.Log($"currentDonutId = {currentDonutId}");
-        Debug.Log($"DonutsIndex = {game.DonutsIndex[currentTurnPlayerId]}");
-        if (selectedPrefab == null)
-        {
-            Debug.LogError("돌 프리팹이 할당되지 않았습니다! 인스펙터에서 할당해주세요.");
-            return null;
+            if (selectedPrefab == null)
+            {
+                Debug.LogError("돌 프리팹이 할당되지 않았습니다! 인스펙터에서 할당해주세요.");
+                return null;
+            }
         }
+        
+       
 
-        // 돌 생성 및 컨트롤러 초기화
         GameObject newStone = Instantiate(selectedPrefab, startPos, spawnPosition.rotation);
         _currentTurnStone = newStone.GetComponent<StoneForceController_Firebase>();
-
 
         if (_currentTurnStone == null)
         {
@@ -115,28 +142,111 @@ public class StoneManager : MonoBehaviour
         }
 
         _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId);
-        if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.A)
+        // if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.A)
+        // {
+        //     _stoneControllers_A[currentDonutId] = _currentTurnStone;
+        // }
+        // else if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.B)
+        // {
+        //     _stoneControllers_B[currentDonutId] = _currentTurnStone;
+        // }
+        
+        // if (currentTurnPlayerId == game.RoundStartingPlayerId)
+        // {
+        //     _stoneControllers_A[currentDonutId] = _currentTurnStone;
+        //     Debug.Log("Starting");
+        //     Debug.Log(_stoneControllers_A.Count);
+        //     Debug.Log($"my user id = {myUserId}");
+        //     Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
+        // }
+        // else
+        // {
+        //     _stoneControllers_B[currentDonutId] = _currentTurnStone;
+        //     Debug.Log("Second");
+        //     Debug.Log(_stoneControllers_B.Count);
+        //     Debug.Log($"my user id = {myUserId}");
+        //     
+        //     Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
+        //     
+        // }
+        if (currentTurnPlayerId == game.PlayerIds[0]) // 현재 턴의 주인이 A팀(방장) 이면
         {
             _stoneControllers_A[currentDonutId] = _currentTurnStone;
-        }
-        else if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.B)
-        {
-            _stoneControllers_B[currentDonutId] = _currentTurnStone;
+            Debug.Log("A팀");
+            Debug.Log(_stoneControllers_A.Count);
+            Debug.Log($"my user id = {myUserId}");
+            Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
         }
         else
         {
-            Debug.Log("팀 설정 오류");
+            _stoneControllers_B[currentDonutId] = _currentTurnStone;
+            Debug.Log("B팀");
+            Debug.Log(_stoneControllers_B.Count);
+            Debug.Log($"my user id = {myUserId}");
+            Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
         }
-
+        
+        
+        
         return newStone.GetComponent<Rigidbody>();
     }
+
+    
 
     // FirebaseGameManager가 샷 데이터를 받았을 때 호출할 함수
     // 서버/클라이언트로부터 받은 샷 데이터로 돌을 발사.
     public void LaunchStone(LastShot shotData, int stoneId)
     {
         StoneForceController_Firebase donutToLaunch;
-        if (shotData.Team == StoneForceController_Firebase.Team.A)
+        // if (shotData.Team == StoneForceController_Firebase.Team.A)
+        // {
+        //     if (!_stoneControllers_StartingPlayer.TryGetValue(stoneId, out var donutForceController))
+        //     {
+        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
+        //         return;
+        //     }
+        //
+        //     donutToLaunch = donutForceController;
+        // }
+        // else if (shotData.Team == StoneForceController_Firebase.Team.B)
+        // {
+        //     if (!_stoneControllers_SecondPlayer.TryGetValue(stoneId, out var donutForceController))
+        //     {
+        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
+        //         return;
+        //     }
+        //
+        //     donutToLaunch = donutForceController;
+        // }
+        // else
+        // {
+        //     Debug.Log("팀 값이 LaunchStone 함수에 안넘어옴");
+        //     return;
+        // }
+        
+        // if (shotData.PlayerId == gameReference.RoundStartingPlayerId)
+        // {
+        //     if (!_stoneControllers_A.TryGetValue(stoneId, out var donutForceController))
+        //     {
+        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
+        //         return;
+        //     }
+        //
+        //     donutToLaunch = donutForceController;
+        // }
+        // else 
+        // {
+        //     if (!_stoneControllers_B.TryGetValue(stoneId, out var donutForceController))
+        //     {
+        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
+        //         Debug.Log($"{_stoneControllers_B.Count}");
+        //         return;
+        //     }
+        //
+        //     donutToLaunch = donutForceController;
+        // }
+        
+        if (shotData.PlayerId == gameReference.PlayerIds[0])
         {
             if (!_stoneControllers_A.TryGetValue(stoneId, out var donutForceController))
             {
@@ -146,21 +256,18 @@ public class StoneManager : MonoBehaviour
 
             donutToLaunch = donutForceController;
         }
-        else if (shotData.Team == StoneForceController_Firebase.Team.B)
+        else 
         {
             if (!_stoneControllers_B.TryGetValue(stoneId, out var donutForceController))
             {
                 Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
+                Debug.Log($"{_stoneControllers_B.Count}");
                 return;
             }
 
             donutToLaunch = donutForceController;
         }
-        else
-        {
-            Debug.Log("팀 값이 LaunchStone 함수에 안넘어옴");
-            return;
-        }
+        
 
 
         Debug.Log($"StoneManager: 샷 데이터로 돌(ID: {stoneId})을 발사합니다.");
@@ -260,10 +367,12 @@ public class StoneManager : MonoBehaviour
     public void SyncPositions(List<StonePosition> serverPositions)
     {
         Debug.Log("서버의 최종 위치로 모든 돌을 동기화합니다.");
+        lastStonePosition = serverPositions; //지금 받아온 포지션 정보를 로컬에 저장해둠
         StoneForceController_Firebase fc;
         Rigidbody rb;
         Vector3 newPosition;
         Debug.Log($"A컨트롤러 개수 : {_stoneControllers_A.Count}");
+        //Debug.Log($"선공 플레이어 컨트롤러 개수 : {_stoneControllers_A.Count}");
         // foreach (KeyValuePair<int, StoneForceController_Firebase> aValues in _stoneControllers_A)
         // {
         //     fc = aValues.Value;
@@ -275,6 +384,7 @@ public class StoneManager : MonoBehaviour
         // }
         //
          Debug.Log($"B컨트롤러 개수 : {_stoneControllers_B.Count}");
+         //Debug.Log($"후공 플레이어 컨트롤러 개수 : {_stoneControllers_B.Count}");
         // foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
         // {
         //     fc = bValues.Value;
@@ -288,28 +398,37 @@ public class StoneManager : MonoBehaviour
         Debug.Log($"serverPositions 개수 : {serverPositions.Count}");
         for (int i = 0; i < serverPositions.Count; i++)
         {
-            if (i == 0 || (i % 2 == 0))
+            if (serverPositions[i].Team == "A") // A 팀이면
             {
-                fc = _stoneControllers_A[i / 2];
-                // newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-                //     serverPositions[i].Position["z"]);
-                // fc.transform.DOMove(newPosition, 0.1f).OnComplete(() =>
-                // {
-                //     fc.GetComponent<Rigidbody>().isKinematic = false;
-                //     fc.transform.GetComponent<MeshCollider>().isTrigger = false;
-                // });
-            }
-            else if (i % 2 == 1)
-            {
-                fc = _stoneControllers_B[i / 2];
-                // fc.transform.position = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-                //     serverPositions[i].Position["z"]);
+                // StoneId를 불러와 딕셔너리에서 키값으로 넣어 밸류값(stoneforcecontrolller)을 찾는다.
+                fc = _stoneControllers_A[serverPositions[i].StoneId]; 
             }
             else
             {
-                fc = _stoneControllers_A[i / 2];
-                Debug.Log("계산 오류");
+                fc = _stoneControllers_B[serverPositions[i].StoneId];
             }
+            // if (i == 0 || (i % 2 == 0))
+            // {
+            //     fc = _stoneControllers_A[i / 2];
+            //     // newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
+            //     //     serverPositions[i].Position["z"]);
+            //     // fc.transform.DOMove(newPosition, 0.1f).OnComplete(() =>
+            //     // {
+            //     //     fc.GetComponent<Rigidbody>().isKinematic = false;
+            //     //     fc.transform.GetComponent<MeshCollider>().isTrigger = false;
+            //     // });
+            // }
+            // else if (i % 2 == 1)
+            // {
+            //     fc = _stoneControllers_B[i / 2];
+            //     // fc.transform.position = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
+            //     //     serverPositions[i].Position["z"]);
+            // }
+            // else
+            // {
+            //     fc = _stoneControllers_A[i / 2];
+            //     Debug.Log("계산 오류");
+            // }
 
             rb = fc.GetComponent<Rigidbody>();
             rb.isKinematic = true;
@@ -356,13 +475,15 @@ public class StoneManager : MonoBehaviour
     // 시뮬레이션 완료 시 모든 돌의 최종 위치를 수집하는 함수
     public List<StonePosition> GetAllStonePositions()
     {
-        if (_currentTurnStoneTeam == myTeam) return null;
+        //if (_currentTurnStoneTeam == myTeam) return null;
         var positions = new List<StonePosition>();
-        int maxLength = Math.Max(_stoneControllers_A.Count, _stoneControllers_B.Count);
+        //int maxLength = Math.Max(_stoneControllers_A.Count, _stoneControllers_B.Count);
+        int maxLength = Math.Max(aShotIndex + 1, bShotIndex + 1);
         StoneForceController_Firebase sfc;
         for (int i = 0; i < maxLength; i++)
         {
-            if (i < _stoneControllers_A.Count)
+            //if (i < _stoneControllers_A.Count && _stoneControllers_A.ContainsKey(i))
+            if (_stoneControllers_A.ContainsKey(i))
             {
                 sfc = _stoneControllers_A[i];
                 positions.Add(new StonePosition
@@ -379,7 +500,8 @@ public class StoneManager : MonoBehaviour
                 Debug.Log($"donutId = {sfc.donutId}, Team = {sfc.team}, Position = ({sfc.transform.position.x}, {sfc.transform.position.y}, {sfc.transform.position.z})");
             }
 
-            if (i < _stoneControllers_B.Count)
+            //if (i < _stoneControllers_B.Count && _stoneControllers_B.ContainsKey(i))
+            if (_stoneControllers_B.ContainsKey(i))
             {
                 sfc = _stoneControllers_B[i];
                 positions.Add(new StonePosition
@@ -398,6 +520,7 @@ public class StoneManager : MonoBehaviour
             }
         }
 
+        lastStonePosition = positions; // 지금 만들어둔 포지션정보를 로컬에도 저장 
         return positions;
     }
 
@@ -416,7 +539,7 @@ public class StoneManager : MonoBehaviour
                 Debug.LogError($"발사할 돌(ID: {donutId})을 찾을 수 없습니다!");
                 return null;
             }
-
+        
             donutToLaunch = forceController;
         }
         else if (myTeam == StoneForceController_Firebase.Team.B) //내가 B팀이면
@@ -426,7 +549,7 @@ public class StoneManager : MonoBehaviour
                 Debug.LogError($"발사할 돌(ID: {donutId})을 찾을 수 없습니다!");
                 return null;
             }
-
+        
             donutToLaunch = forceController;
         }
         else
@@ -434,8 +557,196 @@ public class StoneManager : MonoBehaviour
             Debug.Log(" 팀 설정 값이 없음");
             return null;
         }
+        
+        // if (myUserId == gameReference.RoundStartingPlayerId) // 내가 선공이면
+        // {
+        //     if (!_stoneControllers_B.TryGetValue(donutId, out var forceController)) //상대는 후공 팀이니까 후공팀 리스트에서 찾음
+        //     {
+        //         Debug.LogError($"발사할 돌(ID: {donutId})을 찾을 수 없습니다!");
+        //         return null;
+        //     }
+        //
+        //     donutToLaunch = forceController;
+        // }
+        // else  // 그럼 내가 후공이니까
+        // {
+        //     if (!_stoneControllers_A.TryGetValue(donutId, out var forceController)) //상대는 선공이니까 선공팀 리스트에서 찾음
+        //     {
+        //         Debug.LogError($"발사할 돌(ID: {donutId})을 찾을 수 없습니다!");
+        //         return null;
+        //     }
+        //
+        //     donutToLaunch = forceController;
+        // }
+        
 
 
         return donutToLaunch;
     }
+
+    public void CalculateScore(out StoneForceController_Firebase.Team team, out int score)
+    {
+        
+        
+        Vector3 housePosition = _scr_Collider_House.transform.position; // 하우스(점수중심점) 의 포지션
+
+        //하우스 콜라이더로부터 닿아있는 도넛들을 가져옴
+        List<StoneForceController_Firebase> inHouseDonutList = _scr_Collider_House.GetInHouseDonutList(); 
+
+        if (inHouseDonutList.Count == 0) // 만약 아무도 하우스에 도넛을 못올렸으면 무승부
+        {
+            team = StoneForceController_Firebase.Team.None;
+            score = 0;
+            return;
+        }
+        
+        List<StoneForceController_Firebase> sortedDonutList = inHouseDonutList
+            .OrderBy(donut => Vector3.Distance(housePosition, donut.transform.position)) // 거리 오름차순 정렬
+            .ToList();
+            //LinQ를 이용해서 하우스에 올라간 도넛들의 거리를 측정하여 그 거리별로 오름차순으로 정렬
+        
+        team = sortedDonutList[0].team; // out으로 보낼 승리팀
+        score = 1;
+        for (int i = 1; i < sortedDonutList.Count; i++)
+        {
+            if (sortedDonutList[i].team == team) // 승리팀의 연속된 득점 계산.
+            {
+                score++; // out으로 보낼 점수
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    public void ClearOldDonutsInNewRound(Game newGame, int round = -99) // 새 라운드가 시작하기 전에, 기존에 생성되었던 모든 도넛들을 지움
+    {
+        foreach (KeyValuePair<int, StoneForceController_Firebase> force in _stoneControllers_A)
+        {
+            Destroy(force.Value.gameObject);
+        }
+
+        foreach (KeyValuePair<int, StoneForceController_Firebase> force in _stoneControllers_B)
+        {
+            Destroy(force.Value.gameObject);
+        }
+        _stoneControllers_A.Clear();
+        _stoneControllers_B.Clear();
+        lastStonePosition.Clear();
+        
+        aShotIndex = -1;
+        bShotIndex = -1;
+        roundCount = round == -99 ? newGame.RoundNumber : round;
+        //roundCount = newGame.RoundNumber;
+        aScore = FirebaseGameManager.Instance.aTeamScore;
+        bScore = FirebaseGameManager.Instance.bTeamScore;
+        _scr_Collider_House.ClearDonutList();
+        _uilaunchIndicator.RoundChanged(roundCount, aScore, bScore);
+    }
+
+    #region 변수 교체 함수
+
+    public void A_ShotIndexUp()
+    {
+        aShotIndex++;
+    }
+
+    public void B_ShotIndexUp()
+    {
+        bShotIndex++;
+    }
+
+    #endregion
+
+
+    #region 아웃 판정 관련 함수
+
+    
+
+    //도넛이 양 옆의 벽에 닿았을 경우, Scr_Collider_DonutSideOut.cs 에서 호출하는 함수
+    public void DonutContactedSideWall(StoneForceController_Firebase.Team team, int donutId) 
+    {
+        if (team == StoneForceController_Firebase.Team.A)
+        {
+            DonutOut(_stoneControllers_A[donutId]);
+            _stoneControllers_A.Remove(donutId);
+        }
+        else
+        {
+            DonutOut(_stoneControllers_B[donutId]);
+            _stoneControllers_B.Remove(donutId);
+        }
+        // if (team == StoneForceController_Firebase.Team.A)
+        // {
+        //     if (gameReference.PlayerIds[0] == gameReference.RoundStartingPlayerId)
+        //     {
+        //         // 방장이 이번 라운드의 선공이라면?
+        //         // 방장은 무조건 A팀이고, 인자로 받아온 팀도 A 이기 때문에, A팀을 관리하는 리스트는 _stoneControllers_StartingPlayer 이다.
+        //         
+        //         DonutOut(_stoneControllers_A[donutId]); // 아웃판정하면 destroy 될것임
+        //         _stoneControllers_A.Remove(donutId); // 리스트에서 지운다
+        //     }
+        //     else
+        //     {
+        //         //방장이 이번 라운드의 후공이다.
+        //         // 방장은 무조건 A팀이고, 인자로 받아온 팀도 A이기 때문에, A팀을 관리하는 리스트는 _stoneControllers_SecondPlayer 이다.
+        //         
+        //         DonutOut(_stoneControllers_B[donutId]); // 아웃판정하면 destroy 될것임
+        //         _stoneControllers_B.Remove(donutId); // 리스트에서 지운다
+        //     }
+        // }
+        // else
+        // {
+        //     if (gameReference.PlayerIds[1] == gameReference.RoundStartingPlayerId)
+        //     {
+        //         // 방장이 아닌 플레이어가 이번 라운드의 선공이라면?
+        //         // 방장이 아닌 플레이어는 무조건 B팀이고, 인자로 받아온 팀도 B 이기 때문에,
+        //         // B팀을 관리하는 리스트는 _stoneControllers_StartingPlayer 이다.
+        //         
+        //         DonutOut(_stoneControllers_A[donutId]); // 아웃판정하면 destroy 될것임
+        //         _stoneControllers_A.Remove(donutId); // 리스트에서 지운다
+        //     }
+        //     else
+        //     {
+        //         // 방장이 아닌 플레이어가 이번 라운드의 후공이다.
+        //         // 방장이 아닌 플레이어는 무조건 B팀이고, 인자로 받아온 팀도 B이기 때문에,
+        //         // B팀을 관리하는 리스트는 _stoneControllers_SecondPlayer 이다.
+        //         
+        //         DonutOut(_stoneControllers_B[donutId]); // 아웃 판정하면 destroy 될것임
+        //         _stoneControllers_B.Remove(donutId); // 리스트에서 지운다
+        //     }
+        // }
+    }
+    
+    public void DonutOut(StoneForceController_Firebase donut, bool deleteInDict = false) //도넛의 아웃 판정
+    {
+        // outText.SetActive(true);
+        // DOVirtual.DelayedCall(3f, () =>
+        // {
+        //     outText.SetActive(false);
+        // });
+        //donut.gameObject.SetActive(false);
+        if (deleteInDict)
+        {
+            if (donut.team == StoneForceController_Firebase.Team.A)
+            {
+                _stoneControllers_A.Remove(donut.donutId);
+            }
+            else
+            {
+                _stoneControllers_B.Remove(donut.donutId);
+            }
+        }
+        
+        Destroy(donut.gameObject);
+
+        //StoneForceController sfc = donut.GetComponent<StoneForceController>();
+        //sfc.team
+         
+        //rb.gameObject.SetActive(false);
+        //forceController.enabled = false;
+        //DonutAttackFinished();
+    }
+    #endregion
 }
