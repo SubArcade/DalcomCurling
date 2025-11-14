@@ -147,7 +147,6 @@ public class Scr_OrderSystem : MonoBehaviour
         orderClearBtn3 = transform.Find("Top/QuestGroup/Order3/OrderClearBtn")?.GetComponent<Button>();
 
         refreshCountText = transform.Find("Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
-        refreshCount = PlayerPrefs.GetInt("RefreshCount", maxRefreshCount); // 저장된 새로고침횟수 불러오기
         refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
 
         completeObject1 = transform.Find("Top/QuestGroup/Order1/CompleteObject")?.gameObject;
@@ -299,8 +298,6 @@ public class Scr_OrderSystem : MonoBehaviour
         }
 
         refreshCount--;
-        PlayerPrefs.SetInt("RefreshCount", refreshCount);
-        PlayerPrefs.Save();
         refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
 
         // 해당 주문서의 CompleteObject 비활성화
@@ -504,8 +501,6 @@ public class Scr_OrderSystem : MonoBehaviour
             if (refreshCount < maxRefreshCount)
             {
                 refreshCount++;
-                PlayerPrefs.SetInt("RefreshCount", refreshCount);
-                PlayerPrefs.Save();
                 refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
             }
         }
