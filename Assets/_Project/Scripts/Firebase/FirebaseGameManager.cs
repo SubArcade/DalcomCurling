@@ -1,9 +1,10 @@
-﻿using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 필요합니다.
-using System.Collections.Generic; // 리스트나 딕셔너리 같은 자료구조를 사용하기 위해 필요합니다.
-using UnityEngine; // Unity 엔진의 기능을 사용하기 위해 필요합니다.
-using System.Linq; // 리스트에서 데이터를 쉽게 찾거나 걸러낼 때 사용합니다.
-using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
+﻿using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
+using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 필요합니다.
 using System;
+using System.Collections.Generic; // 리스트나 딕셔너리 같은 자료구조를 사용하기 위해 필요합니다.
+using System.Linq; // 리스트에서 데이터를 쉽게 찾거나 걸러낼 때 사용합니다.
+using UnityEngine; // Unity 엔진의 기능을 사용하기 위해 필요합니다.
+using UnityEngine.PlayerLoop;
 
 /// <summary>
 /// 이 스크립트는 컬링 게임의 전체적인 흐름(상태)을 관리하는 중요한 역할을 합니다.
@@ -64,6 +65,11 @@ public class FirebaseGameManager : MonoBehaviour
     // --- 게임 시스템 변수 ---
     public float timeMultiplier { get; private set; } = 5f; //게임 빨리감기 속도를 결정할 변수, 읽기전용 (기본값 5)
 
+    // --- 게임 연결 상태 변수 ---
+    [Header("연결 상태 관리")]
+    [SerializeField] private float heartbeatInterval = 10f; // 생존 신호를 보내는 주기 (초)
+    [SerializeField] private float disconnectionThreshold = 25f; // 연결 끊김으로 판단하는 임계 시간 (초)
+
     // --- 게임 내부 변수 ---
     private float initialFixedDeltaTime;
     private bool isFirstTurn = true;
@@ -71,11 +77,12 @@ public class FirebaseGameManager : MonoBehaviour
     private Tweener countDownTween = null;
     private bool SuccessfullyShotInTime = false;
     private bool lostTimeToShot = false;
+    private Coroutine _heartbeatCoroutine; // 생존 신호 코루틴 참조
 
     // --- 공유 가능한 게임 변수 ---
     public int aTeamScore { get; private set; } = 0;
     public int bTeamScore { get; private set; } = 0;
-    public int shotsPerRound  { get; private set; } = 4; // 이 변수값 조절하여 1라운드당 각각 몇번씩 던지게 할 것인지 조절 가능
+    public int shotsPerRound { get; private set; } = 4; // 이 변수값 조절하여 1라운드당 각각 몇번씩 던지게 할 것인지 조절 가능
 
     //public bool canShotDonutNow { get; private set; } = false;
 
@@ -127,6 +134,9 @@ public class FirebaseGameManager : MonoBehaviour
 
         // Firestore에 나의 준비 상태를 업데이트합니다.
         gameRef.UpdateAsync("ReadyPlayers", FieldValue.ArrayUnion(myUserId));
+
+        // 하트비트 코루틴 시작
+        _heartbeatCoroutine = StartCoroutine(UpdateHeartbeat());
     }
 
     /// <summary>
@@ -137,6 +147,12 @@ public class FirebaseGameManager : MonoBehaviour
     {
         gameListener?.Stop();
         if (inputController != null) inputController.OnShotConfirmed -= SubmitShot;
+
+        // 하트비트 코루틴 중지
+        if (_heartbeatCoroutine != null)
+        {
+            StopCoroutine(_heartbeatCoroutine);
+        }
     }
     #endregion
 
@@ -166,8 +182,8 @@ public class FirebaseGameManager : MonoBehaviour
         bool newShotFired = _currentGame?.LastShot?.Timestamp != newGameData.LastShot?.Timestamp;
         //bool newPredictionReceived = _currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber;
         bool newPredictionReceived = false;
-        if (_currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber 
-            &&_currentGame?.PredictedResult?.PredictingPlayerId != newGameData.PredictedResult?.PredictingPlayerId)
+        if (_currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber
+            && _currentGame?.PredictedResult?.PredictingPlayerId != newGameData.PredictedResult?.PredictingPlayerId)
         {
             newPredictionReceived = true;
         }
@@ -180,6 +196,12 @@ public class FirebaseGameManager : MonoBehaviour
 
         _currentGame = newGameData;
         _isMyTurn = _currentGame.CurrentTurnPlayerId == myUserId;
+
+        // 상대방의 연결 끊김을 감지하고 처리합니다.
+        if (_currentGame.GameState == "InProgress")
+        {
+            CheckForDisconnectedPlayer();
+        }
 
         Debug.Log($"[Snapshot] GameState: {_currentGame.GameState}, MyTurn: {_isMyTurn}, LocalState: {_localState}, newShot: {newShotFired}, newPrediction: {newPredictionReceived}");
 
@@ -264,13 +286,13 @@ public class FirebaseGameManager : MonoBehaviour
                 //     OnRoundEnd();
                 //     //updatedNewRoundData = true;
                 // }
-                
+
                 //if (_localState != LocalGameState.Idle && _localState != LocalGameState.PreparingShot) break; //중복 방지
                 if (_localState != LocalGameState.Idle && _localState != LocalGameState.SimulatingOpponentShot) break; //중복 방지
                 //if (updatedRoundByMe == true) break;
                 Debug.Log($"라운드 {_currentGame.RoundNumber} 종료. 다음 라운드를 준비합니다.");
                 _localState = LocalGameState.Idle; // 상태 초기화
-               // OnRoundEnd(); // 점수 계산 및 돌 정리
+                                                   // OnRoundEnd(); // 점수 계산 및 돌 정리
 
                 // if (IsStartingPlayer())
                 // {
@@ -281,13 +303,14 @@ public class FirebaseGameManager : MonoBehaviour
                     OnRoundEnd();
                 }
 
-                
+
                 break;
 
             case "Finished":
                 HandleGameFinished();
                 break;
         }
+
     }
 
     /// <summary>
@@ -345,22 +368,22 @@ public class FirebaseGameManager : MonoBehaviour
                 {
                     // 샷이 발사되었으므로, 중복 실행을 막기 위해 Idle로 전환
                     // (곧 SimulatingMyShot으로 변경될 것임)
-                   // _localState = LocalGameState.Idle;
+                    // _localState = LocalGameState.Idle;
                 }
                 else
                 {
                     //canShotDonutNow = true;
                 }
-                
+
             }
             else if (_localState == LocalGameState.Idle || _localState == LocalGameState.InTimeline)
             {
                 Debug.Log("내 턴 시작. 입력을 준비합니다.");
                 _localState = LocalGameState.WaitingForInput;
-                
+
                 //카운트다운 활성화
                 //ControlCountdown(true);
-                
+
                 Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame);
                 if (donutRigid != null)
                 {
@@ -373,7 +396,7 @@ public class FirebaseGameManager : MonoBehaviour
                     Debug.Log("발사 기회를 모두 소진했을 가능성이 높음");
                 }
             }
-                
+
         }
         else if (!_isMyTurn)
         {
@@ -381,7 +404,7 @@ public class FirebaseGameManager : MonoBehaviour
             SuccessfullyShotInTime = false;
             inputController?.DisableInput();
             _localState = LocalGameState.Idle;
-            
+
         }
     }
 
@@ -422,11 +445,11 @@ public class FirebaseGameManager : MonoBehaviour
         //     inputController.SimulateStone(rb, _currentGame.LastShot, stoneIdToLaunch);
         //     //stoneManager?.LaunchStone(_currentGame.LastShot, stoneIdToLaunch);
         // }
-        
+
         if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;
-            
+
             // 만약 샷 정보에 발사 시간을 놓쳤음을 나타내는 정보가 있을경우
             if ((_currentGame.LastShot.Force == -999f)
                 && (_currentGame.LastShot.Spin == -999f) && (_currentGame.LastShot.Direction["x"] == 0)
@@ -489,7 +512,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// 예측 결과를 처리하는 메서드입니다.
     /// 돌 위치를 동기화하고 다음 턴으로 넘깁니다.
     /// </summary>
-     private void ProcessPrediction(PredictedResult result)
+    private void ProcessPrediction(PredictedResult result)
     {
         Debug.Log($"{result.PredictingPlayerId}로부터 받은 예측 결과 처리.");
         stoneManager?.SyncPositions(result.FinalStonePositions);
@@ -498,7 +521,7 @@ public class FirebaseGameManager : MonoBehaviour
         {
             // 8턴(0~7)이 끝나면 라운드 전환 상태로 변경
             // 현재턴이 마지막 턴이고 선공플레이어가 아닐때 (후공 플레이이가 라운드 종료로직을 시작해야할때) true
-            if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer()) 
+            if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
             {
                 Debug.Log("게임 종료를 위한 계산 시작");
                 // 호스트가 점수를 기반으로 다음 라운드 시작 플레이어를 결정하고 DB를 업데이트합니다.
@@ -550,7 +573,7 @@ public class FirebaseGameManager : MonoBehaviour
             _cachedPrediction = null;
         });
     }
-    
+
 
     /// <summary>
     /// 게임 종료 상태가 감지되었을 때 호출됩니다.
@@ -673,13 +696,13 @@ public class FirebaseGameManager : MonoBehaviour
                 //
                 // 라운드 끝나면 안만들어지게
                 if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
-                    && stoneManager.aShotIndex >= shotsPerRound - 1) 
-                    ||(stoneManager.myTeam == StoneForceController_Firebase.Team.B
+                    && stoneManager.aShotIndex >= shotsPerRound - 1)
+                    || (stoneManager.myTeam == StoneForceController_Firebase.Team.B
                     && stoneManager.bShotIndex >= shotsPerRound - 1))
                 {
                     //이미 발사횟수를 모두 소진함
                     Debug.Log("라운드에 발사가능한 횟수가 끝나서 내 턴으로 돌아오지 않습니다");
-                    
+
                 }
                 else
                 {
@@ -694,7 +717,7 @@ public class FirebaseGameManager : MonoBehaviour
                         Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
                     }
                 }
-                
+
                 //inputController?.EnableInput(stoneManager?.SpawnStone(_currentGame, myUserId));
             }
             else if (_localState == LocalGameState.SimulatingMyShot)
@@ -733,21 +756,21 @@ public class FirebaseGameManager : MonoBehaviour
         // needToUpdateRound = true;
         // Debug.Log($"승리팀 : {winner}, 점수 : {score}");
         //받아온 리턴값으로 여기서 결과를 처리한다.
-        
-        
+
+
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame);
         var updates = new Dictionary<string, object>
         {
-           
+
             { "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
         };
         db.Collection("games").Document(gameId).UpdateAsync(updates);
 
     }
 
-    public void UpdateScoreInLocal(StoneForceController_Firebase.Team  winner, int score)
+    public void UpdateScoreInLocal(StoneForceController_Firebase.Team winner, int score)
     {
         if (winner == StoneForceController_Firebase.Team.A)
         {
@@ -773,7 +796,7 @@ public class FirebaseGameManager : MonoBehaviour
             TurnNumber = 0,
             FinalStonePositions = new List<StonePosition>()
         };
-        
+
         currentRound = _currentGame.RoundNumber;
         var updates = new Dictionary<string, object>
         {
@@ -791,7 +814,7 @@ public class FirebaseGameManager : MonoBehaviour
         db.Collection("games").Document(gameId).UpdateAsync(updates);
 
         //db.Collection("games").Document(gameId).UpdateAsync("PredictedResult", result);
-        
+
         currentRound++;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame, currentRound);
     }
@@ -835,8 +858,8 @@ public class FirebaseGameManager : MonoBehaviour
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
 
-    
-    
+
+
 
     #endregion
 
@@ -908,19 +931,19 @@ public class FirebaseGameManager : MonoBehaviour
         ControlCountdown(true);
         countDownTween = DOTween.To(
                 // 1. Getter: 시작 값 (10.0f)
-                () => time, 
+                () => time,
                 // 2. Setter: 변화하는 값을 처리하는 람다 함수
-                (float x) => 
+                (float x) =>
                 {
                     // 변화하는 값 x를 정수로 변환하여 변수에 저장
                     // Mathf.CeilToInt를 사용하여 9.9초가 되어도 '10'으로 표시되게 함 (올림 처리)
                     _remainingTime = Mathf.CeilToInt(x);
-                
+
                     // 디버깅 용 (매 프레임 호출됨)
                     //Debug.Log($"남은 시간: {_remainingTime}초");
-                }, 
+                },
                 // 3. 목표 값 (0.0f)
-                0.0f, 
+                0.0f,
                 // 4. 지속 시간 (10초)
                 time
             )
@@ -955,5 +978,79 @@ public class FirebaseGameManager : MonoBehaviour
 
     #endregion
 
+
+    /// <summary>
+    /// 주기적으로 자신의 생존 신호(하트비트)를 Firestore에 업데이트합니다.
+    /// </summary>
+    private System.Collections.IEnumerator UpdateHeartbeat()
+    {
+        DocumentReference gameRef = db.Collection("games").Document(gameId);
+        while (true)
+        {
+            // PlayerHeartbeats 필드 내의 현재 플레이어 ID에 현재 타임스탬프를 업데이트
+            string heartbeatPath = $"PlayerHeartbeats.{myUserId}";
+            var updates = new Dictionary<string, object> { 
+                { heartbeatPath, Timestamp.GetCurrentTimestamp()}
+            };
+            gameRef.UpdateAsync(updates);
+
+            // 정해진 주기만큼 대기
+            yield return new WaitForSeconds(heartbeatInterval);
+        }
+    }
+
+    /// <summary>
+    /// 상대 플레이어의 연결 끊김을 확인하고, 끊겼다면 게임을 종료시킵니다.
+    /// (호스트만 이 메서드를 호출합니다)
+    /// </summary>
+    private void CheckForDisconnectedPlayer()
+    {
+        if (_currentGame.PlayerHeartbeats == null) return;
+
+        // 상대 플레이어 ID 찾기
+        string opponentId = _currentGame.PlayerIds.FirstOrDefault(id => id != myUserId);
+        if (string.IsNullOrEmpty(opponentId)) return;
+
+        // 상대방의 하트비트가 있는지, 있다면 마지막 시간이 언제인지 확인
+        if (_currentGame.PlayerHeartbeats.TryGetValue(opponentId, out Timestamp lastHeartbeat))
+        {
+            // 현재 시간과 마지막 하트비트 시간의 차이 계산
+            TimeSpan timeSinceLastHeartbeat = Timestamp.GetCurrentTimestamp().ToDateTime() - lastHeartbeat.ToDateTime();
+
+            // 시간 차이가 임계값을 넘었으면 연결이 끊긴 것으로 간주
+            if (timeSinceLastHeartbeat.TotalSeconds > disconnectionThreshold)
+            {
+                Debug.LogWarning($"상대방({opponentId})의 연결이 끊긴 것으로 보입니다. 게임을 종료합니다.");
+                ForfeitGame(opponentId, "Opponent disconnected");
+            }
+        }
+        else if (_currentGame.TurnNumber > 0) // 게임이 시작되었는데도 상대 하트비트가 없으면 문제로 간주
+        {
+            // 첫 턴 이후에도 하트비트가 없다면 연결이 끊겼다고 판단
+            Debug.LogWarning($"상대방({opponentId})의 하트비트가 감지되지 않습니다. 게임을 종료합니다.");
+            ForfeitGame(opponentId, "Opponent never connected");
+        }
+    }
+
+    /// <summary>
+    /// 특정 플레이어의 패배로 게임을 종료시킵니다.
+    /// </summary>
+    /// <param name="loserId">패배한 플레이어의 ID</param>
+    /// <param name="reason">게임 종료 사유</param>
+    private void ForfeitGame(string loserId, string reason)
+    {
+        // 이미 게임이 끝났으면 중복 실행 방지
+        if (_currentGame.GameState == "Finished") return;
+
+        string winnerId = _currentGame.PlayerIds.FirstOrDefault(id => id != loserId);
+
+        var updates = new Dictionary<string, object> {
+            { "GameState", "Finished" },
+            { "WinnerId", winnerId },
+            { "FinishReason", reason }
+        };
+
+        db.Collection("games").Document(gameId).UpdateAsync(updates);
+    }
 
 }
