@@ -554,17 +554,20 @@ public class FirebaseGameManager : MonoBehaviour
                     nextRoundStarterId = _currentGame.PlayerIds.FirstOrDefault(id => id != winnerId);
                 }
 
-                ResetGameDatas(nextRoundStarterId);
-                // 3라운드가 끝났으면 게임 종료
-                // if (_currentGame.RoundNumber >= 3)
-                // {
-                //     db.Collection("games").Document(gameId).UpdateAsync("GameState", "Finished");
-                // }
-                // else
-                // {
-                //     ResetGameDatas(nextRoundStarterId);
-                // }
-                //db.Collection("games").Document(gameId).UpdateAsync("GameState", "RoundChanging");
+                //ResetGameDatas(nextRoundStarterId, false);
+                
+                // 3라운드가 끝났으면 게임 종료, 아니면 지속
+                // 2라운드가 끝났지만, 점수차가 5점이상이 나면 3라운드에서 4점을 따라잡더라도 이길수 없으므로 콜드게임 처리
+                 if (_currentGame.RoundNumber >= 3 || 
+                     (_currentGame.RoundNumber == 2 && Math.Abs(aTeamScore - bTeamScore) >= 5))
+                 {
+                     ResetGameDatas(nextRoundStarterId, true); // 게임 끝내기 위한 정보들도 전송해야함
+                 }
+                 else
+                 {
+                     ResetGameDatas(nextRoundStarterId, false); // 다음 라운드를 위한 정보들 전송
+                 }
+                
             }
             else // 일반적인 턴에서 다음턴으로 넘겨줌
             {
@@ -752,35 +755,23 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void OnRoundEnd() //이번 라운드가 끝났을때.
     {
-        // StoneForceController_Firebase.Team winner;
-        // int score;
-        // stoneManager.CalculateScore(out winner, out score);
-        // stoneManager.ClearOldDonutsInNewRound();
-        // if (winner == StoneForceController_Firebase.Team.A)
-        // {
-        //     aTeamScore += score;
-        // }
-        // else if (winner == StoneForceController_Firebase.Team.B)
-        // {
-        //     bTeamScore += score;
-        // }
-        // else
-        // {
-        //     Debug.Log("무승부");
-        // }
-        //
-        // needToUpdateRound = true;
-        // Debug.Log($"승리팀 : {winner}, 점수 : {score}");
-        //받아온 리턴값으로 여기서 결과를 처리한다.
-
-
+        
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame);
+        string nextState;
+        if (_currentGame.CurrentTurnPlayerId == "Finished" && _currentGame.RoundStartingPlayerId == "Finished")
+        {
+            nextState = "Finished";
+        }
+        else
+        {
+            nextState = "TimeLine";
+        }
         var updates = new Dictionary<string, object>
         {
 
-            { "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
+            { "GameState", nextState } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
         };
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
@@ -803,8 +794,15 @@ public class FirebaseGameManager : MonoBehaviour
         Debug.Log($"승리팀 : {winner}, 점수 : {score}");
     }
 
-    private void ResetGameDatas(string nextPlayerId) // 다음 라운드 시작 플레이어를 파라미터로 받음
+    private void ResetGameDatas(string nextPlayerId, bool isFinished = false) // 다음 라운드 시작 플레이어를 파라미터로 받음
     {
+        
+        if (isFinished) // 만약 게임이 끝났다면
+        {
+            nextPlayerId = "Finished"; // 다음 플레이어 이름에 Finished를 적어서 상대방에게 게임 끝남을 알림
+        }
+        
+        
         PredictedResult result = new PredictedResult
         {
             PredictingPlayerId = myUserId,
