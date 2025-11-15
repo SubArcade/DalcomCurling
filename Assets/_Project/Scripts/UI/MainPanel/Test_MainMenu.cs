@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -48,7 +48,7 @@ public class Test_MainMenu : MonoBehaviour
     void Awake()
     {
         //DataManager.Instance.PlayerData.energy = 0;
-        energyButton.onClick.AddListener(()=> testAdd());
+        //energyButton.onClick.AddListener(()=> testAdd());
         loginButton.onClick.AddListener(TestLogin);
         dropdown.ClearOptions();
         dropdown.AddOptions(new List<string>(idDictionary.Keys));
@@ -59,13 +59,13 @@ public class Test_MainMenu : MonoBehaviour
 
     }
     
-    private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
-    private void Disable() =>  DataManager.Instance.OnUserDataChanged -= see;
+    //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
+    //private void Disable() =>  DataManager.Instance.OnUserDataChanged -= see;
     
     // 데이터 UI 노출
     public void see(PlayerData playerData)
     {
-        energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        //energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
     }
     
     // 에너지 추가
@@ -80,6 +80,7 @@ public class Test_MainMenu : MonoBehaviour
     void TestLogin()
     {
         //FirebaseAuthManager.Instance.Login("asd@asd.asd", "asdasd");
+        FirebaseAuthManager.Instance.Init();
         FirebaseAuthManager.Instance.Login(id, pw);
         UIManager.Instance.Open(PanelId.StartPanel);
         //UIManager.Instance.Open(PanelId.MainPanel);
@@ -90,6 +91,5 @@ public class Test_MainMenu : MonoBehaviour
         string display = dropdown.options[index].text;
         id = idDictionary[display];
         pw = pwDictionary[display];
-        
     }
 }

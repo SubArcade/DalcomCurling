@@ -34,6 +34,26 @@ public class DonutManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        var entries = DataManager.Instance.InventoryData.donutEntries;
+
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            
+            // 도넛 스탯 설정
+            weight = entry.weight;
+            resilience = entry.resilience;
+            friction = entry.friction;
+            level = entry.level;
+
+            // 도넛 생성
+            SpawnDonut(entry.type, entry.level);
+
+        }
+    }
+
     private void UpdateDonutEntries(DonutType type, int level, int listIndex)
     {
         DonutData data = DataManager.Instance.GetDonutData(type, level);

@@ -10,16 +10,16 @@ public class SoundManager : MonoBehaviour
     [Header("BGM Events")]
     [SerializeField] private EventReference[] lobbyBGMs;
     [SerializeField] private EventReference[] gameBGMs;
-    //[SerializeField] private EventReference intenseMusic;
+    [SerializeField] private EventReference intenseMusic;
 
-    //[Header("SFX Events")]
-    //[SerializeField] private EventReference stoneImpact;
-    //[SerializeField] private EventReference particleSound;
-    //[SerializeField] private EventReference cheerSound;
-    //[SerializeField] private EventReference mergeSound;
-    //[SerializeField] private EventReference buttonSound;
-    //[SerializeField] private EventReference menuSound;
-    //[SerializeField] private EventReference crowdAmbience;
+    [Header("SFX Events")]
+    [SerializeField] private EventReference stoneImpact;
+    [SerializeField] private EventReference particleSound;
+    [SerializeField] private EventReference cheerSound;
+    [SerializeField] private EventReference mergeSound;
+    [SerializeField] private EventReference buttonSound;
+    [SerializeField] private EventReference menuSound;
+    [SerializeField] private EventReference crowdAmbience;
 
     private FMOD.Studio.EventInstance currentBGMInstance;
     private List<EventReference> currentPlaylist;

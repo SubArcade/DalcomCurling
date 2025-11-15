@@ -24,6 +24,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_2
     level: 2
     sprite: {fileID: 21300000, guid: 874a5481f6eccc94b9ddb4addda010aa, type: 3}
@@ -34,6 +35,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_3
     level: 3
     sprite: {fileID: 21300000, guid: 2c9251641e6b1584083d297b400b2b64, type: 3}
@@ -44,6 +46,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_4
     level: 4
     sprite: {fileID: 21300000, guid: a221c1890bc9edc4d8e7faa0179a361c, type: 3}
@@ -54,6 +57,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_5
     level: 5
     sprite: {fileID: 21300000, guid: 6eb9b62f24deb194fa9b991b0c5c6b7a, type: 3}
@@ -64,6 +68,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_6
     level: 6
     sprite: {fileID: 21300000, guid: dff7cc1e8f3dbb844913afd1a1439d59, type: 3}
@@ -74,6 +79,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_7
     level: 7
     sprite: {fileID: 21300000, guid: ba8177e86d55c2f4990f93522af6f9e3, type: 3}
@@ -84,6 +90,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_8
     level: 8
     sprite: {fileID: 21300000, guid: 0070017372b9d774f8a769bfc357f975, type: 3}
@@ -94,6 +101,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_9
     level: 9
     sprite: {fileID: 21300000, guid: 11c0078677b772c44838eb1cbbc6f48e, type: 3}
@@ -104,6 +112,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_10
     level: 10
     sprite: {fileID: 21300000, guid: a71a5cc2ebc96204eac1468e4ec33c8b, type: 3}
@@ -114,6 +123,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_11
     level: 11
     sprite: {fileID: 21300000, guid: 0e9b6fb72e6a85549a939b873fd7deca, type: 3}
@@ -124,6 +134,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_12
     level: 12
     sprite: {fileID: 21300000, guid: 0456ef2da4eae4f43b09898f692f64b6, type: 3}
@@ -134,6 +145,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_13
     level: 13
     sprite: {fileID: 21300000, guid: eb5aec1c7adb858488abe9c6f04befaf, type: 3}
@@ -144,6 +156,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_14
     level: 14
     sprite: {fileID: 21300000, guid: 8374f4320db36e74c91010d174eb7cbf, type: 3}
@@ -154,6 +167,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_15
     level: 15
     sprite: {fileID: 21300000, guid: 6ed6b94d7f0bfc14b9761dda86244747, type: 3}
@@ -164,6 +178,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_16
     level: 16
     sprite: {fileID: 21300000, guid: 681c68ffbbf0d794b85e15186129db0b, type: 3}
@@ -174,6 +189,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_17
     level: 17
     sprite: {fileID: 21300000, guid: 2a3c4996efa4a504cb5a4902dfbdc8de, type: 3}
@@ -184,6 +200,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_18
     level: 18
     sprite: {fileID: 21300000, guid: 4f695c4d55dd82945b3b39f8af825746, type: 3}
@@ -194,6 +211,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_19
     level: 19
     sprite: {fileID: 21300000, guid: 35fddfb2378aaff48b030472dfd5b565, type: 3}
@@ -204,6 +222,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_20
     level: 20
     sprite: {fileID: 21300000, guid: 97815d487ecc8924fbea48e9a40ad722, type: 3}
@@ -214,6 +233,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_21
     level: 21
     sprite: {fileID: 21300000, guid: 746396714d70fec48b142424e819b1ec, type: 3}
@@ -224,6 +244,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_22
     level: 22
     sprite: {fileID: 21300000, guid: 167ffc6e0f2326f4dbe6bff41ce57f6a, type: 3}
@@ -234,6 +255,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_23
     level: 23
     sprite: {fileID: 21300000, guid: da4cab5a883e4fd4a8ac018f6c677ca0, type: 3}
@@ -244,6 +266,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_24
     level: 24
     sprite: {fileID: 21300000, guid: 771f98deff952a94cb8a373b7007d11e, type: 3}
@@ -254,6 +277,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_25
     level: 25
     sprite: {fileID: 21300000, guid: f23a1f2364776f341b001601b00dbe67, type: 3}
@@ -264,6 +288,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_26
     level: 26
     sprite: {fileID: 21300000, guid: 4f3d46a66280413479a0cb5b54686571, type: 3}
@@ -274,6 +299,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_27
     level: 27
     sprite: {fileID: 21300000, guid: d520df74c7d037046a8759864b9a9cd0, type: 3}
@@ -284,6 +310,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_28
     level: 28
     sprite: {fileID: 21300000, guid: 84a7680aad7fc8b44bad32acbae8271e, type: 3}
@@ -294,6 +321,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_29
     level: 29
     sprite: {fileID: 21300000, guid: 87fd358746b481f4b808f4767b2e188e, type: 3}
@@ -304,6 +332,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Hard_30
     level: 30
     sprite: {fileID: 21300000, guid: 1f27f320d970d5d4ba3443baed53d72a, type: 3}
@@ -314,6 +343,7 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   donutData:
     id: 
     level: 0
@@ -325,3 +355,4 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1

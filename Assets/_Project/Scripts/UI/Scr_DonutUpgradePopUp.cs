@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class Scr_DonutUpgradePopUp : MonoBehaviour
 {
+    private DataManager Data => DataManager.Instance;
+
     [Header("창 닫기 버튼")]
     [SerializeField] private Button CloseButton;
 
@@ -36,9 +38,7 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
 
     
     //도넛 업그레이드 레벨 체크용도
-    private int hardDonutLevel = 1;
-    private int moistDonutLevel = 1;
-    private int softDonutLevel = 1;
+    
     private const int MaxLevel = 20;
     void Awake()
     {
@@ -72,36 +72,95 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     void Start()
     {
         CloseButton.onClick.AddListener(OnClickClosePopUp);
-        HardUpgradeButton.onClick.AddListener(() =>
-        UpgradeDonut(ref hardDonutLevel, "단단", HardDonutCreatText, HardDonutOptionText, HardUpgradeButton, HardUpgradeMax));
+        //HardUpgradeButton.onClick.AddListener(() =>
+        //UpgradeDonut(ref hardDonutLevel, "단단", HardDonutCreatText, HardDonutOptionText, HardUpgradeButton, HardUpgradeMax));
 
-        MoistUpgradeButton.onClick.AddListener(() =>
-        UpgradeDonut(ref moistDonutLevel, "촉촉", MoistDonutCreatText, MoistDonutOptionText, MoistUpgradeButton, MoistUpgradeMax));
+        //MoistUpgradeButton.onClick.AddListener(() =>
+        //UpgradeDonut(ref moistDonutLevel, "촉촉", MoistDonutCreatText, MoistDonutOptionText, MoistUpgradeButton, MoistUpgradeMax));
 
-        SoftUpgradeButton.onClick.AddListener(() =>
-        UpgradeDonut(ref softDonutLevel, "말랑", SoftDonutCreatText, SoftDonutOptionText, SoftUpgradeButton, SoftUpgradeMax));
+        //SoftUpgradeButton.onClick.AddListener(() =>
+        //UpgradeDonut(ref softDonutLevel, "말랑", SoftDonutCreatText, SoftDonutOptionText, SoftUpgradeButton, SoftUpgradeMax));
+
+        HardUpgradeButton.onClick.AddListener(OnClickHardUpgrade);
+        MoistUpgradeButton.onClick.AddListener(OnClickMoistUpgrade);
+        SoftUpgradeButton.onClick.AddListener(OnClickSoftUpgrade);
 
         updateAllText();
     }
 
-    //도넛 업그레이드 시 레벨업 & 만렙 도달시 업그레이드 비활성화
-    void UpgradeDonut(ref int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText, Button upgradeButton, GameObject maxlevelPanel)
+    //단단 업글
+    void OnClickHardUpgrade()
     {
-        if (level >= MaxLevel)
-        {
-            upgradeButton.interactable = false;
-            maxlevelPanel.SetActive(true);
-            return;
-        }
-        level++;
-        UpdateDonutText(level,type, createText, optionText);
+        int level = Data.MergeBoardData.generatorLevelHard;
 
         if (level >= MaxLevel)
         {
-            upgradeButton.interactable = false;
-            maxlevelPanel.SetActive(true);
+            HardUpgradeButton.interactable = false;
+            HardUpgradeMax.SetActive(true);
+            return;
         }
+
+        level++;
+        Data.MergeBoardData.generatorLevelHard = level;
+
+        UpdateDonutText(level, "단단", HardDonutCreatText, HardDonutOptionText);
     }
+
+    //촉촉 업글
+    void OnClickMoistUpgrade()
+    {
+        int level = Data.MergeBoardData.generatorLevelMoist;
+
+        if (level >= MaxLevel)
+        {
+            MoistUpgradeButton.interactable = false;
+            MoistUpgradeMax.SetActive(true);
+            return;
+        }
+
+        level++;
+        Data.MergeBoardData.generatorLevelMoist = level;
+
+        UpdateDonutText(level, "촉촉", MoistDonutCreatText, MoistDonutOptionText);
+    }
+
+    //말랑 업글
+    void OnClickSoftUpgrade()
+    {
+        int level = Data.MergeBoardData.generatorLevelSoft;
+
+        if (level >= MaxLevel)
+        {
+            SoftUpgradeButton.interactable = false;
+            SoftUpgradeMax.SetActive(true);
+            return;
+        }
+
+        level++;
+        Data.MergeBoardData.generatorLevelSoft = level;
+
+        UpdateDonutText(level, "말랑", SoftDonutCreatText, SoftDonutOptionText);
+    }
+
+
+    ////도넛 업그레이드 시 레벨업 & 만렙 도달시 업그레이드 비활성화
+    //void UpgradeDonut(ref int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText, Button upgradeButton, GameObject maxlevelPanel)
+    //{
+    //    if (level >= MaxLevel)
+    //    {
+    //        upgradeButton.interactable = false;
+    //        maxlevelPanel.SetActive(true);
+    //        return;
+    //    }
+    //    level++;
+    //    UpdateDonutText(level,type, createText, optionText);
+
+    //    if (level >= MaxLevel)
+    //    {
+    //        upgradeButton.interactable = false;
+    //        maxlevelPanel.SetActive(true);
+    //    }
+    //}
 
     //도넛 레벨에 따라 텍스트 갱신
     void UpdateDonutText(int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText) 
@@ -112,10 +171,12 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
 
     void updateAllText() 
     {
-        UpdateDonutText(hardDonutLevel,"단단", HardDonutCreatText, HardDonutOptionText);
-        UpdateDonutText(moistDonutLevel,"촉촉", MoistDonutCreatText, MoistDonutOptionText);
-        UpdateDonutText(softDonutLevel,"말랑" ,SoftDonutCreatText, SoftDonutOptionText);
-
+        //UpdateDonutText(hardDonutLevel,"단단", HardDonutCreatText, HardDonutOptionText);
+        //UpdateDonutText(moistDonutLevel,"촉촉", MoistDonutCreatText, MoistDonutOptionText);
+        //UpdateDonutText(softDonutLevel,"말랑" ,SoftDonutCreatText, SoftDonutOptionText);
+        UpdateDonutText(Data.MergeBoardData.generatorLevelHard, "단단", HardDonutCreatText, HardDonutOptionText);
+        UpdateDonutText(Data.MergeBoardData.generatorLevelMoist, "촉촉", MoistDonutCreatText, MoistDonutOptionText);
+        UpdateDonutText(Data.MergeBoardData.generatorLevelSoft, "말랑", SoftDonutCreatText, SoftDonutOptionText);
     }
     void OnClickClosePopUp() 
     {
