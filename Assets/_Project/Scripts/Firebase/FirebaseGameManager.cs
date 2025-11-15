@@ -13,10 +13,10 @@ using UnityEngine.PlayerLoop;
 /// </summary>
 public class FirebaseGameManager : MonoBehaviour
 {
-    // --- 싱글톤 패턴 ---
-    // 이 클래스는 게임 내에 단 하나만 존재하도록 합니다.
-    // 다른 스크립트에서 쉽게 접근할 수 있도록 'Instance'라는 이름으로 자신을 저장합니다.
     public static FirebaseGameManager Instance { get; private set; }
+
+    // ✨ 플레이어 프로필 로딩이 완료되었을 때 발생하는 이벤트
+    public event Action OnProfilesLoaded;
 
     // --- 게임의 현재 상태를 나타내는 변수 ---
     // 게임이 현재 어떤 단계에 있는지를 알려주는 역할을 합니다.
@@ -52,6 +52,9 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private StoneManager stoneManager; // 돌 생성 및 움직임 관리 스크립트
     [SerializeField] private Src_GameCamControl gameCamControl; // 카메라 연출을 제어하는 스크립트
     [SerializeField] private UI_LaunchIndicator_Firebase UI_LaunchIndicator_Firebase; // UI제어 스크립트
+
+    // --- 플레이어 프로필 정보 ---
+    private Dictionary<string, PlayerProfile> _playerProfiles;
 
     // --- 카메라 인덱스 상수 --- (카메라 추가하고 명칭도 다시 명명해야함)
     private const int START_VIEW_CAM = 0; // 기본 뷰 카메라
@@ -111,7 +114,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// 게임 오브젝트가 활성화될 때 호출됩니다.
     /// Firebase 연결을 초기화하고 게임 데이터를 감시하기 시작합니다.
     /// </summary>
-    void Start()
+    async void Start() // Changed to async void
     {
         db = FirebaseFirestore.DefaultInstance;
         gameId = FirebaseMatchmakingManager.CurrentGameId;
@@ -120,10 +123,25 @@ public class FirebaseGameManager : MonoBehaviour
 
         initialFixedDeltaTime = Time.fixedDeltaTime;
 
-        // 게임 ID나 사용자 ID가 없으면 게임을 진행할 수 없습니다.
-        if (string.IsNullOrEmpty(gameId) || string.IsNullOrEmpty(myUserId))
+        // 게임 ID, 사용자 ID, 룸 ID 중 하나라도 없으면 게임을 진행할 수 없습니다.
+        if (string.IsNullOrEmpty(gameId) || string.IsNullOrEmpty(myUserId) || string.IsNullOrEmpty(roomId))
         {
-            Debug.LogError("Game ID or User ID is missing.");
+            Debug.LogError("Game ID, User ID, or Room ID is missing.");
+            return;
+        }
+
+        // 룸 문서에서 플레이어 프로필 정보를 가져옵니다.
+        DocumentSnapshot roomSnapshot = await db.Collection("rooms").Document(roomId).GetSnapshotAsync();
+        if (roomSnapshot.Exists)
+        {
+            Room roomData = roomSnapshot.ConvertTo<Room>();
+            _playerProfiles = roomData.PlayerProfiles;
+            Debug.Log($"룸({roomId})에서 플레이어 프로필 정보를 성공적으로 로드했습니다.");
+            OnProfilesLoaded?.Invoke(); // 프로필 로딩 완료 이벤트 호출
+        }
+        else
+        {
+            Debug.LogError($"룸({roomId}) 문서를 찾을 수 없습니다. 플레이어 프로필 로드 실패.");
             return;
         }
 
@@ -750,6 +768,10 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void OnRoundEnd() //이번 라운드가 끝났을때.
     {
+        // 라운드 변경 시 턴 UI를 초기화합니다.
+        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
+
+
         // StoneForceController_Firebase.Team winner;
         // int score;
         // stoneManager.CalculateScore(out winner, out score);
@@ -938,6 +960,8 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void CountDownStart(float time, Rigidbody donutRigid)
     {
+        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber + 1); // 턴 UI업데이트 (+1을 해주어 선반영)
+
         _localState = LocalGameState.WaitingForInput;
         inputController?.EnableInput(donutRigid);
         int _remainingTime = (int)time;
@@ -1003,7 +1027,7 @@ public class FirebaseGameManager : MonoBehaviour
         {
             // PlayerHeartbeats 필드 내의 현재 플레이어 ID에 현재 타임스탬프를 업데이트
             string heartbeatPath = $"PlayerHeartbeats.{myUserId}";
-            var updates = new Dictionary<string, object> { 
+            var updates = new Dictionary<string, object> {
                 { heartbeatPath, Timestamp.GetCurrentTimestamp()}
             };
             gameRef.UpdateAsync(updates);
@@ -1015,7 +1039,6 @@ public class FirebaseGameManager : MonoBehaviour
 
     /// <summary>
     /// 상대 플레이어의 연결 끊김을 확인하고, 끊겼다면 게임을 종료시킵니다.
-    /// (호스트만 이 메서드를 호출합니다)
     /// </summary>
     private void CheckForDisconnectedPlayer()
     {
@@ -1046,6 +1069,8 @@ public class FirebaseGameManager : MonoBehaviour
         }
     }
 
+
+
     /// <summary>
     /// 특정 플레이어의 패배로 게임을 종료시킵니다.
     /// </summary>
@@ -1059,12 +1084,41 @@ public class FirebaseGameManager : MonoBehaviour
         string winnerId = _currentGame.PlayerIds.FirstOrDefault(id => id != loserId);
 
         var updates = new Dictionary<string, object> {
-            { "GameState", "Finished" },
-            { "WinnerId", winnerId },
-            { "FinishReason", reason }
-        };
+                    { "GameState", "Finished" },
+                    { "WinnerId", winnerId },
+                    { "FinishReason", reason }
+                };
 
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
 
+    /// <summary>
+    /// 주어진 userId에 해당하는 플레이어의 프로필 정보를 반환합니다.
+    /// </summary>
+    public PlayerProfile GetPlayerProfile(string userId)
+    {
+        if (_playerProfiles == null || string.IsNullOrEmpty(userId) || !_playerProfiles.ContainsKey(userId))
+        {
+            Debug.LogWarning($"요청한 플레이어({userId})의 프로필을 찾을 수 없습니다.");
+            return null;
+        }
+        return _playerProfiles[userId];
+    }
+
+    /// <summary>
+    /// 상대방 플레이어의 ID를 반환합니다.
+    /// </summary>
+    public string GetOpponentId()
+    {
+        if (_currentGame == null || _currentGame.PlayerIds == null) return null;
+        return _currentGame.PlayerIds.FirstOrDefault(id => id != myUserId);
+    }
+
+    /// <summary>
+    /// 플레이어 프로필 정보가 성공적으로 로드되었는지 확인합니다.
+    /// </summary>
+    public bool HasLoadedProfiles()
+    {
+        return _playerProfiles != null && _playerProfiles.Count >= 2;
+    }
 }

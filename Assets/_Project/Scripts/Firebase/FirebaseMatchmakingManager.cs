@@ -32,6 +32,10 @@ public class Room
 
     [FirestoreProperty]
     public string ScoreBracket { get; set; } // 룸 생성자의 점수 구간
+
+    // ✨ 새로 추가할 필드: 각 플레이어의 프로필 정보를 저장합니다.
+    [FirestoreProperty]
+    public Dictionary<string, PlayerProfile> PlayerProfiles { get; set; }
 }
 
 // Firestore의 'games' 문서 구조를 나타내는 클래스입니다.
@@ -259,6 +263,21 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     {
         string userId = FirebaseAuthManager.Instance.UserId;
 
+        // 참가 플레이어의 프로필 정보를 미리 가져옵니다. (트랜잭션 외부에서 await)
+        UserDataRoot joiningUserData = await DataManager.Instance.GetUserDataRootAsync(userId);
+        if (joiningUserData == null)
+        {
+            Debug.LogError($"참가 플레이어({userId})의 데이터를 불러오지 못했습니다.");
+            return;
+        }
+
+        PlayerProfile joiningProfile = new PlayerProfile
+        {
+            Nickname = joiningUserData.player.nickname,
+            Email = joiningUserData.player.email,
+            Inventory = joiningUserData.inventory
+        };
+
         await db.RunTransactionAsync(async transaction =>
         {
             DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(roomRef);
@@ -281,7 +300,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             {
                 { "PlayerIds", FieldValue.ArrayUnion(userId) },
                 { "PlayerCount", room.PlayerCount + 1 },
-                { "Status", "playing" }
+                { "Status", "playing" },
+                { $"PlayerProfiles.{userId}", joiningProfile } // 참가 플레이어 프로필 추가
             };
 
             transaction.Update(roomRef, updates);
@@ -296,6 +316,21 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         string userId = FirebaseAuthManager.Instance.UserId;
         DocumentReference newRoomRef = db.Collection(RoomsCollection).Document();
 
+        // 호스트 플레이어의 프로필 정보를 가져옵니다.
+        UserDataRoot hostUserData = await DataManager.Instance.GetUserDataRootAsync(userId);
+        if (hostUserData == null)
+        {
+            Debug.LogError($"호스트 플레이어({userId})의 데이터를 불러오지 못했습니다.");
+            return;
+        }
+
+        PlayerProfile hostProfile = new PlayerProfile
+        {
+            Nickname = hostUserData.player.nickname,
+            Email = hostUserData.player.email,
+            Inventory = hostUserData.inventory
+        };
+
         var room = new Room
         {
             RoomId = newRoomRef.Id,
@@ -304,7 +339,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             PlayerCount = 1, // 플레이어 수 초기화
             CreatedAt = Timestamp.GetCurrentTimestamp(),
             GameId = null, // 초기에는 GameId가 없습니다.
-            ScoreBracket = playerScoreBracket // 룸 생성 시 점수 구간 설정
+            ScoreBracket = playerScoreBracket, // 룸 생성 시 점수 구간 설정
+            PlayerProfiles = new Dictionary<string, PlayerProfile> { { userId, hostProfile } } // 호스트 프로필 추가
         };
 
         await newRoomRef.SetAsync(room);
