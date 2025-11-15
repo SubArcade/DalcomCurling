@@ -126,32 +126,32 @@ public class Scr_OrderSystem : MonoBehaviour
 
     void Awake()
     {
-        orderGroup1 = transform.Find("Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
-        orderGroup2 = transform.Find("Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
-        orderGroup3 = transform.Find("Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
+        orderGroup1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
+        orderGroup2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
+        orderGroup3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
 
         orderDonuts1 = orderGroup1.GetComponentsInChildren<Image>().ToList();
         orderDonuts2 = orderGroup2.GetComponentsInChildren<Image>().ToList();
         orderDonuts3 = orderGroup3.GetComponentsInChildren<Image>().ToList();
 
-        refreshBtn1 = transform.Find("Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
-        refreshBtn2 = transform.Find("Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
-        refreshBtn3 = transform.Find("Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
+        refreshBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
+        refreshBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
+        refreshBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
 
-        costText1 = transform.Find("Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText2 = transform.Find("Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText3 = transform.Find("Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
 
-        orderClearBtn1 = transform.Find("Top/QuestGroup/Order1/OrderClearBtn")?.GetComponent<Button>();
-        orderClearBtn2 = transform.Find("Top/QuestGroup/Order2/OrderClearBtn")?.GetComponent<Button>();
-        orderClearBtn3 = transform.Find("Top/QuestGroup/Order3/OrderClearBtn")?.GetComponent<Button>();
+        orderClearBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn")?.GetComponent<Button>();
+        orderClearBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn")?.GetComponent<Button>();
+        orderClearBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn")?.GetComponent<Button>();
 
-        refreshCountText = transform.Find("Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
+        refreshCountText = transform.Find("MainMenu/Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
         refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
 
-        completeObject1 = transform.Find("Top/QuestGroup/Order1/CompleteObject")?.gameObject;
-        completeObject2 = transform.Find("Top/QuestGroup/Order2/CompleteObject")?.gameObject;
-        oompleteObject3 = transform.Find("Top/QuestGroup/Order3/CompleteObject")?.gameObject;
+        completeObject1 = transform.Find("MainMenu/Top/QuestGroup/Order1/CompleteObject")?.gameObject;
+        completeObject2 = transform.Find("MainMenu/Top/QuestGroup/Order2/CompleteObject")?.gameObject;
+        oompleteObject3 = transform.Find("MainMenu/Top/QuestGroup/Order3/CompleteObject")?.gameObject;
 
         // orderdonuts1~3의 자식 텍스트들을 리스트에 저장
         donutTextInfos1 = FindLevelAndTypeText(orderDonuts1);

@@ -37,7 +37,8 @@ public class BoardManager : MonoBehaviour
 
     async void Start()
     {
-        selectionHighlight = GameObject.Find("Canvas/Main_Panel/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
+        //selectionHighlight = GameObject.Find("Canvas/Main_Panel/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
+        selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
 
         GenerateBoard();
         UpdateBoardUnlock(1);

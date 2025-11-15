@@ -368,7 +368,66 @@ public class DataManager : MonoBehaviour
         return result;
     }
 
+    // 인벤토리 데이터 관련 함수들
+    /// <summary>
+    /// 도넛 리스트가 비어있으면 5칸 초기화
+    /// </summary>
+    public void EnsureDonutSlots()
+    {
+        if (InventoryData.donutEntries == null)
+            InventoryData.donutEntries = new List<DonutEntry>();
 
+        if (InventoryData.donutEntries.Count == 0)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                InventoryData.donutEntries.Add(new DonutEntry()
+                {
+                    id = null,
+                    type = DonutType.Hard,   // 너가 정의한 기본값
+                    weight = 0,
+                    resilience = 0,
+                    friction = 0
+                });
+            }
+        }
+    }
+
+    /// <summary>
+    /// 특정 슬롯(index)에 도넛 넣기
+    /// </summary>
+    public void SetDonutAt(int index, bool isDonutEntry = true, DonutEntry entry = null, DonutData donutData = null)
+    {
+        EnsureDonutSlots();
+
+        index = index - 1;
+        if (index < 0 || index >= InventoryData.donutEntries.Count)
+        {
+            Debug.LogError($"[InventoryData] 잘못된 인덱스: {index}");
+            return;
+        }
+
+        if (isDonutEntry)
+        {
+            Debug.Log("앤트리 들어옴");
+            InventoryData.donutEntries[index] = entry;
+        }
+        else
+        {
+            Debug.Log("도넛데이터 들어옴");
+            Debug.Log(donutData.id);
+            Debug.Log(donutData.donutType);
+            Debug.Log(donutData.weight);
+            Debug.Log(donutData.friction);
+            InventoryData.donutEntries[index].id = donutData.id;
+            InventoryData.donutEntries[index].type = donutData.donutType;
+            InventoryData.donutEntries[index].weight = donutData.weight;
+            InventoryData.donutEntries[index].friction = donutData.friction;
+            InventoryData.donutEntries[index].resilience =donutData.resilience;
+        }
+        
+    }
+    
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
     {

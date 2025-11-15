@@ -32,7 +32,6 @@ public class Scr_ButtonScale : MonoBehaviour
     [SerializeField] private Transform UpgradeTransform;
     [SerializeField] private Image UpgradeImage;
 
-
     IEnumerator Start()
     {
         yield return new WaitForSeconds(0.2f); // 혹시라도 로딩 지연 대비
