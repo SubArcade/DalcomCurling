@@ -20,10 +20,11 @@ public enum PanelId
     DonutUpgradePopup,
     DonutCodexClickPopup,
     RewardCheckPopup,
-    NickNameChangePopup,
     Matching,
     EntryPopUp,
     MatchingPopUp,
+    TestLoginPanel,
+    ReadyMenuPanel
 }
 
 public class UIManager : MonoBehaviour
@@ -38,6 +39,10 @@ public class UIManager : MonoBehaviour
     public PanelId CurrentPanelId => currentPanelId;
     
     [SerializeField] private Button settingsBackBtn;
+    
+    // 준비화면 액션함수
+    public event Action OnReadyPanelOpen;
+    public event Action OnReadyPanelClose;
 
     private void Awake()
     {
@@ -90,7 +95,8 @@ public class UIManager : MonoBehaviour
 
             if (go.activeSelf != active)
             {
-                Debug.Log($"Panelid : {go}");
+                //
+                //Debug.Log($"Panelid : {go}");
                 go.SetActive(active);
             }
             
@@ -100,7 +106,14 @@ public class UIManager : MonoBehaviour
         {
             case PanelId.StartPanel:
             case PanelId.LoginPanel:
+            case PanelId.TestLoginPanel:
+                break;
             case PanelId.MainPanel:
+                OnReadyPanelClose?.Invoke();
+                break;
+            case PanelId.ReadyMenuPanel:
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                OnReadyPanelOpen?.Invoke();
                 break;
             default:
                 //Debug.Log("vkvkvkvkvkvkvk");

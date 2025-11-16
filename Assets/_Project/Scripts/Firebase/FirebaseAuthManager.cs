@@ -1,6 +1,8 @@
 ﻿using Firebase.Auth;
 using UnityEngine;
 using System;
+using System.Threading.Tasks;
+using Firebase;
 using Google; 
 
 public class FirebaseAuthManager
@@ -44,6 +46,21 @@ public class FirebaseAuthManager
 
         // 초기 상태 강제 확인
         OnChanged(this, null);
+        
+        await FirebaseApp.CheckAndFixDependenciesAsync();
+        
+        if (auth.CurrentUser != null)
+        {
+            Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
+            UIManager.Instance.Open(PanelId.StartPanel);
+            await DataManager.Instance.EnsureUserDocAsync(auth.CurrentUser.UserId, isAutoLogin: true);
+        }
+        else
+        {
+            Debug.Log("로그인 필요 (게스트 또는 계정 로그인)");
+            UIManager.Instance.Open(PanelId.LoginPanel);
+        }
+        
     }
 
     private void OnChanged(object sender, EventArgs e)
@@ -113,55 +130,15 @@ public class FirebaseAuthManager
             user = result.User;
             Debug.Log($"익명 로그인 성공! User ID: {user.UserId}");
 
-            await DataManager.Instance.EnsureUserDocAsync(user.UserId, user.Email);
-
+            await DataManager.Instance.EnsureUserDocAsync(user.UserId, user.Email ?? "guest");
+            
             LoginState?.Invoke(true);
+            UIManager.Instance.Open(PanelId.StartPanel);
         }
         catch (Exception e)
         {
             Debug.LogError($"익명 로그인 실패: {e.Message}");
             Debug.LogException(e);
-        }
-    }
-
-    public async void LoginTestAccount()
-    {
-        string testEmail = "test@example.com";
-        string testPassword = "123456";
-
-        try
-        {
-            // 로그인 시도
-            var result = await auth.SignInWithEmailAndPasswordAsync(testEmail, testPassword);
-            user = result.User;
-            Debug.Log($"[Auth] 테스트 계정 로그인 성공: {user.Email}");
-            LoginState?.Invoke(true);
-        }
-        catch (Exception e)
-        {
-            // 로그인 실패 시 (계정이 없으면 자동 생성)
-            if (e.Message.Contains("no user record"))
-            {
-                Debug.Log("[Auth] 테스트 계정이 없어서 새로 생성합니다...");
-
-                try
-                {
-                    var createResult = await auth.CreateUserWithEmailAndPasswordAsync(testEmail, testPassword);
-                    user = createResult.User;
-                    Debug.Log($"[Auth] 테스트 계정 생성 완료: {user.Email}");
-                    LoginState?.Invoke(true);
-                }
-                catch (Exception createEx)
-                {
-                    Debug.LogError($"[Auth] 테스트 계정 생성 실패: {createEx.Message}");
-                    Debug.LogException(createEx);
-                }
-            }
-            else
-            {
-                Debug.LogError($"[Auth] 테스트 로그인 실패: {e.Message}");
-                Debug.LogException(e);
-            }
         }
     }
 
@@ -205,5 +182,24 @@ public class FirebaseAuthManager
         auth.SignOut();
         Debug.Log("로그아웃");
         LoginState?.Invoke(false);
+        UIManager.Instance.Open(PanelId.LoginPanel);
+    }
+
+    public async Task ConnectAccountAsync(string email, string password)
+    {
+        var cred = EmailAuthProvider.GetCredential(email, password);
+
+        try
+        {
+            // UID 유지한 채 게스트 → 정식 계정 승격
+            await auth.CurrentUser.LinkWithCredentialAsync(cred);
+            
+            DataManager.Instance.PlayerData.email = email;
+            Debug.Log($"[Auth] 게스트 계정이 {email}로 연동 완료");
+        }
+        catch (FirebaseException e)
+        {
+            Debug.LogError($"[Auth] 연동 실패: {e.Message}");
+        }
     }
 }
