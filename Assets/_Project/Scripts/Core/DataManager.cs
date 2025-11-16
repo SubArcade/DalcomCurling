@@ -4,6 +4,7 @@ using Firebase.Auth;
 using Firebase.Firestore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor.Localization.Platform.Android;
 using UnityEngine;
 
 public enum GameMode
@@ -45,6 +46,7 @@ public class UserDataRoot
         levelMax = 20,
     };
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
+   
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
         cellMax = 49,
@@ -90,6 +92,26 @@ public class DataManager : MonoBehaviour
     
     // 백그라운드 이벤트
     public event Action PauseChanged;
+
+    // 바뀐 데이터 이벤트 함수 실행용 함수
+    // 텍스트를 바꿔줄꺼다
+    public void GemChange(int gem)
+    {
+        PlayerData.gem = gem;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+    
+    public void GoldChange(int gold)
+    {
+        PlayerData.gold = gold;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+    
+    public void EnergyChange(int energy)
+    {
+        PlayerData.energy = energy;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
     
     void Awake()
     {
@@ -135,7 +157,7 @@ public class DataManager : MonoBehaviour
             userData = snap.ConvertTo<UserDataRoot>();
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
-            BaseInventoryData();
+            //BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
 
@@ -164,7 +186,7 @@ public class DataManager : MonoBehaviour
             userData = snap.ConvertTo<UserDataRoot>();
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
-            BaseInventoryData();
+            //BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
 
@@ -185,7 +207,41 @@ public class DataManager : MonoBehaviour
     // 기본 인벤토리 데이터
     private void BaseInventoryData()
     {
-        
+        Debug.Log("함수 실행1111111111111111111111111");
+        InventoryData.hardDonutCodexDataList = new List<DonutCodexData>();
+        InventoryData.softDonutCodexDataList = new List<DonutCodexData>();
+        InventoryData.moistDnutCodexDataList = new List<DonutCodexData>();
+
+        foreach (DonutType type in Enum.GetValues(typeof(DonutType)))
+        {
+            Debug.Log("함수 22222222222222222222222222222222");
+            for (int level = 1; level <= 30; level++)
+            {
+                var codex = new DonutCodexData
+                {
+                    id = $"{type}_{level}",
+                    donutType = type,
+                    donutDexViewState = DonutDexViewState.Question
+                };
+                Debug.Log("함수 333333333333333333333333333333333");
+
+                switch (type)
+                {
+                    case DonutType.Hard:
+                        InventoryData.hardDonutCodexDataList.Add(codex);
+                        break;
+
+                    case DonutType.Soft:
+                        InventoryData.softDonutCodexDataList.Add(codex);
+                        break;
+
+                    case DonutType.Moist:
+                        InventoryData.moistDnutCodexDataList.Add(codex);
+                        break;
+                }
+            }
+        }
+        Debug.Log("실행완료");
     }
     
     // 기본 머지보드 데이터

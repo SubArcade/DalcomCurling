@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
@@ -59,6 +60,13 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("팝업창 닫기 버튼")] private Button platePopupCloseButton;
     [SerializeField, Tooltip("팝업창 닫기 버튼")] private Button nickPopupCloseButton;
     
+    [Header("환생하기")]
+    [SerializeField, Tooltip("확정 팝업")] private GameObject ReincarnationConfirmPopup;
+    [SerializeField, Tooltip("확정 닫기 버튼")] private Button ReincarnationConfirmCloseButton;
+    [SerializeField, Tooltip("환생 버튼")] private Button ReincarnationConfirmButton;
+    [SerializeField, Tooltip("설명 팝업")] private GameObject ReincarnationInfoPopup;
+    [SerializeField, Tooltip("설명 닫기 버튼")] private Button ReincarnationInfoCloseButton;
+    
     
     private void OnEnable()
     {
@@ -84,6 +92,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         gemchangeNicknameButton.gameObject.SetActive(false);
         nickNameAnswerPopup.gameObject.SetActive(false);
         notEnoughGemPopup.SetActive(false);
+        ReincarnationConfirmPopup.SetActive(false);
+        ReincarnationInfoPopup.SetActive(false);
         
         nameTitleList.Clear();
         foreach (Transform child in inputTransform)
@@ -120,6 +130,10 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             Debug.Log("상점이동");
             PopupPanelClose();
         });
+        
+        ReincarnationConfirmCloseButton.onClick.AddListener(() => ReincarnationConfirmPopup.SetActive(false));
+        ReincarnationInfoCloseButton.onClick.AddListener(() => ReincarnationInfoPopup.SetActive(true));
+        ReincarnationConfirmButton.onClick.AddListener(ReincarnationButton);
     }
 
     // 기본판넬 토글 on/off
@@ -132,12 +146,34 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     // 환생 토글버튼 on/off
     private void IsreincarnationToggle()
     {
-        if(DataManager.Instance.PlayerData.level == DataManager.Instance.PlayerData.levelMax)
+        if (DataManager.Instance.PlayerData.level == DataManager.Instance.PlayerData.levelMax)
+        {
             reincarnationToggle.isOn = true;
+            ReincarnationButton();
+        }
         else
             reincarnationToggle.isOn = false;
     }
-
+    
+    // 환생하기 
+    private void ReincarnationButton()
+    {
+        DataManager.Instance.PlayerData.level = 0;
+        DataManager.Instance.PlayerData.exp = 0;
+        
+        int num = DataManager.Instance.PlayerData.gainNamePlateType.Count;
+        if (Enum.IsDefined(typeof(NamePlateType), num))
+        {
+            DataManager.Instance.PlayerData.gainNamePlateType.Add((NamePlateType)num);
+        }
+        else
+        {
+            Debug.LogWarning($"NamePlateType에 {num}번째 enum이 없습니다!");
+        }
+    }
+    
+    // 환생하기 설명창
+    
     // 팝업창 전체 닫기
     private void PopupPanelClose()
     {
