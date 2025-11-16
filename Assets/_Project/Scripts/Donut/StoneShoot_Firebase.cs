@@ -62,11 +62,13 @@ public class StoneShoot_Firebase : MonoBehaviour
     [SerializeField, Range(0.1f, 2.0f)] private float trajectoryForceMultiplier = 0.5f; // 궤적 예측의 힘 계수 (1.0이 기본)
     [SerializeField, Range(0.001f, 0.1f)] private float trajectoryCurlFactor = 0.05f; // 궤적 예측의 휨 계수
     [SerializeField, Range(0.1f, 2.0f)] private float horizontalDragSensitivity = 0.5f; // 좌우 드래그 방향 민감도 (낮을수록 덜 꺾임)
+    public Color min_Color = Color.white;
+    public Color max_Color = Color.red;
 
     [Header("설정 변수")] // 게임 플레이 조작 관련 변수 헤더
-    public float launchForceMultiplier = 4f; // 드래그 거리를 발사 힘으로 변환하는 계수
-    public float maxDragDistance = 0.5f; // 초기 드래그의 최대 거리 (정규화된 화면 높이 기준)
-    public float maxRotationDragDistance = 1f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준)
+    public float launchForceMultiplier = 8f; // 드래그 거리를 발사 힘으로 변환하는 계수, 4에서 8로 수정(11/16)
+    public float maxDragDistance = 0.25f; // 초기 드래그의 최대 거리 (정규화된 화면 높이 기준) , 0.5에서 0.25로 수정(11/16)
+    public float maxRotationDragDistance = 0.5f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준) , 1에서 0.5로 수정(11/16)
     public float maxRotationValue = 5f; // 스핀의 최대 값
     public float autoMoveToHogLineSpeed = 6f; // 도넛이 호그 라인까지 자동 이동하는 속도
     public float maxUIDirectionAngle = 60f; // UI 화살표가 표시할 수 있는 최대 각도
@@ -143,6 +145,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     private bool _needToTap = false; // 호그 라인까지 이동 중 탭이 필요한지 여부
     private bool _isTrajectoryPreviewActive = false; // 궤적 미리보기 활성화 여부
     private bool _isPowerDirectionSet = false; // 힘/방향이 한 번이라도 설정되었는지 여부
+    private float draggedDistanceForTrajectory = 0; // 발사를 위해 드래그했던 정도를 기록할 변수, 궤적을 위해 저장
 
     // --- 미리 준비한 샷 데이터 저장용 ---
     private LastShot _preparedShotData = null; // 'PreparingShot' 상태에서 미리 입력된 샷 데이터
@@ -313,6 +316,8 @@ public class StoneShoot_Firebase : MonoBehaviour
                 float clampedDistance = Mathf.Min(dragDistance, maxDragDistance);
                 float clampedDistanceForTrajectory = Mathf.Min(dragDistanceForTrajectory, maxDragDistance);
                 
+                draggedDistanceForTrajectory = clampedDistance;
+                
                 _finalLaunchForce = clampedDistance * launchForceMultiplier;
                 _finalLaunchForceForTrajectory = clampedDistanceForTrajectory * launchForceMultiplier;
 
@@ -446,7 +451,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         Vector3 dragVector = currentScreenPos - _rotationDragStartScreenPos; // 회전 드래그 벡터 계산
         float dragXDistance = dragVector.x; // X축 드래그 거리
         float normalizedDrag = dragXDistance / _mainCamera.pixelWidth; // 화면 폭 대비 정규화된 드래그 거리
-        float dragRatio = Mathf.Clamp(normalizedDrag / maxRotationDragDistance, -1f, 1f); // 드래그 비율 클램프 (-1~1)
+        float dragRatio = Mathf.Clamp(normalizedDrag / (maxRotationDragDistance * 2), -1f, 1f); // 드래그 비율 클램프 (-1~1)
         FinalRotationValue = dragRatio * maxRotationValue; // 최종 스핀 값 계산
     }
 
@@ -487,6 +492,13 @@ public class StoneShoot_Firebase : MonoBehaviour
                 break;
             }
         }
+
+        float t = Mathf.InverseLerp(0, maxDragDistance, draggedDistanceForTrajectory);
+        Color resultColor = Color.Lerp(min_Color, max_Color, t);
+        
+        // 시작 컬러와 끝 컬러를 일단 통일하여 표시
+        trajectoryLine.startColor = resultColor;
+        //trajectoryLine.endColor = resultColor;
 
         trajectoryLine.positionCount = points.Count;
         trajectoryLine.SetPositions(points.ToArray());

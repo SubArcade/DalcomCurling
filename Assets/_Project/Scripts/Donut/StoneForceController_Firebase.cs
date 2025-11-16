@@ -15,7 +15,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     public Team team { get; private set; }
     public float spinForce;
     private float velocityCalc; // 발사 파워와 현재 속도를 1로 노멀라이징한 변수
-    private float spinAmountFactor = 1.5f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
+    private float spinAmountFactor = 3f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
     private float sidewaysForceFactor = 5f; // 회전값을 통해 얼마나 옆으로 휘게 할지 적용하는 변수 ( 높을수록 많이 휨 ) , 기본값 5, 0.07(기존로직)
     //private float sidewaysForceSpeedLimit = 0f; // 속도가 몇%가 될때까지 옆으로 휘는 힘을 가할건지 ( 낮을수록 오래 휨 ), 기본값 0.4
     private int sidewaysForceAddLimit = 500; // 동일한 횟수만큼만 옆으로 밀리는 힘을 주어서 각 환경에서 싱크가 일치하도록 도움

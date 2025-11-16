@@ -280,11 +280,13 @@ MonoBehaviour:
   trajectoryPoints: 100
   trajectoryTimeStep: 0.1
   trajectoryForceMultiplier: 1.65
-  trajectoryCurlFactor: 0.001
-  horizontalDragSensitivity: 0.1
-  launchForceMultiplier: 4
-  maxDragDistance: 0.5
-  maxRotationDragDistance: 1
+  trajectoryCurlFactor: 0.005
+  horizontalDragSensitivity: 0.3
+  min_Color: {r: 1, g: 1, b: 1, a: 1}
+  max_Color: {r: 1, g: 0, b: 0, a: 1}
+  launchForceMultiplier: 8
+  maxDragDistance: 0.25
+  maxRotationDragDistance: 0.5
   maxRotationValue: 5
   autoMoveToHogLineSpeed: 6
   maxUIDirectionAngle: 60
@@ -3218,7 +3220,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 55
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -3244,8 +3246,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5401448, y: 0, z: 0, w: 0.8415721}
-  m_LocalPosition: {x: 0.0069274902, y: 7.6943917, z: -43.663334}
+  m_LocalRotation: {x: 0.22224423, y: 0, z: 0, w: 0.974991}
+  m_LocalPosition: {x: 0.0149383545, y: 1.5723915, z: -55.119335}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
