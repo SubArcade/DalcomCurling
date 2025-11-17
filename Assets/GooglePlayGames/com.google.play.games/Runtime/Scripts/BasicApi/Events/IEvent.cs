@@ -1,4 +1,4 @@
-// <copyright file="IEvent.cs" company="Google Inc.">
+﻿// <copyright file="IEvent.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,6 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
-
-using System;
-
 namespace GooglePlayGames.BasicApi.Events
 {
     public enum EventVisibility
@@ -25,57 +22,39 @@ namespace GooglePlayGames.BasicApi.Events
     }
 
     /// <summary>
-    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
     /// Data object representing an Event. <see cref="Native.PInvoke.EventManager"/> for more.
     /// </summary>
     public interface IEvent
     {
         /// <summary>
-        /// Gets the ID of the event.
+        /// The ID of the event.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         string Id { get; }
 
         /// <summary>
-        /// Gets the name of the event.
+        /// The name of the event.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         string Name { get; }
 
         /// <summary>
-        /// Gets the description of the event.
+        /// The description of the event.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         string Description { get; }
 
         /// <summary>
-        /// Gets the URL of the image for the event. Empty if there is no image.
+        /// The URL of the image for the event. Empty if there is no image for this event.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <value>The image URL.</value>
         string ImageUrl { get; }
 
         /// <summary>
-        /// Gets the current count for this event.
+        /// The current count for this event.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         ulong CurrentCount { get; }
 
         /// <summary>
-        /// Gets the visibility of the event.
+        /// The visibility of the event.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         EventVisibility Visibility { get; }
     }
 }

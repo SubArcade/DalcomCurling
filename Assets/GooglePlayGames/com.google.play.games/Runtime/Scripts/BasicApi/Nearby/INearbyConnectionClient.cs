@@ -19,220 +19,159 @@ namespace GooglePlayGames.BasicApi.Nearby
     using System;
     using System.Collections.Generic;
 
+    // move this inside IMessageListener and IDiscoveryListener are always declared.
 #if UNITY_ANDROID
+
     /// <summary>
-    /// Defines the interface for a client that handles Nearby Connections operations.
+    /// Interface for managing connections and communications between devices using Nearby Connections.
     /// </summary>
-    /// <remarks>
-    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
-    /// </remarks>
     public interface INearbyConnectionClient
     {
         /// <summary>
-        /// Gets the maximum size of a message payload for unreliable messages.
+        /// Gets the maximum length of an unreliable message payload.
         /// </summary>
-        /// <returns>The maximum unreliable message payload length in bytes.</returns>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <returns>Maximum length of an unreliable message payload.</returns>
         int MaxUnreliableMessagePayloadLength();
 
         /// <summary>
-        /// Gets the maximum size of a message payload for reliable messages.
+        /// Gets the maximum length of a reliable message payload.
         /// </summary>
-        /// <returns>The maximum reliable message payload length in bytes.</returns>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <returns>Maximum length of a reliable message payload.</returns>
         int MaxReliableMessagePayloadLength();
 
         /// <summary>
         /// Sends a reliable message to a list of recipients.
         /// </summary>
-        /// <param name="recipientEndpointIds">A list of endpoint IDs to which the message should be sent.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
-        /// <param name="payload">The data to be sent.</param>
+        /// <param name="recipientEndpointIds">List of recipient endpoint IDs.</param>
+        /// <param name="payload">The message payload to send.</param>
         void SendReliable(List<string> recipientEndpointIds, byte[] payload);
 
         /// <summary>
         /// Sends an unreliable message to a list of recipients.
         /// </summary>
-        /// <param name="recipientEndpointIds">A list of endpoint IDs to which the message should be sent.</param>
-        /// <param name="payload">The data to be sent.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="recipientEndpointIds">List of recipient endpoint IDs.</param>
+        /// <param name="payload">The message payload to send.</param>
         void SendUnreliable(List<string> recipientEndpointIds, byte[] payload);
 
         /// <summary>
-        /// Starts advertising the local device so other devices can discover and connect to it.
+        /// Starts advertising the local device to nearby devices.
         /// </summary>
-        /// <param name="name">The name to advertise for this device. If null, the device name is used.</param>
-        /// <param name="appIdentifiers">The identifiers for the app, used to distinguish it from others.</param>
-        /// <param name="advertisingDuration">The duration for which to advertise. If null, advertises indefinitely.</param>
-        /// <param name="resultCallback">A callback invoked with the result of the advertising attempt.</param>
-        /// <param name="connectionRequestCallback">A callback for handling incoming connection requests.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="name">The name to advertise.</param>
+        /// <param name="appIdentifiers">List of application identifiers.</param>
+        /// <param name="advertisingDuration">Optional advertising duration.</param>
+        /// <param name="resultCallback">Callback for advertising result.</param>
+        /// <param name="connectionRequestCallback">Callback for incoming connection requests.</param>
         void StartAdvertising(string name, List<string> appIdentifiers,
             TimeSpan? advertisingDuration, Action<AdvertisingResult> resultCallback,
             Action<ConnectionRequest> connectionRequestCallback);
 
         /// <summary>
-        /// Stops advertising the local device.
+        /// Stops advertising the local device to nearby devices.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         void StopAdvertising();
 
         /// <summary>
         /// Sends a connection request to a remote endpoint.
         /// </summary>
-        /// <param name="name">The name of the local player.</param>
-        /// <param name="remoteEndpointId">The ID of the endpoint to which the connection request is sent.</param>
-        /// <param name="payload">A payload to send with the connection request.</param>
-        /// <param name="responseCallback">A callback to receive the response to the connection request.</param>
-        /// <param name="listener">A message listener for this connection.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="name">The name of the local device.</param>
+        /// <param name="remoteEndpointId">The ID of the remote endpoint.</param>
+        /// <param name="payload">The connection request payload.</param>
+        /// <param name="responseCallback">Callback for the connection response.</param>
+        /// <param name="listener">Listener for message events.</param>
         void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
             Action<ConnectionResponse> responseCallback, IMessageListener listener);
 
         /// <summary>
         /// Accepts a connection request from a remote endpoint.
         /// </summary>
-        /// <param name="remoteEndpointId">The ID of the endpoint whose connection request is being accepted.</param>
-        /// <param name="payload">A payload to send back to the requesting endpoint.</param>
-        /// <param name="listener">A message listener for this connection.</param>
+        /// <param name="remoteEndpointId">The ID of the remote endpoint.</param>
+        /// <param name="payload">The connection acceptance payload.</param>
+        /// <param name="listener">Listener for message events.</param>
         void AcceptConnectionRequest(string remoteEndpointId, byte[] payload,
             IMessageListener listener);
 
         /// <summary>
-        /// Starts discovering remote endpoints that are advertising for the same service ID.
+        /// Starts discovering nearby endpoints for a specific service.
         /// </summary>
-        /// <param name="serviceId">The ID of the service to discover.</param>
-        /// <param name="advertisingTimeout">The duration for which to discover. If null, discovers indefinitely.</param>
-        /// <param name="listener">A listener for discovery events.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="serviceId">The service ID to discover.</param>
+        /// <param name="advertisingTimeout">Optional timeout for advertising discovery.</param>
+        /// <param name="listener">Listener for discovery events.</param>
         void StartDiscovery(string serviceId, TimeSpan? advertisingTimeout,
             IDiscoveryListener listener);
 
         /// <summary>
-        /// Stops discovering remote endpoints.
+        /// Stops discovering endpoints for a specific service.
         /// </summary>
-        /// <param name="serviceId">The ID of the service for which to stop discovery.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="serviceId">The service ID to stop discovering.</param>
         void StopDiscovery(string serviceId);
 
         /// <summary>
         /// Rejects a connection request from a remote endpoint.
         /// </summary>
-        /// <param name="requestingEndpointId">The ID of the endpoint whose connection request is being rejected.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="requestingEndpointId">The ID of the endpoint that sent the request.</param>
         void RejectConnectionRequest(string requestingEndpointId);
 
         /// <summary>
         /// Disconnects from a remote endpoint.
         /// </summary>
-        /// <param name="remoteEndpointId">The ID of the remote endpoint from which to disconnect.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="remoteEndpointId">The ID of the remote endpoint to disconnect from.</param>
         void DisconnectFromEndpoint(string remoteEndpointId);
 
         /// <summary>
-        /// Disconnects from all connected endpoints and stops all advertising and discovery.
+        /// Stops all connections to nearby endpoints.
         /// </summary>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         void StopAllConnections();
 
         /// <summary>
-        /// Gets the application's bundle ID.
+        /// Gets the app bundle ID.
         /// </summary>
         /// <returns>The app bundle ID.</returns>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         string GetAppBundleId();
 
         /// <summary>
-        /// Gets the service ID used for discovery.
+        /// Gets the service ID used for discovery and connection.
         /// </summary>
         /// <returns>The service ID.</returns>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         string GetServiceId();
     }
 #endif
 
     /// <summary>
-    /// A listener for receiving messages and disconnection events from a remote endpoint.
+    /// Interface for receiving messages and notifications about remote endpoints.
     /// </summary>
-    /// <remarks>
-    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
-    /// </remarks>
     public interface IMessageListener
     {
         /// <summary>
         /// Called when a message is received from a remote endpoint.
         /// </summary>
-        /// <param name="remoteEndpointId">The ID of the endpoint that sent the message.</param>
-        /// <param name="data">The message data.</param>
-        /// <param name="isReliableMessage">True if the message was sent reliably, false otherwise.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
+        /// <param name="remoteEndpointId">The ID of the remote endpoint.</param>
+        /// <param name="data">The data of the received message.</param>
+        /// <param name="isReliableMessage">Indicates whether the message is reliable.</param>
         void OnMessageReceived(string remoteEndpointId, byte[] data,
             bool isReliableMessage);
 
         /// <summary>
-        /// Called when a remote endpoint is disconnected.
+        /// Called when a remote endpoint has disconnected.
         /// </summary>
         /// <param name="remoteEndpointId">The ID of the disconnected endpoint.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         void OnRemoteEndpointDisconnected(string remoteEndpointId);
     }
 
     /// <summary>
-    /// A listener for discovering remote endpoints.
+    /// Interface for receiving notifications about discovered endpoints.
     /// </summary>
-    /// <remarks>
-    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
-    /// </remarks>
     public interface IDiscoveryListener
     {
         /// <summary>
-        /// Called when a remote endpoint is found.
+        /// Called when an endpoint is found during discovery.
         /// </summary>
         /// <param name="discoveredEndpoint">The details of the discovered endpoint.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         void OnEndpointFound(EndpointDetails discoveredEndpoint);
 
         /// <summary>
-        /// Called when a previously discovered endpoint is no longer available.
+        /// Called when an endpoint is lost during discovery.
         /// </summary>
         /// <param name="lostEndpointId">The ID of the lost endpoint.</param>
-        /// <remarks>
-        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
-        /// </remarks>
         void OnEndpointLost(string lostEndpointId);
     }
 }

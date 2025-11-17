@@ -142,7 +142,7 @@ public class FirebaseAuthManager
         }
     }
 
-    public async void LoginWithGoogle()
+    /*public async void LoginWithGoogle()
     {
         try
         {
@@ -175,7 +175,7 @@ public class FirebaseAuthManager
         {
             Debug.LogError($"[Google/Firebase] 로그인 실패: {e.Message}");
         }
-    }
+    }*/
 
     public void Logout()
     {

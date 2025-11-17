@@ -48,9 +48,6 @@ public class BoardManager : MonoBehaviour
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
-        
-        // Firestore에서 보드 데이터 로드
-        await DataManager.Instance.LoadBoardDataOnlyAsync();
 
         // 불러온 데이터로 보드 복원
         LoadBoardLocal();
