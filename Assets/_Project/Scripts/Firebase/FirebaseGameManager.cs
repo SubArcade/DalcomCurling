@@ -13,10 +13,10 @@ using UnityEngine.PlayerLoop;
 /// </summary>
 public class FirebaseGameManager : MonoBehaviour
 {
-    // --- 싱글톤 패턴 ---
-    // 이 클래스는 게임 내에 단 하나만 존재하도록 합니다.
-    // 다른 스크립트에서 쉽게 접근할 수 있도록 'Instance'라는 이름으로 자신을 저장합니다.
     public static FirebaseGameManager Instance { get; private set; }
+
+    // ✨ 플레이어 프로필 로딩이 완료되었을 때 발생하는 이벤트
+    public event Action OnProfilesLoaded;
 
     // --- 게임의 현재 상태를 나타내는 변수 ---
     // 게임이 현재 어떤 단계에 있는지를 알려주는 역할을 합니다.
@@ -52,6 +52,10 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private StoneManager stoneManager; // 돌 생성 및 움직임 관리 스크립트
     [SerializeField] private Src_GameCamControl gameCamControl; // 카메라 연출을 제어하는 스크립트
     [SerializeField] private UI_LaunchIndicator_Firebase UI_LaunchIndicator_Firebase; // UI제어 스크립트
+    [SerializeField] private DonutSelectionUI donutSelectionUI; // 도넛 선택 UI 스크립트
+
+    // --- 플레이어 프로필 정보 ---
+    private Dictionary<string, PlayerProfile> _playerProfiles;
 
     // --- 카메라 인덱스 상수 --- (카메라 추가하고 명칭도 다시 명명해야함)
     private const int START_VIEW_CAM = 0; // 기본 뷰 카메라
@@ -111,7 +115,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// 게임 오브젝트가 활성화될 때 호출됩니다.
     /// Firebase 연결을 초기화하고 게임 데이터를 감시하기 시작합니다.
     /// </summary>
-    void Start()
+    async void Start() // Changed to async void
     {
         db = FirebaseFirestore.DefaultInstance;
         gameId = FirebaseMatchmakingManager.CurrentGameId;
@@ -120,10 +124,25 @@ public class FirebaseGameManager : MonoBehaviour
 
         initialFixedDeltaTime = Time.fixedDeltaTime;
 
-        // 게임 ID나 사용자 ID가 없으면 게임을 진행할 수 없습니다.
-        if (string.IsNullOrEmpty(gameId) || string.IsNullOrEmpty(myUserId))
+        // 게임 ID, 사용자 ID, 룸 ID 중 하나라도 없으면 게임을 진행할 수 없습니다.
+        if (string.IsNullOrEmpty(gameId) || string.IsNullOrEmpty(myUserId) || string.IsNullOrEmpty(roomId))
         {
-            Debug.LogError("Game ID or User ID is missing.");
+            Debug.LogError("Game ID, User ID, or Room ID is missing.");
+            return;
+        }
+
+        // 룸 문서에서 플레이어 프로필 정보를 가져옵니다.
+        DocumentSnapshot roomSnapshot = await db.Collection("rooms").Document(roomId).GetSnapshotAsync();
+        if (roomSnapshot.Exists)
+        {
+            Room roomData = roomSnapshot.ConvertTo<Room>();
+            _playerProfiles = roomData.PlayerProfiles;
+            Debug.Log($"룸({roomId})에서 플레이어 프로필 정보를 성공적으로 로드했습니다.");
+            OnProfilesLoaded?.Invoke(); // 프로필 로딩 완료 이벤트 호출
+        }
+        else
+        {
+            Debug.LogError($"룸({roomId}) 문서를 찾을 수 없습니다. 플레이어 프로필 로드 실패.");
             return;
         }
 
@@ -389,7 +408,15 @@ public class FirebaseGameManager : MonoBehaviour
                 //카운트다운 활성화
                 //ControlCountdown(true);
 
-                Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame);
+                // UI에서 선택된 도넛 엔트리를 가져옵니다.
+                DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+                if (selectedDonut == null)
+                {
+                    Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
+                    return;
+                }
+
+                Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut);
                 if (donutRigid != null)
                 {
                     CountDownStart(10.0f, donutRigid);
@@ -475,7 +502,32 @@ public class FirebaseGameManager : MonoBehaviour
 
             gameCamControl?.SwitchCamera(SIMULATING_VIEW_CAM); // 시뮬레이션 시작 카메라로 전환
 
-            stoneManager?.SpawnStone(_currentGame);
+            // 상대방의 프로필에서 발사된 도넛 정보를 가져옵니다.
+            string opponentId = GetOpponentId();
+            PlayerProfile opponentProfile = GetPlayerProfile(opponentId);
+            DonutEntry opponentDonut = null;
+
+            if (opponentProfile != null && _currentGame.LastShot != null && !string.IsNullOrEmpty(_currentGame.LastShot.DonutId))
+            {
+                opponentDonut = opponentProfile.Inventory.donutEntries.FirstOrDefault(d => d.id == _currentGame.LastShot.DonutId);
+            }
+
+            if (opponentDonut == null)
+            {
+                Debug.LogError($"상대방({opponentId})의 발사된 도넛({_currentGame.LastShot?.DonutId}) 정보를 찾을 수 없습니다. 기본 도넛으로 대체합니다.");
+                // TODO: 기본 도넛으로 대체하는 로직 추가 (예: 첫 번째 인벤토리 도넛 또는 기본값)
+                // 현재는 임시로 첫 번째 도넛을 사용하거나, 에러를 발생시킬 수 있습니다.
+                // 여기서는 임시로 상대방의 첫 번째 도넛을 사용하도록 합니다.
+                opponentDonut = opponentProfile?.Inventory.donutEntries.FirstOrDefault();
+                if (opponentDonut == null)
+                {
+                    // 정말 아무 도넛도 없으면 에러 처리
+                    Debug.LogError("상대방 인벤토리에 도넛이 없습니다. 시뮬레이션을 진행할 수 없습니다.");
+                    return;
+                }
+            }
+
+            stoneManager?.SpawnStone(_currentGame, opponentDonut);
             int stoneIdToLaunch =
                 stoneManager.myTeam == StoneForceController_Firebase.Team.A
                     ? stoneManager.bShotIndex
@@ -669,6 +721,19 @@ public class FirebaseGameManager : MonoBehaviour
     {
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
+
+        // 현재 선택된 도넛을 가져옵니다.
+        DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+        
+        // LastShot 데이터에 도넛 ID를 저장합니다.
+        shotData.DonutId = selectedDonut?.id;
+
+        // 사용한 도넛을 UI에서 '사용됨'으로 표시하고 다음 도넛을 선택합니다.
+        if (donutSelectionUI != null && selectedDonut != null)
+        {
+            donutSelectionUI.MarkDonutAsUsed(selectedDonut);
+        }
+        
         int count = stoneManager.myTeam == StoneForceController_Firebase.Team.A
             ? stoneManager.aShotIndex
             : stoneManager.bShotIndex;
@@ -750,7 +815,15 @@ public class FirebaseGameManager : MonoBehaviour
                 }
                 else
                 {
-                    Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, myUserId);
+                    // UI에서 선택된 도넛 엔트리를 가져옵니다.
+                    DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+                    if (selectedDonut == null)
+                    {
+                        Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
+                        return;
+                    }
+
+                    Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut, myUserId);
                     if (donutRigid != null)
                     {
                         //inputController?.EnableInput(donutRigid);
@@ -785,11 +858,40 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void OnRoundEnd() //이번 라운드가 끝났을때.
     {
-        
+        // 라운드 변경 시 턴 UI를 초기화합니다.
+        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
+
+
+        // StoneForceController_Firebase.Team winner;
+        // int score;
+        // stoneManager.CalculateScore(out winner, out score);
+        // stoneManager.ClearOldDonutsInNewRound();
+        // if (winner == StoneForceController_Firebase.Team.A)
+        // {
+        //     aTeamScore += score;
+        // }
+        // else if (winner == StoneForceController_Firebase.Team.B)
+        // {
+        //     bTeamScore += score;
+        // }
+        // else
+        // {
+        //     Debug.Log("무승부");
+        // }
+        //
+        // needToUpdateRound = true;
+        // Debug.Log($"승리팀 : {winner}, 점수 : {score}");
+        //받아온 리턴값으로 여기서 결과를 처리한다.
+
+
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame);
         string nextState;
+
+        // 라운드 종료 시 플레이어의 도넛 사용 상태를 초기화합니다.
+        donutSelectionUI?.ResetDonutUsage();
+
         if (_currentGame.CurrentTurnPlayerId == "Finished" && _currentGame.RoundStartingPlayerId == "Finished")
         {
             nextState = "Finished";
@@ -969,6 +1071,8 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void CountDownStart(float time, Rigidbody donutRigid)
     {
+        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber + 1); // 턴 UI업데이트 (+1을 해주어 선반영)
+
         _localState = LocalGameState.WaitingForInput;
         inputController?.EnableInput(donutRigid);
         int _remainingTime = (int)time;
@@ -1034,7 +1138,7 @@ public class FirebaseGameManager : MonoBehaviour
         {
             // PlayerHeartbeats 필드 내의 현재 플레이어 ID에 현재 타임스탬프를 업데이트
             string heartbeatPath = $"PlayerHeartbeats.{myUserId}";
-            var updates = new Dictionary<string, object> { 
+            var updates = new Dictionary<string, object> {
                 { heartbeatPath, Timestamp.GetCurrentTimestamp()}
             };
             gameRef.UpdateAsync(updates);
@@ -1046,7 +1150,6 @@ public class FirebaseGameManager : MonoBehaviour
 
     /// <summary>
     /// 상대 플레이어의 연결 끊김을 확인하고, 끊겼다면 게임을 종료시킵니다.
-    /// (호스트만 이 메서드를 호출합니다)
     /// </summary>
     private void CheckForDisconnectedPlayer()
     {
@@ -1077,6 +1180,8 @@ public class FirebaseGameManager : MonoBehaviour
         }
     }
 
+
+
     /// <summary>
     /// 특정 플레이어의 패배로 게임을 종료시킵니다.
     /// </summary>
@@ -1090,12 +1195,50 @@ public class FirebaseGameManager : MonoBehaviour
         string winnerId = _currentGame.PlayerIds.FirstOrDefault(id => id != loserId);
 
         var updates = new Dictionary<string, object> {
-            { "GameState", "Finished" },
-            { "WinnerId", winnerId },
-            { "FinishReason", reason }
-        };
+                    { "GameState", "Finished" },
+                    { "WinnerId", winnerId },
+                    { "FinishReason", reason }
+                };
 
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
 
+    /// <summary>
+    /// 주어진 userId에 해당하는 플레이어의 프로필 정보를 반환합니다.
+    /// </summary>
+    public PlayerProfile GetPlayerProfile(string userId)
+    {
+        if (_playerProfiles == null || string.IsNullOrEmpty(userId) || !_playerProfiles.ContainsKey(userId))
+        {
+            Debug.LogWarning($"요청한 플레이어({userId})의 프로필을 찾을 수 없습니다.");
+            return null;
+        }
+        return _playerProfiles[userId];
+    }
+
+    /// <summary>
+    /// 상대방 플레이어의 ID를 반환합니다.
+    /// </summary>
+    public string GetOpponentId()
+    {
+        // _currentGame이 아직 로드되지 않았을 수 있으므로, _playerProfiles에서 먼저 찾아봅니다.
+        if (_playerProfiles != null && _playerProfiles.Count >= 2)
+        {
+            return _playerProfiles.Keys.FirstOrDefault(id => id != myUserId);
+        }
+        // _currentGame이 로드된 후에는 여기서 찾습니다.
+        if (_currentGame != null && _currentGame.PlayerIds != null)
+        {
+            return _currentGame.PlayerIds.FirstOrDefault(id => id != myUserId);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 플레이어 프로필 정보가 성공적으로 로드되었는지 확인합니다.
+    /// </summary>
+    public bool HasLoadedProfiles()
+    {
+        return _playerProfiles != null && _playerProfiles.Count >= 2;
+    }
 }

@@ -9,6 +9,11 @@ public class StoneForceController_Firebase : MonoBehaviour
     public float stoneForce;
     public int donutId;
 
+    // 도넛의 물리적 속성
+    public int DonutWeight { get; private set; }
+    public int DonutResilience { get; private set; }
+    public int DonutFriction { get; private set; }
+
     private bool isPassedEndHogLine;
 
     // StoneShoot.Team 대신 직접 Team enum을 정의하거나, FirebaseGameManager에서 팀 정보를 관리하도록 변경
@@ -126,11 +131,42 @@ public class StoneForceController_Firebase : MonoBehaviour
     }
 
     // StoneShoot.Team 대신 직접 정의한 Team enum 사용
-    public void InitializeDonut(Team team, int donutId) // 도넛의 팀과 id를 적용
+    public void InitializeDonut(Team team, int donutId, int weight, int resilience, int friction) // 도넛의 팀과 id, 물리 속성을 적용
     {
         this.team = team;
         this.donutId = donutId;
-        //this.isStartingTeam = isStartingTeam;
+        this.DonutWeight = weight;
+        this.DonutResilience = resilience;
+        this.DonutFriction = friction;
+
+        // 무게를 Rigidbody의 질량으로 설정
+        if (rigid != null)
+        {
+            rigid.mass = DonutWeight;
+        }
+
+        // 반발력과 마찰력은 PhysicMaterial을 통해 설정합니다.
+        if (physicMaterial == null)
+        {
+            MeshCollider meshCollider = transform.GetComponent<MeshCollider>();
+            if (meshCollider != null)
+            {
+                // 다른 돌에 영향을 주지 않도록 공유된 물리 재질의 인스턴스를 생성합니다.
+                physicMaterial = new PhysicMaterial(gameObject.name + "_PhysicMaterial");
+                meshCollider.material = physicMaterial;
+            }
+            else
+            {
+                Debug.LogError("InitializeDonut: MeshCollider가 없어 물리 속성을 적용할 수 없습니다.");
+                return;
+            }
+        }
+
+        // int 값을 float (0~1) 범위로 변환하여 적용합니다. (예: 10 -> 1.0, 5 -> 0.5)
+        // 이 변환 방식은 기획에 따라 달라질 수 있습니다.
+        physicMaterial.bounciness = Mathf.Clamp01(DonutResilience / 10.0f);
+        physicMaterial.dynamicFriction = Mathf.Clamp01(DonutFriction / 10.0f);
+        initialFrictionValue = physicMaterial.dynamicFriction; // 스위핑 로직을 위해 초기 마찰값 업데이트
     }
 
 
