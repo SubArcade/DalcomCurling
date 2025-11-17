@@ -20,41 +20,61 @@ namespace GooglePlayGames.BasicApi.Nearby
     using GooglePlayGames.OurUtils;
 
     /// <summary>
-    /// Represents the configuration for a Nearby Connections operation.
-    /// Includes initialization status and client-specific configuration.
+    /// Represents the status of the Nearby Connections initialization process.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public enum InitializationStatus
     {
         /// <summary>
-        /// Indicates that the initialization was successful.
+        /// Initialization was successful.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         Success,
 
         /// <summary>
-        /// Signifies that a version update is required for nearby connections.
+        /// Initialization failed because the service version is out of date.
+        /// An update is required.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         VersionUpdateRequired,
 
         /// <summary>
-        /// Denotes that an internal error occurred during initialization.
+        /// Initialization failed due to an internal error.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         InternalError
     }
 
     /// <summary>
-    /// Defines the configuration for establishing a Nearby connection.
-    /// This includes parameters like client ID and initialization callback.
+    /// Configuration for the Nearby Connections service. This is an immutable struct.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This struct will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public struct NearbyConnectionConfiguration
     {
         /// <summary>
-        /// A constant integer representing the maximum payload length for unreliable messages.
+        /// The maximum length of a message payload for unreliable messages, in bytes.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This constant will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public const int MaxUnreliableMessagePayloadLength = 1168;
 
         /// <summary>
-        /// A constant integer representing the maximum payload length for reliable messages.
+        /// The maximum length of a message payload for reliable messages, in bytes.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This constant will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public const int MaxReliableMessagePayloadLength = 4096;
 
         private readonly Action<InitializationStatus> mInitializationCallback;
@@ -63,8 +83,11 @@ namespace GooglePlayGames.BasicApi.Nearby
         /// <summary>
         /// Initializes a new instance of the <see cref="NearbyConnectionConfiguration"/> struct.
         /// </summary>
-        /// <param name="callback">A callback that will be invoked when initialization completes.</param>
-        /// <param name="localClientId">The unique identifier for the local client.</param>
+        /// <param name="callback">The callback to invoke with the result of the initialization.</param>
+        /// <param name="localClientId">The ID of the local client.</param>
+        /// <remarks>
+        /// @deprecated This constructor will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public NearbyConnectionConfiguration(Action<InitializationStatus> callback,
             long localClientId)
         {
@@ -73,16 +96,24 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Gets the unique identifier for the local client.
+        /// Gets the ID of the local client.
         /// </summary>
+        /// <value>The local client ID.</value>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public long LocalClientId
         {
             get { return mLocalClientId; }
         }
 
         /// <summary>
-        /// Gets the callback to be invoked upon the completion of initialization.
+        /// Gets the callback to be invoked upon completion of initialization.
         /// </summary>
+        /// <value>The initialization callback.</value>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public Action<InitializationStatus> InitializationCallback
         {
             get { return mInitializationCallback; }

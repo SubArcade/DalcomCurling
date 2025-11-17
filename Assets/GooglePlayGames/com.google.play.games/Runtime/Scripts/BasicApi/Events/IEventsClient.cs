@@ -13,7 +13,9 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
+
 namespace GooglePlayGames.BasicApi.Events
 {
     using System;
@@ -27,6 +29,9 @@ namespace GooglePlayGames.BasicApi.Events
     ///
     /// All callbacks in this interface must be invoked on the game thread.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public interface IEventsClient
     {
         /// <summary>
@@ -37,16 +42,22 @@ namespace GooglePlayGames.BasicApi.Events
         /// <param name="callback">A callback for the results of the request. The passed list will only
         /// be non-empty if the request succeeded. This callback will be invoked on the game thread.
         /// </param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void FetchAllEvents(DataSource source, Action<ResponseStatus, List<IEvent>> callback);
 
         /// <summary>
-        /// Fetches the event with the specified ID.
+        /// Fetchs the event with the specified ID.
         /// </summary>
         /// <param name="source">The source of the event (i.e. whether we can return stale cached
         /// values).</param>
         /// <param name="eventId">The ID of the event.</param>
         /// <param name="callback">A callback for the result of the event. If the request failed, the
         /// passed event will be null. This callback will be invoked on the game thread.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void FetchEvent(DataSource source, string eventId, Action<ResponseStatus, IEvent> callback);
 
         /// <summary>
@@ -54,6 +65,9 @@ namespace GooglePlayGames.BasicApi.Events
         /// </summary>
         /// <param name="eventId">The ID of the event to increment.</param>
         /// <param name="stepsToIncrement">The number of steps to increment by.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void IncrementEvent(string eventId, uint stepsToIncrement);
     }
 }

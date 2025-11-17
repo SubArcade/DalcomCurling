@@ -32,10 +32,8 @@ public class Scr_ButtonScale : MonoBehaviour
     [SerializeField] private Transform UpgradeTransform;
     [SerializeField] private Image UpgradeImage;
 
-    IEnumerator Start()
+    void Start()
     {
-        yield return new WaitForSeconds(0.2f); // 혹시라도 로딩 지연 대비
-
         TrashCan = transform.Find("MainMenu/Bottom/ButtonGroup/basket_Button")?.gameObject;
         TrashCanTransform = TrashCan.transform;
         TrashCanImage = TrashCan.GetComponent<Image>();

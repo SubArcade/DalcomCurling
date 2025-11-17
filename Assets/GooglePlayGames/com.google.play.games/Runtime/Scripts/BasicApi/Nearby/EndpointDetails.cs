@@ -19,8 +19,12 @@ namespace GooglePlayGames.BasicApi.Nearby
     using GooglePlayGames.OurUtils;
 
     /// <summary>
-    /// Represents details of an endpoint involved in a Nearby Connections operation.
+    /// Represents the details of a remote endpoint discovered in the network.
+    /// This is an immutable value-type.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This struct will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public struct EndpointDetails
     {
         private readonly string mEndpointId;
@@ -31,8 +35,11 @@ namespace GooglePlayGames.BasicApi.Nearby
         /// Initializes a new instance of the <see cref="EndpointDetails"/> struct.
         /// </summary>
         /// <param name="endpointId">The unique identifier of the endpoint.</param>
-        /// <param name="name">The name of the endpoint.</param>
-        /// <param name="serviceId">The service ID associated with the endpoint.</param>
+        /// <param name="name">The human-readable name of the endpoint.</param>
+        /// <param name="serviceId">The identifier of the service the endpoint is advertising.</param>
+        /// <remarks>
+        /// @deprecated This constructor will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public EndpointDetails(string endpointId, string name, string serviceId)
         {
             this.mEndpointId = Misc.CheckNotNull(endpointId);
@@ -41,24 +48,36 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Gets the unique identifier of the endpoint.
+        /// Gets the unique ID for the endpoint.
         /// </summary>
+        /// <value>The endpoint's unique ID.</value>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string EndpointId
         {
             get { return mEndpointId; }
         }
 
         /// <summary>
-        /// Gets the name of the endpoint.
+        /// Gets the human-readable name of the endpoint.
         /// </summary>
+        /// <value>The endpoint's name.</value>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string Name
         {
             get { return mName; }
         }
 
         /// <summary>
-        /// Gets the service ID associated with the endpoint.
+        /// Gets the service ID the endpoint is advertising.
         /// </summary>
+        /// <value>The service ID.</value>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string ServiceId
         {
             get { return mServiceId; }
