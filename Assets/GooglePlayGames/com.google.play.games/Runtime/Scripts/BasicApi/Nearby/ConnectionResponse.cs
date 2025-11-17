@@ -19,45 +19,69 @@ namespace GooglePlayGames.BasicApi.Nearby
     using GooglePlayGames.OurUtils;
 
     /// <summary>
-    /// Represents a response to a connection request, including status, payload, and identifying information.
+    /// Represents the response to a connection request in the Nearby API.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This struct will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public struct ConnectionResponse
     {
         private static readonly byte[] EmptyPayload = new byte[0];
 
         /// <summary>
-        /// Status codes representing the outcome of a connection request.
+        /// Represents the status of a connection response.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public enum Status
         {
             /// <summary>
-            /// Indicates that the connection was accepted.
+            /// The connection request was accepted.
             /// </summary>
+            /// <remarks>
+            /// @deprecated This enum value will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             Accepted,
 
             /// <summary>
-            /// Indicates that the connection was rejected.
+            /// The connection request was rejected.
             /// </summary>
+            /// <remarks>
+            /// @deprecated This enum value will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             Rejected,
 
             /// <summary>
-            /// Indicates that an internal error occurred.
+            /// An internal error occurred.
             /// </summary>
+            /// <remarks>
+            /// @deprecated This enum value will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             ErrorInternal,
- 
+
             /// <summary>
-            /// Indicates that the device is not connected to a network.
+            /// The network is not connected.
             /// </summary>
+            /// <remarks>
+            /// @deprecated This enum value will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             ErrorNetworkNotConnected,
 
             /// <summary>
-            /// Indicates that the remote endpoint is not connected.
+            /// The endpoint is not connected.
             /// </summary>
+            /// <remarks>
+            /// @deprecated This enum value will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             ErrorEndpointNotConnected,
 
             /// <summary>
-            /// Indicates that the endpoints are already connected.
+            /// The endpoints are already connected.
             /// </summary>
+            /// <remarks>
+            /// @deprecated This enum value will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             ErrorAlreadyConnected
         }
 
@@ -67,12 +91,15 @@ namespace GooglePlayGames.BasicApi.Nearby
         private readonly byte[] mPayload;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectionResponse"/> struct.
+        /// Initializes a new instance of the ConnectionResponse struct.
         /// </summary>
-        /// <param name="localClientId">The ID of the local client.</param>
+        /// <param name="localClientId">The local client ID.</param>
         /// <param name="remoteEndpointId">The ID of the remote endpoint.</param>
-        /// <param name="code">The status of the connection response.</param>
-        /// <param name="payload">The payload data included with the response.</param>
+        /// <param name="code">The status code of the response.</param>
+        /// <param name="payload">The payload data associated with the response.</param>
+        /// <remarks>
+        /// @deprecated This constructor will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         private ConnectionResponse(long localClientId, string remoteEndpointId, Status code,
             byte[] payload)
         {
@@ -83,40 +110,55 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Gets the ID of the local client.
+        /// Gets the local client ID.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public long LocalClientId
         {
             get { return mLocalClientId; }
         }
 
         /// <summary>
-        /// Gets the ID of the remote endpoint responding to the connection request.
+        /// Gets the remote endpoint ID.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string RemoteEndpointId
         {
             get { return mRemoteEndpointId; }
         }
 
         /// <summary>
-        /// Gets the status of the connection response.
+        /// Gets the response status of the connection.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public Status ResponseStatus
         {
             get { return mResponseStatus; }
         }
 
         /// <summary>
-        /// Gets the payload sent with the connection response.
+        /// Gets the payload data associated with the connection response.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public byte[] Payload
         {
             get { return mPayload; }
         }
 
         /// <summary>
-        /// Creates a response indicating the connection was rejected.
+        /// Returns a connection response indicating rejection.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public static ConnectionResponse Rejected(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.Rejected,
@@ -124,8 +166,11 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Creates a response indicating the device is not connected to a network.
+        /// Returns a connection response indicating that the network is not connected.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public static ConnectionResponse NetworkNotConnected(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.ErrorNetworkNotConnected,
@@ -133,8 +178,11 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Creates a response indicating an internal error occurred.
+        /// Returns a connection response indicating an internal error.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public static ConnectionResponse InternalError(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.ErrorInternal,
@@ -142,8 +190,11 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Creates a response indicating the remote endpoint is not connected.
+        /// Returns a connection response indicating that the endpoint is not connected.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public static ConnectionResponse EndpointNotConnected(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.ErrorEndpointNotConnected,
@@ -151,8 +202,11 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Creates a response indicating the connection was accepted with a payload.
+        /// Returns a connection response indicating that the connection was accepted.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public static ConnectionResponse Accepted(long localClientId, string remoteEndpointId,
             byte[] payload)
         {
@@ -161,8 +215,11 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Creates a response indicating the endpoints are already connected.
+        /// Returns a connection response indicating that the endpoints are already connected.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public static ConnectionResponse AlreadyConnected(long localClientId,
             string remoteEndpointId)
         {

@@ -19,21 +19,26 @@ namespace GooglePlayGames.BasicApi.Nearby
     using GooglePlayGames.OurUtils;
 
     /// <summary>
-    /// Represents a request to establish a connection with a remote endpoint.
-    /// Contains information about the remote endpoint and an optional payload.
+    /// Represents a connection request for a Nearby API operation.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This struct will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public struct ConnectionRequest
     {
         private readonly EndpointDetails mRemoteEndpoint;
         private readonly byte[] mPayload;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectionRequest"/> struct.
+        /// Initializes a new instance of the ConnectionRequest struct.
         /// </summary>
-        /// <param name="remoteEndpointId">The ID of the remote endpoint requesting the connection.</param>
+        /// <param name="remoteEndpointId">The ID of the remote endpoint.</param>
         /// <param name="remoteEndpointName">The name of the remote endpoint.</param>
-        /// <param name="serviceId">The service ID the connection is targeting.</param>
-        /// <param name="payload">The payload associated with the connection request.</param>
+        /// <param name="serviceId">The service ID for the connection.</param>
+        /// <param name="payload">The payload data associated with the request.</param>
+        /// <remarks>
+        /// @deprecated This constructor will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public ConnectionRequest(string remoteEndpointId,
             string remoteEndpointName, string serviceId, byte[] payload)
         {
@@ -43,16 +48,22 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
-        /// Gets the details of the remote endpoint making the connection request.
+        /// Gets the remote endpoint details for the connection request.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public EndpointDetails RemoteEndpoint
         {
             get { return mRemoteEndpoint; }
         }
 
         /// <summary>
-        /// Gets the payload data included with the connection request.
+        /// Gets the payload data associated with the connection request.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public byte[] Payload
         {
             get { return mPayload; }

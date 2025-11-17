@@ -25,6 +25,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
     /// untouched). Instances must be built using <see cref="SavedGameMetadataUpdate.Builder"/>
     /// and once created, these instances are immutable and threadsafe.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This struct will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public struct SavedGameMetadataUpdate
     {
         private readonly bool mDescriptionUpdated;
@@ -33,10 +36,6 @@ namespace GooglePlayGames.BasicApi.SavedGame
         private readonly byte[] mNewPngCoverImage;
         private readonly TimeSpan? mNewPlayedTime;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SavedGameMetadataUpdate"/> struct using the specified builder.
-        /// </summary>
-        /// <param name="builder">The builder used to initialize the saved game metadata update.</param>
         private SavedGameMetadataUpdate(Builder builder)
         {
             mDescriptionUpdated = builder.mDescriptionUpdated;
@@ -47,56 +46,71 @@ namespace GooglePlayGames.BasicApi.SavedGame
         }
 
         /// <summary>
-        /// Gets whether the description has been updated in the metadata.
+        /// Returns true if the description was updated.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsDescriptionUpdated
         {
             get { return mDescriptionUpdated; }
         }
 
         /// <summary>
-        /// Gets the updated description for the saved game, if it has been changed.
+        /// Returns the new description.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string UpdatedDescription
         {
             get { return mNewDescription; }
         }
 
         /// <summary>
-        /// Gets whether the cover image has been updated in the metadata.
+        /// Returns true if the cover image was updated.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsCoverImageUpdated
         {
             get { return mCoverImageUpdated; }
         }
 
-        /// <summary>
-        /// Gets the updated PNG cover image, if it has been changed.
-        /// </summary>
         public byte[] UpdatedPngCoverImage
         {
             get { return mNewPngCoverImage; }
         }
 
         /// <summary>
-        /// Gets whether the played time has been updated in the metadata.
+        /// Returns true if the played time was updated.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsPlayedTimeUpdated
         {
             get { return mNewPlayedTime.HasValue; }
         }
 
         /// <summary>
-        /// Gets the updated played time, if it has been changed.
+        /// Returns the new played time.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public TimeSpan? UpdatedPlayedTime
         {
             get { return mNewPlayedTime; }
         }
 
         /// <summary>
-        /// A builder for constructing instances of <see cref="SavedGameMetadataUpdate"/>.
+        /// Builder for <see cref="SavedGameMetadataUpdate"/>.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This struct will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public struct Builder
         {
             internal bool mDescriptionUpdated;
@@ -106,10 +120,11 @@ namespace GooglePlayGames.BasicApi.SavedGame
             internal TimeSpan? mNewPlayedTime;
 
             /// <summary>
-            /// Sets the description to be updated in the saved game metadata.
+            /// Updates the description of the saved game.
             /// </summary>
-            /// <param name="description">The new description to set.</param>
-            /// <returns>The builder with the updated description.</returns>
+            /// <remarks>
+            /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             public Builder WithUpdatedDescription(string description)
             {
                 mNewDescription = Misc.CheckNotNull(description);
@@ -118,10 +133,11 @@ namespace GooglePlayGames.BasicApi.SavedGame
             }
 
             /// <summary>
-            /// Sets the PNG cover image to be updated in the saved game metadata.
+            /// Updates the cover image of the saved game.
             /// </summary>
-            /// <param name="newPngCoverImage">The new PNG image data for the cover image.</param>
-            /// <returns>The builder with the updated cover image.</returns>
+            /// <remarks>
+            /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             public Builder WithUpdatedPngCoverImage(byte[] newPngCoverImage)
             {
                 mCoverImageUpdated = true;
@@ -130,11 +146,11 @@ namespace GooglePlayGames.BasicApi.SavedGame
             }
 
             /// <summary>
-            /// Sets the played time to be updated in the saved game metadata.
+            /// Updates the played time of the saved game.
             /// </summary>
-            /// <param name="newPlayedTime">The new played time to set.</param>
-            /// <returns>The builder with the updated played time.</returns>
-            /// <exception cref="InvalidOperationException">Thrown if the played time exceeds the maximum allowed value.</exception>
+            /// <remarks>
+            /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             public Builder WithUpdatedPlayedTime(TimeSpan newPlayedTime)
             {
                 if (newPlayedTime.TotalMilliseconds > ulong.MaxValue)
@@ -148,9 +164,11 @@ namespace GooglePlayGames.BasicApi.SavedGame
             }
 
             /// <summary>
-            /// Builds a new <see cref="SavedGameMetadataUpdate"/> instance with the configured updates.
+            /// Builds the <see cref="SavedGameMetadataUpdate"/>.
             /// </summary>
-            /// <returns>A new instance of <see cref="SavedGameMetadataUpdate"/>.</returns>
+            /// <remarks>
+            /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+            /// </remarks>
             public SavedGameMetadataUpdate Build()
             {
                 return new SavedGameMetadataUpdate(this);

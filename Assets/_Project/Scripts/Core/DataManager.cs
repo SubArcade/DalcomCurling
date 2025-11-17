@@ -1,10 +1,7 @@
 ﻿using System;
-using Firebase;
-using Firebase.Auth;
 using Firebase.Firestore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.Localization.Platform.Android;
 using UnityEngine;
 
 public enum GameMode
