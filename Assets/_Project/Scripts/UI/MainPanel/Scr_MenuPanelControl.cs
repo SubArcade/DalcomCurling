@@ -19,9 +19,9 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject donutUpgradePopup;
     [SerializeField] private GameObject donutCodexClickPopup;
     [SerializeField] private GameObject rewardCheckPopup;
-    [SerializeField] private GameObject nickNameChangePopup;
     [SerializeField] private GameObject EntryPopUp;
     [SerializeField] private GameObject MatchingPopUp;
+    [SerializeField] private GameObject readyMenuPanel;
     
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
@@ -29,6 +29,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private Button donutUpgradeButton;
     [SerializeField] private Button EntryPopUpButton;
     [SerializeField] private Button detailedSettingsButton;
+    [SerializeField] private Button readyButton;
     [SerializeField] private Button testBattle;
     
     
@@ -38,6 +39,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private TMP_Text goldText;
     [SerializeField] private TMP_Text gemText;
     
+    public GameObject testLoginPanel;
     void Awake()
     {
         UIManager.Instance.RegisterPanel(PanelId.StartPanel,startPanel);    
@@ -50,6 +52,10 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.DonutUpgradePopup,donutUpgradePopup);
         UIManager.Instance.RegisterPanel(PanelId.EntryPopUp, EntryPopUp);
         UIManager.Instance.RegisterPanel(PanelId.MatchingPopUp, MatchingPopUp);
+        UIManager.Instance.RegisterPanel(PanelId.ReadyMenuPanel, readyMenuPanel);
+        
+        
+        UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
         
         playerLevelInfoButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.PlayerLevelInfoPopup));
         donutCodexButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.DonutCodexPopup));
@@ -57,6 +63,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         EntryPopUpButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EntryPopUp));
         detailedSettingsButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DetailedSettingsPanel));
         testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
+        readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
@@ -68,5 +75,5 @@ public class Scr_MenuPanelControl : MonoBehaviour
         goldText.text = $"{playerData.gold}";
         gemText.text = $"{playerData.gem}";
     }
-
+    
 }

@@ -37,6 +37,7 @@ public class Scr_OrderSystem : MonoBehaviour
     
     private int refreshCount = 5; //새로고침 횟수
     private const int maxRefreshCount = 5; //최대 새로고침 횟수
+    private Coroutine refreshCoroutine; //일정 시간마다 새로고침 횟수 회복 코루틴
 
     //도넛들의 체크이미지 활성/비활성용
     public class DonutVisualInfo
@@ -71,8 +72,6 @@ public class Scr_OrderSystem : MonoBehaviour
     private int rewardGold2 = 0;
     private int rewardGold3 = 0;
 
-    //일정 시간마다 새로고침 횟수 회복 코루틴
-    private Coroutine refreshCoroutine;
 
     //저장된퀘스트가 있는지 없는지 판단용도 변수
     private bool isRestored = false;
@@ -128,32 +127,32 @@ public class Scr_OrderSystem : MonoBehaviour
 
     void Awake()
     {
-        orderGroup1 = transform.Find("Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
-        orderGroup2 = transform.Find("Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
-        orderGroup3 = transform.Find("Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
+        orderGroup1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
+        orderGroup2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
+        orderGroup3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
 
         orderDonuts1 = orderGroup1.GetComponentsInChildren<Image>().ToList();
         orderDonuts2 = orderGroup2.GetComponentsInChildren<Image>().ToList();
         orderDonuts3 = orderGroup3.GetComponentsInChildren<Image>().ToList();
 
-        refreshBtn1 = transform.Find("Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
-        refreshBtn2 = transform.Find("Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
-        refreshBtn3 = transform.Find("Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
+        refreshBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
+        refreshBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
+        refreshBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
 
-        costText1 = transform.Find("Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText2 = transform.Find("Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText3 = transform.Find("Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
 
-        orderClearBtn1 = transform.Find("Top/QuestGroup/Order1/OrderClearBtn")?.GetComponent<Button>();
-        orderClearBtn2 = transform.Find("Top/QuestGroup/Order2/OrderClearBtn")?.GetComponent<Button>();
-        orderClearBtn3 = transform.Find("Top/QuestGroup/Order3/OrderClearBtn")?.GetComponent<Button>();
+        orderClearBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn")?.GetComponent<Button>();
+        orderClearBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn")?.GetComponent<Button>();
+        orderClearBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn")?.GetComponent<Button>();
 
-        refreshCountText = transform.Find("Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
+        refreshCountText = transform.Find("MainMenu/Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
         refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
 
-        completeObject1 = transform.Find("Top/QuestGroup/Order1/CompleteObject")?.gameObject;
-        completeObject2 = transform.Find("Top/QuestGroup/Order2/CompleteObject")?.gameObject;
-        oompleteObject3 = transform.Find("Top/QuestGroup/Order3/CompleteObject")?.gameObject;
+        completeObject1 = transform.Find("MainMenu/Top/QuestGroup/Order1/CompleteObject")?.gameObject;
+        completeObject2 = transform.Find("MainMenu/Top/QuestGroup/Order2/CompleteObject")?.gameObject;
+        oompleteObject3 = transform.Find("MainMenu/Top/QuestGroup/Order3/CompleteObject")?.gameObject;
 
         // orderdonuts1~3의 자식 텍스트들을 리스트에 저장
         donutTextInfos1 = FindLevelAndTypeText(orderDonuts1);
@@ -164,6 +163,9 @@ public class Scr_OrderSystem : MonoBehaviour
         donutVisuals1 = FindCheckMark(orderDonuts1);
         donutVisuals2 = FindCheckMark(orderDonuts2);
         donutVisuals3 = FindCheckMark(orderDonuts3);
+
+        //도넛별 보상골드 갱신
+        DonutRewardTable();
     }
     void Start()
     {     
@@ -293,7 +295,6 @@ public class Scr_OrderSystem : MonoBehaviour
     {
         if (refreshCount <= 0)
         {
-            print("남은 새로고침 횟수가 없습니다!");
             return;
         }
 
@@ -322,20 +323,43 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 새로고침시 이미지, 이름.레벨,보상골드 갱신
     public void RefreshOrderDonut(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
     {
-        idList.Clear();
+        idList.Clear(); //id 초기화
 
         int count = Mathf.Min(orderImages.Count, textInfos.Count, 3); //도넛을 최대 3개까지만 새로고침
         int totalReward = 0;
         var questList = new List<QuestList>();
+        HashSet<string> usedDonuts = new(); //타입+레벨 검사해서 중복 방지
 
+        // 플레이어 레벨 기반 도넛 레벨 범위 계산
+        int playerLevel = DataManager.Instance.PlayerData.level;
+        var (minLevel, maxLevel) = DonutLevelRange(playerLevel);
         for (int i = 0; i < count; i++)
         {
+            DonutData donut = null; //도넛을 찾기 위한 변수와 무한루프 방지
+            int safety = 100;
+            while (safety-- > 0) //100에서 점점 1회씩 빼가며 중복되지않는 도넛 탐샘
+            {
+                DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
+                int randomLevel = Random.Range(minLevel, maxLevel + 1); //도넛의 타입과 레벨 무작위 선택
+                string comboKey = $"{randomType}_{randomLevel}"; //타입+레벨 조합한 키 생성
             //도넛 타입과 레벨을 랜덤으로 고름
             //DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
             DonutType randomType = orderDonutTypes[Random.Range(0, orderDonutTypes.Length)];
             int randomLevel = Random.Range(1, 31);
 
-            DonutData donut = DataManager.Instance.GetDonutData(randomType, randomLevel);
+                if (usedDonuts.Contains(comboKey)) continue; //이미 생성된 조합이면 다시 시도
+
+                var candidate = DataManager.Instance.GetDonutData(randomType, randomLevel); //해당 도넛 데이터 가져옴
+                if (candidate != null) //도넛이 존재하면
+                {
+                    donut = candidate; //도넛을 선택하고 
+                    usedDonuts.Add(comboKey); //조합을 추가해서 넣은뒤
+                    break;
+                }
+            }
+
+            if (donut == null) continue; //도넛을 못 찾아도 계속 진행
+
 
             //이미지, 타입, 단계 설명표시
             orderImages[i].sprite = donut.sprite;
@@ -357,7 +381,7 @@ public class Scr_OrderSystem : MonoBehaviour
         }
         costText.text = $"{totalReward}";
 
-        // 퀘스트 저장
+        // 어떤 주문서인지에 따라 해당 퀘스트 저장
         if (orderImages == orderDonuts1)
         {
             DataManager.Instance.QuestData.questList1 = questList;
@@ -472,12 +496,12 @@ public class Scr_OrderSystem : MonoBehaviour
         completeObject.SetActive(false); // 완료 UI 숨김
     }
 
-    //새로고침횟수 회복 코루틴
+    //새로고침횟수 회복 코루틴 원하는 시간을 직접 넣으시면됩니다.
     private IEnumerator RecoveryRefreshCount()
     {
         while (true)
         {
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(10f);//요기!
 
             if (refreshCount < maxRefreshCount)
             {
@@ -537,4 +561,24 @@ public class Scr_OrderSystem : MonoBehaviour
         return restored;
     }
 
+    //플레이어 레벨에 따라 주문도넛 레벨 결정  
+    private (int minLevel, int maxLevel) DonutLevelRange(int playerLevel)
+    {
+        int min = playerLevel;
+        int max;
+
+        switch (playerLevel)
+        {
+            case int n when n <= 9:
+                max = playerLevel + 3;
+                break;
+            case int n when n <= 19:
+                max = playerLevel + 5;
+                break;
+            default:
+                max = playerLevel + 10;
+                break;
+        }
+        return (min, Mathf.Clamp(max, min, 30));
+    }
 }
