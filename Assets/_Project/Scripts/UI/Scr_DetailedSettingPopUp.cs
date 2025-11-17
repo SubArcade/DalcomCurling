@@ -22,6 +22,9 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     [SerializeField] private Scrollbar SFXsliderBar;
     [SerializeField] private TextMeshProUGUI BGMvolumeText;
     [SerializeField] private TextMeshProUGUI SFXvolumeText;
+    [SerializeField] private Image BGMGage;
+    [SerializeField] private Image SFXGage;
+
 
     [Header("ON/OFF 기타설정")]
     [SerializeField] private Button OFFBGM;
@@ -57,6 +60,8 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         SFXsliderBar = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXsliderBar")?.GetComponent<Scrollbar>();
         BGMvolumeText = transform.Find("rectangle625/UIBackground/settingUI/setting/BGMvolume_Text")?.GetComponent<TextMeshProUGUI>();
         SFXvolumeText = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXvolume_Text")?.GetComponent<TextMeshProUGUI>();
+        BGMGage = transform.Find("rectangle625/UIBackground/settingUI/setting/BGMsliderBar/Gage")?.GetComponent<Image>();
+        SFXGage = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXsliderBar/Gage")?.GetComponent<Image>();
 
         OFFBGM = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFBGM")?.GetComponent<Button>();
         OFFSFX = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFSFX")?.GetComponent<Button>();
@@ -77,6 +82,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         nightOffbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/NightOffButton")?.GetComponent<Button>();
 
         closeButton = transform.Find("rectangle625/CloseButton")?.GetComponent<Button>();
+
     }
     void Start()
     {
@@ -187,6 +193,9 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         BGMsliderBar.value = savedBGM;
         SFXsliderBar.value = savedSFX;
 
+        BGMGage.fillAmount = savedBGM;
+        SFXGage.fillAmount = savedSFX;
+
         //텍스트 초기화
         BGMvolumeText.text = Mathf.RoundToInt(savedBGM * 100f).ToString();
         SFXvolumeText.text = Mathf.RoundToInt(savedSFX * 100f).ToString();
@@ -196,6 +205,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             int volume = Mathf.RoundToInt(value * 100f);
             BGMvolumeText.text = volume.ToString();
+            BGMGage.fillAmount = value; // 게이지 채우기
             PlayerPrefs.SetFloat("BGMVolume", value);
             PlayerPrefs.Save();
         });
@@ -204,6 +214,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             int volume = Mathf.RoundToInt(value * 100f);
             SFXvolumeText.text = volume.ToString();
+            SFXGage.fillAmount = value; // 게이지 채우기
             PlayerPrefs.SetFloat("SFXVolume", value);
             PlayerPrefs.Save();
         });
