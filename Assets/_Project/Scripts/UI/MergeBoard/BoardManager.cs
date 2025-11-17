@@ -161,31 +161,31 @@ public class BoardManager : MonoBehaviour
 
         // 생성기에서 도넛 정보 랜덤 선택 (DonutGenerator 내부 확률 계산)
         var generator = generatorCell.GetComponentInChildren<DonutGenerator>();
-        var donutData = generator.GetRandomDonut();
-        if (donutData == null)
-        {
-            Debug.LogWarning("도넛 데이터가 없습니다.");
-            return;
-        }
+        //var donutData = generator.GetRandomDonut();
+        //if (donutData == null)
+        //{
+        //    Debug.LogWarning("도넛 데이터가 없습니다.");
+        //    return;
+        //}
 
-        // 공용 도넛 프리팹으로 생성
-        GameObject donutObj = Instantiate(donutPrefab, target.transform);
-        RectTransform rt = donutObj.GetComponent<RectTransform>();
-        rt.anchoredPosition = Vector2.zero;
-        rt.localScale = Vector3.one;
+        //// 공용 도넛 프리팹으로 생성
+        //GameObject donutObj = Instantiate(donutPrefab, target.transform);
+        //RectTransform rt = donutObj.GetComponent<RectTransform>();
+        //rt.anchoredPosition = Vector2.zero;
+        //rt.localScale = Vector3.one;
 
-        // 스프라이트, ID, 기타 정보 적용
-        var item = donutObj.GetComponent<MergeItemUI>();
-        var img = donutObj.GetComponent<Image>();
-        img.sprite = donutData.sprite;
-        item.donutData = donutData;
-        item.donutId = donutData.id;
-        target.SetItem(item, donutData);
+        //// 스프라이트, ID, 기타 정보 적용
+        //var item = donutObj.GetComponent<MergeItemUI>();
+        //var img = donutObj.GetComponent<Image>();
+        //img.sprite = donutData.sprite;
+        //item.donutData = donutData;
+        //item.donutId = donutData.id;
+        //target.SetItem(item, donutData);
 
 
 
-        Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
-        AutoSaveBoardLocal();
+        //Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
+        //AutoSaveBoardLocal();
     }
 
     public void SpawnGiftBox()

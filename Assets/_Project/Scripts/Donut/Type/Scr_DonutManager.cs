@@ -8,7 +8,7 @@ public class DonutManager : MonoBehaviour
 
     [Header("도넛 프리팹")]
     [SerializeField] private GameObject donutMasterPrefab; // donutMasterPrefab = 생산되는 도넛의 변수
-    
+
     [Header("도넛 선택하기")]
     [SerializeField] public int selectDonutIndex = 0;
 

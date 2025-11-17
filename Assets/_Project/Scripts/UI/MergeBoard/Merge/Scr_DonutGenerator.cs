@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using UnityEditor.Localization.Plugins.XLIFF.V20;
+//using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 
 public class DonutGenerator : MonoBehaviour
@@ -44,39 +44,39 @@ public class DonutGenerator : MonoBehaviour
         };
     }
 
-    public DonutData GetRandomDonut()
-    {
-        if (DataManager.Instance == null)
-            return null;
+    //public DonutData GetRandomDonut()
+    //{
+    //    if (DataManager.Instance == null)
+    //        return null;
 
-        // 1. Hard/Soft/Moist 중 어떤 타입을 생성할지 선택
-        DonutType selectedType = PickDonutType();
+    //    // 1. Hard/Soft/Moist 중 어떤 타입을 생성할지 선택
+    //    DonutType selectedType = PickDonutType();
 
-        // 2. 타입에 따른 생성기 레벨 얻기
-        int generatorLevel = DataManager.Instance.GetGeneratorLevel(selectedType);
+    //    // 2. 타입에 따른 생성기 레벨 얻기
+    //    int generatorLevel = DataManager.Instance.GetGeneratorLevel(selectedType);
 
-        // 3. 선택된 타입의 확률표 가져오기
-        float[] chances = GetChanceArray(generatorLevel);
+    //    // 3. 선택된 타입의 확률표 가져오기
+    //    float[] chances = GetChanceArray(generatorLevel);
 
-        // 4. 실제 생성될 도넛 단계 선택
-        int chosenLevel = PickLevel(chances, generatorLevel);
+    //    // 4. 실제 생성될 도넛 단계 선택
+    //    int chosenLevel = PickLevel(chances, generatorLevel);
 
-        // 5. 해당 타입 + 단계의 도넛 목록 가져오기
-        List<DonutData> list = DataManager.Instance.GetDonutsByTypeAndLevel(selectedType, chosenLevel);
+    //    // 5. 해당 타입 + 단계의 도넛 목록 가져오기
+    //    List<DonutData> list = DataManager.Instance.GetDonutsByTypeAndLevel(selectedType, chosenLevel);
 
-        if (list == null || list.Count == 0)
-        {
-            Debug.LogError($"❌ {selectedType} {chosenLevel}레벨 도넛이 존재하지 않습니다!");
-            return null;
-        }
+    //    if (list == null || list.Count == 0)
+    //    {
+    //        Debug.LogError($"❌ {selectedType} {chosenLevel}레벨 도넛이 존재하지 않습니다!");
+    //        return null;
+    //    }
 
-        // 6. 최종 생성
-        DonutData result = list[Random.Range(0, list.Count)];
+    //    // 6. 최종 생성
+    //    DonutData result = list[Random.Range(0, list.Count)];
 
-        Debug.Log($"생성된 도넛: Type={selectedType}, Level={chosenLevel}, Name={result.id}");
+    //    Debug.Log($"생성된 도넛: Type={selectedType}, Level={chosenLevel}, Name={result.id}");
 
-        return result;
-    }
+    //    return result;
+    //}
 
 
     /// <summary>

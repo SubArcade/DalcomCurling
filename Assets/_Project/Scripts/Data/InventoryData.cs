@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Firebase.Firestore;
 using UnityEngine;
@@ -14,6 +14,8 @@ public class DonutEntry
     [field: SerializeField, Tooltip("무게")] [FirestoreProperty] public int weight { get; set; }
     [field: SerializeField, Tooltip("반발력")] [FirestoreProperty] public int resilience { get; set; }
     [field: SerializeField, Tooltip("마찰력")] [FirestoreProperty] public int friction { get; set; }
+    [field: SerializeField, Tooltip("도넛 레벨")][FirestoreProperty] public int level { get; set; }
+
 }
 
 [System.Serializable, FirestoreData]
