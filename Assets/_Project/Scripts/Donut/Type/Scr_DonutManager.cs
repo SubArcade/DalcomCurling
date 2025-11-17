@@ -19,7 +19,7 @@ public class DonutManager : MonoBehaviour
 
     [Header("레벨 설정")]
     [Range(1, 30)] public int level = 1;
-
+    
     private List<GameObject> spawnedDonuts = new List<GameObject>();
 
     private void Awake()
