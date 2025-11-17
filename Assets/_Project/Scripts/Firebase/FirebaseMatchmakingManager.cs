@@ -47,7 +47,7 @@ public class Game
 
     [FirestoreProperty]
     public string CurrentTurnPlayerId { get; set; }
-    
+
     [FirestoreProperty]
     public string RoundStartingPlayerId { get; set; }
 
@@ -59,16 +59,16 @@ public class Game
 
     [FirestoreProperty]
     public int TurnNumber { get; set; } // 현재 턴 번호 (1~8)
-    
+
     [FirestoreProperty]
     public int RoundNumber { get; set; } // 현재 라운드 정보 ( 1 ~ 3 )
-    
+
     [FirestoreProperty]
     public int ATeamScore { get; set; } //A 팀의 현재 점수
-    
+
     [FirestoreProperty]
     public int BTeamScore { get; set; } //B 팀의 현재 점수
-    
+
 
     [FirestoreProperty]
     public Dictionary<string, int> DonutsIndex { get; set; } // 플레이어별 사용한 돌 개수
@@ -149,7 +149,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
 
     private Coroutine matchmakingTimeoutCoroutine; // 매치메이킹 타임아웃 코루틴
     private string waitingRoomId; // 현재 대기 중인 룸의 ID
-    
+
     // 점수 구간 정의
     private const string ScoreBracket_0_199 = "0-199";
     private const string ScoreBracket_200_499 = "200-499";
@@ -210,11 +210,11 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     public async Task StartMatchmaking()
     {
         Debug.Log("매치메이킹을 시작합니다...");
-        
+
         //매칭버튼을 누르면 버튼 비활성화
         //if (matchmakingButton != null) { matchmakingButton.interactable = false; }
         //if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
-        
+
         string userId = FirebaseAuthManager.Instance.UserId;
         if (string.IsNullOrEmpty(userId))
         {
@@ -223,7 +223,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
 
         // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
-        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync(); 
+        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync();
         if (!userDoc.Exists)
         {
             Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
@@ -233,7 +233,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
         PlayerData playerData = userDoc.ConvertTo<PlayerData>();
         int playerSoloScore = playerData.soloScore;
-        string playerScoreBracket = GetScoreBracket(playerSoloScore);        
+        string playerScoreBracket = GetScoreBracket(playerSoloScore);
         Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
 
         // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
@@ -289,15 +289,15 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             };
         }
 
-                    // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
-                    string displayNickname = string.IsNullOrEmpty(joiningUserData.player.nickname) ? "플레이어2" : joiningUserData.player.nickname;
-        
-                    PlayerProfile joiningProfile = new PlayerProfile
-                    {
-                        Nickname = displayNickname,
-                        Email = joiningUserData.player.email,
-                        Inventory = joiningUserData.inventory
-                    };
+        // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
+        string displayNickname = string.IsNullOrEmpty(joiningUserData.player.nickname) ? "플레이어2" : joiningUserData.player.nickname;
+
+        PlayerProfile joiningProfile = new PlayerProfile
+        {
+            Nickname = displayNickname,
+            Email = joiningUserData.player.email,
+            Inventory = joiningUserData.inventory
+        };
         await db.RunTransactionAsync(async transaction =>
         {
             DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(roomRef);
@@ -361,15 +361,15 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             };
         }
 
-                    // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
-                    string displayNickname = string.IsNullOrEmpty(hostUserData.player.nickname) ? "플레이어1" : hostUserData.player.nickname;
-        
-                    PlayerProfile hostProfile = new PlayerProfile
-                    {
-                        Nickname = displayNickname,
-                        Email = hostUserData.player.email,
-                        Inventory = hostUserData.inventory
-                    };
+        // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
+        string displayNickname = string.IsNullOrEmpty(hostUserData.player.nickname) ? "플레이어1" : hostUserData.player.nickname;
+
+        PlayerProfile hostProfile = new PlayerProfile
+        {
+            Nickname = displayNickname,
+            Email = hostUserData.player.email,
+            Inventory = hostUserData.inventory
+        };
         var room = new Room
         {
             RoomId = newRoomRef.Id,
@@ -509,7 +509,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
 
         // 타임아웃 코루틴 중지
         if (matchmakingTimeoutCoroutine != null)
-        { 
+        {
             StopCoroutine(matchmakingTimeoutCoroutine);
             matchmakingTimeoutCoroutine = null;
         }

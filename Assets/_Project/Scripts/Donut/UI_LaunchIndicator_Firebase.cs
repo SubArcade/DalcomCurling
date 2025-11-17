@@ -40,7 +40,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
     void Start()
     {
-        // ✨ 실제 빌드: Firebase에서 데이터를 로드합니다.
+        // Firebase에서 데이터를 로드합니다.
         var gameManager = FirebaseGameManager.Instance;
         if (gameManager != null)
         {

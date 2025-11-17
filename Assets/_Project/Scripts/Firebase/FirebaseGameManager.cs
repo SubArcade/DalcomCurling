@@ -887,10 +887,19 @@ public class FirebaseGameManager : MonoBehaviour
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame);
-        
+        string nextState;
+
         // 라운드 종료 시 플레이어의 도넛 사용 상태를 초기화합니다.
         donutSelectionUI?.ResetDonutUsage();
 
+        if (_currentGame.CurrentTurnPlayerId == "Finished" && _currentGame.RoundStartingPlayerId == "Finished")
+        {
+            nextState = "Finished";
+        }
+        else
+        {
+            nextState = "Timeline";
+        }
         var updates = new Dictionary<string, object>
         {
 

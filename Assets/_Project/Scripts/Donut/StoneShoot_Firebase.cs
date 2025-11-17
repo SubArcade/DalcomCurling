@@ -150,6 +150,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     private float _releaseRandomValue = -99f; // 릴리즈 타이밍에 따른 랜덤 값
     private bool _needToTap = false; // 호그 라인까지 이동 중 탭이 필요한지 여부
     private bool _isTrajectoryPreviewActive = false; // 궤적 미리보기 활성화 여부
+    private float draggedDistanceForTrajectory = 0; // 발사를 위해 드래그했던 정도를 기록할 변수, 궤적을 위해 저장
 
     // --- 미리 준비한 샷 데이터 저장용 ---
     private LastShot _preparedShotData = null; // 'PreparingShot' 상태에서 미리 입력된 샷 데이터
