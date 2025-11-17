@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -10,7 +10,21 @@ public enum LocalizationKey
     Btn_Start,
     Btn_Exit,
     Title_Main,
-    Label_Gold
+    Label_Gold,
+    Label_Setting,
+    Label_Account,
+    Label_DeleteAccount,
+    Label_AccountLink,
+    Label_GameSetting,
+    Label_AlarmSetting,
+    Label_AlarmText,
+    Label_AlarmEnergy,
+    Label_EventAlarm,
+    Label_Midnight,
+    Label_Service,
+    Label_Protect,
+    Label_ContactEMail,
+    Language_Select,
 }
 
 public class LocalizationManager : MonoBehaviour

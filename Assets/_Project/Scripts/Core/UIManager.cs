@@ -23,7 +23,8 @@ public enum PanelId
     Matching,
     EntryPopUp,
     MatchingPopUp,
-    TestLoginPanel
+    TestLoginPanel,
+    ShopPopUp
 }
 
 public class UIManager : MonoBehaviour

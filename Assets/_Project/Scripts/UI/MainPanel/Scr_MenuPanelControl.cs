@@ -21,6 +21,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject rewardCheckPopup;
     [SerializeField] private GameObject EntryPopUp;
     [SerializeField] private GameObject MatchingPopUp;
+    [SerializeField] private GameObject ShopPopUp;
     
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
@@ -50,6 +51,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.DonutUpgradePopup,donutUpgradePopup);
         UIManager.Instance.RegisterPanel(PanelId.EntryPopUp, EntryPopUp);
         UIManager.Instance.RegisterPanel(PanelId.MatchingPopUp, MatchingPopUp);
+        UIManager.Instance.RegisterPanel(PanelId.ShopPopUp, ShopPopUp);
         
         
         UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
@@ -60,6 +62,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         EntryPopUpButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EntryPopUp));
         detailedSettingsButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DetailedSettingsPanel));
         testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
+        //상점팝업창 넣어야해요 어디버튼인지 모르겠어요
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
