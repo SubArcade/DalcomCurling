@@ -77,12 +77,15 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         // GameManager에서 ID 정보를 가져옵니다.
         string myUserId = FirebaseAuthManager.Instance.UserId;
         string opponentId = gameManager.GetOpponentId();
+        Debug.Log($"GetPlayerProfile : {opponentId} 여기서 함수 호출");
 
         // 프로필 정보를 가져와서 저장합니다.
         MyProfile = gameManager.GetPlayerProfile(myUserId);
+        Debug.Log("GetPlayerProfile : MyProfile 여기서 함수 호출");
         OpponentProfile = gameManager.GetPlayerProfile(opponentId);
+        Debug.Log("GetPlayerProfile : OpponentProfile 여기서 함수 호출");
 
-        if (MyProfile != null && OpponentProfile != null)
+        if (MyProfile != null)
         {
             // TODO: 여기에 닉네임, 인벤토리 정보를 UI에 표시하는 로직 추가
             Debug.Log($"UI_LaunchIndicator_Firebase: 내 닉네임: {MyProfile.Nickname}, 상대 닉네임: {OpponentProfile.Nickname}");
@@ -103,9 +106,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             // 3. (표시 전용) 상대방 인벤토리 UI 채우기
             PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
         }
+        else if (OpponentProfile != null)
+        {
+            Debug.LogWarning("UI_LaunchIndicator_Firebase: OpponentProfile 프로필 정보를 모두 가져오지 못했습니다.");
+        }
         else
         {
-            Debug.LogWarning("UI_LaunchIndicator_Firebase: 프로필 정보를 모두 가져오지 못했습니다.");
+            Debug.LogWarning("UI_LaunchIndicator_Firebase: MyProfile 프로필 정보를 모두 가져오지 못했습니다.");
         }
     }
 

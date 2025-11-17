@@ -21,12 +21,14 @@ public class DonutSelectionUI : MonoBehaviour
     /// <param name="entries">플레이어의 도넛 엔트리 리스트.</param>
     public void Populate(List<DonutEntry> entries)
     {
+        Debug.Log("도넛 슬랏에 데이터 주입1111111111111111111111");
         if (entries == null) entries = new List<DonutEntry>();
 
         for (int i = 0; i < donutSlots.Count; i++)
         {
             if (i < entries.Count)
             {
+                Debug.Log("도넛 슬랏에 데이터 주입222222222222222222222222");
                 donutSlots[i].gameObject.SetActive(true);
                 donutSlots[i].Setup(entries[i], OnDonutClicked);
             }
