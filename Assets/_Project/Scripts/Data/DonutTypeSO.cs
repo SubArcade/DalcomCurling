@@ -5,7 +5,8 @@ public enum DonutType
 {
     Hard, //단단
     Soft, //말랑
-    Moist //촉촉
+    Moist, //촉촉
+    Gift //기프트박스
 }
 
 [System.Serializable]
