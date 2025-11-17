@@ -146,6 +146,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     private bool _isTrajectoryPreviewActive = false; // 궤적 미리보기 활성화 여부
     private bool _isPowerDirectionSet = false; // 힘/방향이 한 번이라도 설정되었는지 여부
     private float draggedDistanceForTrajectory = 0; // 발사를 위해 드래그했던 정도를 기록할 변수, 궤적을 위해 저장
+    private float draggedAmountBetween_0_Or_1 = 0; // 회전값을 주었을때, 회전힘에 따라 전진방향 힘을 살짝 약하게 주기 위한 값
 
     // --- 미리 준비한 샷 데이터 저장용 ---
     private LastShot _preparedShotData = null; // 'PreparingShot' 상태에서 미리 입력된 샷 데이터
@@ -307,6 +308,7 @@ public class StoneShoot_Firebase : MonoBehaviour
             if (CurrentDragType == DragType.PowerDirection)
             {
                 // 힘/방향 실시간 계산
+                // 실제 발사를 위한 계산과 궤적을 위한 계산이 분리되어있는 상태 ( 사용해야할 변수가 다름 )
                 Vector3 dragVector2D = (Vector3)touchPosition - _actualDragStartScreenPos;
                 Vector3 dragVector2DForTrajectory = new Vector3(dragVector2D.x * horizontalDragSensitivity, dragVector2D.y);
 
@@ -452,6 +454,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         float dragXDistance = dragVector.x; // X축 드래그 거리
         float normalizedDrag = dragXDistance / _mainCamera.pixelWidth; // 화면 폭 대비 정규화된 드래그 거리
         float dragRatio = Mathf.Clamp(normalizedDrag / (maxRotationDragDistance * 2), -1f, 1f); // 드래그 비율 클램프 (-1~1)
+        draggedAmountBetween_0_Or_1 = Mathf.Abs(dragRatio); // 드래그한 비율의 절대값을 가져옴(나중에 발사 힘 계산에 포함하기 위함)
         FinalRotationValue = dragRatio * maxRotationValue; // 최종 스핀 값 계산
     }
 
@@ -493,8 +496,8 @@ public class StoneShoot_Firebase : MonoBehaviour
             }
         }
 
-        float t = Mathf.InverseLerp(0, maxDragDistance, draggedDistanceForTrajectory);
-        Color resultColor = Color.Lerp(min_Color, max_Color, t);
+        float t = Mathf.InverseLerp(0, maxDragDistance, draggedDistanceForTrajectory); // 드래그한 거리를 비율화
+        Color resultColor = Color.Lerp(min_Color, max_Color, t); // 그 비율에 따라 시작 색상과 종료 색상 믹싱
         
         // 시작 컬러와 끝 컬러를 일단 통일하여 표시
         trajectoryLine.startColor = resultColor;
@@ -537,7 +540,9 @@ public class StoneShoot_Firebase : MonoBehaviour
         // LastShot 객체를 생성하여 반환
         return new LastShot
         {
-            Force = finalForce * calculatedRandomValue, // 최종 힘
+            // 좌우 회전값에 따라 발사 힘을 아주 살짝 약하게 줌으로써 최종 전진거리 감소 효과
+            Force = finalForce * calculatedRandomValue * (1 - (draggedAmountBetween_0_Or_1 * 0.1f)), // 최종 힘
+            
             PlayerId = stoneManager.myUserId,
             Team = stoneManager.myTeam, // 발사하는 팀
             Spin = FinalRotationValue * calculatedRandomValue, // 최종 스핀 값
