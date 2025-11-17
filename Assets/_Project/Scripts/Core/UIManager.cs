@@ -24,8 +24,7 @@ public enum PanelId
     EntryPopUp,
     MatchingPopUp,
     TestLoginPanel,
-    ReadyMenuPanel
-    TestLoginPanel,
+    ReadyMenuPanel,
     ShopPopUp
 }
 

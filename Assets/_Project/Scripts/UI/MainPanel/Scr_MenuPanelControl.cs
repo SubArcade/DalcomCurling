@@ -32,6 +32,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private Button detailedSettingsButton;
     [SerializeField] private Button readyButton;
     [SerializeField] private Button testBattle;
+    [SerializeField] private Button goldShopButton;
+    [SerializeField] private Button gemShopButton;
     
     
     [Header("플레이어 데이터 값")]
@@ -66,7 +68,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
         detailedSettingsButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DetailedSettingsPanel));
         testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
         readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
-        //상점팝업창 넣어야해요 어디버튼인지 모르겠어요
+        goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
+        gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;

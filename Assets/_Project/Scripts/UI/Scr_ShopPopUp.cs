@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,9 @@ public class Scr_ShopPopUp : MonoBehaviour
     [SerializeField] private Button eneryBtn;
     [SerializeField] private Button goldBtn;
     [SerializeField] private Button gemBtn;
+    [SerializeField] private TextMeshProUGUI energyText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI gemText;
 
     [Header("광고제거 아이템&패키지 아이템")]
     [SerializeField] private Button deleteAdsBtn1;
@@ -46,6 +50,10 @@ public class Scr_ShopPopUp : MonoBehaviour
         eneryBtn = transform.Find("TopUI/PlayerMoneyGroup/Energy")?.GetComponent<Button>();
         goldBtn = transform.Find("TopUI/PlayerMoneyGroup/Gold")?.GetComponent<Button>();
         gemBtn = transform.Find("TopUI/PlayerMoneyGroup/Gem")?.GetComponent<Button>();
+
+        energyText = transform.Find("TopUI/PlayerMoneyGroup/Energy/Energy_Text")?.GetComponent<TextMeshProUGUI>();
+        goldText = transform.Find("TopUI/PlayerMoneyGroup/Gold/Gold_Text")?.GetComponent<TextMeshProUGUI>();
+        gemText = transform.Find("TopUI/PlayerMoneyGroup/Gem/Gem_Text")?.GetComponent<TextMeshProUGUI>();
 
         deleteAdsBtn1 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem1")?.GetComponent<Button>();
         deleteAdsBtn2 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem2")?.GetComponent<Button>();
@@ -89,6 +97,7 @@ public class Scr_ShopPopUp : MonoBehaviour
             UIManager.Instance.Close(PanelId.ShopPopUp);
         });
 
+        SetPlayerText(DataManager.Instance.PlayerData);
     }
 
     //캐시샵열기용
@@ -104,6 +113,11 @@ public class Scr_ShopPopUp : MonoBehaviour
         transform.Find("GoldUIBackground").gameObject.SetActive(true);
     }
 
-    
+    public void SetPlayerText(PlayerData playerData)
+    {
+        energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        goldText.text = $"{playerData.gold}";
+        gemText.text = $"{playerData.gem}";
+    }
 
 }

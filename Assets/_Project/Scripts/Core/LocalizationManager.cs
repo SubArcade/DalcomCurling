@@ -25,6 +25,17 @@ public enum LocalizationKey
     Label_Protect,
     Label_ContactEMail,
     Language_Select,
+    Label_Info,
+    Label_Profile,
+    Label_Rank,
+    Label_Codex,
+    Label_HardDonut,
+    Label_SoftDonut,
+    Label_MoistDonut,
+    Label_GeneratorUgrade,
+    Label_UpgradeText,
+    Btn_Upgrade,
+    Label_AskUpgrade,
 }
 
 public class LocalizationManager : MonoBehaviour
