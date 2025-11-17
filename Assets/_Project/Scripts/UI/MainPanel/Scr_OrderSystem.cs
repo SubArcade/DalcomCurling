@@ -128,6 +128,7 @@ public class Scr_OrderSystem : MonoBehaviour
     };
     }
 
+    private readonly DonutType[] orderDonutTypes = { DonutType.Hard, DonutType.Soft, DonutType.Moist };
 
     void Awake()
     {
@@ -349,6 +350,10 @@ public class Scr_OrderSystem : MonoBehaviour
                 DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
                 int randomLevel = Random.Range(minLevel, maxLevel + 1); //도넛의 타입과 레벨 무작위 선택
                 string comboKey = $"{randomType}_{randomLevel}"; //타입+레벨 조합한 키 생성
+
+            //도넛 타입과 레벨을 랜덤으로 고름
+            //DonutType randomType = orderDonutTypes[Random.Range(0, orderDonutTypes.Length)];
+            //int randomLevel = Random.Range(1, 31);
 
                 if (usedDonuts.Contains(comboKey)) continue; //이미 생성된 조합이면 다시 시도
 

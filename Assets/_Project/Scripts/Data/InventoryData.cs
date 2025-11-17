@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Firebase.Firestore;
 using UnityEngine;
@@ -38,7 +38,7 @@ public class InventoryData
     // 이팩트
     
     // 도감 데이터
-    [field: SerializeField, Tooltip("도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> hardDonutCodexDataList { get; set; } = new();
-    [field: SerializeField, Tooltip("도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> softDonutCodexDataList { get; set; } = new();
-    [field: SerializeField, Tooltip("도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> moistDnutCodexDataList { get; set; } = new();
+    [field: SerializeField, Tooltip("단단도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> hardDonutCodexDataList { get; set; } = new();
+    [field: SerializeField, Tooltip("말랑도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> softDonutCodexDataList { get; set; } = new();
+    [field: SerializeField, Tooltip("촉촉도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> moistDnutCodexDataList { get; set; } = new();
 }

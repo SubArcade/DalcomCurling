@@ -8,9 +8,11 @@ public class Cells : MonoBehaviour, IPointerClickHandler
 {
     [Header("잠금 상태 표시용 UI")]
     [SerializeField] private Image lockOverlay; // Cell 프리팹 안 자식 오브젝트
+    public Image LockOverlay => lockOverlay;
+
     [SerializeField] private int requiredLevel; // 이 칸을 해금하기 위한 최소 플레이어 레벨
 
-    public bool isActive { get; private set; }
+    public bool isActive { get; set; }
     public MergeItemUI occupant { get; set; }
     public int gridX, gridY;
     public string donutId;

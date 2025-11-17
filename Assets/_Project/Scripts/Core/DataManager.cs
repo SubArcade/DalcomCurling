@@ -172,6 +172,7 @@ public class DataManager : MonoBehaviour
             FirstBasePlayerData();
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            FirstBaseMergeBoardData();
             BaseQuestData(baseGold);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
@@ -252,6 +253,29 @@ public class DataManager : MonoBehaviour
         MergeBoardData.cellLength = cellLength;
     }
     
+    // 처음 머지보드 데이터 셋
+    private void FirstBaseMergeBoardData()
+    {
+        MergeBoardData.cells = new List<CellData>();
+
+        for(int x = 0; x < MergeBoardData.cellLength; x++) {
+
+            for (int y = 0; y < MergeBoardData.cellWidth; y++)
+            {
+                CellData cellData = new CellData()
+                {
+                    x = x,
+                    y = y,
+                    isCellActive = false,
+                    donutId = null,
+                    isQuestActive = false,
+                };
+
+                MergeBoardData.cells.Add(cellData);
+            }
+        }
+    }
+
     // 기본 퀘스트 데이터
     private void BaseQuestData(int baseGold)
     {
@@ -341,9 +365,64 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    
+    public async Task LoadBoardDataOnlyAsync()
+    {
+        var docRef = db.Collection(userCollection).Document(docId);
+        var snapshot = await docRef.GetSnapshotAsync();
+
+        if (!snapshot.Exists)
+        {
+            Debug.LogWarning("[FS] 문서 없음 → 신규 계정으로 간주");
+            return;
+        }
+
+        // Firestore 데이터를 Dictionary로 변환
+        Dictionary<string, object> doc = snapshot.ToDictionary();
+
+        if (!doc.ContainsKey("mergeBoard"))
+        {
+            Debug.LogWarning("[FS] mergeBoard 데이터 없음");
+            return;
+        }
+
+        var mergeBoardDict = doc["mergeBoard"] as Dictionary<string, object>;
+
+        if (!mergeBoardDict.ContainsKey("cells"))
+        {
+            Debug.LogWarning("[FS] mergeBoard.cells 없음");
+            return;
+        }
+
+        var rawCells = mergeBoardDict["cells"] as List<object>;
+
+        var cellList = new List<CellData>();
+
+        foreach (var cellObj in rawCells)
+        {
+            var c = cellObj as Dictionary<string, object>;
+
+            CellData cd = new CellData
+            {
+                x = Convert.ToInt32(c["x"]),
+                y = Convert.ToInt32(c["y"]),
+                donutId = c.ContainsKey("donutId") ? c["donutId"]?.ToString() : null,
+                isCellActive = c.ContainsKey("isCellActive") ?
+                               Convert.ToBoolean(c["isCellActive"]) : true
+            };
+
+            cellList.Add(cd);
+        }
+
+        // DataManager의 mergeBoard에 cellList 넣기
+        MergeBoardData.cells = cellList;
+
+        Debug.Log("[FS] mergeBoard.cells 로드 완료: " + cellList.Count);
+    }
+
+
+
     // Rank 디비 관련 함수들
-    
+
     // 디비에 들어가는 컬랙션과 문서 설정
     DocumentReference ModeDoc(GameMode? mode = null)
     {
@@ -410,17 +489,20 @@ public class DataManager : MonoBehaviour
         return next;
     }
 
-    // 특정 레벨의 모든 도넛 가져오기 (랜덤 생성용)
-    public List<DonutData> GetDonutsByLevel(int level)
+    public List<DonutData> GetDonutsByTypeAndLevel(DonutType type, int level)
     {
         List<DonutData> result = new();
 
-        foreach (var so in _donutTypeDB.Values)
+        // 타입 DB가 있는지 확인
+        if (_donutTypeDB.TryGetValue(type, out var typeDB))
         {
-            var data = so.GetLevelData(level);
+            // 해당 타입에서 레벨 데이터 가져오기
+            var data = typeDB.GetLevelData(level);
+
             if (data != null)
                 result.Add(data);
         }
+
         return result;
     }
 
@@ -484,6 +566,20 @@ public class DataManager : MonoBehaviour
         
     }
     
+    //생성기 레벨 받아오기
+    public int GetGeneratorLevel(DonutType type)
+    {
+        var board = userData.mergeBoard;
+
+        return type switch
+        {
+            DonutType.Hard => board.generatorLevelHard,
+            DonutType.Soft => board.generatorLevelSoft,
+            DonutType.Moist => board.generatorLevelMoist,
+            _ => 1
+        };
+    }
+
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
     {
