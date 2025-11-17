@@ -181,6 +181,17 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         });
 
         InitVolumeSettings();
+
+        languageDropDown.onValueChanged.AddListener(OnLanguageChanged);
+
+        // 현재 언어에 따라 드롭다운 초기화
+        if (LocalizationManager.Instance != null)
+        {
+            string lang = LocalizationManager.Instance.CurrentLanguage;
+            int index = lang == "ko" ? 0 : 1;
+            languageDropDown.value = index;
+        }
+
     }
     //사운드 조절 슬라이더와 텍스트 연결 및 저장 불러오기
     private void InitVolumeSettings()
@@ -218,6 +229,20 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
             PlayerPrefs.SetFloat("SFXVolume", value);
             PlayerPrefs.Save();
         });
+    }
+
+    private void OnLanguageChanged(int index)
+    {
+        string selectedLang = "ko"; // 기본값
+
+        switch (index)
+        {
+            case 0: selectedLang = "ko"; break;
+            case 1: selectedLang = "en"; break;
+                // 필요 시 다른 언어 추가
+        }
+
+        LocalizationManager.Instance.SetLanguage(selectedLang);
     }
 
 }

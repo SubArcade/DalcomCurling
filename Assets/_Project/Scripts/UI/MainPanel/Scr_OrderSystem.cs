@@ -29,7 +29,7 @@ public class Scr_OrderSystem : MonoBehaviour
     [SerializeField] private Button refreshBtn3;
     [SerializeField] private TextMeshProUGUI costText3;
     [SerializeField] private GameObject orderClearBtn3;
-    [SerializeField] private GameObject oompleteObject3;
+    [SerializeField] private GameObject completeObject3;
 
     [Header("갱신된 새로고침 횟수 텍스트")]
     [SerializeField] private TextMeshProUGUI refreshCountText;
@@ -131,32 +131,32 @@ public class Scr_OrderSystem : MonoBehaviour
 
     void Awake()
     {
-        orderGroup1 = transform.Find("Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
-        orderGroup2 = transform.Find("Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
-        orderGroup3 = transform.Find("Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
+        orderGroup1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
+        orderGroup2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
+        orderGroup3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
 
         orderDonuts1 = orderGroup1.GetComponentsInChildren<Image>().ToList();
         orderDonuts2 = orderGroup2.GetComponentsInChildren<Image>().ToList();
         orderDonuts3 = orderGroup3.GetComponentsInChildren<Image>().ToList();
 
-        refreshBtn1 = transform.Find("Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
-        refreshBtn2 = transform.Find("Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
-        refreshBtn3 = transform.Find("Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
+        refreshBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
+        refreshBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
+        refreshBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
 
-        costText1 = transform.Find("Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText2 = transform.Find("Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText3 = transform.Find("Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
+        costText3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
 
-        orderClearBtn1 = transform.Find("Top/QuestGroup/Order1/OrderClearBtn")?.gameObject;
-        orderClearBtn2 = transform.Find("Top/QuestGroup/Order2/OrderClearBtn")?.gameObject;
-        orderClearBtn3 = transform.Find("Top/QuestGroup/Order3/OrderClearBtn")?.gameObject;
+        orderClearBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn")?.gameObject;
+        orderClearBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn")?.gameObject;
+        orderClearBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn")?.gameObject;
 
-        refreshCountText = transform.Find("Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
+        refreshCountText = transform.Find("MainMenu/Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
         refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
 
-        completeObject1 = transform.Find("Top/QuestGroup/Order1/CompleteObject")?.gameObject;
-        completeObject2 = transform.Find("Top/QuestGroup/Order2/CompleteObject")?.gameObject;
-        oompleteObject3 = transform.Find("Top/QuestGroup/Order3/CompleteObject")?.gameObject;
+        completeObject1 = transform.Find("MainMenu/Top/QuestGroup/Order1/CompleteObject")?.gameObject;
+        completeObject2 = transform.Find("MainMenu/Top/QuestGroup/Order2/CompleteObject")?.gameObject;
+        completeObject3 = transform.Find("MainMenu/Top/QuestGroup/Order3/CompleteObject")?.gameObject;
 
         // orderdonuts1~3의 자식 텍스트들을 리스트에 저장
         donutTextInfos1 = FindLevelAndTypeText(orderDonuts1);
@@ -182,13 +182,13 @@ public class Scr_OrderSystem : MonoBehaviour
         //주문서 완료 연결
         completeObject1.GetComponent<Button>().onClick.AddListener(() => OnClickCompleteObject(completeObject1, orderDonutIDs1));
         completeObject2.GetComponent<Button>().onClick.AddListener(() => OnClickCompleteObject(completeObject2, orderDonutIDs2));
-        oompleteObject3.GetComponent<Button>().onClick.AddListener(() => OnClickCompleteObject(oompleteObject3, orderDonutIDs3));
+        completeObject3.GetComponent<Button>().onClick.AddListener(() => OnClickCompleteObject(completeObject3, orderDonutIDs3));
         
 
         //시작 시 퀘스트 완료 판떼기 비활성화
         completeObject1.SetActive(false);
         completeObject2.SetActive(false);
-        oompleteObject3.SetActive(false);
+        completeObject3.SetActive(false);
     
         // 새로고침 회복 코루틴
         refreshCoroutine = StartCoroutine(RecoveryRefreshCount());
@@ -216,7 +216,7 @@ public class Scr_OrderSystem : MonoBehaviour
         // 보상 UI 표시 조건
         completeObject1.SetActive(isOrder1Complete || isRewarding1);
         completeObject2.SetActive(isOrder2Complete || isRewarding2);
-        oompleteObject3.SetActive(isOrder3Complete || isRewarding3);
+        completeObject3.SetActive(isOrder3Complete || isRewarding3);
 
 
         // ClearBtn은 항상 비활성화 상태 유지
@@ -323,7 +323,7 @@ public class Scr_OrderSystem : MonoBehaviour
         else if (ClickedButton == refreshBtn3)
         {
             RefreshOrderDonut(orderDonuts3, donutTextInfos3, orderDonutIDs3,costText3);
-            oompleteObject3.SetActive(false);
+            completeObject3.SetActive(false);
         }
     }
 
@@ -461,11 +461,11 @@ public class Scr_OrderSystem : MonoBehaviour
         int reward = 0;
         if (completeObject == completeObject1) reward = rewardGold1;
         else if (completeObject == completeObject2) reward = rewardGold2;
-        else if (completeObject == oompleteObject3) reward = rewardGold3;
+        else if (completeObject == completeObject3) reward = rewardGold3;
         //컴플리트버튼 유지를 위해 true 적용
         if (completeObject == completeObject1) isRewarding1 = true;
         else if (completeObject == completeObject2) isRewarding2 = true;
-        else if (completeObject == oompleteObject3) isRewarding3 = true;
+        else if (completeObject == completeObject3) isRewarding3 = true;
 
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;
@@ -476,8 +476,8 @@ public class Scr_OrderSystem : MonoBehaviour
             StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));
         else if (completeObject == completeObject2)
             StartCoroutine(RefreshAfterOrderClear(orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2, completeObject2, 1.5f));
-        else if (completeObject == oompleteObject3)
-            StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, oompleteObject3, 1.5f));
+        else if (completeObject == completeObject3)
+            StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, completeObject3, 1.5f));
     }
 
     //주문서 완료 후 퀘스트 알아서 새로고침
@@ -488,7 +488,7 @@ public class Scr_OrderSystem : MonoBehaviour
         //새로고침이 되었으니 컴플리트 버튼 비활성화
         if (completeObject == completeObject1) isRewarding1 = false;
         else if (completeObject == completeObject2) isRewarding2 = false;
-        else if (completeObject == oompleteObject3) isRewarding3 = false;
+        else if (completeObject == completeObject3) isRewarding3 = false;
 
         completeObject.SetActive(false); // 완료 UI 숨김
     }
