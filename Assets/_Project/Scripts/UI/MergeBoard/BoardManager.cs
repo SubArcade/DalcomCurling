@@ -48,6 +48,12 @@ public class BoardManager : MonoBehaviour
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
+        
+        // Firestore에서 보드 데이터 로드
+        await DataManager.Instance.LoadBoardDataOnlyAsync();
+
+        // 불러온 데이터로 보드 복원
+        LoadBoardLocal();
 
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
     }
@@ -112,6 +118,9 @@ public class BoardManager : MonoBehaviour
             {
                 GameObject obj = Instantiate(cellPrefab, transform);
                 Cells cell = obj.GetComponent<Cells>();
+
+                cell.gridX = x;
+                cell.gridY = y;
                 cells[x, y] = cell;
 
                 int reqLevel = requiredLevelMap[y, x];
@@ -158,6 +167,15 @@ public class BoardManager : MonoBehaviour
             Debug.Log("빈 칸이 없습니다.");
             return;
         }
+        PlayerData playerData = DataManager.Instance.PlayerData;
+        if (playerData.energy <= 0)
+        {
+            Debug.Log("에너지가 부족합니다");
+            return;
+        }
+
+        //에너지 차감
+        playerData.energy -= 1;
 
         // 생성기에서 도넛 정보 랜덤 선택 (DonutGenerator 내부 확률 계산)
         var generator = generatorCell.GetComponentInChildren<DonutGenerator>();
@@ -325,19 +343,83 @@ public class BoardManager : MonoBehaviour
         if (boardData == null) return;
 
         boardData.cells.Clear();
+        //for(int x = 0; x < boardSize; x++)
+        //{
+        //    boardData.cells[x] = ;
+        //}
+       
 
         foreach (var cell in GetAllCells())
         {
-            if (cell.occupant == null) continue;
-            boardData.cells.Add(new CellData
+            CellData data = new CellData
             {
                 x = cell.gridX,
                 y = cell.gridY,
-                donutId = cell.donutId
-            });
+                isCellActive = cell.isActive,
+
+                // occupant 말고 cell.donutId 사용해야 함
+                donutId = !string.IsNullOrEmpty(cell.donutId) ? cell.donutId : null
+            };
+
+            boardData.cells.Add(data);
         }
 
-        Debug.Log($"[AutoSaveBoardLocal] 현재 보드 상태를 MergeBoardData에 로컬 저장 ({boardData.cells.Count}개)");
+        Debug.Log($"[AutoSaveBoardLocal] 저장 완료: 총 {boardData.cells.Count}칸 저장");
+    }
+
+    public void LoadBoardLocal()
+    {
+        var boardData = DataManager.Instance.MergeBoardData;
+        if (boardData == null || boardData.cells == null || boardData.cells.Count == 0)
+        {
+            Debug.LogWarning("[LoadBoardLocal] 저장된 보드 데이터가 없습니다.");
+            return;
+        }
+
+        foreach (var data in boardData.cells)
+        {
+            Cells cell = GetCell(data.x, data.y);
+            if (cell == null) continue;
+
+            // 저장된 활성상태 그대로 복구
+            cell.isActive = data.isCellActive;
+
+            // 락 UI 갱신 (잠금 또는 잠금 해제)
+            if (cell.LockOverlay != null)
+                cell.LockOverlay.gameObject.SetActive(!cell.isActive);
+
+            // 기존 도넛 제거
+            if (cell.occupant != null)
+            {
+                Destroy(cell.occupant.gameObject);
+                cell.ClearItem();
+            }
+
+            // 도넛 없으면 빈칸으로 유지
+            if (string.IsNullOrEmpty(data.donutId))
+                continue;
+
+            // 도넛 데이터 찾기
+            DonutData donut = DataManager.Instance.GetDonutByID(data.donutId);
+            if (donut == null)
+            {
+                Debug.LogWarning($"[LoadBoardLocal] 도넛 ID '{data.donutId}' 를 찾을 수 없습니다.");
+                continue;
+            }
+
+            // 도넛 프리팹 생성
+            GameObject obj = Instantiate(donutPrefab, cell.transform);
+            var item = obj.GetComponent<MergeItemUI>();
+            var img = obj.GetComponent<Image>();
+
+            img.sprite = donut.sprite;
+            item.donutId = donut.id;
+            item.donutData = donut;
+
+            cell.SetItem(item, donut);
+        }
+
+        Debug.Log("[LoadBoardLocal] 보드 로드 완료");
     }
 
 }
