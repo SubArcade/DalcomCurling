@@ -102,6 +102,7 @@ public class LastShot
     [FirestoreProperty] public Dictionary<string, float> Direction { get; set; }
     [FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
     [FirestoreProperty, ServerTimestamp] public Timestamp Timestamp { get; set; }
+    [FirestoreProperty] public string DonutId { get; set; } // 발사된 도넛의 ID
 }
 
 [FirestoreData]
@@ -271,13 +272,32 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             return;
         }
 
-        PlayerProfile joiningProfile = new PlayerProfile
+        // [테스트용 임시 코드] 인벤토리가 비어있으면 더미 데이터를 주입합니다.
+        if (joiningUserData.inventory == null || joiningUserData.inventory.donutEntries == null || joiningUserData.inventory.donutEntries.Count == 0)
         {
-            Nickname = joiningUserData.player.nickname,
-            Email = joiningUserData.player.email,
-            Inventory = joiningUserData.inventory
-        };
+            Debug.LogWarning($"참가 플레이어({userId})의 인벤토리가 비어있어 테스트용 더미 데이터를 주입합니다.");
+            joiningUserData.inventory = new InventoryData
+            {
+                donutEntries = new List<DonutEntry>
+                {
+                    new DonutEntry { id = "Soft_15", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
+                    new DonutEntry { id = "Hard_22", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
+                    new DonutEntry { id = "Moist_13", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
+                    new DonutEntry { id = "Soft_14", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
+                    new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
+                }
+            };
+        }
 
+                    // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
+                    string displayNickname = string.IsNullOrEmpty(joiningUserData.player.nickname) ? "플레이어2" : joiningUserData.player.nickname;
+        
+                    PlayerProfile joiningProfile = new PlayerProfile
+                    {
+                        Nickname = displayNickname,
+                        Email = joiningUserData.player.email,
+                        Inventory = joiningUserData.inventory
+                    };
         await db.RunTransactionAsync(async transaction =>
         {
             DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(roomRef);
@@ -324,13 +344,32 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             return;
         }
 
-        PlayerProfile hostProfile = new PlayerProfile
+        // [테스트용 임시 코드] 인벤토리가 비어있으면 더미 데이터를 주입합니다.
+        if (hostUserData.inventory == null || hostUserData.inventory.donutEntries == null || hostUserData.inventory.donutEntries.Count == 0)
         {
-            Nickname = hostUserData.player.nickname,
-            Email = hostUserData.player.email,
-            Inventory = hostUserData.inventory
-        };
+            Debug.LogWarning($"호스트 플레이어({userId})의 인벤토리가 비어있어 테스트용 더미 데이터를 주입합니다.");
+            hostUserData.inventory = new InventoryData
+            {
+                donutEntries = new List<DonutEntry>
+                {
+                    new DonutEntry { id = "Soft_10", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
+                    new DonutEntry { id = "Hard_5", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
+                    new DonutEntry { id = "Moist_20", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
+                    new DonutEntry { id = "Soft_22", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
+                    new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
+                }
+            };
+        }
 
+                    // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
+                    string displayNickname = string.IsNullOrEmpty(hostUserData.player.nickname) ? "플레이어1" : hostUserData.player.nickname;
+        
+                    PlayerProfile hostProfile = new PlayerProfile
+                    {
+                        Nickname = displayNickname,
+                        Email = hostUserData.player.email,
+                        Inventory = hostUserData.inventory
+                    };
         var room = new Room
         {
             RoomId = newRoomRef.Id,

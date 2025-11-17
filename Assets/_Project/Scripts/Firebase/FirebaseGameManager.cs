@@ -52,6 +52,7 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private StoneManager stoneManager; // 돌 생성 및 움직임 관리 스크립트
     [SerializeField] private Src_GameCamControl gameCamControl; // 카메라 연출을 제어하는 스크립트
     [SerializeField] private UI_LaunchIndicator_Firebase UI_LaunchIndicator_Firebase; // UI제어 스크립트
+    [SerializeField] private DonutSelectionUI donutSelectionUI; // 도넛 선택 UI 스크립트
 
     // --- 플레이어 프로필 정보 ---
     private Dictionary<string, PlayerProfile> _playerProfiles;
@@ -407,7 +408,15 @@ public class FirebaseGameManager : MonoBehaviour
                 //카운트다운 활성화
                 //ControlCountdown(true);
 
-                Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame);
+                // UI에서 선택된 도넛 엔트리를 가져옵니다.
+                DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+                if (selectedDonut == null)
+                {
+                    Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
+                    return;
+                }
+
+                Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut);
                 if (donutRigid != null)
                 {
                     CountDownStart(10.0f, donutRigid);
@@ -493,7 +502,32 @@ public class FirebaseGameManager : MonoBehaviour
 
             gameCamControl?.SwitchCamera(SIMULATING_VIEW_CAM); // 시뮬레이션 시작 카메라로 전환
 
-            stoneManager?.SpawnStone(_currentGame);
+            // 상대방의 프로필에서 발사된 도넛 정보를 가져옵니다.
+            string opponentId = GetOpponentId();
+            PlayerProfile opponentProfile = GetPlayerProfile(opponentId);
+            DonutEntry opponentDonut = null;
+
+            if (opponentProfile != null && _currentGame.LastShot != null && !string.IsNullOrEmpty(_currentGame.LastShot.DonutId))
+            {
+                opponentDonut = opponentProfile.Inventory.donutEntries.FirstOrDefault(d => d.id == _currentGame.LastShot.DonutId);
+            }
+
+            if (opponentDonut == null)
+            {
+                Debug.LogError($"상대방({opponentId})의 발사된 도넛({_currentGame.LastShot?.DonutId}) 정보를 찾을 수 없습니다. 기본 도넛으로 대체합니다.");
+                // TODO: 기본 도넛으로 대체하는 로직 추가 (예: 첫 번째 인벤토리 도넛 또는 기본값)
+                // 현재는 임시로 첫 번째 도넛을 사용하거나, 에러를 발생시킬 수 있습니다.
+                // 여기서는 임시로 상대방의 첫 번째 도넛을 사용하도록 합니다.
+                opponentDonut = opponentProfile?.Inventory.donutEntries.FirstOrDefault();
+                if (opponentDonut == null)
+                {
+                    // 정말 아무 도넛도 없으면 에러 처리
+                    Debug.LogError("상대방 인벤토리에 도넛이 없습니다. 시뮬레이션을 진행할 수 없습니다.");
+                    return;
+                }
+            }
+
+            stoneManager?.SpawnStone(_currentGame, opponentDonut);
             int stoneIdToLaunch =
                 stoneManager.myTeam == StoneForceController_Firebase.Team.A
                     ? stoneManager.bShotIndex
@@ -652,6 +686,19 @@ public class FirebaseGameManager : MonoBehaviour
     {
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
+
+        // 현재 선택된 도넛을 가져옵니다.
+        DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+        
+        // LastShot 데이터에 도넛 ID를 저장합니다.
+        shotData.DonutId = selectedDonut?.id;
+
+        // 사용한 도넛을 UI에서 '사용됨'으로 표시하고 다음 도넛을 선택합니다.
+        if (donutSelectionUI != null && selectedDonut != null)
+        {
+            donutSelectionUI.MarkDonutAsUsed(selectedDonut);
+        }
+        
         int count = stoneManager.myTeam == StoneForceController_Firebase.Team.A
             ? stoneManager.aShotIndex
             : stoneManager.bShotIndex;
@@ -733,7 +780,15 @@ public class FirebaseGameManager : MonoBehaviour
                 }
                 else
                 {
-                    Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, myUserId);
+                    // UI에서 선택된 도넛 엔트리를 가져옵니다.
+                    DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+                    if (selectedDonut == null)
+                    {
+                        Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
+                        return;
+                    }
+
+                    Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut, myUserId);
                     if (donutRigid != null)
                     {
                         //inputController?.EnableInput(donutRigid);
@@ -797,6 +852,10 @@ public class FirebaseGameManager : MonoBehaviour
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame);
+        
+        // 라운드 종료 시 플레이어의 도넛 사용 상태를 초기화합니다.
+        donutSelectionUI?.ResetDonutUsage();
+
         var updates = new Dictionary<string, object>
         {
             { "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
@@ -1110,8 +1169,17 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     public string GetOpponentId()
     {
-        if (_currentGame == null || _currentGame.PlayerIds == null) return null;
-        return _currentGame.PlayerIds.FirstOrDefault(id => id != myUserId);
+        // _currentGame이 아직 로드되지 않았을 수 있으므로, _playerProfiles에서 먼저 찾아봅니다.
+        if (_playerProfiles != null && _playerProfiles.Count >= 2)
+        {
+            return _playerProfiles.Keys.FirstOrDefault(id => id != myUserId);
+        }
+        // _currentGame이 로드된 후에는 여기서 찾습니다.
+        if (_currentGame != null && _currentGame.PlayerIds != null)
+        {
+            return _currentGame.PlayerIds.FirstOrDefault(id => id != myUserId);
+        }
+        return null;
     }
 
     /// <summary>

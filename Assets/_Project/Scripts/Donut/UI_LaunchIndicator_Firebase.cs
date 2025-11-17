@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {
     //UI의 표시(활성화) 여부를 제어하는 스크립트
-    
+
     [Header("References")]
     // 발사 로직 스크립트를 드래그 앤 드롭으로 연결
     public StoneShoot_Firebase launchScript;
@@ -27,6 +27,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject donutEntry;
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject result;
+    [SerializeField] private DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
+    [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
+    [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
     //내부변수
     private int displayTurn = 0;
@@ -37,10 +40,25 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
     void Start()
     {
-        // FirebaseGameManager가 프로필 로딩을 완료하면 HandleProfilesLoaded를 호출하도록 이벤트를 구독합니다.
-        if (FirebaseGameManager.Instance != null)
+        // ✨ 실제 빌드: Firebase에서 데이터를 로드합니다.
+        var gameManager = FirebaseGameManager.Instance;
+        if (gameManager != null)
         {
-            FirebaseGameManager.Instance.OnProfilesLoaded += HandleProfilesLoaded;
+            // 데이터가 이미 로드되었는지 확인합니다.
+            if (gameManager.HasLoadedProfiles())
+            {
+                // 이미 로드되었다면 즉시 UI를 업데이트합니다.
+                HandleProfilesLoaded();
+            }
+            else
+            {
+                // 아직 로드되지 않았다면, 로드가 완료될 때를 기다리기 위해 이벤트를 구독합니다.
+                gameManager.OnProfilesLoaded += HandleProfilesLoaded;
+            }
+        }
+        else
+        {
+            Debug.LogError("UI_LaunchIndicator_Firebase: Start()에서 FirebaseGameManager.Instance를 찾을 수 없습니다.");
         }
     }
 
@@ -57,7 +75,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         // GameManager에서 ID 정보를 가져옵니다.
         string myUserId = FirebaseAuthManager.Instance.UserId;
-        string opponentId = gameManager.GetOpponentId(); 
+        string opponentId = gameManager.GetOpponentId();
 
         // 프로필 정보를 가져와서 저장합니다.
         MyProfile = gameManager.GetPlayerProfile(myUserId);
@@ -67,6 +85,22 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         {
             // TODO: 여기에 닉네임, 인벤토리 정보를 UI에 표시하는 로직 추가
             Debug.Log($"UI_LaunchIndicator_Firebase: 내 닉네임: {MyProfile.Nickname}, 상대 닉네임: {OpponentProfile.Nickname}");
+
+            // 1. (선택 가능) 내 인벤토리 UI 채우기
+            if (donutSelectionUI != null)
+            {
+                donutSelectionUI.Populate(MyProfile.Inventory.donutEntries);
+            }
+            else
+            {
+                Debug.LogWarning("UI_LaunchIndicator_Firebase: donutSelectionUI가 할당되지 않았습니다.");
+            }
+
+            // 2. (표시 전용) 내 인벤토리 UI 채우기
+            PopulateDisplayDonuts(myDisplayDonutSlots, MyProfile.Inventory.donutEntries);
+
+            // 3. (표시 전용) 상대방 인벤토리 UI 채우기
+            PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
         }
         else
         {
@@ -144,13 +178,38 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         AllcloseUI();
         result.SetActive(true);
     }
-
     private void AllcloseUI()
     {
         roundPanel.SetActive(false);
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
+    }
+
+    /// <summary>
+    /// (표시 전용) 도넛 인벤토리 UI 슬롯들을 채웁니다.
+    /// </summary>
+    /// <param name="slots">채울 UI 슬롯 리스트</param>
+    /// <param name="entries">표시할 도넛 엔트리 리스트</param>
+
+    private void PopulateDisplayDonuts(List<DonutEntryUI> slots, List<DonutEntry> entries)
+    {
+        if (slots == null) return;
+        if (entries == null) entries = new List<DonutEntry>();
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (i < entries.Count)
+            {
+                slots[i].gameObject.SetActive(true);
+                // 표시 전용 슬롯은 클릭 기능이 필요 없으므로 onClickAction에 null 전달
+                slots[i].Setup(entries[i], null);
+            }
+            else
+            {
+                slots[i].gameObject.SetActive(false); // 남는 슬롯은 비활성화
+            }
+        }
     }
 
 }
