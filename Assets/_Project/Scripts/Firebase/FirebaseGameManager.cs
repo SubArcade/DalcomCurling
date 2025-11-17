@@ -15,7 +15,7 @@ public class FirebaseGameManager : MonoBehaviour
 {
     public static FirebaseGameManager Instance { get; private set; }
 
-    // ✨ 플레이어 프로필 로딩이 완료되었을 때 발생하는 이벤트
+    // 플레이어 프로필 로딩이 완료되었을 때 발생하는 이벤트
     public event Action OnProfilesLoaded;
 
     // --- 게임의 현재 상태를 나타내는 변수 ---
@@ -148,6 +148,7 @@ public class FirebaseGameManager : MonoBehaviour
 
         // 돌 조작 스크립트가 존재한다면 샷 확정 이벤트를 등록합니다.
         if (inputController != null) inputController.OnShotConfirmed += SubmitShot;
+        if (donutSelectionUI != null) donutSelectionUI.OnDonutSelectionChanged += OnDonutChanged; //도넛 변경 이벤트
 
         // Firestore에서 게임 데이터 변화를 감시합니다.
         DocumentReference gameRef = db.Collection("games").Document(gameId);
@@ -168,6 +169,7 @@ public class FirebaseGameManager : MonoBehaviour
     {
         gameListener?.Stop();
         if (inputController != null) inputController.OnShotConfirmed -= SubmitShot;
+        if (donutSelectionUI != null) donutSelectionUI.OnDonutSelectionChanged -= OnDonutChanged;
 
         // 하트비트 코루틴 중지
         if (_heartbeatCoroutine != null)
@@ -242,14 +244,16 @@ public class FirebaseGameManager : MonoBehaviour
                 if (_localState == LocalGameState.Idle)
                 {
                     _localState = LocalGameState.InTimeline; // 중복 실행 방지를 위해 InTimeline 상태로 변경
+                    
+                    UI_LaunchIndicator_Firebase.AllcloseUI(); //게임 UI를 모두 닫아둠
 
                     // [짧은 타임라인 실행 > InProgress로 상태 변경] 로직을 Action으로 묶어 재사용.
                     Action playShortTimelineAndStartGame = () =>
                     {
-                        Debug.Log($"[{_currentGame.RoundNumber} 라운드 시작!] 연출 (1초)");
-                        // TODO: gameCamControl?.PlayRoundStartAnimation(); 라운드시작 연출 만들어 붙이기
+                        Debug.Log($"[{_currentGame.RoundNumber} 라운드 시작!] 연출 (2.5초)");
+                        gameCamControl?.PlayRoundTimeline(); // 라운드시작 연출
 
-                        DOVirtual.DelayedCall(1f, () =>
+                        DOVirtual.DelayedCall(2.5f, () =>
                         {
                             if (IsHost())
                             {
@@ -270,13 +274,19 @@ public class FirebaseGameManager : MonoBehaviour
                         isFirstTurn = false;
                         gameCamControl?.PlayStartTimeline(); // 긴 타임라인 재생
 
-                        // 8.5초의 긴 연출이 끝난 후, 짧은 연출 로직을 실행합니다.
-                        DOVirtual.DelayedCall(8.5f, () => { playShortTimelineAndStartGame(); });
+                        // 8.5초의 연출 대기시간을 기다림
+                        DOVirtual.DelayedCall(8.5f, () => {
+                            Debug.Log("<<<<<< 첫턴 긴 타임라인 이후 짧은 타임라인 실행 >>>>>>");
+                            playShortTimelineAndStartGame(); 
+                        });
                     }
                     else // 첫 라운드가 아닐 경우
                     {
-                        // 짧은 연출 로직만 바로 실행합니다.
+                        // 짧은 연출 로직만 실행합니다.
+
+                        Debug.Log("<<<<<< 라운드 변경의 짧은 타임라인 실행 >>>>>>");
                         playShortTimelineAndStartGame();
+                        
                     }
                 }
 
@@ -405,6 +415,8 @@ public class FirebaseGameManager : MonoBehaviour
                 Debug.Log("내 턴 시작. 입력을 준비합니다.");
                 _localState = LocalGameState.WaitingForInput;
 
+                UI_LaunchIndicator_Firebase.FireShotReadyUI(); //입력준비 UI
+
                 //카운트다운 활성화
                 //ControlCountdown(true);
 
@@ -432,6 +444,8 @@ public class FirebaseGameManager : MonoBehaviour
         else if (!_isMyTurn)
         {
             //canShotDonutNow = false;
+            UI_LaunchIndicator_Firebase.IdleUI(); //기본 UI
+
             SuccessfullyShotInTime = false;
             inputController?.DisableInput();
             _localState = LocalGameState.Idle;
@@ -719,6 +733,9 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     public void SubmitShot(LastShot shotData)
     {
+        //상태 변경을 바로 해주어 다음 인덱스 도넛이 생성되는 오류 방지
+        _localState = LocalGameState.SimulatingMyShot;
+
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
 
@@ -782,6 +799,7 @@ public class FirebaseGameManager : MonoBehaviour
         DOVirtual.DelayedCall(1.5f, () =>
         {
             gameCamControl?.SwitchCamera(START_VIEW_CAM); // 시뮬레이션 완료 후 시점 전환
+            UI_LaunchIndicator_Firebase.FireShotReadyUI(); // UI켜주기
 
             if (_localState == LocalGameState.SimulatingOpponentShot)
             {
@@ -799,10 +817,7 @@ public class FirebaseGameManager : MonoBehaviour
                 //_localState = LocalGameState.Idle;
                 Debug.Log("상대 턴 시뮬레이션 완료. 내 샷을 미리 준비합니다.");
                 // 'myUserId'를 명시하여 '나'의 돌을 생성하도록 새 메서드 호출
-                //
-                //
-                //
-                //
+
                 // 라운드 끝나면 안만들어지게
                 if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
                     && stoneManager.aShotIndex >= shotsPerRound - 1)
@@ -1002,6 +1017,16 @@ public class FirebaseGameManager : MonoBehaviour
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
 
+    public void OnShotStepUI() //도넛 엔트리만 꺼주는 UI호출
+    {
+        UI_LaunchIndicator_Firebase.FireShotReadyTwoUI();
+    }
+
+    public void OnIdleUI()
+    {
+        UI_LaunchIndicator_Firebase.IdleUI();
+    }
+
     #endregion
 
     #region 턴 관리
@@ -1038,6 +1063,59 @@ public class FirebaseGameManager : MonoBehaviour
     }
 
     #endregion
+
+    #region 도넛 교체 관련
+
+    /// <summary>
+    /// DonutSelectionUI에서 다른 도넛을 선택했을 때 호출되는 이벤트 핸들러입니다.
+    /// </summary>
+        private void OnDonutChanged(DonutEntry newDonut)
+        {
+            // 입력대기 상태면 도넛을 교체 할 수 있게
+            if (_localState == LocalGameState.WaitingForInput)
+            {
+                Debug.Log($"선택한 도넛이 {newDonut.id}(으)로 변경되어 교체합니다.");
+                ReplaceCurrentStone(newDonut);
+            }
+        }
+
+    /// <summary>
+    /// 현재 턴에 생성된 돌을 파괴하고 새로운 돌로 교체합니다.
+    /// </summary>
+    private void ReplaceCurrentStone(DonutEntry newDonut)
+    {
+        if (stoneManager == null || inputController == null) return;
+
+        // 1. 현재 돌 가져오기 및 파괴
+        StoneForceController_Firebase currentStone = stoneManager.GetCurrentTurnStone();
+        if (currentStone != null)
+        {
+            // StoneManager의 관리 리스트에서 제거하지 않고 순수하게 게임 오브젝트만 파괴합니다.
+            // SpawnStone에서 shotIndex를 기준으로 다시 리스트에 할당할 것이기 때문입니다.
+            Destroy(currentStone.gameObject);
+        }
+    
+        // 2. shotIndex를 1 감소시켜 SpawnStone에서 올바른 인덱스를 다시 사용하도록 함
+        // (SpawnStone 내부에서 shotIndex가 1 증가하기 때문)
+        if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+        {
+            stoneManager.A_ShotIndexDown();
+        }
+        else
+        {
+            stoneManager.B_ShotIndexDown();
+        }
+
+        // 3. 새로운 돌 생성 및 제어권 부여
+        Rigidbody newDonutRigid = stoneManager.SpawnStone(_currentGame, newDonut);
+        if (newDonutRigid != null)
+        {
+            inputController.EnableInput(newDonutRigid);
+        }
+    }
+
+    #endregion
+
 
     #region 상태전환용 메서드
 

@@ -17,6 +17,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public TextMeshProUGUI aScoreText;
     public TextMeshProUGUI bScoreText;
     public TextMeshProUGUI roundText;
+    public TextMeshProUGUI roundChangeText;
     // 현재 턴 번호를 표시하는 TextMeshProUGUI 객체
     public TextMeshProUGUI turnText;
     public GameObject CountDownText;
@@ -136,6 +137,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         aScoreText.text = $"{aScore}";
         bScoreText.text = $"{bScore}";
         roundText.text = $"Round : {round}";
+        roundChangeText.text = $"Round {round} Start!";
     }
 
     /// <summary>
@@ -173,12 +175,28 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     /// </summary>
 
 
-    public void FinishedUI()
+    public void FinishedUI() // 결과창
     {
         AllcloseUI();
         result.SetActive(true);
     }
-    private void AllcloseUI()
+    public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
+    {
+        AllcloseUI();
+        roundPanel.SetActive(true);
+        donutEntry.SetActive(true);
+        minimap.SetActive(true);
+    }
+    public void FireShotReadyTwoUI()
+    {
+        donutEntry.SetActive(false);
+    }
+    public void IdleUI() //기본 상단 UI만 출력되는 상태
+    {
+        AllcloseUI();
+        roundPanel.SetActive(true);
+    }
+    public void AllcloseUI() // 모든 UI를 닫음
     {
         roundPanel.SetActive(false);
         donutEntry.SetActive(false);

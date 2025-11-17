@@ -335,6 +335,8 @@ public class StoneShoot_Firebase : MonoBehaviour
                 if (dragVector.magnitude > minLaunchDragDistance)
                 {
                     Debug.Log("힘/방향 설정 완료. 이제 회전을 설정하세요.");
+                    FirebaseGameManager.Instance.OnShotStepUI(); // 도넛 엔트리창만 off
+
                     _currentAimingPhase = AimingPhase.Rotation; // 다음 단계로 전환
                 }
                 else
@@ -370,6 +372,7 @@ public class StoneShoot_Firebase : MonoBehaviour
             {
                 EndDrag(); // 드래그 종료
                 Debug.Log("회전 설정 완료. 발사합니다!");
+                FirebaseGameManager.Instance.OnIdleUI();
                 ReleaseShot(); // 발사!
             }
         }

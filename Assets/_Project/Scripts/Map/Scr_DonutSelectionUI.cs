@@ -7,6 +7,9 @@ using System.Linq;
 /// </summary>
 public class DonutSelectionUI : MonoBehaviour
 {
+    // 도넛 선택이 변경될 때 발생하는 이벤트
+    public event System.Action<DonutEntry> OnDonutSelectionChanged;
+
     [SerializeField] private List<DonutEntryUI> donutSlots; // 인스펙터에서 할당할 도넛 슬롯 UI 요소들
 
     private DonutEntry _selectedDonutEntry; // 현재 선택된 도넛 엔트리 데이터
@@ -66,6 +69,12 @@ public class DonutSelectionUI : MonoBehaviour
             // Debug.LogWarning($"DonutSelectionUI: 유효하지 않거나 사용할 수 없는 도넛 슬롯 인덱스 {index} 입니다.");
             return;
         }
+        
+        // 선택이 실제로 변경되었는지 확인
+        if (_selectedIndex == index)
+        {
+            return; // 이미 선택된 슬롯이면 아무것도 하지 않음
+        }
 
         // 이전에 선택된 슬롯이 있다면 선택 해제
         if (_selectedIndex != -1 && _selectedIndex < donutSlots.Count)
@@ -79,6 +88,9 @@ public class DonutSelectionUI : MonoBehaviour
         _selectedDonutEntry = donutSlots[_selectedIndex].GetDonutEntry();
 
         Debug.Log($"DonutSelectionUI: 도넛 슬롯 {index} 선택됨. ID: {_selectedDonutEntry?.id}");
+        
+        // 선택 변경 이벤트를 호출합니다.
+        OnDonutSelectionChanged?.Invoke(_selectedDonutEntry);
     }
 
     /// <summary>
