@@ -191,9 +191,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb0c72f73ae8ff469e7c1a3ee68c311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stonePrefabA: {fileID: 8981461065803206208, guid: 754a67bbb3acf904296a8021f058a792, type: 3}
-  stonePrefabB: {fileID: 8981461065803206208, guid: 624761d8addb29342aa46959ec784abf, type: 3}
   spawnPosition: {fileID: 2010081595}
+  donutSamplePrefab: {fileID: 2597265814505318722, guid: fc70b4ba79a8d9041b12db38d5e0ef78, type: 3}
   _scr_Collider_House: {fileID: 1878140752}
   endHogLine: {fileID: 159821090}
   backLine: {fileID: 484471462}
@@ -224,7 +223,7 @@ MonoBehaviour:
   maxDragDistance: 0.25
   maxRotationDragDistance: 0.5
   maxRotationValue: 5
-  autoMoveToHogLineSpeed: 6
+  autoMoveToHogLineSpeed: 5
   maxUIDirectionAngle: 60
   minLaunchDragDistance: 50
   startHogLine: {fileID: 1964964876}

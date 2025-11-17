@@ -76,13 +76,21 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 3327944817592106568, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
+      propertyPath: m_TagString
+      value: InGameDonut
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: -4286995000054953585, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2694538517850989810, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
       insertIndex: -1
       addedObject: {fileID: 702067107073105045}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3327944817592106568, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3560483734020147995}
     - targetCorrespondingSourceObject: {fileID: 3327944817592106568, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
       insertIndex: -1
       addedObject: {fileID: -8775906831814360088}
@@ -95,6 +103,29 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3327944817592106568, guid: d0499b9b7490dd04aad71f2a84ddfc39, type: 3}
   m_PrefabInstance: {fileID: 3028170065906398683}
   m_PrefabAsset: {fileID: 0}
+--- !u!136 &3560483734020147995
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 299775851241638803}
+  m_Material: {fileID: 13400000, guid: 88b3eb50ce8d335428708d8e55e4daa0, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.05
+  m_Height: 0.04
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.015, z: 0}
 --- !u!54 &-8775906831814360088
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -120,7 +151,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &8166111525026085511
 MonoBehaviour:
