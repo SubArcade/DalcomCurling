@@ -21,6 +21,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject rewardCheckPopup;
     [SerializeField] private GameObject EntryPopUp;
     [SerializeField] private GameObject MatchingPopUp;
+    [SerializeField] private GameObject readyMenuPanel;
     [SerializeField] private GameObject ShopPopUp;
     
     [Header("화면 전환 버튼")]
@@ -29,6 +30,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private Button donutUpgradeButton;
     [SerializeField] private Button EntryPopUpButton;
     [SerializeField] private Button detailedSettingsButton;
+    [SerializeField] private Button readyButton;
     [SerializeField] private Button testBattle;
     
     
@@ -51,6 +53,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.DonutUpgradePopup,donutUpgradePopup);
         UIManager.Instance.RegisterPanel(PanelId.EntryPopUp, EntryPopUp);
         UIManager.Instance.RegisterPanel(PanelId.MatchingPopUp, MatchingPopUp);
+        UIManager.Instance.RegisterPanel(PanelId.ReadyMenuPanel, readyMenuPanel);
         UIManager.Instance.RegisterPanel(PanelId.ShopPopUp, ShopPopUp);
         
         
@@ -62,6 +65,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         EntryPopUpButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EntryPopUp));
         detailedSettingsButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DetailedSettingsPanel));
         testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
+        readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
         //상점팝업창 넣어야해요 어디버튼인지 모르겠어요
     }
     
@@ -74,5 +78,5 @@ public class Scr_MenuPanelControl : MonoBehaviour
         goldText.text = $"{playerData.gold}";
         gemText.text = $"{playerData.gem}";
     }
-
+    
 }

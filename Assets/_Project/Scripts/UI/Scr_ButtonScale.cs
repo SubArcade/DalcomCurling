@@ -32,28 +32,27 @@ public class Scr_ButtonScale : MonoBehaviour
     [SerializeField] private Transform UpgradeTransform;
     [SerializeField] private Image UpgradeImage;
 
-
     IEnumerator Start()
     {
         yield return new WaitForSeconds(0.2f); // 혹시라도 로딩 지연 대비
 
-        TrashCan = transform.Find("Bottom/ButtonGroup/basket_Button")?.gameObject;
+        TrashCan = transform.Find("MainMenu/Bottom/ButtonGroup/basket_Button")?.gameObject;
         TrashCanTransform = TrashCan.transform;
         TrashCanImage = TrashCan.GetComponent<Image>();
 
-        StartPopUp = transform.Find("Bottom/Battle_Button")?.gameObject;
+        StartPopUp = transform.Find("MainMenu/Bottom/Battle_Button")?.gameObject;
         StartButtonTransform = StartPopUp.transform;
         startImage = StartPopUp.GetComponent<Image>();
         
-        Codex = transform.Find("Bottom/ButtonGroup/Codex_Button")?.gameObject;
+        Codex = transform.Find("MainMenu/Bottom/ButtonGroup/Codex_Button")?.gameObject;
         CodexButtonTransform = Codex.transform;
         CodexImage = Codex.GetComponent<Image>();
 
-        Entry = transform.Find("Bottom/ButtonGroup/Entry_Button")?.gameObject;
+        Entry = transform.Find("MainMenu/Bottom/ButtonGroup/Entry_Button")?.gameObject;
         EntryTransform = Entry.transform;
         EntryImage = Entry.GetComponent<Image>();
 
-        Upgrade = transform.Find("Bottom/ButtonGroup/Upgrade_Button")?.gameObject;
+        Upgrade = transform.Find("MainMenu/Bottom/ButtonGroup/Upgrade_Button")?.gameObject;
         UpgradeTransform = Upgrade.transform;
         UpgradeImage = Upgrade.GetComponent<Image>();
 

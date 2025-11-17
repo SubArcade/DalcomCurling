@@ -24,6 +24,8 @@ public enum PanelId
     EntryPopUp,
     MatchingPopUp,
     TestLoginPanel,
+    ReadyMenuPanel
+    TestLoginPanel,
     ShopPopUp
 }
 
@@ -39,6 +41,10 @@ public class UIManager : MonoBehaviour
     public PanelId CurrentPanelId => currentPanelId;
     
     [SerializeField] private Button settingsBackBtn;
+    
+    // 준비화면 액션함수
+    public event Action OnReadyPanelOpen;
+    public event Action OnReadyPanelClose;
 
     private void Awake()
     {
@@ -102,8 +108,13 @@ public class UIManager : MonoBehaviour
         {
             case PanelId.StartPanel:
             case PanelId.LoginPanel:
-            case PanelId.MainPanel:
             case PanelId.TestLoginPanel:
+                break;
+            case PanelId.MainPanel:
+                break;
+            case PanelId.ReadyMenuPanel:
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                OnReadyPanelOpen?.Invoke();
                 break;
             default:
                 //Debug.Log("vkvkvkvkvkvkvk");

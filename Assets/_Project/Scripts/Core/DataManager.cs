@@ -4,6 +4,7 @@ using Firebase.Auth;
 using Firebase.Firestore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor.Localization.Platform.Android;
 using UnityEngine;
 
 public enum GameMode
@@ -45,6 +46,7 @@ public class UserDataRoot
         levelMax = 20,
     };
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
+   
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
         cellMax = 49,
@@ -90,6 +92,26 @@ public class DataManager : MonoBehaviour
     
     // 백그라운드 이벤트
     public event Action PauseChanged;
+
+    // 바뀐 데이터 이벤트 함수 실행용 함수
+    // 텍스트를 바꿔줄꺼다
+    public void GemChange(int gem)
+    {
+        PlayerData.gem = gem;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+    
+    public void GoldChange(int gold)
+    {
+        PlayerData.gold = gold;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+    
+    public void EnergyChange(int energy)
+    {
+        PlayerData.energy = energy;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
     
     void Awake()
     {
@@ -109,7 +131,7 @@ public class DataManager : MonoBehaviour
         // 여러 클라이언트 테스트 시 로컬 DB 충돌을 막기 위해 지속성 비활성화
         FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;
         db = FirebaseFirestore.DefaultInstance;
-        Debug.Log("[FS] Firestore instance OK");
+        //Debug.Log("[FS] Firestore instance OK");
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
@@ -135,7 +157,7 @@ public class DataManager : MonoBehaviour
             userData = snap.ConvertTo<UserDataRoot>();
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
-            BaseInventoryData();
+            //BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
 
@@ -150,6 +172,7 @@ public class DataManager : MonoBehaviour
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
+            FirstBasePlayerData();
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -164,7 +187,7 @@ public class DataManager : MonoBehaviour
             userData = snap.ConvertTo<UserDataRoot>();
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
-            BaseInventoryData();
+            //BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
 
@@ -172,6 +195,7 @@ public class DataManager : MonoBehaviour
             Debug.Log($"[FS] 기존 유저 로드/갱신 완료: /{userCollection}/{uId}");
         }
         OnUserDataChanged?.Invoke(PlayerData);
+        OnUserDataRootChanged?.Invoke(userData);
     }
     
     // 기본 데이터 적용
@@ -182,10 +206,45 @@ public class DataManager : MonoBehaviour
         PlayerData.levelMax = maxLevel;
     }
 
+    private void FirstBasePlayerData()
+    {
+        PlayerData.gainNamePlateType.Add(NamePlateType.NONE);
+    }
+    
     // 기본 인벤토리 데이터
     private void BaseInventoryData()
     {
-        
+        InventoryData.hardDonutCodexDataList = new List<DonutCodexData>();
+        InventoryData.softDonutCodexDataList = new List<DonutCodexData>();
+        InventoryData.moistDnutCodexDataList = new List<DonutCodexData>();
+
+        foreach (DonutType type in Enum.GetValues(typeof(DonutType)))
+        {
+            for (int level = 1; level <= 30; level++)
+            {
+                var codex = new DonutCodexData
+                {
+                    id = $"{type}_{level}",
+                    donutDexViewState = DonutDexViewState.Question
+                };
+
+                switch (type)
+                {
+                    case DonutType.Hard:
+                        InventoryData.hardDonutCodexDataList.Add(codex);
+                        break;
+
+                    case DonutType.Soft:
+                        InventoryData.softDonutCodexDataList.Add(codex);
+                        break;
+
+                    case DonutType.Moist:
+                        InventoryData.moistDnutCodexDataList.Add(codex);
+                        break;
+                }
+            }
+        }
+        //Debug.Log("실행완료");
     }
     
     // 기본 머지보드 데이터
@@ -241,7 +300,7 @@ public class DataManager : MonoBehaviour
             
             if (patch.Count == 0)
             {
-                Debug.LogWarning("변경할 필드가 없습니다.");
+                //Debug.LogWarning("변경할 필드가 없습니다.");
                 return;
             }
             if(patch.ContainsKey("energy"))
@@ -250,13 +309,13 @@ public class DataManager : MonoBehaviour
             // var docRef = db.Collection(userCollection).Document(docId);
             // await docRef.UpdateAsync(patch);
             await db.Collection(userCollection).Document(docId).UpdateAsync(patch);
-            Debug.Log($"부분 업데이트 완료: /{userCollection}/{docId}");
+            //Debug.Log($"부분 업데이트 완료: /{userCollection}/{docId}");
             
             bool rankChanged = patch.ContainsKey("soloScore") || patch.ContainsKey("soloTier");
             if (rankChanged)
             {
                 await UpsertLeader(PlayerData.soloScore, PlayerData.soloTier);
-                Debug.Log($"[FS] Rank 동기화 완료: /{Season}_{gameMode.ToString().ToLower()}/{docId}");
+                //Debug.Log($"[FS] Rank 동기화 완료: /{Season}_{gameMode.ToString().ToLower()}/{docId}");
             }
 
             OnUserDataChanged?.Invoke(PlayerData);
@@ -277,7 +336,7 @@ public class DataManager : MonoBehaviour
             var docRef = db.Collection(userCollection).Document(docId);
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             
-            Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
+            //Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
         }
         catch (System.Exception e)
         {
@@ -368,7 +427,66 @@ public class DataManager : MonoBehaviour
         return result;
     }
 
+    // 인벤토리 데이터 관련 함수들
+    /// <summary>
+    /// 도넛 리스트가 비어있으면 5칸 초기화
+    /// </summary>
+    public void EnsureDonutSlots()
+    {
+        if (InventoryData.donutEntries == null)
+            InventoryData.donutEntries = new List<DonutEntry>();
 
+        if (InventoryData.donutEntries.Count == 0)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                InventoryData.donutEntries.Add(new DonutEntry()
+                {
+                    id = null,
+                    type = DonutType.Hard,   // 너가 정의한 기본값
+                    weight = 0,
+                    resilience = 0,
+                    friction = 0
+                });
+            }
+        }
+    }
+
+    /// <summary>
+    /// 특정 슬롯(index)에 도넛 넣기
+    /// </summary>
+    public void SetDonutAt(int index, bool isDonutEntry = true, DonutEntry entry = null, DonutData donutData = null)
+    {
+        EnsureDonutSlots();
+
+        index = index - 1;
+        if (index < 0 || index >= InventoryData.donutEntries.Count)
+        {
+            Debug.LogError($"[InventoryData] 잘못된 인덱스: {index}");
+            return;
+        }
+
+        if (isDonutEntry)
+        {
+            Debug.Log("앤트리 들어옴");
+            InventoryData.donutEntries[index] = entry;
+        }
+        else
+        {
+            Debug.Log("도넛데이터 들어옴");
+            Debug.Log(donutData.id);
+            Debug.Log(donutData.donutType);
+            Debug.Log(donutData.weight);
+            Debug.Log(donutData.friction);
+            InventoryData.donutEntries[index].id = donutData.id;
+            InventoryData.donutEntries[index].type = donutData.donutType;
+            InventoryData.donutEntries[index].weight = donutData.weight;
+            InventoryData.donutEntries[index].friction = donutData.friction;
+            InventoryData.donutEntries[index].resilience =donutData.resilience;
+        }
+        
+    }
+    
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
     {
