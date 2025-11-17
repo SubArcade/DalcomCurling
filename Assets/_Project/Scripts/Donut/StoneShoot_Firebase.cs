@@ -72,11 +72,11 @@ public class StoneShoot_Firebase : MonoBehaviour
     public Color max_Color = Color.red;
 
     [Header("설정 변수")] // 게임 플레이 조작 관련 변수 헤더
-    public float launchForceMultiplier = 8f; // 드래그 거리를 발사 힘으로 변환하는 계수, 4에서 8로 수정(11/16)
+    public float launchForceMultiplier = 6f; // 드래그 거리를 발사 힘으로 변환하는 계수, 4에서 8로 수정(11/16), 4에서 6로 수정 11/17
     public float maxDragDistance = 0.25f; // 초기 드래그의 최대 거리 (정규화된 화면 높이 기준) , 0.5에서 0.25로 수정(11/16)
     public float maxRotationDragDistance = 0.5f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준) , 1에서 0.5로 수정(11/16)
     public float maxRotationValue = 5f; // 스핀의 최대 값
-    public float autoMoveToHogLineSpeed = 6f; // 도넛이 호그 라인까지 자동 이동하는 속도
+    public float autoMoveToHogLineSpeed = 4f; // 도넛이 호그 라인까지 자동 이동하는 속도, 6에서 4로 수정 11/17
     public float maxUIDirectionAngle = 60f; // UI 화살표가 표시할 수 있는 최대 각도
     public float minLaunchDragDistance = 50f; // 발사로 인정할 최소 드래그 거리 (픽셀)
 

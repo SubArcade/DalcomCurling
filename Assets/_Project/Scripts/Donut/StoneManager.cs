@@ -9,9 +9,10 @@ using UnityEngine.Rendering.Universal;
 // 이 스크립트는 씬에 있는 모든 돌의 생성, 관리, 발사를 담당합니다.
 public class StoneManager : MonoBehaviour
 {
-    [SerializeField] private GameObject stonePrefabA; // 플레이어 A(호스트)의 돌 프리팹
-    [SerializeField] private GameObject stonePrefabB; // 플레이어 B의 돌 프리팹
+    //[SerializeField] private GameObject stonePrefabA; // 플레이어 A(호스트)의 돌 프리팹
+    //[SerializeField] private GameObject stonePrefabB; // 플레이어 B의 돌 프리팹
     [SerializeField] private Transform spawnPosition; // 돌이 생성될 위치
+    [SerializeField] private GameObject donutSamplePrefab; // 도넛 반지름을 미리 계산해놓기 위한 프리팹.
 
     private Game gameReference;
 
@@ -51,34 +52,50 @@ public class StoneManager : MonoBehaviour
     private void Start()
     {
         // 아웃판정에 사용될 값(도넛의 반지름)을 미리 계산해둠
-        donutColliderRadius = CalculateDonutColliderRadius(stonePrefabA); //A 도넛이나 B도넛이나 콜라이더는 같을것이므로.
+        donutColliderRadius = CalculateDonutColliderRadius(donutSamplePrefab); 
     }
 
     private float CalculateDonutColliderRadius(GameObject donut)
     {
-        MeshCollider meshCollider = donut.GetComponent<MeshCollider>();
+        CapsuleCollider capsuleCollider = donut.GetComponent<CapsuleCollider>();
+        // 1. Capsule Collider의 로컬 반지름 값
+        float localRadius = capsuleCollider.radius;
 
-        if (meshCollider == null)
-        {
-            Debug.LogError("MeshCollider를 찾을 수 없습니다.");
-            return 0f;
-        }
+        // 2. 오브젝트의 Transform 컴포넌트 월드 스케일(Scale) 가져오기
+        Vector3 lossyScale = capsuleCollider.transform.lossyScale;
 
-        // 1. 콜라이더의 바운딩 박스 가져오기 (월드 좌표 기준)
-        Bounds bounds = meshCollider.bounds;
+        // 3. 캡슐 콜라이더는 기본적으로 X와 Z 스케일에 영향을 받음 (수직 방향 제외)
+        // 두 축 중 더 큰 스케일 값을 찾습니다.
+        // 이는 오브젝트가 비균일하게 스케일 되었을 때, 가장 크게 늘어난 쪽의 반지름을 구하기 위함입니다.
+        float maxScale = Mathf.Max(lossyScale.x, lossyScale.z); 
 
-        // 2. 바운딩 박스의 절반 크기 (Extent) 가져오기
-        Vector3 extents = bounds.extents;
+        // 4. 로컬 반지름에 최대 스케일 값을 곱하여 최종 월드 반지름을 계산합니다.
+        float worldRadius = localRadius * maxScale;
 
-        // 3. 좌우 반지름은 보통 X축이나 Z축의 절반 크기(Extent)와 같습니다.
-        // 실린더가 Y축을 따라 세워져 있다고 가정하고, X와 Z 중 큰 값을 반지름으로 사용합니다.
-        // (스케일이 균일하지 않을 수 있으므로 Max를 사용해 안전하게 처리)
-        float radiusApproximation = Mathf.Max(extents.x, extents.z);
-
-        // extents는 이미 바운딩 박스의 절반 크기(중앙에서 끝까지의 거리)이므로, 
-        // 이것이 곧 월드 좌표 기준의 반지름 근사치입니다.
-
-        return radiusApproximation;
+        return worldRadius;
+        // MeshCollider meshCollider = donut.GetComponent<MeshCollider>();
+        //
+        // if (meshCollider == null)
+        // {
+        //     Debug.LogError("MeshCollider를 찾을 수 없습니다.");
+        //     return 0f;
+        // }
+        //
+        // // 1. 콜라이더의 바운딩 박스 가져오기 (월드 좌표 기준)
+        // Bounds bounds = meshCollider.bounds;
+        //
+        // // 2. 바운딩 박스의 절반 크기 (Extent) 가져오기
+        // Vector3 extents = bounds.extents;
+        //
+        // // 3. 좌우 반지름은 보통 X축이나 Z축의 절반 크기(Extent)와 같습니다.
+        // // 실린더가 Y축을 따라 세워져 있다고 가정하고, X와 Z 중 큰 값을 반지름으로 사용합니다.
+        // // (스케일이 균일하지 않을 수 있으므로 Max를 사용해 안전하게 처리)
+        // float radiusApproximation = Mathf.Max(extents.x, extents.z);
+        //
+        // // extents는 이미 바운딩 박스의 절반 크기(중앙에서 끝까지의 거리)이므로, 
+        // // 이것이 곧 월드 좌표 기준의 반지름 근사치입니다.
+        //
+        // return radiusApproximation;
 
     }
 
@@ -485,7 +502,8 @@ public class StoneManager : MonoBehaviour
             rb.isKinematic = true;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            fc.transform.GetComponent<MeshCollider>().isTrigger = true;
+            //fc.transform.GetComponent<MeshCollider>().isTrigger = true;
+            fc.transform.GetComponent<CapsuleCollider>().isTrigger = true;
 
             float distance = Vector3.Distance(fc.transform.position, newPosition);
             if (distance > 0.1f)
@@ -509,7 +527,8 @@ public class StoneManager : MonoBehaviour
             fc = aValues.Value;
             rb = fc.GetComponent<Rigidbody>();
             rb.isKinematic = false;
-            fc.transform.GetComponent<MeshCollider>().isTrigger = false;
+            //fc.transform.GetComponent<MeshCollider>().isTrigger = false;
+            fc.transform.GetComponent<CapsuleCollider>().isTrigger = false;
         }
 
         foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
@@ -517,7 +536,8 @@ public class StoneManager : MonoBehaviour
             fc = bValues.Value;
             rb = fc.GetComponent<Rigidbody>();
             rb.isKinematic = false;
-            fc.transform.GetComponent<MeshCollider>().isTrigger = false;
+            //fc.transform.GetComponent<MeshCollider>().isTrigger = false;
+            fc.transform.GetComponent<CapsuleCollider>().isTrigger = false;
         }
     }
 
