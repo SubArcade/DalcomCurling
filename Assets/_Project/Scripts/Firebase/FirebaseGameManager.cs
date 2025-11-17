@@ -604,17 +604,20 @@ public class FirebaseGameManager : MonoBehaviour
                     nextRoundStarterId = _currentGame.PlayerIds.FirstOrDefault(id => id != winnerId);
                 }
 
-                ResetGameDatas(nextRoundStarterId);
-                // 3라운드가 끝났으면 게임 종료
-                // if (_currentGame.RoundNumber >= 3)
-                // {
-                //     db.Collection("games").Document(gameId).UpdateAsync("GameState", "Finished");
-                // }
-                // else
-                // {
-                //     ResetGameDatas(nextRoundStarterId);
-                // }
-                //db.Collection("games").Document(gameId).UpdateAsync("GameState", "RoundChanging");
+                //ResetGameDatas(nextRoundStarterId, false);
+                
+                // 3라운드가 끝났으면 게임 종료, 아니면 지속
+                // 2라운드가 끝났지만, 점수차가 5점이상이 나면 3라운드에서 4점을 따라잡더라도 이길수 없으므로 콜드게임 처리
+                 if (_currentGame.RoundNumber >= 3 || 
+                     (_currentGame.RoundNumber == 2 && Math.Abs(aTeamScore - bTeamScore) >= 5))
+                 {
+                     ResetGameDatas(nextRoundStarterId, true); // 게임 끝내기 위한 정보들도 전송해야함
+                 }
+                 else
+                 {
+                     ResetGameDatas(nextRoundStarterId, false); // 다음 라운드를 위한 정보들 전송
+                 }
+                
             }
             else // 일반적인 턴에서 다음턴으로 넘겨줌
             {
@@ -638,11 +641,43 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleGameFinished()
     {
+        if (aTeamScore > bTeamScore)
+        {
+            if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+            {
+                Debug.Log("승리");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+            else
+            {
+                Debug.Log("패배");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+        }
+        else if (bTeamScore > aTeamScore)
+        {
+            if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+            {
+                Debug.Log("패배");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+            else
+            {
+                Debug.Log("승리");
+                UI_LaunchIndicator_Firebase.FinishedUI();
+            }
+        }
+        else // 비겼을때 ( 연장전을 이때 시작하거나, 이미 연장전을 해서 이게 없어질 수도 있음 )
+        {
+            Debug.Log("비김");
+            UI_LaunchIndicator_Firebase.FinishedUI();
+        }
+        
         // 리스너를 즉시 중지하여 추가 데이터 변경 감지를 막습니다.
         gameListener?.Stop();
         gameListener = null;
 
-        Debug.Log("게임 종료! 3초 후 메뉴 씬으로 돌아갑니다.");
+        Debug.Log("게임 종료! 10초 후 메뉴 씬으로 돌아갑니다.");
 
         // 호스트인 경우에만 DB 문서를 정리합니다.
         if (IsHost())
@@ -651,7 +686,7 @@ public class FirebaseGameManager : MonoBehaviour
         }
 
         // 3초 후에 모든 플레이어를 메뉴 씬으로 보냅니다.
-        DOVirtual.DelayedCall(3f, () =>
+        DOVirtual.DelayedCall(10f, () =>
         {
             SceneLoader.Instance.LoadLocal(GameManager.Instance.menuSceneName); // 메뉴씬으로 이동
         });
@@ -858,7 +893,8 @@ public class FirebaseGameManager : MonoBehaviour
 
         var updates = new Dictionary<string, object>
         {
-            { "GameState", "Timeline" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
+
+            { "GameState", nextState } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
         };
         db.Collection("games").Document(gameId).UpdateAsync(updates);
     }
@@ -881,8 +917,15 @@ public class FirebaseGameManager : MonoBehaviour
         Debug.Log($"승리팀 : {winner}, 점수 : {score}");
     }
 
-    private void ResetGameDatas(string nextPlayerId) // 다음 라운드 시작 플레이어를 파라미터로 받음
+    private void ResetGameDatas(string nextPlayerId, bool isFinished = false) // 다음 라운드 시작 플레이어를 파라미터로 받음
     {
+        
+        if (isFinished) // 만약 게임이 끝났다면
+        {
+            nextPlayerId = "Finished"; // 다음 플레이어 이름에 Finished를 적어서 상대방에게 게임 끝남을 알림
+        }
+        
+        
         PredictedResult result = new PredictedResult
         {
             PredictingPlayerId = myUserId,
