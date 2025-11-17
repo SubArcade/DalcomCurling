@@ -15,8 +15,10 @@ public class LoginSystem : MonoBehaviour
     [SerializeField] private Button loginButton;
     [SerializeField] private Button logoutButton;
     [SerializeField] private Button guestButton;
-
-    [SerializeField] private GameObject loginPanel;
+    
+    [SerializeField] private Button googlePlayButton;
+    [SerializeField] private Button guestButtontest;
+    
     
     void Start()
     {
@@ -35,10 +37,11 @@ public class LoginSystem : MonoBehaviour
         loginButton.onClick.AddListener(Login);
         logoutButton.onClick.AddListener(LogOut);
         guestButton.onClick.AddListener(AnonymousLogin);
-
-        loginPanel = GameObject.Find("Login_Panel");
-
-        FirebaseAuthManager.Instance.Init();
+        
+        googlePlayButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.TestLoginPanel));
+        guestButtontest.onClick.AddListener(AnonymousLogin);
+        
+        //FirebaseAuthManager.Instance.Init();
     }
 
     private void OnChangedState(bool sign)

@@ -5776,6 +5776,18 @@ MonoBehaviour:
   TrashCan: {fileID: 0}
   TrashCanTransform: {fileID: 0}
   TrashCanImage: {fileID: 0}
+  StartPopUp: {fileID: 0}
+  StartButtonTransform: {fileID: 0}
+  startImage: {fileID: 0}
+  Codex: {fileID: 0}
+  CodexButtonTransform: {fileID: 0}
+  CodexImage: {fileID: 0}
+  Entry: {fileID: 0}
+  EntryTransform: {fileID: 0}
+  EntryImage: {fileID: 0}
+  Upgrade: {fileID: 0}
+  UpgradeTransform: {fileID: 0}
+  UpgradeImage: {fileID: 0}
 --- !u!1 &5724483424534079894
 GameObject:
   m_ObjectHideFlags: 0

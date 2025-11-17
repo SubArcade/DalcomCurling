@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -7,6 +8,8 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     [Header("현재 슬롯에 들어있는 도넛")]
     public MergeItemUI currentItem;
 
+    public int slotIndex = 0;
+    
     private Image slotImage;
 
     void Awake()
@@ -71,10 +74,14 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         if (checkMark != null)
             checkMark.SetActive(false);
 
-
-        Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
-        Debug.Log($"currentItem: {currentItem?.name}");
-        Debug.Log($"IsEmpty: {IsEmpty}");
+        // 해당 도넛 데이터 연동
+        DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
+        
+        
+        Debug.Log($"[MoveIn] {currentItem.donutData.id} 슬롯에 도넛 들어감");
+        // Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
+        // Debug.Log($"currentItem: {currentItem?.name}");
+        // Debug.Log($"IsEmpty: {IsEmpty}");
     }
 
     // 슬롯을 비우는 함수

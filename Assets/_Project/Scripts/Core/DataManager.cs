@@ -1,12 +1,10 @@
-﻿using Firebase;
+﻿using System;
+using Firebase;
 using Firebase.Auth;
 using Firebase.Firestore;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
-using UnityEngine.Android;
 
 public enum GameMode
 {
@@ -44,11 +42,9 @@ public class UserDataRoot
         perSecEnergy = 10,
         soloScore = 0,
         soloTier = GameTier.Bronze,
+        levelMax = 20,
     };
-    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData() 
-    {
-
-    };
+    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
         cellMax = 49,
@@ -90,6 +86,7 @@ public class DataManager : MonoBehaviour
     
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
+    public event Action<UserDataRoot> OnUserDataRootChanged;
     
     // 백그라운드 이벤트
     public event Action PauseChanged;
@@ -116,13 +113,13 @@ public class DataManager : MonoBehaviour
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
-    public async Task EnsureUserDocAsync(string uId, string userEmail)
+    public async Task EnsureUserDocAsync(string uId, string userEmail= null, bool isAutoLogin = false, AuthProviderType authProviderType = AuthProviderType.Guest)
     {
         docId = uId;
-        PlayerData.email = userEmail;
         
         int maxEnergy = userData.player.maxEnergy;
         int secEnergy = userData.player.perSecEnergy;
+        int maxLevel = userData.player.levelMax;
         
         int cellMax = MergeBoardData.cellMax;
         int cellWidth = MergeBoardData.cellWidth;
@@ -132,13 +129,27 @@ public class DataManager : MonoBehaviour
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
+
+        if (isAutoLogin)
+        {
+            userData = snap.ConvertTo<UserDataRoot>();
+            
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
+            BaseInventoryData();
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold);
+
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            Debug.Log($"자동 로그인: /{userCollection}/{uId}");
+        }
         
         if (!snap.Exists)
         {
             // 처음 로그인 시
+            PlayerData.email = userEmail;
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
             
-            BasePlayerData(maxEnergy, secEnergy);
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -149,11 +160,10 @@ public class DataManager : MonoBehaviour
         else
         {
             // 기존 유저 로드
-            userData = snap.ConvertTo<UserDataRoot>();
-
             PlayerData.email = userEmail;
+            userData = snap.ConvertTo<UserDataRoot>();
             
-            BasePlayerData(maxEnergy, secEnergy);
+            BasePlayerData(maxEnergy, secEnergy, maxLevel);
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -165,10 +175,11 @@ public class DataManager : MonoBehaviour
     }
     
     // 기본 데이터 적용
-    private void BasePlayerData(int maxEnergy, int secEnergy)
+    private void BasePlayerData(int maxEnergy, int secEnergy, int maxLevel)
     {
         PlayerData.maxEnergy = maxEnergy;
         PlayerData.perSecEnergy = secEnergy;
+        PlayerData.levelMax = maxLevel;
     }
 
     // 기본 인벤토리 데이터
@@ -343,37 +354,80 @@ public class DataManager : MonoBehaviour
         return next;
     }
 
-    public List<DonutData> GetDonutsByTypeAndLevel(DonutType type, int level)
+    // 특정 레벨의 모든 도넛 가져오기 (랜덤 생성용)
+    public List<DonutData> GetDonutsByLevel(int level)
     {
         List<DonutData> result = new();
 
-        // 타입 DB가 있는지 확인
-        if (_donutTypeDB.TryGetValue(type, out var typeDB))
+        foreach (var so in _donutTypeDB.Values)
         {
-            // 해당 타입에서 레벨 데이터 가져오기
-            var data = typeDB.GetLevelData(level);
-
+            var data = so.GetLevelData(level);
             if (data != null)
                 result.Add(data);
         }
-
         return result;
     }
 
-    //생성기 레벨 받아오기
-    public int GetGeneratorLevel(DonutType type)
+    // 인벤토리 데이터 관련 함수들
+    /// <summary>
+    /// 도넛 리스트가 비어있으면 5칸 초기화
+    /// </summary>
+    public void EnsureDonutSlots()
     {
-        var board = userData.mergeBoard;
+        if (InventoryData.donutEntries == null)
+            InventoryData.donutEntries = new List<DonutEntry>();
 
-        return type switch
+        if (InventoryData.donutEntries.Count == 0)
         {
-            DonutType.Hard => board.generatorLevelHard,
-            DonutType.Soft => board.generatorLevelSoft,
-            DonutType.Moist => board.generatorLevelMoist,
-            _ => 1
-        };
+            for (int i = 0; i < 5; i++)
+            {
+                InventoryData.donutEntries.Add(new DonutEntry()
+                {
+                    id = null,
+                    type = DonutType.Hard,   // 너가 정의한 기본값
+                    weight = 0,
+                    resilience = 0,
+                    friction = 0
+                });
+            }
+        }
     }
 
+    /// <summary>
+    /// 특정 슬롯(index)에 도넛 넣기
+    /// </summary>
+    public void SetDonutAt(int index, bool isDonutEntry = true, DonutEntry entry = null, DonutData donutData = null)
+    {
+        EnsureDonutSlots();
+
+        index = index - 1;
+        if (index < 0 || index >= InventoryData.donutEntries.Count)
+        {
+            Debug.LogError($"[InventoryData] 잘못된 인덱스: {index}");
+            return;
+        }
+
+        if (isDonutEntry)
+        {
+            Debug.Log("앤트리 들어옴");
+            InventoryData.donutEntries[index] = entry;
+        }
+        else
+        {
+            Debug.Log("도넛데이터 들어옴");
+            Debug.Log(donutData.id);
+            Debug.Log(donutData.donutType);
+            Debug.Log(donutData.weight);
+            Debug.Log(donutData.friction);
+            InventoryData.donutEntries[index].id = donutData.id;
+            InventoryData.donutEntries[index].type = donutData.donutType;
+            InventoryData.donutEntries[index].weight = donutData.weight;
+            InventoryData.donutEntries[index].friction = donutData.friction;
+            InventoryData.donutEntries[index].resilience =donutData.resilience;
+        }
+        
+    }
+    
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
     {

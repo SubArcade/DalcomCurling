@@ -5,18 +5,19 @@ using UnityEngine;
 
 public class Scr_Collider_DonutSideOutCheck : MonoBehaviour
 {
-    private StoneShoot stoneShoot;
+    private StoneManager stoneManager;
     private void Awake()
     {
-        stoneShoot = GameObject.FindGameObjectWithTag("GameController").GetComponent<StoneShoot>();
+        stoneManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<StoneManager>();
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
-        if (other.CompareTag("InGameDonut"))
+        if (other.gameObject.CompareTag("InGameDonut"))
         {
-            StoneForceController sfc = other.GetComponent<StoneForceController>();
-            stoneShoot.DonutContactedSideWall(sfc.team, sfc.donutId);
+            StoneForceController_Firebase sfc = other.transform.GetComponent<StoneForceController_Firebase>();
+            stoneManager.DonutContactedSideWall(sfc.team, sfc.donutId);
+            Debug.Log("ff");
         }
     }
 }

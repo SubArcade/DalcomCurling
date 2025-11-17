@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,6 +16,7 @@ public class Test_MainMenu : MonoBehaviour
     public string pw;
 
     public Button testDBSaveButton;
+    public Button testLogoutButton;
 
     private Dictionary<string, string> idDictionary = new Dictionary<string, string>
     {
@@ -48,7 +49,7 @@ public class Test_MainMenu : MonoBehaviour
     void Awake()
     {
         //DataManager.Instance.PlayerData.energy = 0;
-        //energyButton.onClick.AddListener(()=> testAdd());
+        energyButton.onClick.AddListener(()=> testAdd());
         loginButton.onClick.AddListener(TestLogin);
         dropdown.ClearOptions();
         dropdown.AddOptions(new List<string>(idDictionary.Keys));
@@ -56,16 +57,18 @@ public class Test_MainMenu : MonoBehaviour
         // 값 변경 시 호출될 이벤트 등록
         dropdown.onValueChanged.AddListener(OnDropdownChanged);
         testDBSaveButton.onClick.AddListener(async () => await DataManager.Instance.SaveAllUserDataAsync());
-
+        testLogoutButton.onClick.AddListener(FirebaseAuthManager.Instance.Logout);
+        //testLogoutButton.onClick.AddListener(addNameTitle);
     }
     
-    //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
-    //private void Disable() =>  DataManager.Instance.OnUserDataChanged -= see;
+    private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
+    private void Disable() =>  DataManager.Instance.OnUserDataChanged -= see;
     
     // 데이터 UI 노출
     public void see(PlayerData playerData)
     {
-        //energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        Debug.Log("에너지 셋업");
+        energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
     }
     
     // 에너지 추가
@@ -80,7 +83,6 @@ public class Test_MainMenu : MonoBehaviour
     void TestLogin()
     {
         //FirebaseAuthManager.Instance.Login("asd@asd.asd", "asdasd");
-        FirebaseAuthManager.Instance.Init();
         FirebaseAuthManager.Instance.Login(id, pw);
         UIManager.Instance.Open(PanelId.StartPanel);
         //UIManager.Instance.Open(PanelId.MainPanel);
@@ -91,5 +93,14 @@ public class Test_MainMenu : MonoBehaviour
         string display = dropdown.options[index].text;
         id = idDictionary[display];
         pw = pwDictionary[display];
+    }
+
+    void addNameTitle()
+    {
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP1);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP2);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP3);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP5);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP6);
     }
 }
