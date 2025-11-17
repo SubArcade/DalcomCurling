@@ -52,10 +52,10 @@ public class StoneForceController_Firebase : MonoBehaviour
     void Awake()
     {
         rigid = GetComponent<Rigidbody>();
-    }
+    //}
 
-    private void Start()
-    {
+    //private void Start()
+    //{
         // MeshCollider가 없을 경우를 대비한 null 체크
         MeshCollider meshCollider = transform.GetComponent<MeshCollider>();
         if (meshCollider != null)
