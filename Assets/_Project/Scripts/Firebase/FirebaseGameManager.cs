@@ -1107,7 +1107,7 @@ public class FirebaseGameManager : MonoBehaviour
         }
 
         // 3. 새로운 돌 생성 및 제어권 부여
-        Rigidbody newDonutRigid = stoneManager.SpawnStone(_currentGame, newDonut);
+        Rigidbody newDonutRigid = stoneManager.SpawnStone(_currentGame, newDonut, myUserId);
         if (newDonutRigid != null)
         {
             inputController.EnableInput(newDonutRigid);
