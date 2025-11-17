@@ -109,7 +109,6 @@ public class UIManager : MonoBehaviour
             case PanelId.TestLoginPanel:
                 break;
             case PanelId.MainPanel:
-                OnReadyPanelClose?.Invoke();
                 break;
             case PanelId.ReadyMenuPanel:
                 currentPanel[PanelId.MainPanel].SetActive(true);

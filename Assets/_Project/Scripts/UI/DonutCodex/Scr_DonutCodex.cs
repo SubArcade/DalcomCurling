@@ -30,11 +30,25 @@ public class Scr_DonutCodex : MonoBehaviour
     
     [Header("닫기 버튼")]
     [SerializeField, Tooltip("닫기")] private Button closeButton;
-    
+
+
+    private void OnEnable()
+    {
+        OnUserDataChangedHandler();
+    }
+
+    private void OnUserDataChangedHandler()
+    {
+        // 데이터 들어온 뒤에만 호출됨
+        //Debug.Log("OnUserDataChangedHandler 함수 실행");
+        RefreshType(DonutType.Hard, hardShells);
+        hardPanel.SetActive(true);
+        softPanel.SetActive(false);
+        moistPanel.SetActive(false);
+    }
     
     void Awake()
     {
-        RefreshType(DonutType.Hard, hardShells);
         hardPanel.SetActive(true);
         softPanel.SetActive(false);
         moistPanel.SetActive(false);
@@ -122,7 +136,7 @@ public class Scr_DonutCodex : MonoBehaviour
                     break;
             }
 
-           
+           //Debug.Log($"DonutType: {donuttype}, DonutData: {donutData}");
         }
     }
     

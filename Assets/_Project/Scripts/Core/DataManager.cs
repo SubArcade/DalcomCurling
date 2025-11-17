@@ -131,7 +131,7 @@ public class DataManager : MonoBehaviour
         // 여러 클라이언트 테스트 시 로컬 DB 충돌을 막기 위해 지속성 비활성화
         FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;
         db = FirebaseFirestore.DefaultInstance;
-        Debug.Log("[FS] Firestore instance OK");
+        //Debug.Log("[FS] Firestore instance OK");
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신
@@ -172,6 +172,7 @@ public class DataManager : MonoBehaviour
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
+            FirstBasePlayerData();
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
@@ -194,6 +195,7 @@ public class DataManager : MonoBehaviour
             Debug.Log($"[FS] 기존 유저 로드/갱신 완료: /{userCollection}/{uId}");
         }
         OnUserDataChanged?.Invoke(PlayerData);
+        OnUserDataRootChanged?.Invoke(userData);
     }
     
     // 기본 데이터 적용
@@ -204,26 +206,27 @@ public class DataManager : MonoBehaviour
         PlayerData.levelMax = maxLevel;
     }
 
+    private void FirstBasePlayerData()
+    {
+        PlayerData.gainNamePlateType.Add(NamePlateType.NONE);
+    }
+    
     // 기본 인벤토리 데이터
     private void BaseInventoryData()
     {
-        Debug.Log("함수 실행1111111111111111111111111");
         InventoryData.hardDonutCodexDataList = new List<DonutCodexData>();
         InventoryData.softDonutCodexDataList = new List<DonutCodexData>();
         InventoryData.moistDnutCodexDataList = new List<DonutCodexData>();
 
         foreach (DonutType type in Enum.GetValues(typeof(DonutType)))
         {
-            Debug.Log("함수 22222222222222222222222222222222");
             for (int level = 1; level <= 30; level++)
             {
                 var codex = new DonutCodexData
                 {
                     id = $"{type}_{level}",
-                    donutType = type,
                     donutDexViewState = DonutDexViewState.Question
                 };
-                Debug.Log("함수 333333333333333333333333333333333");
 
                 switch (type)
                 {
@@ -241,7 +244,7 @@ public class DataManager : MonoBehaviour
                 }
             }
         }
-        Debug.Log("실행완료");
+        //Debug.Log("실행완료");
     }
     
     // 기본 머지보드 데이터
@@ -297,7 +300,7 @@ public class DataManager : MonoBehaviour
             
             if (patch.Count == 0)
             {
-                Debug.LogWarning("변경할 필드가 없습니다.");
+                //Debug.LogWarning("변경할 필드가 없습니다.");
                 return;
             }
             if(patch.ContainsKey("energy"))
@@ -306,13 +309,13 @@ public class DataManager : MonoBehaviour
             // var docRef = db.Collection(userCollection).Document(docId);
             // await docRef.UpdateAsync(patch);
             await db.Collection(userCollection).Document(docId).UpdateAsync(patch);
-            Debug.Log($"부분 업데이트 완료: /{userCollection}/{docId}");
+            //Debug.Log($"부분 업데이트 완료: /{userCollection}/{docId}");
             
             bool rankChanged = patch.ContainsKey("soloScore") || patch.ContainsKey("soloTier");
             if (rankChanged)
             {
                 await UpsertLeader(PlayerData.soloScore, PlayerData.soloTier);
-                Debug.Log($"[FS] Rank 동기화 완료: /{Season}_{gameMode.ToString().ToLower()}/{docId}");
+                //Debug.Log($"[FS] Rank 동기화 완료: /{Season}_{gameMode.ToString().ToLower()}/{docId}");
             }
 
             OnUserDataChanged?.Invoke(PlayerData);
@@ -333,7 +336,7 @@ public class DataManager : MonoBehaviour
             var docRef = db.Collection(userCollection).Document(docId);
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             
-            Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
+            //Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
         }
         catch (System.Exception e)
         {

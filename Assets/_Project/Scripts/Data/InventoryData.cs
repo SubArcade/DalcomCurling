@@ -27,7 +27,6 @@ public class DonutEntry
 public class DonutCodexData
 {
     [field: SerializeField, Tooltip("고유 아이디")] [FirestoreProperty] public string id { get; set; }
-    [field: SerializeField, Tooltip("도넛 타입")] [FirestoreProperty] public DonutType donutType { get; set; }
     [field: SerializeField, Tooltip("프리팹 이미지 상태")] [FirestoreProperty] public DonutDexViewState donutDexViewState { get; set; }
 }
 
