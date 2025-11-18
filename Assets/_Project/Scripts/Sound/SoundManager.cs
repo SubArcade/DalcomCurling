@@ -17,8 +17,10 @@ public class SoundManager : MonoBehaviour
     [Header("SFX Events")]
     [SerializeField] private EventReference stoneImpact;
     [SerializeField] private EventReference buttonSound;
+    [SerializeField] private EventReference spectatorSound;
 
     private FMOD.Studio.EventInstance currentBGMInstance;
+    private FMOD.Studio.EventInstance spectatorInstance;
     private List<EventReference> currentPlaylist;
     private int currentBGMIndex = 0;
     private bool isInGame = false;
@@ -122,19 +124,22 @@ public class SoundManager : MonoBehaviour
             if (!currentBGM.IsNull)
             {
                 string bgmName = GetBGMName(currentBGM.Path);
-                Debug.Log($"🎵 BGM 재생: {bgmName} (인덱스: {currentBGMIndex + 1}/{currentPlaylist.Count})");
+                Debug.Log($"BGM 재생: {bgmName} (인덱스: {currentBGMIndex + 1}/{currentPlaylist.Count})");
 
                 currentBGMInstance = RuntimeManager.CreateInstance(currentBGM);
                 currentBGMInstance.start();
 
-                // BGM 길이 대기 (테스트용 30초, 실제로는 음악 길이에 맞게 조정)
-                yield return new WaitForSeconds(30f);
+                FMOD.Studio.PLAYBACK_STATE playbackState;
+                do
+                {
+                    yield return null;
+                    currentBGMInstance.getPlaybackState(out playbackState);
+                }
+                while (playbackState != FMOD.Studio.PLAYBACK_STATE.STOPPED);
 
-                // 현재 인스턴스 정리
-                currentBGMInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 currentBGMInstance.release();
 
-                // 다음 트랙으로
+                // 다음 트랙으로 진행하기
                 currentBGMIndex = (currentBGMIndex + 1) % currentPlaylist.Count;
             }
             else
@@ -154,6 +159,8 @@ public class SoundManager : MonoBehaviour
     #endregion
 
     #region Public Controls
+
+    //-----------씬 이름 넣는 구간-----------
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "LobbyScene")
@@ -187,6 +194,31 @@ public class SoundManager : MonoBehaviour
     public void HandleDonutCollision(GameObject source)
     {
         PlaySFX(stoneImpact, source.transform.position);
+    }
+
+    public void PlaySpectatorCheer(Vector3 position)
+    {
+        if (!spectatorSound.IsNull)
+        {
+            spectatorInstance = RuntimeManager.CreateInstance(spectatorSound);
+            spectatorInstance.set3DAttributes(RuntimeUtils.To3DAttributes(position));
+            spectatorInstance.start();
+            Debug.Log("관중 응원 사운드 시작");
+        }
+        else
+        {
+            Debug.LogWarning("관중 사운드 이벤트가 비어 있습니다.");
+        }
+    }
+
+    public void StopSpectatorCheer()
+    {
+        if (spectatorInstance.isValid())
+        {
+            spectatorInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            spectatorInstance.release();
+            Debug.Log("관중 응원 사운드 정지");
+        }
     }
 
     public void SetBGMVolume(float volume)

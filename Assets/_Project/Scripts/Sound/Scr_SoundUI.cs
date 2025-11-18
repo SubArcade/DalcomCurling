@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SoundUI : MonoBehaviour
+public class Scr_SoundUI : MonoBehaviour
 {
     [Header("UI Controls")]
     public Button lobbyBGMButton;
@@ -12,10 +12,7 @@ public class SoundUI : MonoBehaviour
     public Slider bgmSlider;
     public Slider sfxSlider;
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
+ 
     void Start()
     {
         // 버튼 이벤트 연결

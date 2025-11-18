@@ -603,7 +603,7 @@ PrefabInstance:
       addedObject: {fileID: 2666552962590875145}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1368837083992491513}
+      addedObject: {fileID: 3521751511986077402}
   m_SourcePrefab: {fileID: 100100000, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
 --- !u!1 &555398899643251778 stripped
 GameObject:
@@ -688,19 +688,18 @@ MonoBehaviour:
   CrashParticleDuation: 2
   targetLayerName: Donut
   minCrashForce: 1
---- !u!114 &1368837083992491513
+--- !u!114 &3521751511986077402
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 555398899643251778}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c04f9a8e37922a5439b0bd00e507df78, type: 3}
+  m_Script: {fileID: 11500000, guid: f08a4468405aec748994cdd471ad751a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
 --- !u!4 &936463913872041720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
