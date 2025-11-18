@@ -295,6 +295,7 @@ public class FirebaseGameManager : MonoBehaviour
 
                         Debug.Log("<<<<<< 라운드 변경의 짧은 타임라인 실행 >>>>>>");
                         stoneManager.ClearOldDonutsInNewRound(_currentGame);
+                        gameCamControl.SwitchCamera(START_VIEW_CAM);
                         roundDataUpdated = false;
                         playShortTimelineAndStartGame();
                         
@@ -332,9 +333,10 @@ public class FirebaseGameManager : MonoBehaviour
                 //라운드 변경 시 사용한 도넛 목록 초기화
                 donutSelectionUI?.ResetDonutUsage();
                 //카메라도 시작 캠으로 변경
-                gameCamControl?.SwitchCamera(START_VIEW_CAM);
+                //gameCamControl?.SwitchCamera(START_VIEW_CAM);
+                gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
 
-                if (stoneManager.roundCount != _currentGame.RoundNumber)
+               // if (stoneManager.roundCount != _currentGame.RoundNumber)
                 
 
                 
@@ -349,6 +351,7 @@ public class FirebaseGameManager : MonoBehaviour
                     Debug.Log("OnRoundEnd 호출되었음");
                     OnRoundEnd();
                 }
+                
 
                 break;
 
