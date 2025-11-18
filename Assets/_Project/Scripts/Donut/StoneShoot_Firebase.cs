@@ -608,9 +608,10 @@ public class StoneShoot_Firebase : MonoBehaviour
             {
                 if (_needToTap)
                 {
-                    // 탭을 못했으면 아웃처리
-                    stoneManager.DonutOut(_currentStoneRb.transform.GetComponent<StoneForceController_Firebase>());
-                    Debug.Log("호그라인 전까지 탭하지 않았기에 아웃처리됩니다");
+                    // 탭을 못했으면 FirebaseGameManager의 실패 처리 메서드를 호출합니다. 아웃처리 후 다음 상태로 넘어가도록 HandleTapFailed()호출.
+                    Debug.Log("호그라인 전까지 탭하지 않았기에 턴을 넘깁니다.");
+                    FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, shotData.DonutId);
+                    DisableInput();
                     return;
                 }
 

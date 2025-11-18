@@ -718,6 +718,34 @@ public class FirebaseGameManager : MonoBehaviour
     #region Public Methods
 
     /// <summary>
+    /// 샷 발사 시 탭 입력을 실패했을 때 호출됩니다.
+    /// 턴이 멈추지 않도록 실패한 샷으로 처리하고 턴을 넘깁니다.
+    /// </summary>
+    public void HandleTapFailed(Rigidbody donutRigid, string donutId)
+    {
+        Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
+        if (donutRigid != null)
+        {
+            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>());
+        }
+
+        var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
+        LastShot failedShotData = new LastShot()
+        {
+            Force = -999f, // 실패를 나타내는 특수 값
+            PlayerId = myUserId,
+            Team = stoneManager.myTeam,
+            Spin = -999f,
+            Direction = zeroDict,
+            ReleasePosition = zeroDict,
+            DonutId = donutId
+        };
+
+        SubmitShot(failedShotData);
+        _localState = LocalGameState.WaitingForPrediction;
+    }
+
+    /// <summary>
     /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다.
     /// 샷 데이터를 Firebase에 전송하고 입력을 비활성화합니다.
     /// </summary>
