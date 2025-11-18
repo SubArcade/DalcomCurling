@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using EPOOutline;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -689,11 +690,13 @@ public class StoneManager : MonoBehaviour
         //LinQ를 이용해서 하우스에 올라간 도넛들의 거리를 측정하여 그 거리별로 오름차순으로 정렬
 
         team = sortedDonutList[0].team; // out으로 보낼 승리팀
+        sortedDonutList[0].transform.GetComponent<Outlinable>().enabled = true;
         score = 1;
         for (int i = 1; i < sortedDonutList.Count; i++)
         {
             if (sortedDonutList[i].team == team) // 승리팀의 연속된 득점 계산.
             {
+                sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
                 score++; // out으로 보낼 점수
             }
             else
