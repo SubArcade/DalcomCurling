@@ -391,6 +391,9 @@ public class DataManager : MonoBehaviour
 
         foreach (var so in allSO)
         {
+            if (so.type == DonutType.Gift)
+                continue; // Gift 타입 완전 제외
+
             if (!_donutTypeDB.ContainsKey(so.type))
             {
                 _donutTypeDB.Add(so.type, so);
@@ -434,6 +437,7 @@ public class DataManager : MonoBehaviour
         return next;
     }
 
+    // 생성기 레벨따라 도넛생성
     public List<DonutData> GetDonutsByTypeAndLevel(DonutType type, int level)
     {
         List<DonutData> result = new();
