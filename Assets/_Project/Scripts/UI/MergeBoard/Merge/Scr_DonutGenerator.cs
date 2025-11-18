@@ -6,8 +6,10 @@ public class DonutGenerator : MonoBehaviour
     [Header("생성기 레벨 (1~20)")]
     [Range(1, 20)] public int generatorLevel = 1;
 
-    [Header("도넛 데이터베이스 (자동 참조)")]
-    public DataManager dataManager;
+    private DataManager Data => DataManager.Instance;
+
+    [Header("이 생성기가 생성할 도넛 타입")]
+    public DonutType generatorType;
 
     // 1~5레벨 기준 확률표
     // 배열: [1단계, 2단계, 3단계, 4단계, 5단계]
@@ -22,87 +24,106 @@ public class DonutGenerator : MonoBehaviour
 
     private void Awake()
     {
-        if (dataManager == null)
-            dataManager = DataManager.Instance;
+        if (Data == null)
+        {
+            Debug.LogError("❌ DataManager가 아직 초기화되지 않았습니다.");
+        }
     }
 
-    // 생성기 레벨에 따라 도넛 확률 기반으로 랜덤 도넛 선택
+    private DonutType PickDonutType()
+    {
+        // 3개를 동일 확률로 선택하는 기본 구조
+        int rand = Random.Range(0, 3);
+
+        return rand switch
+        {
+            0 => DonutType.Hard,
+            1 => DonutType.Soft,
+            _ => DonutType.Moist
+        };
+    }
+
     public DonutData GetRandomDonut()
     {
-        if (dataManager == null)
+        if (DataManager.Instance == null)
+            return null;
+
+        // 1. Hard/Soft/Moist 중 어떤 타입을 생성할지 선택
+        DonutType selectedType = PickDonutType();
+
+        // 2. 타입에 따른 생성기 레벨 얻기
+        int generatorLevel = DataManager.Instance.GetGeneratorLevel(selectedType);
+
+        // 3. 선택된 타입의 확률표 가져오기
+        float[] chances = GetChanceArray(generatorLevel);
+
+        // 4. 실제 생성될 도넛 단계 선택
+        int chosenLevel = PickLevel(chances, generatorLevel);
+
+        // 5. 해당 타입 + 단계의 도넛 목록 가져오기
+        List<DonutData> list = DataManager.Instance.GetDonutsByTypeAndLevel(selectedType, chosenLevel);
+
+        if (list == null || list.Count == 0)
         {
-            Debug.LogError("DataManager가 초기화되지 않았습니다.");
+            Debug.LogError($"❌ {selectedType} {chosenLevel}레벨 도넛이 존재하지 않습니다!");
             return null;
         }
 
-        // 확률배열 가져오기
-        float[] activeChances = GetChanceArrayForLevel(generatorLevel);
-        if (activeChances == null || activeChances.Length == 0)
-        {
-            Debug.LogWarning($"{generatorLevel}레벨 확률 데이터를 찾을 수 없습니다.");
-            return null;
-        }
-        
-        
+        // 6. 최종 생성
+        DonutData result = list[Random.Range(0, list.Count)];
 
-        // 레벨별 범위 계산
-        // 1~5레벨은 1단계부터 시작 / 6레벨 이상은 낮은 단계 제외
-        int startLevel = Mathf.Max(1, generatorLevel - (activeChances.Length - 1));
-        int endLevel = startLevel + activeChances.Length - 1;
+        Debug.Log($"생성된 도넛: Type={selectedType}, Level={chosenLevel}, Name={result.id}");
 
-        // 확률 기반으로 레벨 선택
+        return result;
+    }
+
+
+    /// <summary>
+    /// 확률표를 이용해서 실제 도넛 '단계 레벨'을 고름
+    /// </summary>
+    private int PickLevel(float[] chances, int generatorLevel)
+    {
+        // 예: generatorLevel=3, chances.Length=3 → start = 1
+        int start = Mathf.Max(1, generatorLevel - (chances.Length - 1));
+
         float rand = Random.value;
         float cumulative = 0f;
-        int chosenLevel = startLevel;
 
-        // 해당 레벨의 모든 도넛 목록 가져오기
-        List<DonutData> availableDonuts = dataManager.GetDonutsByLevel(chosenLevel);
-        if (availableDonuts == null || availableDonuts.Count == 0)
+        for (int i = 0; i < chances.Length; i++)
         {
-            Debug.LogWarning($"{chosenLevel}레벨 도넛이 DataManager에서 비어있습니다.");
-            return null;
-        }
-
-        for (int i = 0; i < activeChances.Length; i++)
-        {
-            cumulative += activeChances[i];
+            cumulative += chances[i];
             if (rand <= cumulative)
             {
-                chosenLevel = startLevel + i;
-                break;
+                return start + i; // 실제 도넛 레벨
             }
         }
 
-        // 랜덤 타입 선택
-        DonutData selected = availableDonuts[Random.Range(0, availableDonuts.Count)];
-        Debug.Log($"생성기 Lv.{generatorLevel} → 도넛 Lv.{chosenLevel} ({selected.displayName}) 생성됨");
-
-        return selected;
+        return start; // 혹시 분기 안 타면 최소 레벨 반환
     }
 
-    // 생성기 레벨에 맞는 확률배열 반환
-    private float[] GetChanceArrayForLevel(int generatorLevel)
+    /// <summary>
+    /// 생성기 레벨에 맞는 확률배열 반환
+    /// </summary>
+    private float[] GetChanceArray(int level)
     {
-        if (generatorLevel <= 5)
-        {
-            // 기본 확률표 그대로 사용
-            return chanceTable[generatorLevel];
-        }
+        if (level <= 5)
+            return chanceTable[level];
 
-        // 6레벨 이상일 경우 — 낮은 단계 확률이 점점 사라짐 (왼쪽 잘라내기)
-        int shift = generatorLevel - 5; // 예: 6레벨이면 1칸, 7레벨이면 2칸 자름
+        // 6레벨 이상: 낮은 단계 제거하면서 고단계만 나오게
+        int removeCount = level - 5;
         var baseArray = chanceTable[5];
-        List<float> shifted = new();
 
-        // 왼쪽 요소 제거 (낮은 단계 제거)
-        for (int i = shift; i < baseArray.Length; i++)
-            shifted.Add(baseArray[i]);
+        List<float> temp = new();
 
-        // 정규화 (합이 1 되도록)
+        for (int i = removeCount; i < baseArray.Length; i++)
+            temp.Add(baseArray[i]);
+
+        // 정규화
         float sum = 0f;
-        foreach (float f in shifted) sum += f;
-        for (int i = 0; i < shifted.Count; i++) shifted[i] /= sum;
+        foreach (var v in temp) sum += v;
+        for (int i = 0; i < temp.Count; i++)
+            temp[i] /= sum;
 
-        return shifted.ToArray();
+        return temp.ToArray();
     }
 }

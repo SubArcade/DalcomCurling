@@ -743,6 +743,16 @@ public class StoneManager : MonoBehaviour
         bShotIndex++;
     }
 
+    public void A_ShotIndexDown()
+    {
+        aShotIndex--;
+    }
+
+    public void B_ShotIndexDown()
+    {
+        bShotIndex--;
+    }
+
     #endregion
 
 

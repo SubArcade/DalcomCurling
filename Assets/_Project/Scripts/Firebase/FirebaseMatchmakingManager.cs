@@ -33,7 +33,7 @@ public class Room
     [FirestoreProperty]
     public string ScoreBracket { get; set; } // 룸 생성자의 점수 구간
 
-    // ✨ 새로 추가할 필드: 각 플레이어의 프로필 정보를 저장합니다.
+    // 새로 추가할 필드: 각 플레이어의 프로필 정보를 저장합니다.
     [FirestoreProperty]
     public Dictionary<string, PlayerProfile> PlayerProfiles { get; set; }
 }

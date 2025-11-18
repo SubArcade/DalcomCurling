@@ -1733,13 +1733,53 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2597265814505318722, guid: 3df6f5a973bc2654daec2540715fa914, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4890494908763991188}
   m_SourcePrefab: {fileID: 100100000, guid: 3df6f5a973bc2654daec2540715fa914, type: 3}
 --- !u!4 &3601866675866352678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3404870662063043576, guid: 3df6f5a973bc2654daec2540715fa914, type: 3}
   m_PrefabInstance: {fileID: 2214893038130302942}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4231050507090978460 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2597265814505318722, guid: 3df6f5a973bc2654daec2540715fa914, type: 3}
+  m_PrefabInstance: {fileID: 2214893038130302942}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4890494908763991188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4231050507090978460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85df1ed0cc65dd041ad1add865a4b04f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  auraEnabled: 0
+  selectedAura: 0
+  auraFirePrefab: {fileID: 0}
+  auraLightPrefab: {fileID: 0}
+  auraMagicPrefab: {fileID: 0}
+  auraIcePrefab: {fileID: 0}
+  auraElectricPrefab: {fileID: 0}
+  trailEnabled: 0
+  selectedTrail: 0
+  trailRenderer: {fileID: 0}
+  minSpeedForTrail: 1
+  trailFirePrefab: {fileID: 0}
+  trailLightPrefab: {fileID: 0}
+  trailMagicPrefab: {fileID: 0}
+  trailIcePrefab: {fileID: 0}
+  trailElectricPrefab: {fileID: 0}
+  CrashParticlePrefab: {fileID: 0}
+  CrashParticleDuation: 2
+  targetLayerName: Donut
+  minCrashForce: 1
 --- !u!1001 &2269991259534251787
 PrefabInstance:
   m_ObjectHideFlags: 0
