@@ -384,7 +384,6 @@ public class Scr_OrderSystem : MonoBehaviour
 
             //이미지, 타입, 단계 설명표시
             orderImages[i].sprite = donut.sprite;
-            SetDonutTexts(textInfos, idList);
 
             //저장
             idList.Add(donut.id);
@@ -400,6 +399,7 @@ public class Scr_OrderSystem : MonoBehaviour
             });
 
         }
+        SetDonutTexts(textInfos, idList);
         costText.text = $"{totalReward}";
 
         // 어떤 주문서인지에 따라 해당 퀘스트 저장
@@ -541,11 +541,11 @@ public class Scr_OrderSystem : MonoBehaviour
             if (donut == null) continue;
 
             orderImages[i].sprite = donut.sprite;
-            SetDonutTexts(textInfos, idList);
 
             idList.Add(donut.id);
             totalReward += quest.rewardGold;
         }
+        SetDonutTexts(textInfos, idList);
         costText.text = $"{totalReward}";
     }
 
