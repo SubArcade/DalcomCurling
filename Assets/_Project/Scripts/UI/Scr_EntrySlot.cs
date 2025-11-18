@@ -25,6 +25,10 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         var dragged = eventData.pointerDrag?.GetComponent<MergeItemUI>();
         if (dragged == null) return;
 
+        dragged.DetachFromCurrentCell();  // 셀 연결 제거 (필수!)
+        dragged.currentCell = null;       // 안전장치
+        dragged.isFromEntry = true;
+
         // 드래그된 오브젝트가 이미 내 자식이면 무시
         if (dragged.transform.parent == transform)
         {
@@ -46,9 +50,9 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         if (dragged.OriginalParent == transform)
         {
             Debug.Log($"{name}: 이전 슬롯 == 현재 슬롯, 중복 드롭 방지");
+            dragged.ResetPosition();
             return;
         }
-
 
         // 보드에서 왔다면 보드 점유 해제
         dragged.DetachFromCurrentCell();
@@ -59,15 +63,26 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
     private void MoveIn(MergeItemUI dragged)
     {
+        // Gift 타입은 차단
+        if (dragged.donutData != null && dragged.donutData.donutType == DonutType.Gift)
+        {
+            dragged.ResetPosition();
+            return;
+        }
+
         // 기존 슬롯의 currentItem 초기화
         var oldSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
         if (oldSlot != null && oldSlot != this)
             oldSlot.Clear();
 
+        dragged.DetachFromCurrentCell();
+
         dragged.transform.SetParent(transform, false);
         var rt = dragged.GetComponent<RectTransform>();
         rt.anchoredPosition = Vector2.zero;
         currentItem = dragged;
+        dragged.currentCell = null;  // 보드 참조 제거
+        dragged.isFromEntry = true;  // 도넛 
 
         // ✅ 체크마크 비활성화
         var checkMark = dragged.transform.Find("CheckMark")?.gameObject;
@@ -76,8 +91,9 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
-        
-        
+
+        dragged.UpdateOriginalParent(transform);
+
         Debug.Log($"[MoveIn] {currentItem.donutData.id} 슬롯에 도넛 들어감");
         // Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
         // Debug.Log($"currentItem: {currentItem?.name}");
@@ -88,6 +104,11 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     public void Clear()
     {
         if (currentItem != null)
+        {
+            if (currentItem.transform.parent == transform)
+                Destroy(currentItem.gameObject);
+
             currentItem = null;
+        }
     }
 }

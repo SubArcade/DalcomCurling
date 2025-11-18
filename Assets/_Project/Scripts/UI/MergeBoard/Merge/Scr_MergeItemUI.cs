@@ -13,13 +13,14 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private CanvasGroup canvasGroup;
     private Canvas canvas;
     private Image image;
+    public bool isFromEntry = false; //엔트리 확인용
 
     private Vector2 originalPos;
     private Transform originalParent;
 
     public Transform OriginalParent => originalParent;
 
-    public Cells currentCell { get; private set; }
+    public Cells currentCell { get; set; }
     public Cells originalCell { get; private set; } // 드래그 시작 시 셀 (EntrySlot용)
 
     private void Awake()
@@ -92,7 +93,6 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 currentCell.ClearItem();
 
             Destroy(gameObject); // 오브젝트 삭제
-            // 기존 firestore저장함수 있던곳
             return;
         }
 
@@ -160,12 +160,11 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         {
             MoveToCell(targetCell);
             BoardManager.Instance.SelectCell(targetCell);
-            //await AutoSaveAsync();
             return;
         }
 
-        // 엔트리 슬롯은 금지
-        if (targetCell.CompareTag("EntrySlot"))
+        // 엔트리 슬롯이면 차단
+        if (isFromEntry)
         {
             ResetPosition();
             return;
@@ -236,11 +235,15 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     private void MoveToCell(Cells target)
     {
+        isFromEntry = false; //엔트리 끄기
+
         currentCell?.ClearItem();
         target.SetItem(this, donutData); 
         transform.SetParent(target.transform, false);
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.localScale = Vector3.one;
+
+        UpdateOriginalParent(target.transform);
     }
 
     public void ResetPosition()
@@ -251,7 +254,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         if (originalCell != null)
             BoardManager.Instance.SelectCell(originalCell); //격자 원위치
     }
-    
+
+    //엔트리 슬롯 참조용
+    public void UpdateOriginalParent(Transform newParent) 
+    {
+        originalParent = newParent;
+    }
 
     // 나중에 이펙트 추가할거
     /*
