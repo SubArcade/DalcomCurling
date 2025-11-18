@@ -347,12 +347,12 @@ public class Scr_OrderSystem : MonoBehaviour
             int safety = 100;
             while (safety-- > 0) //100에서 점점 1회씩 빼가며 중복되지않는 도넛 탐샘
             {
-                //DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
+                // DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
                 DonutType randomType;
 
                 DonutType[] types = { DonutType.Hard, DonutType.Soft, DonutType.Moist };
                 randomType = types[Random.Range(0, types.Length)];
-
+                
                 int randomLevel = Random.Range(minLevel, maxLevel + 1); //도넛의 타입과 레벨 무작위 선택
                 string comboKey = $"{randomType}_{randomLevel}"; //타입+레벨 조합한 키 생성
 

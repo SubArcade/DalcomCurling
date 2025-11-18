@@ -38,7 +38,7 @@ public class Scr_ButtonScale : MonoBehaviour
         TrashCanTransform = TrashCan.transform;
         TrashCanImage = TrashCan.GetComponent<Image>();
 
-        StartPopUp = transform.Find("MainMenu/Bottom/Battle_Button")?.gameObject;
+        StartPopUp = transform.Find("MainMenu/Bottom/Battle/Battle_Button")?.gameObject;
         StartButtonTransform = StartPopUp.transform;
         startImage = StartPopUp.GetComponent<Image>();
         
