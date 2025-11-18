@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
       propertyPath: m_LocalPosition.x
       value: 12.5943
       objectReference: {fileID: 0}
@@ -52,6 +64,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level 29
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
+      propertyPath: m_TagString
+      value: InGameDonut
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -71,6 +87,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6783504338962371325}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1972567038125651354}
   m_SourcePrefab: {fileID: 100100000, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}
 --- !u!1 &192843987788595675 stripped
 GameObject:
@@ -310,6 +329,23 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &1972567038125651354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 192843987788595675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48652f4fd1e77824588bfc782d1efbe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stoneForce: 0
+  donutId: 0
+  spinForce: 0
+  sweepSidewaysForce: 0
+  sweepFrictionValue: 0
 --- !u!4 &713484336661650273 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d819c024ed5fe3540a97b5f89adffdba, type: 3}

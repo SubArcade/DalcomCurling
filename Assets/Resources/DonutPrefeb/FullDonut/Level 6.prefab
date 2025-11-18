@@ -187,6 +187,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.8893
       objectReference: {fileID: 0}
@@ -230,6 +242,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level 6
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
+      propertyPath: m_TagString
+      value: InGameDonut
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -258,6 +274,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
       insertIndex: -1
       addedObject: {fileID: -3437877438429282832}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8454095405827960910}
   m_SourcePrefab: {fileID: 100100000, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
 --- !u!4 &2342376835489105065 stripped
 Transform:
@@ -427,6 +446,23 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &-8454095405827960910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3155365270216695315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48652f4fd1e77824588bfc782d1efbe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stoneForce: 0
+  donutId: 0
+  spinForce: 0
+  sweepSidewaysForce: 0
+  sweepFrictionValue: 0
 --- !u!23 &3515877060036886470 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
