@@ -303,7 +303,7 @@ public class FirebaseGameManager : MonoBehaviour
 
                 break;
             case "InProgress":
-                
+
                 // 첫 턴 시작 조건을 _localState == InTimeline일 때도 포함
                 if (turnChanged || (_currentGame.GameState == "InProgress" && _isMyTurn &&
                                     (_localState == LocalGameState.Idle || _localState == LocalGameState.InTimeline)))
@@ -321,7 +321,6 @@ public class FirebaseGameManager : MonoBehaviour
                 break;
 
             case "RoundChanging":
-                
 
                 //if (_localState != LocalGameState.Idle && _localState != LocalGameState.PreparingShot) break; //중복 방지
                 if (_localState != LocalGameState.Idle && _localState != LocalGameState.SimulatingOpponentShot)
@@ -329,6 +328,13 @@ public class FirebaseGameManager : MonoBehaviour
                 //if (updatedRoundByMe == true) break;
                 Debug.Log($"라운드 {_currentGame.RoundNumber - 1} 종료. 다음 라운드를 준비합니다.");
                 _localState = LocalGameState.Idle; // 상태 초기화
+
+                //라운드 변경 시 사용한 도넛 목록 초기화
+                donutSelectionUI?.ResetDonutUsage();
+                //카메라도 시작 캠으로 변경
+                gameCamControl?.SwitchCamera(START_VIEW_CAM);
+
+                if (stoneManager.roundCount != _currentGame.RoundNumber)
                 
 
                 
@@ -343,7 +349,6 @@ public class FirebaseGameManager : MonoBehaviour
                     Debug.Log("OnRoundEnd 호출되었음");
                     OnRoundEnd();
                 }
-
 
                 break;
 
@@ -683,6 +688,34 @@ public class FirebaseGameManager : MonoBehaviour
     #region Public Methods
 
     /// <summary>
+    /// 샷 발사 시 탭 입력을 실패했을 때 호출됩니다.
+    /// 턴이 멈추지 않도록 실패한 샷으로 처리하고 턴을 넘깁니다.
+    /// </summary>
+    public void HandleTapFailed(Rigidbody donutRigid, string donutId)
+    {
+        Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
+        if (donutRigid != null)
+        {
+            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>());
+        }
+
+        var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
+        LastShot failedShotData = new LastShot()
+        {
+            Force = -999f, // 실패를 나타내는 특수 값
+            PlayerId = myUserId,
+            Team = stoneManager.myTeam,
+            Spin = -999f,
+            Direction = zeroDict,
+            ReleasePosition = zeroDict,
+            DonutId = donutId
+        };
+
+        SubmitShot(failedShotData);
+        _localState = LocalGameState.WaitingForPrediction;
+    }
+
+    /// <summary>
     /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다.
     /// 샷 데이터를 Firebase에 전송하고 입력을 비활성화합니다.
     /// </summary>
@@ -748,7 +781,7 @@ public class FirebaseGameManager : MonoBehaviour
 
     /// <summary>
     /// 돌 시뮬레이션이 완료되면 호출됩니다.
-    /// 예측 결과를 전송하거나, 상대의 예측 결과를 기다립니다.   상대 시뮬 끝나면 내 도넛을 미리 생성하고 발사대기 가능하도록
+    /// 예측 결과를 전송하거나, 상대의 예측 결과를 기다립니다. 상대 시뮬 끝나면 내 도넛을 미리 생성하고 발사대기 가능하도록
     /// </summary>
     public void OnSimulationComplete(List<StonePosition> finalPositions)
     {

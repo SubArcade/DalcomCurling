@@ -83,6 +83,8 @@ public class DataManager : MonoBehaviour
     [SerializeField, Tooltip("시즌")] private string Season = "2025";
     private GameMode gameMode = GameMode.SOLO;
     
+    [SerializeField] private RankData rankData = new RankData();
+    
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
     public event Action<UserDataRoot> OnUserDataRootChanged;
@@ -356,7 +358,7 @@ public class DataManager : MonoBehaviour
             
             var docRef = db.Collection(userCollection).Document(docId);
             await docRef.SetAsync(userData, SetOptions.MergeAll);
-            
+            await UpsertLeader(PlayerData.soloScore, PlayerData.soloTier);
             //Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
         }
         catch (System.Exception e)
@@ -534,20 +536,49 @@ public class DataManager : MonoBehaviour
 
     // 유저 데이터 넣기 (Rank)
     // 기본 데이터 값 설정 않넣어도 상관없다 ( GameMode mode = GameMode.SOLO, docid = docId)
-    public async Task UpsertLeader(int score, GameTier tier, GameMode? mode = null, string docid = null, string nickname = null)
-    {
-        mode = mode ?? gameMode;
-        docid = null ?? docId;
-        nickname = null ?? PlayerData.nickname;
-        var doc = LeadersCol(mode).Document(docid);
-        await doc.SetAsync(new Dictionary<string, object> {
-            { "nickname", nickname }, 
-            { "score", score }, 
-            { "tier", tier.ToString().ToLower() }, 
-            { "updatedAt", FieldValue.ServerTimestamp }
-        }, SetOptions.MergeAll);
-    }
+    // public async Task UpsertLeader(int score, GameTier tier, GameMode? mode = null, string docid = null, string nickname = null)
+    // {
+    //     mode = mode ?? gameMode;
+    //     docid = null ?? docId;
+    //     nickname = null ?? PlayerData.nickname;
+    //     var doc = LeadersCol(mode).Document(docid);
+    //     await doc.SetAsync(new Dictionary<string, object> {
+    //         { "nickname", nickname }, 
+    //         { "score", score }, 
+    //         { "tier", tier.ToString().ToLower() }, 
+    //         { "updatedAt", FieldValue.ServerTimestamp }
+    //     }, SetOptions.MergeAll);
+    // }
 
+    public async Task UpsertLeader(
+        int? score = null, 
+        GameTier? tier = null, 
+        GameMode? mode = null, 
+        string docid = null, 
+        string nickname = null)
+    {
+        mode     ??= gameMode;            // 현재 게임 모드 (SOLO/DUO 등)
+        docid    ??= docId;               // 현재 유저 UID
+        nickname ??= PlayerData.nickname; // 현재 닉네임
+
+        score ??= PlayerData.soloScore;   // 기본: 솔로 점수
+        tier  ??= PlayerData.soloTier;    // 기본: 솔로 티어
+
+        var data = new RankData
+        {
+            nickname  = nickname,
+            score     = score.Value,
+            tier      = tier.Value,
+            uid       = docid
+        };
+
+        rankData = data;
+        var docRef = LeadersCol(mode.Value).Document(docid);
+        await docRef.SetAsync(data, SetOptions.MergeAll);
+
+        Debug.Log($"[Rank] UpsertLeader 완료: mode={mode}, uid={docid}, score={data.score}, tier={data.tier}");
+    }
+    
     // 예시 (테이블 기본 셋팅)
     async Task SeedSummaryAsync()
     {
@@ -560,6 +591,60 @@ public class DataManager : MonoBehaviour
         }, SetOptions.MergeAll);
     }
 
+    private DocumentReference RankSummaryDoc =>
+    db.Collection("rank_summaries").Document(Season);
+
+    // GameMode → 필드 이름 매핑
+    private string GetSummaryFieldName(GameMode mode)
+    {
+        return mode switch
+        {
+            GameMode.SOLO => "soloTop100",
+            GameMode.DUO  => "duoTop100",
+            GameMode.TRIO => "trioTop100"
+        };
+    }
+
+    /// <summary>
+    /// leaders 컬렉션 기준으로 Top100 다시 계산해서
+    /// rank_summaries/{Season} 의 해당 모드 필드만 갱신
+    /// </summary>
+    public async Task RebuildRankSummaryAsync(GameMode mode, int limit = 100)
+    {
+        // 1) leaders에서 점수 내림차순 Top100 가져오기
+        var col = LeadersCol(mode); // 이미 있는 함수라 했지?
+        var query = col.OrderByDescending("score").Limit(limit);
+        var snap = await query.GetSnapshotAsync();
+
+        var topList = new List<Dictionary<string, object>>();
+
+        foreach (var doc in snap.Documents)
+        {
+            var data = doc.ConvertTo<RankData>();
+
+            topList.Add(new Dictionary<string, object>
+            {
+                { "nickname", data.nickname },
+                { "score",    data.score },
+                { "tier",     data.tier },
+                { "uid",      data.uid }
+            });
+        }
+
+        // 2) rank_summaries/{Season} 문서에 해당 모드 배열만 갈아끼우기
+        string fieldName = GetSummaryFieldName(mode);
+
+        var patch = new Dictionary<string, object>
+        {
+            { fieldName,  topList },
+            { "updatedAt", FieldValue.ServerTimestamp }
+        };
+
+        await RankSummaryDoc.SetAsync(patch, SetOptions.MergeAll);
+
+        Debug.Log($"[Rank] RebuildRankSummaryAsync: mode={mode}, count={topList.Count}");
+    }
+    
 
     // 랭크 구분 함수 ( 랭크를 디비에서 계산해서 넣어줘야 함 )
     private GameTier CalculateTier(int score, int? rank = null)
