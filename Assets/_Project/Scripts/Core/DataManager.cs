@@ -365,62 +365,6 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public async Task LoadBoardDataOnlyAsync()
-    {
-        var docRef = db.Collection(userCollection).Document(docId);
-        var snapshot = await docRef.GetSnapshotAsync();
-
-        if (!snapshot.Exists)
-        {
-            Debug.LogWarning("[FS] 문서 없음 → 신규 계정으로 간주");
-            return;
-        }
-
-        // Firestore 데이터를 Dictionary로 변환
-        Dictionary<string, object> doc = snapshot.ToDictionary();
-
-        if (!doc.ContainsKey("mergeBoard"))
-        {
-            Debug.LogWarning("[FS] mergeBoard 데이터 없음");
-            return;
-        }
-
-        var mergeBoardDict = doc["mergeBoard"] as Dictionary<string, object>;
-
-        if (!mergeBoardDict.ContainsKey("cells"))
-        {
-            Debug.LogWarning("[FS] mergeBoard.cells 없음");
-            return;
-        }
-
-        var rawCells = mergeBoardDict["cells"] as List<object>;
-
-        var cellList = new List<CellData>();
-
-        foreach (var cellObj in rawCells)
-        {
-            var c = cellObj as Dictionary<string, object>;
-
-            CellData cd = new CellData
-            {
-                x = Convert.ToInt32(c["x"]),
-                y = Convert.ToInt32(c["y"]),
-                donutId = c.ContainsKey("donutId") ? c["donutId"]?.ToString() : null,
-                isCellActive = c.ContainsKey("isCellActive") ?
-                               Convert.ToBoolean(c["isCellActive"]) : true
-            };
-
-            cellList.Add(cd);
-        }
-
-        // DataManager의 mergeBoard에 cellList 넣기
-        MergeBoardData.cells = cellList;
-
-        Debug.Log("[FS] mergeBoard.cells 로드 완료: " + cellList.Count);
-    }
-
-
-
     // Rank 디비 관련 함수들
 
     // 디비에 들어가는 컬랙션과 문서 설정
