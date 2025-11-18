@@ -35,8 +35,16 @@ public class StoneShoot_Firebase : MonoBehaviour
     {
         None,
         PowerDirection,
-        Rotation,
-        Launch // 발사 제스처
+        Rotation
+    }
+
+    /// <summary>
+    /// 조준 과정의 현재 단계를 나타내는 열거형
+    /// </summary>
+    private enum AimingPhase
+    {
+        PowerDirection, // 힘과 방향을 설정하는 단계
+        Rotation        // 회전을 설정하는 단계
     }
     
     [System.Serializable]
@@ -51,9 +59,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     public StoneManager stoneManager; // 돌 관리를 담당하는 스크립트 참조
 
     [Header("조작 영역")]
-    public RectTransform powerDirectionArea; // 힘/방향 입력을 위한 UI 영역
-    public RectTransform rotationArea; // 회전 입력을 위한 UI 영역
-    public RectTransform launchArea; // 발사를 위한 UI 영역
+    public RectTransform inputArea; // 힘/방향 및 회전 입력을 위한 통합 UI 영역
 
     [Header("궤적 미리보기")] // 궤적 미리보기 관련 변수 헤더
     public LineRenderer trajectoryLine; // 궤적을 그릴 라인 렌더러
@@ -62,13 +68,15 @@ public class StoneShoot_Firebase : MonoBehaviour
     [SerializeField, Range(0.1f, 2.0f)] private float trajectoryForceMultiplier = 0.5f; // 궤적 예측의 힘 계수 (1.0이 기본)
     [SerializeField, Range(0.001f, 0.1f)] private float trajectoryCurlFactor = 0.05f; // 궤적 예측의 휨 계수
     [SerializeField, Range(0.1f, 2.0f)] private float horizontalDragSensitivity = 0.5f; // 좌우 드래그 방향 민감도 (낮을수록 덜 꺾임)
+    public Color min_Color = Color.white;
+    public Color max_Color = Color.red;
 
     [Header("설정 변수")] // 게임 플레이 조작 관련 변수 헤더
-    public float launchForceMultiplier = 4f; // 드래그 거리를 발사 힘으로 변환하는 계수
-    public float maxDragDistance = 0.5f; // 초기 드래그의 최대 거리 (정규화된 화면 높이 기준)
-    public float maxRotationDragDistance = 1f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준)
+    public float launchForceMultiplier = 6f; // 드래그 거리를 발사 힘으로 변환하는 계수, 4에서 8로 수정(11/16), 4에서 6로 수정 11/17
+    public float maxDragDistance = 0.25f; // 초기 드래그의 최대 거리 (정규화된 화면 높이 기준) , 0.5에서 0.25로 수정(11/16)
+    public float maxRotationDragDistance = 0.5f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준) , 1에서 0.5로 수정(11/16)
     public float maxRotationValue = 5f; // 스핀의 최대 값
-    public float autoMoveToHogLineSpeed = 6f; // 도넛이 호그 라인까지 자동 이동하는 속도
+    public float autoMoveToHogLineSpeed = 4f; // 도넛이 호그 라인까지 자동 이동하는 속도, 6에서 4로 수정 11/17
     public float maxUIDirectionAngle = 60f; // UI 화살표가 표시할 수 있는 최대 각도
     public float minLaunchDragDistance = 50f; // 발사로 인정할 최소 드래그 거리 (픽셀)
 
@@ -129,12 +137,12 @@ public class StoneShoot_Firebase : MonoBehaviour
     public DragType CurrentDragType { get; private set; } = DragType.None; // 현재 드래그 타입
 
     // --- 내부 변수 ---
+    private AimingPhase _currentAimingPhase; // 현재 조준 단계 (힘/방향 또는 회전)
     private bool _inputEnabled = false; // 현재 입력을 받을 수 있는지 여부
     private Rigidbody _currentStoneRb; // 현재 조작 중인 돌의 Rigidbody 참조
     [SerializeField] private Camera _mainCamera; // 메인 카메라 참조 (시리얼라이즈 필드로 Inspector에서 설정 가능)
     private Vector3 _actualDragStartScreenPos; // 초기 드래그 시작 화면 좌표
     private Vector3 _rotationDragStartScreenPos; // 회전 드래그 시작 화면 좌표
-    private Vector3 _launchDragStartScreenPos; // 발사 드래그 시작 화면 좌표
     private Vector3 _finalLaunchDirection = Vector3.forward; // 최종 발사 방향
     private Vector3 _finalLaunchDirectionForTrajectory = Vector3.forward; // 궤적 계산을 위한 최종 발사 방향
     private float _finalLaunchForce; // 최종 발사 힘
@@ -142,7 +150,8 @@ public class StoneShoot_Firebase : MonoBehaviour
     private float _releaseRandomValue = -99f; // 릴리즈 타이밍에 따른 랜덤 값
     private bool _needToTap = false; // 호그 라인까지 이동 중 탭이 필요한지 여부
     private bool _isTrajectoryPreviewActive = false; // 궤적 미리보기 활성화 여부
-    private bool _isPowerDirectionSet = false; // 힘/방향이 한 번이라도 설정되었는지 여부
+    private float draggedDistanceForTrajectory = 0; // 발사를 위해 드래그했던 정도를 기록할 변수, 궤적을 위해 저장
+    private float draggedAmountBetween_0_Or_1 = 0; // 회전값을 주었을때, 회전힘에 따라 전진방향 힘을 살짝 약하게 주기 위한 값
 
     // --- 미리 준비한 샷 데이터 저장용 ---
     private LastShot _preparedShotData = null; // 'PreparingShot' 상태에서 미리 입력된 샷 데이터
@@ -173,8 +182,8 @@ public class StoneShoot_Firebase : MonoBehaviour
         _inputEnabled = true; // 입력 활성화 플래그
         _currentStoneRb = stoneRb; // 현재 조작할 돌 설정
         CurrentState = LaunchState.Aiming; // 조준 상태로 변경
+        _currentAimingPhase = AimingPhase.PowerDirection; // 조준 단계를 힘/방향 설정으로 초기화
         _releaseRandomValue = -99f; // 릴리즈 랜덤 값 초기화
-        _isPowerDirectionSet = false; // 힘/방향 설정 여부 플래그 초기화
 
         // 조준 값들 초기화
         FinalRotationValue = 0f;
@@ -188,7 +197,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         _isTrajectoryPreviewActive = true; // 궤적 미리보기 활성화
         if (trajectoryLine != null) trajectoryLine.enabled = true;
 
-        Debug.Log("InputController: 입력 활성화됨 (Aiming state).");
+        Debug.Log("InputController: 입력 활성화됨 (Aiming state). 힘/방향을 설정하세요.");
     }
 
     /// <summary>
@@ -246,7 +255,6 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (_mainCamera == null)
         {
             _mainCamera = Camera.main;
-            // 없으면 이번 프레임 입력 처리를 건너뜁니다.
             if (_mainCamera == null)
             {
                 Debug.LogWarning("조준 입력 처리 중 메인 카메라를 찾을 수 없습니다.");
@@ -272,38 +280,26 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             touchPosition = Input.mousePosition;
             isTouchBegan = Input.GetMouseButtonDown(0);
-            isTouchMoved = Input.GetMouseButton(0); // GetMouseButton(0)은 누르고 있는 동안 true
+            isTouchMoved = Input.GetMouseButton(0);
             isTouchEnded = Input.GetMouseButtonUp(0);
         }
 
-        // 입력 시작
-        if (isTouchBegan)
+        // 현재 조준 단계에 따라 입력 처리 분기
+        if (_currentAimingPhase == AimingPhase.PowerDirection)
         {
-            // Screen Space - Overlay 캔버스에서는 카메라 파라미터에 null을 전달해야 정확한 좌표 계산 가능.
-
-            // 힘/방향 영역 터치 확인
-            if (powerDirectionArea != null && RectTransformUtility.RectangleContainsScreenPoint(powerDirectionArea, touchPosition, null))
+            // --- 힘/방향 설정 단계 ---
+            if (isTouchBegan)
             {
-                StartDrag(touchPosition, DragType.PowerDirection);
+                // 터치 시작 위치가 조작 영역 안인지 확인
+                if (inputArea != null && RectTransformUtility.RectangleContainsScreenPoint(inputArea, touchPosition, null))
+                {
+                    StartDrag(touchPosition, DragType.PowerDirection);
+                }
             }
-            // 회전 영역 터치 확인
-            else if (rotationArea != null && RectTransformUtility.RectangleContainsScreenPoint(rotationArea, touchPosition, null))
-            {
-                StartDrag(touchPosition, DragType.Rotation);
-            }
-            // 발사 영역 터치 확인
-            else if (launchArea != null && RectTransformUtility.RectangleContainsScreenPoint(launchArea, touchPosition, null))
-            {
-                StartDrag(touchPosition, DragType.Launch);
-            }
-        }
-        
-        // 드래그 중
-        if (IsDragging && isTouchMoved)
-        {
-            if (CurrentDragType == DragType.PowerDirection)
+            else if (isTouchMoved && IsDragging && CurrentDragType == DragType.PowerDirection)
             {
                 // 힘/방향 실시간 계산
+                // 실제 발사를 위한 계산과 궤적을 위한 계산이 분리되어있는 상태 ( 사용해야할 변수가 다름 )
                 Vector3 dragVector2D = (Vector3)touchPosition - _actualDragStartScreenPos;
                 Vector3 dragVector2DForTrajectory = new Vector3(dragVector2D.x * horizontalDragSensitivity, dragVector2D.y);
 
@@ -312,6 +308,8 @@ public class StoneShoot_Firebase : MonoBehaviour
                 
                 float clampedDistance = Mathf.Min(dragDistance, maxDragDistance);
                 float clampedDistanceForTrajectory = Mathf.Min(dragDistanceForTrajectory, maxDragDistance);
+                
+                draggedDistanceForTrajectory = clampedDistance;
                 
                 _finalLaunchForce = clampedDistance * launchForceMultiplier;
                 _finalLaunchForceForTrajectory = clampedDistanceForTrajectory * launchForceMultiplier;
@@ -330,35 +328,55 @@ public class StoneShoot_Firebase : MonoBehaviour
 
                 UpdateDragVisual(touchPosition);
             }
-            else if (CurrentDragType == DragType.Rotation)
+            else if (isTouchEnded && IsDragging && CurrentDragType == DragType.PowerDirection)
+            {
+                EndDrag(); // 드래그 종료
+
+                // 드래그 거리가 충분한지 확인
+                Vector3 dragVector = (Vector3)touchPosition - _actualDragStartScreenPos;
+                if (dragVector.magnitude > minLaunchDragDistance)
+                {
+                    Debug.Log("힘/방향 설정 완료. 이제 회전을 설정하세요.");
+                    FirebaseGameManager.Instance.OnShotStepUI(); // 도넛 엔트리창만 off
+
+                    _currentAimingPhase = AimingPhase.Rotation; // 다음 단계로 전환
+                }
+                else
+                {
+                    Debug.Log($"드래그 거리가 짧아 힘/방향이 설정되지 않았습니다. 다시 시도하세요. (최소 드래그 거리: {minLaunchDragDistance}px)");
+                    // 사용자가 다시 시도할 수 있도록 조준 값 초기화
+                    _finalLaunchForce = 0f;
+                    _finalLaunchForceForTrajectory = 0f;
+                    _finalLaunchDirection = Vector3.forward;
+                    _finalLaunchDirectionForTrajectory = Vector3.forward;
+                    CurrentDragRatio = 0f;
+                    CurrentLaunchAngle = 0f;
+                }
+            }
+        }
+        else // _currentAimingPhase == AimingPhase.Rotation
+        {
+            // --- 회전 설정 단계 ---
+            if (isTouchBegan)
+            {
+                // 터치 시작 위치가 조작 영역 안인지 확인
+                if (inputArea != null && RectTransformUtility.RectangleContainsScreenPoint(inputArea, touchPosition, null))
+                {
+                    StartDrag(touchPosition, DragType.Rotation);
+                }
+            }
+            else if (isTouchMoved && IsDragging && CurrentDragType == DragType.Rotation)
             {
                 // 회전값 실시간 계산
                 UpdateRotationValue(touchPosition);
             }
-        }
-
-        // 입력 종료
-        if (isTouchEnded && IsDragging)
-        {
-            // 발사 제스처 확인
-            if (CurrentDragType == DragType.Launch)
+            else if (isTouchEnded && IsDragging && CurrentDragType == DragType.Rotation)
             {
-                // 힘/방향 조작이 한 번이라도 있었는지 확인
-                if (!_isPowerDirectionSet)
-                {
-                    Debug.Log("힘/방향을 먼저 설정해야 발사할 수 있습니다.");
-                }
-                else
-                {
-                    Vector3 dragVector = (Vector3)touchPosition - _launchDragStartScreenPos;
-                    // 위로 일정 거리 이상 드래그했는지 확인
-                    if (dragVector.y > minLaunchDragDistance)
-                    {
-                        ReleaseShot(); // 발사!
-                    }
-                }
+                EndDrag(); // 드래그 종료
+                Debug.Log("회전 설정 완료. 발사합니다!");
+                FirebaseGameManager.Instance.OnIdleUI();
+                ReleaseShot(); // 발사!
             }
-            EndDrag();
         }
     }
 
@@ -388,15 +406,11 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (dragType == DragType.PowerDirection)
         {
             _actualDragStartScreenPos = screenPosition;
-            if (_currentStoneRb != null) _currentStoneRb.isKinematic = true;           
+            if (_currentStoneRb != null) _currentStoneRb.isKinematic = true;
         }
         else if (dragType == DragType.Rotation)
         {
             _rotationDragStartScreenPos = screenPosition;
-        }
-        else if (dragType == DragType.Launch)
-        {
-            _launchDragStartScreenPos = screenPosition;
         }
     }
 
@@ -405,15 +419,8 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     private void EndDrag()
     {
-        // 힘/방향 조작이 끝났다면 플래그를 true로 설정
-        if (CurrentDragType == DragType.PowerDirection)
-        {
-            _isPowerDirectionSet = true;
-        }
-
         IsDragging = false;
         CurrentDragType = DragType.None;
-       
     }
     #endregion
 
@@ -446,7 +453,8 @@ public class StoneShoot_Firebase : MonoBehaviour
         Vector3 dragVector = currentScreenPos - _rotationDragStartScreenPos; // 회전 드래그 벡터 계산
         float dragXDistance = dragVector.x; // X축 드래그 거리
         float normalizedDrag = dragXDistance / _mainCamera.pixelWidth; // 화면 폭 대비 정규화된 드래그 거리
-        float dragRatio = Mathf.Clamp(normalizedDrag / maxRotationDragDistance, -1f, 1f); // 드래그 비율 클램프 (-1~1)
+        float dragRatio = Mathf.Clamp(normalizedDrag / (maxRotationDragDistance * 2), -1f, 1f); // 드래그 비율 클램프 (-1~1)
+        draggedAmountBetween_0_Or_1 = Mathf.Abs(dragRatio); // 드래그한 비율의 절대값을 가져옴(나중에 발사 힘 계산에 포함하기 위함)
         FinalRotationValue = dragRatio * maxRotationValue; // 최종 스핀 값 계산
     }
 
@@ -488,6 +496,13 @@ public class StoneShoot_Firebase : MonoBehaviour
             }
         }
 
+        float t = Mathf.InverseLerp(0, maxDragDistance, draggedDistanceForTrajectory); // 드래그한 거리를 비율화
+        Color resultColor = Color.Lerp(min_Color, max_Color, t); // 그 비율에 따라 시작 색상과 종료 색상 믹싱
+        
+        // 시작 컬러와 끝 컬러를 일단 통일하여 표시
+        trajectoryLine.startColor = resultColor;
+        //trajectoryLine.endColor = resultColor;
+
         trajectoryLine.positionCount = points.Count;
         trajectoryLine.SetPositions(points.ToArray());
     }
@@ -525,7 +540,9 @@ public class StoneShoot_Firebase : MonoBehaviour
         // LastShot 객체를 생성하여 반환
         return new LastShot
         {
-            Force = finalForce * calculatedRandomValue, // 최종 힘
+            // 좌우 회전값에 따라 발사 힘을 아주 살짝 약하게 줌으로써 최종 전진거리 감소 효과
+            Force = finalForce * calculatedRandomValue * (1 - (draggedAmountBetween_0_Or_1 * 0.1f)), // 최종 힘
+            
             PlayerId = stoneManager.myUserId,
             Team = stoneManager.myTeam, // 발사하는 팀
             Spin = FinalRotationValue * calculatedRandomValue, // 최종 스핀 값
@@ -591,8 +608,10 @@ public class StoneShoot_Firebase : MonoBehaviour
             {
                 if (_needToTap)
                 {
-                    // 탭을 못했으면 _releaseRandomValue가 -99이므로, CalculateShotData에서 100%로 처리됨
-                    // 이 경우 (탭을 놓쳤을 경우) 원래의 로직에 따라 랜덤값이 적용되지 않음.
+                    // 탭을 못했으면 아웃처리
+                    stoneManager.DonutOut(_currentStoneRb.transform.GetComponent<StoneForceController_Firebase>());
+                    Debug.Log("호그라인 전까지 탭하지 않았기에 아웃처리됩니다");
+                    return;
                 }
 
                 if (_currentStoneRb != null) _currentStoneRb.DOKill(); // DOTween 애니메이션 중지

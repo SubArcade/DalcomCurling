@@ -9,13 +9,18 @@ public class StoneForceController_Firebase : MonoBehaviour
     public float stoneForce;
     public int donutId;
 
+    // 도넛의 물리적 속성
+    public int DonutWeight { get; private set; }
+    public int DonutResilience { get; private set; }
+    public int DonutFriction { get; private set; }
+
     private bool isPassedEndHogLine;
 
     // StoneShoot.Team 대신 직접 Team enum을 정의하거나, FirebaseGameManager에서 팀 정보를 관리하도록 변경
     public Team team { get; private set; }
     public float spinForce;
     private float velocityCalc; // 발사 파워와 현재 속도를 1로 노멀라이징한 변수
-    private float spinAmountFactor = 1.5f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
+    private float spinAmountFactor = 3f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
     private float sidewaysForceFactor = 5f; // 회전값을 통해 얼마나 옆으로 휘게 할지 적용하는 변수 ( 높을수록 많이 휨 ) , 기본값 5, 0.07(기존로직)
     //private float sidewaysForceSpeedLimit = 0f; // 속도가 몇%가 될때까지 옆으로 휘는 힘을 가할건지 ( 낮을수록 오래 휨 ), 기본값 0.4
     private int sidewaysForceAddLimit = 500; // 동일한 횟수만큼만 옆으로 밀리는 힘을 주어서 각 환경에서 싱크가 일치하도록 도움
@@ -29,6 +34,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     private float initialFrictionValue;
     private bool isShooted = false;
     private bool attackMoveFinished = false;
+    private bool isCollided = false;
     public float sweepSidewaysForce;
 
     public float sweepFrictionValue;
@@ -47,41 +53,41 @@ public class StoneForceController_Firebase : MonoBehaviour
     void Awake()
     {
         rigid = GetComponent<Rigidbody>();
-    }
+    //}
 
-    private void Start()
-    {
+    //private void Start()
+    //{
         // MeshCollider가 없을 경우를 대비한 null 체크
-        MeshCollider meshCollider = transform.GetComponent<MeshCollider>();
-        if (meshCollider != null)
+        // MeshCollider meshCollider = transform.GetComponent<MeshCollider>();
+        // if (meshCollider != null)
+        // {
+        //     physicMaterial = meshCollider.material;
+        //     initialFrictionValue = physicMaterial.dynamicFriction;
+        // }
+        // else
+        // {
+        //     Debug.LogWarning("StoneForceController_Firebase: MeshCollider를 찾을 수 없습니다. 물리 재질 초기화에 실패했습니다.");
+        // }
+        CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
+        if (capsuleCollider != null)
         {
-            physicMaterial = meshCollider.material;
+            physicMaterial = capsuleCollider.material;
             initialFrictionValue = physicMaterial.dynamicFriction;
         }
         else
         {
-            Debug.LogWarning("StoneForceController_Firebase: MeshCollider를 찾을 수 없습니다. 물리 재질 초기화에 실패했습니다.");
+            Debug.LogWarning("StoneForceController_Firebase: CapsuleCollider를 찾을 수 없습니다. 물리 재질 초기화에 실패했습니다.");
         }
     }
 
 
     private void FixedUpdate()
     {
-        if (isShooted == true && attackMoveFinished == false && rigid.isKinematic == false && sidewaysForceAddLimit > sidewaysForceAddCount)
+        if (isShooted && attackMoveFinished == false && rigid.isKinematic == false 
+            && sidewaysForceAddLimit > sidewaysForceAddCount && isCollided == false)
         {
             sidewaysForceAddCount++;
-            /*
-            // 돌이 거의 멈췄는지 확인
-            if (rigid.velocity.magnitude < 0.01f)
-            {
-                attackMoveFinished = true;
-                if (physicMaterial != null) // null 체크 추가
-                {
-                    physicMaterial.dynamicFriction = initialFrictionValue; // 마찰력 원래대로 복구
-                }
-                // 이전에는 DonutAttackFinished()를 여기서 호출했지만, 이제 StoneManager가 전체를 모니터링합니다.
-            }
-            */
+            
             velocityCalc =
                 1f - (stoneForce - rigid.velocity.magnitude) / stoneForce; // 발사 파워와 현재 속도를 통해, 현재 속도의 비율을 0~1로 고정
 
@@ -101,7 +107,10 @@ public class StoneForceController_Firebase : MonoBehaviour
             //rigid.AddForce(
             //    Vector3.right * velocityCalc * 0.5f * sweepSidewaysForce * sweepSidewaysForceFactor, ForceMode.Acceleration);
         }
-        else if (isShooted == true && attackMoveFinished == false && rigid.isKinematic == false && sidewaysForceAddLimit <= sidewaysForceAddCount)
+        else if ((isShooted && attackMoveFinished == false && rigid.isKinematic == false 
+                 && sidewaysForceAddLimit <= sidewaysForceAddCount)
+                 || isShooted && attackMoveFinished == false && rigid.isKinematic == false
+                 && isCollided) // 좌우로 가해지는 힘 횟수가 끝났거나 다른 도넛과 충돌했으면
         {
             velocityCalc =
                 1f - (stoneForce - rigid.velocity.magnitude) / stoneForce; // 발사 파워와 현재 속도를 통해, 현재 속도의 비율을 0~1로 고정
@@ -126,23 +135,79 @@ public class StoneForceController_Firebase : MonoBehaviour
     }
 
     // StoneShoot.Team 대신 직접 정의한 Team enum 사용
-    public void InitializeDonut(Team team, int donutId) // 도넛의 팀과 id를 적용
+    public void InitializeDonut(Team team, int donutId, int weight, int resilience, int friction) // 도넛의 팀과 id, 물리 속성을 적용
     {
         this.team = team;
         this.donutId = donutId;
-        //this.isStartingTeam = isStartingTeam;
+        this.DonutWeight = weight;
+        this.DonutResilience = resilience;
+        this.DonutFriction = friction;
+
+        // 무게를 Rigidbody의 질량으로 설정
+        if (rigid != null)
+        {
+           // rigid.mass = DonutWeight;
+        }
+
+        // // 반발력과 마찰력은 PhysicMaterial을 통해 설정합니다.
+        // if (physicMaterial == null)
+        // {
+        //     MeshCollider meshCollider = transform.GetComponent<MeshCollider>();
+        //     if (meshCollider != null)
+        //     {
+        //         // 다른 돌에 영향을 주지 않도록 공유된 물리 재질의 인스턴스를 생성합니다.
+        //         physicMaterial = new PhysicMaterial(gameObject.name + "_PhysicMaterial");
+        //         meshCollider.material = physicMaterial;
+        //     }
+        //     else
+        //     {
+        //         Debug.LogError("InitializeDonut: MeshCollider가 없어 물리 속성을 적용할 수 없습니다.");
+        //         return;
+        //     }
+        // }
+        // 반발력과 마찰력은 PhysicMaterial을 통해 설정합니다.
+        if (physicMaterial == null)
+        {
+            CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
+            if (capsuleCollider != null)
+            {
+                // 다른 돌에 영향을 주지 않도록 공유된 물리 재질의 인스턴스를 생성합니다.
+                physicMaterial = new PhysicMaterial(gameObject.name + "_PhysicMaterial");
+                capsuleCollider.material = physicMaterial;
+            }
+            else
+            {
+                Debug.LogError("InitializeDonut: CapsuleCollider가 없어 물리 속성을 적용할 수 없습니다.");
+                return;
+            }
+        }
+
+        // int 값을 float (0~1) 범위로 변환하여 적용합니다. (예: 10 -> 1.0, 5 -> 0.5)
+        // 이 변환 방식은 기획에 따라 달라질 수 있습니다.
+        // physicMaterial.bounciness = Mathf.Clamp01(DonutResilience / 10.0f);
+        // physicMaterial.dynamicFriction = Mathf.Clamp01(DonutFriction / 10.0f);
+        initialFrictionValue = physicMaterial.dynamicFriction; // 스위핑 로직을 위해 초기 마찰값 업데이트
     }
 
 
     public void MoveFinishedInTurn()
     {
         attackMoveFinished = true;
+        rigid.angularVelocity = Vector3.zero;
         Debug.Log($"sidewaysForceAddCount = {sidewaysForceAddCount}");
     }
 
     public void PassedEndHogLine() // 엔드 호그라인 콜라이더가 자신과 충돌한 적이 있음을 알림 ( 최소로 넘어가야 할 선을 넘김 )
     {
         isPassedEndHogLine = true;
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("InGameDonut"))
+        {
+            isCollided = true;
+        }
     }
 
     // SweepState enum도 StoneShoot에서 가져오거나 직접 정의해야 합니다.

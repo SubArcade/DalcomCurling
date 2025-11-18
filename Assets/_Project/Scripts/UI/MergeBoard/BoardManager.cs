@@ -55,6 +55,9 @@ public class BoardManager : MonoBehaviour
         // 불러온 데이터로 보드 복원
         LoadBoardLocal();
 
+        // 불러온 데이터로 보드 복원
+        LoadBoardLocal();
+
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
     }
 

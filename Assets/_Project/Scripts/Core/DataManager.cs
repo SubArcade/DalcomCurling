@@ -419,8 +419,6 @@ public class DataManager : MonoBehaviour
         Debug.Log("[FS] mergeBoard.cells 로드 완료: " + cellList.Count);
     }
 
-
-
     // Rank 디비 관련 함수들
 
     // 디비에 들어가는 컬랙션과 문서 설정
@@ -579,6 +577,20 @@ public class DataManager : MonoBehaviour
             _ => 1
         };
     }
+    
+    //생성기 레벨 받아오기
+    public int GetGeneratorLevel(DonutType type)
+    {
+        var board = userData.mergeBoard;
+
+        return type switch
+        {
+            DonutType.Hard => board.generatorLevelHard,
+            DonutType.Soft => board.generatorLevelSoft,
+            DonutType.Moist => board.generatorLevelMoist,
+            _ => 1
+        };
+    }
 
     // 랭킹 초기값 설정
     async Task SeedRankAsync(GameMode mode)
@@ -693,5 +705,26 @@ public class DataManager : MonoBehaviour
         }
     }
 
-
+    // 주어진 uId로 UserDataRoot를 가져오는 메서드 추가
+    public async Task<UserDataRoot> GetUserDataRootAsync(string uId)
+    {
+        try
+        {
+            DocumentSnapshot userDoc = await db.Collection(userCollection).Document(uId).GetSnapshotAsync();
+            if (userDoc.Exists)
+            {
+                return userDoc.ConvertTo<UserDataRoot>();
+            }
+            else
+            {
+                Debug.LogWarning($"[FS] User data not found for uId: {uId}");
+                return null;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[FS][READ][ERR] Failed to get user data for {uId}: {e}");
+            return null;
+        }
+    }
 }

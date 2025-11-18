@@ -28,6 +28,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("환생 토글")] private Toggle reincarnationToggle;
     [SerializeField, Tooltip("환생 설명 버튼")] private Button explanationButton;
     [SerializeField, Tooltip("경험치 게이지")] private Image expFillImage;
+    [SerializeField, Tooltip("랭킹 스크롤바")] private ScrollRect scrollRect;
     
     [Header("닉네임 변경 기능")]
     [SerializeField, Tooltip("닉네임 변경 창 버튼")] private Button renameButton;
@@ -126,7 +127,14 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         nameTitleButton.onClick.AddListener(() => NamaTitleOpen());
         platePopupCloseButton.onClick.AddListener(() => PopupPanelClose());
         nickPopupCloseButton.onClick.AddListener(() => PopupPanelClose());
-        closeButton.onClick.AddListener(()=> UIManager.Instance.Open(PanelId.MainPanel));
+        closeButton.onClick.AddListener(()=>
+        {
+            profileToggle.isOn = true;
+            rankToggle.isOn = false;
+            scrollRect.verticalNormalizedPosition = 1f; 
+            UpdateBasePanels();
+            UIManager.Instance.Open(PanelId.MainPanel);
+        });
         renameButton.onClick.AddListener(IsChangeNickname);
         changeNicknameButton.onClick.AddListener(OnAnswerPopup);
         gemchangeNicknameButton.onClick.AddListener(OnAnswerPopup);
