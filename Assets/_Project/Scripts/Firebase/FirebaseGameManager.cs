@@ -585,6 +585,7 @@ public class FirebaseGameManager : MonoBehaviour
             if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
             {
                 Debug.Log("게임 종료를 위한 계산 시작");
+                gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
                 // 호스트가 점수를 기반으로 다음 라운드 시작 플레이어를 결정하고 DB를 업데이트합니다.
                 stoneManager.CalculateScore(out StoneForceController_Firebase.Team winnerTeam, out int score);
                 UpdateScoreInLocal(winnerTeam, score); // 계산된 점수를 로컬상에서 변경
@@ -864,6 +865,7 @@ public class FirebaseGameManager : MonoBehaviour
     {
         // 라운드 변경 시 턴 UI를 초기화합니다.
         UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
+        gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
 
 
         // StoneForceController_Firebase.Team winner;
@@ -887,26 +889,35 @@ public class FirebaseGameManager : MonoBehaviour
         // Debug.Log($"승리팀 : {winner}, 점수 : {score}");
         //받아온 리턴값으로 여기서 결과를 처리한다.
 
-
+        stoneManager.CalculateScore(out StoneForceController_Firebase.Team team, out int score);
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         stoneManager?.ClearOldDonutsInNewRound(_currentGame);
         string nextState;
 
-        if (_currentGame.CurrentTurnPlayerId == "Finished" && _currentGame.RoundStartingPlayerId == "Finished")
+        DOVirtual.DelayedCall(4f, () =>
         {
-            nextState = "Finished";
-        }
-        else
-        {
-            nextState = "Timeline";
-        }
-        var updates = new Dictionary<string, object>
-        {
+            // 라운드 종료 시 플레이어의 도넛 사용 상태를 초기화합니다.
+            donutSelectionUI?.ResetDonutUsage();
 
-            { "GameState", nextState } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
-        };
-        db.Collection("games").Document(gameId).UpdateAsync(updates);
+            if (_currentGame.CurrentTurnPlayerId == "Finished" && _currentGame.RoundStartingPlayerId == "Finished")
+            {
+                nextState = "Finished";
+            }
+            else
+            {
+                nextState = "Timeline";
+            }
+            var updates = new Dictionary<string, object>
+            {
+
+                { "GameState", nextState } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
+            };
+            db.Collection("games").Document(gameId).UpdateAsync(updates);
+        });
+            
+        
+        
     }
 
     public void UpdateScoreInLocal(StoneForceController_Firebase.Team winner, int score)
@@ -961,8 +972,12 @@ public class FirebaseGameManager : MonoBehaviour
 
         //db.Collection("games").Document(gameId).UpdateAsync("PredictedResult", result);
 
-        currentRound++;
-        stoneManager?.ClearOldDonutsInNewRound(_currentGame, currentRound);
+        DOVirtual.DelayedCall(4f, () =>
+        {
+            currentRound++;
+            stoneManager?.ClearOldDonutsInNewRound(_currentGame, currentRound);
+        });
+        
     }
 
     private void PlayerLostTimeToShotInTime(Rigidbody donutRigid)
