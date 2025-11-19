@@ -197,31 +197,6 @@ public class StoneManager : MonoBehaviour
         // 선택된 도넛의 물리 속성을 StoneForceController_Firebase에 전달합니다.
         _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId, selectedDonut.id, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
 
-        // if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.A)
-        // {
-        //     _stoneControllers_A[currentDonutId] = _currentTurnStone;
-        // }
-        // else if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.B)
-        // {
-        //     _stoneControllers_B[currentDonutId] = _currentTurnStone;
-        // }
-        // if (currentTurnPlayerId == game.RoundStartingPlayerId)
-        // {
-        //     _stoneControllers_A[currentDonutId] = _currentTurnStone;
-        //     Debug.Log("Starting");
-        //     Debug.Log(_stoneControllers_A.Count);
-        //     Debug.Log($"my user id = {myUserId}");
-        //     Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
-        // }
-        // else
-        // {
-        //     _stoneControllers_B[currentDonutId] = _currentTurnStone;
-        //     Debug.Log("Second");
-        //     Debug.Log(_stoneControllers_B.Count);
-        //     Debug.Log($"my user id = {myUserId}");
-        //     Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
-        // }
-
         if (currentTurnPlayerId == game.PlayerIds[0]) // 현재 턴의 주인이 A팀(방장) 이면
         {
             _stoneControllers_A[currentDonutId] = _currentTurnStone;
@@ -252,53 +227,6 @@ public class StoneManager : MonoBehaviour
     public void LaunchStone(LastShot shotData, int stoneId)
     {
         StoneForceController_Firebase donutToLaunch;
-        // if (shotData.Team == StoneForceController_Firebase.Team.A)
-        // {
-        //     if (!_stoneControllers_StartingPlayer.TryGetValue(stoneId, out var donutForceController))
-        //     {
-        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
-        //         return;
-        //     }
-        //
-        //     donutToLaunch = donutForceController;
-        // }
-        // else if (shotData.Team == StoneForceController_Firebase.Team.B)
-        // {
-        //     if (!_stoneControllers_SecondPlayer.TryGetValue(stoneId, out var donutForceController))
-        //     {
-        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
-        //         return;
-        //     }
-        //
-        //     donutToLaunch = donutForceController;
-        // }
-        // else
-        // {
-        //     Debug.Log("팀 값이 LaunchStone 함수에 안넘어옴");
-        //     return;
-        // }
-
-        // if (shotData.PlayerId == gameReference.RoundStartingPlayerId)
-        // {
-        //     if (!_stoneControllers_A.TryGetValue(stoneId, out var donutForceController))
-        //     {
-        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
-        //         return;
-        //     }
-        //
-        //     donutToLaunch = donutForceController;
-        // }
-        // else 
-        // {
-        //     if (!_stoneControllers_B.TryGetValue(stoneId, out var donutForceController))
-        //     {
-        //         Debug.LogError($"발사할 돌(Team : {shotData.Team},  (ID: {stoneId})을 찾을 수 없습니다!");
-        //         Debug.Log($"{_stoneControllers_B.Count}");
-        //         return;
-        //     }
-        //
-        //     donutToLaunch = donutForceController;
-        // }
 
         if (shotData.PlayerId == gameReference.PlayerIds[0])
         {
@@ -329,13 +257,18 @@ public class StoneManager : MonoBehaviour
             $"stoneused , {gameReference.DonutsIndex[gameReference.PlayerIds[0]]}, {gameReference.DonutsIndex[gameReference.PlayerIds[1]]}  ");
 
         // 발사 전, Rigidbody의 isKinematic을 false로 설정하여 물리 효과를 받도록 합니다.
-        Rigidbody rb = donutToLaunch.GetComponent<Rigidbody>();
-        if (rb != null)
+
+        if (!donutToLaunch.TryGetComponent<Rigidbody>(out Rigidbody rb)) // 못찾으면 그냥 턴 종료
         {
-            rb.isKinematic = false;
-            rb.velocity = Vector3.zero; // 기존 속도 초기화
-            rb.angularVelocity = Vector3.zero;
+            Debug.Log("Rigidbody를 찾을 수 없음");
+            StartCoroutine(MonitorSimulation(shotData.Team));
+            return; // 여기 이후의 코드 진행을 멈춤
         }
+        
+        rb.isKinematic = false;
+        rb.velocity = Vector3.zero; // 기존 속도 초기화
+        rb.angularVelocity = Vector3.zero;
+        
 
         // Dictionary를 Vector3로 변환
         Vector3 direction = new Vector3(shotData.Direction["x"], shotData.Direction["y"], shotData.Direction["z"]);
@@ -347,7 +280,7 @@ public class StoneManager : MonoBehaviour
     }
 
     // 모든 돌의 속도를 체크하여 시뮬레이션 완료 시점 감지
-    private System.Collections.IEnumerator MonitorSimulation(StoneForceController_Firebase.Team team)
+    private IEnumerator MonitorSimulation(StoneForceController_Firebase.Team team)
     {
         yield return new WaitForSeconds(0.5f); // 물리 시뮬레이션이 안정적으로 시작될 때까지 잠시 대기
         WaitForSeconds wait = new WaitForSeconds(0.2f);
@@ -359,8 +292,12 @@ public class StoneManager : MonoBehaviour
             {
                 if (controller != null)
                 {
-                    var rb = controller.GetComponent<Rigidbody>();
-                    float velocity = rb.velocity.magnitude;
+                    //var rb = controller.GetComponent<Rigidbody>();
+                    if (!controller.TryGetComponent<Rigidbody>(out Rigidbody rb)) // 못찾으면
+                    {
+                        continue;
+                    }
+                    float velocity = rb.velocity.sqrMagnitude;
                     // Debug.Log(
                     //     $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
                     if (velocity > 0.01f)
@@ -375,8 +312,12 @@ public class StoneManager : MonoBehaviour
             {
                 if (controller != null)
                 {
-                    var rb = controller.GetComponent<Rigidbody>();
-                    float velocity = rb.velocity.magnitude;
+                    //var rb = controller.GetComponent<Rigidbody>();
+                    if (!controller.TryGetComponent<Rigidbody>(out Rigidbody rb)) // 못찾으면
+                    {
+                        continue;
+                    }
+                    float velocity = rb.velocity.sqrMagnitude;
                     // Debug.Log(
                     //     $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
                     if (velocity > 0.01f)
@@ -467,19 +408,30 @@ public class StoneManager : MonoBehaviour
                 continue;
             }
 
-            Rigidbody rb = fc.GetComponent<Rigidbody>();
+            //Rigidbody rb = fc.GetComponent<Rigidbody>();
+            if (!fc.TryGetComponent<Rigidbody>(out Rigidbody rb)) // rigidbody 못찾으면
+            {
+                Debug.Log("Rigidbody를 찾을 수 없음");
+                continue;
+            }
             rb.isKinematic = true;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             
             // isTrigger를 true로 설정하여 순간이동 중 다른 오브젝트와 충돌 방지
-            var capCollider = fc.transform.GetComponent<CapsuleCollider>();
-            if(capCollider != null) capCollider.isTrigger = true;
+            //var capCollider = fc.transform.GetComponent<CapsuleCollider>();
+            if (!fc.transform.TryGetComponent<CapsuleCollider>(out CapsuleCollider capCollider))
+            {
+                Debug.Log("캡슐콜라이더를 찾을 수 없습니다");
+                continue;
+            }
+            //if(capCollider != null) capCollider.isTrigger = true;
+            capCollider.isTrigger = true;
 
             fc.transform.DOMove(newPosition, 0.2f).OnComplete(() => {
                 // 이동 완료 후 물리 다시 활성화
                 rb.isKinematic = false;
-                if(capCollider != null) capCollider.isTrigger = false;
+                capCollider.isTrigger = false;
             });
         }
     }
@@ -637,9 +589,21 @@ public class StoneManager : MonoBehaviour
         }
         return donutToLaunch;
     }
-    
 
-    public void CalculateScore(out StoneForceController_Firebase.Team team, out int score)
+    public void HighlightNearestDonut()
+    {
+        Vector3 housePosition = _scr_Collider_House.transform.position; // 하우스(점수중심점) 의 포지션
+
+        //하우스 콜라이더로부터 닿아있는 도넛들을 가져옴
+        List<StoneForceController_Firebase> inHouseDonutList = _scr_Collider_House.GetInHouseDonutList();
+        if (inHouseDonutList.Count == 0) // 만약 아무도 하우스에 도넛을 못올렸으면 무승부
+        {
+            return;
+        }
+    }
+
+
+    public void CalculateScore(out StoneForceController_Firebase.Team team, out int score, bool needNearest = false)
     {
 
         Vector3 housePosition = _scr_Collider_House.transform.position; // 하우스(점수중심점) 의 포지션
@@ -659,8 +623,15 @@ public class StoneManager : MonoBehaviour
             .ToList();
         //LinQ를 이용해서 하우스에 올라간 도넛들의 거리를 측정하여 그 거리별로 오름차순으로 정렬
 
+        if (needNearest)
+        {
+            StartCoroutine(HighlightScoredDonuts(sortedDonutList, 0, true));
+            team = StoneForceController_Firebase.Team.None;
+            score = -99;
+            return;
+        }
         team = sortedDonutList[0].team; // out으로 보낼 승리팀
-        sortedDonutList[0].transform.GetComponent<Outlinable>().enabled = true;
+        //sortedDonutList[0].transform.GetComponent<Outlinable>().enabled = true;
         score = 1;
 
         int indexToHighlight = 0;
@@ -683,14 +654,31 @@ public class StoneManager : MonoBehaviour
         
     }
 
-    IEnumerator HighlightScoredDonuts(List<StoneForceController_Firebase> sortedDonutList, int index)
+    IEnumerator HighlightScoredDonuts(List<StoneForceController_Firebase> sortedDonutList, int index, bool needToDisable = false)
     {
+        if (needToDisable) // 만약에 하나만 보여주고 아웃라인을 해제해야하는경우
+        {
+            if (sortedDonutList[0].transform.TryGetComponent<Outlinable>(out var outline))
+            {
+                outline.enabled = true; // 아웃라인 활성화
+                DOVirtual.DelayedCall( 1.8f, () =>
+                {
+                    outline.enabled = false; // 아웃라인 비활성화
+                }).SetLink(gameObject); //객체 오브젝트에 생명주기를 맞춰서 코루틴이 이미 종료되더라도 이 DelayedCall이 실행되도록 보장
+            }
+            yield break;
+        }
+        
         WaitForSeconds wait = new WaitForSeconds(0.5f);
 
         for (int i = 0; i <= index; i++)
         {
             yield return wait;
-            sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
+            if (sortedDonutList[i].transform.TryGetComponent<Outlinable>(out var outline))
+            {
+                outline.enabled = true;
+            }
+            //sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
         }
       
     }

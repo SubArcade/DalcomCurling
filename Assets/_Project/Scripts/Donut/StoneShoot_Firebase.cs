@@ -604,6 +604,7 @@ public class StoneShoot_Firebase : MonoBehaviour
 
         // DOTween을 사용하여 호그 라인까지 돌을 이동시킵니다.
         _currentStoneRb.DOMove(startHogLine.position, autoMoveToHogLineSpeed).SetSpeedBased(true).SetEase(Ease.Linear)
+            .SetUpdate(UpdateType.Fixed)
             .OnComplete(() => // 이동 완료 시 호출되는 콜백 함수
             {
                 if (_needToTap)
