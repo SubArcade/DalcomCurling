@@ -679,11 +679,11 @@ MonoBehaviour:
   selectedTrail: 1
   trailRenderer: {fileID: 0}
   minSpeedForTrail: 1
-  trailFirePrefab: {fileID: 7823327091382468809, guid: f26debc113eb71a47baa7039beb1bb9b, type: 3}
+  trailFirePrefab: {fileID: 7823327091382468809, guid: 11fc4e4ded3f4dc4a801a6f169142926, type: 3}
   trailLightPrefab: {fileID: 7823327091382468809, guid: f26debc113eb71a47baa7039beb1bb9b, type: 3}
-  trailMagicPrefab: {fileID: 7823327091382468809, guid: f26debc113eb71a47baa7039beb1bb9b, type: 3}
-  trailIcePrefab: {fileID: 7823327091382468809, guid: f26debc113eb71a47baa7039beb1bb9b, type: 3}
-  trailElectricPrefab: {fileID: 7823327091382468809, guid: f26debc113eb71a47baa7039beb1bb9b, type: 3}
+  trailMagicPrefab: {fileID: 8846737274113074935, guid: 142cab9a09298724595c35609c03a547, type: 3}
+  trailIcePrefab: {fileID: 4823518202205099639, guid: 05062558909d75341a4db9da950b00e0, type: 3}
+  trailElectricPrefab: {fileID: 6532625474870085665, guid: 42ae47f7db5b2f4478cc38727b2b191b, type: 3}
   CrashParticlePrefab: {fileID: 3223031359271505891, guid: 62d5298ce92ee8a4c87039604bc35cea, type: 3}
   CrashParticleDuation: 2
   targetLayerName: Donut

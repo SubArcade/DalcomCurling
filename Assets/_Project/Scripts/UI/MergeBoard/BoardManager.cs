@@ -249,51 +249,51 @@ public class BoardManager : MonoBehaviour
         Destroy(cell.occupant.gameObject);
     }
 
-    public void SpawnGiftBox()
-    {
-        // 빈 활성 셀 찾기
-        var cell = FindEmptyActiveCell();
-        if (cell == null)
-        {
-            Debug.Log("빈 칸 없음 → 기프트박스 생성 불가");
-            return;
-        }
+    //public void SpawnGiftBox()
+    //{
+    //    // 빈 활성 셀 찾기
+    //    var cell = FindEmptyActiveCell();
+    //    if (cell == null)
+    //    {
+    //        Debug.Log("빈 칸 없음 → 기프트박스 생성 불가");
+    //        return;
+    //    }
 
-        // GiftBox Level 1 데이터 가져오기
-        var giftData = DataManager.Instance.GetDonutData(DonutType.Gift, 1);
-        if (giftData == null)
-        {
-            Debug.LogError("GiftBox 데이터 없음! DonutGiftSO를 확인하세요.");
-            return;
-        }
+    //    // GiftBox Level 1 데이터 가져오기
+    //    var giftData = DataManager.Instance.GetDonutData(DonutType.Gift, 1);
+    //    if (giftData == null)
+    //    {
+    //        Debug.LogError("GiftBox 데이터 없음! DonutGiftSO를 확인하세요.");
+    //        return;
+    //    }
 
-        // 프리팹 생성
-        GameObject obj = Instantiate(donutPrefab, cell.transform);
-        var item = obj.GetComponent<MergeItemUI>();
-        var img = obj.GetComponent<Image>();
+    //    // 프리팹 생성
+    //    GameObject obj = Instantiate(donutPrefab, cell.transform);
+    //    var item = obj.GetComponent<MergeItemUI>();
+    //    var img = obj.GetComponent<Image>();
 
-        // GiftBox 아이콘/ID 설정
-        img.sprite = giftData.sprite;
-        item.donutId = giftData.id;
-        item.donutData = giftData;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
+    //    // GiftBox 아이콘/ID 설정
+    //    img.sprite = giftData.sprite;
+    //    item.donutId = giftData.id;
+    //    item.donutData = giftData;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
 
-        // 셀에 등록
-        cell.SetItem(item, giftData);
-    }
+    //    // 셀에 등록
+    //    cell.SetItem(item, giftData);
+    //}
 
-    //기프트박스 보상 함수
-    void ClaimGiftReward(DonutData gift, Cells cell)
-    {
-        Debug.Log($"기프트 박스 보상 지급: {gift.displayName}");
+    ////기프트박스 보상 함수
+    //void ClaimGiftReward(DonutData gift, Cells cell)
+    //{
+    //    Debug.Log($"기프트 박스 보상 지급: {gift.displayName}");
 
-        //// 예시 보상
-        //DataManager.Instance.PlayerData.gold += gift.rewardGold;
-        //DataManager.Instance.PlayerData.energy += gift.rewardEnergy;
+    //    //// 예시 보상
+    //    //DataManager.Instance.PlayerData.gold += gift.rewardGold;
+    //    //DataManager.Instance.PlayerData.energy += gift.rewardEnergy;
 
-        // 보상 후 기프트 박스 삭제
-        cell.ClearItem();
-        Destroy(cell.occupant.gameObject);
-    }
+    //    // 보상 후 기프트 박스 삭제
+    //    cell.ClearItem();
+    //    Destroy(cell.occupant.gameObject);
+    //}
 
 
     // 도넛 찾기

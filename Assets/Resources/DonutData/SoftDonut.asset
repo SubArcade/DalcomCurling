@@ -20,300 +20,330 @@ MonoBehaviour:
     displayName: "\uB9D0\uB791"
     description: "1\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 2931537195914527195, guid: 08ee9bfde53e76646ab4b4a3bb6f22c0, type: 3}
+    prefab: {fileID: 6146423835327086637, guid: 623705e8a68742745a81e9f75092ca15, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_2
     level: 2
     sprite: {fileID: 21300000, guid: 822cb570f3c69cf41a19a83b37279a2b, type: 3}
     displayName: "\uB9D0\uB791"
     description: "2\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 7365671759680038930, guid: 4fc5f01109754e44b9a6a7e820192f11, type: 3}
+    prefab: {fileID: 9039706676683412993, guid: 77974bc0ea218e04abff3852f0c35ba0, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_3
     level: 3
     sprite: {fileID: 21300000, guid: 0129b2d469e8ac74f8d50bc71bed93d7, type: 3}
     displayName: "\uB9D0\uB791"
     description: "3\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 2900691293653107202, guid: 447b3ba0602ad6e4f98b0cb2c0f911f3, type: 3}
+    prefab: {fileID: 7503967602022611622, guid: ee3dbb11bffc4e7459f93d5c69badae4, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_4
     level: 4
     sprite: {fileID: 21300000, guid: 1156af3df7f2a4347a0a32abf1b7b41c, type: 3}
     displayName: "\uB9D0\uB791"
     description: "4\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 6887439718951720149, guid: 1dbcab2a64b2d4947aca0dcca1b65c6b, type: 3}
+    prefab: {fileID: 1103277480984196209, guid: 69e6cd2afb6c3f941b0e524a8e74a8dd, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_5
     level: 5
     sprite: {fileID: 21300000, guid: 067a7a8500363414899672789942210f, type: 3}
     displayName: "\uB9D0\uB791"
     description: "5\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 299775851241638803, guid: 5be2e5cc71e777b4ea7dddc832df0fd1, type: 3}
+    prefab: {fileID: 1615285610798665259, guid: efaa94f0858b48349a39c6a171e09648, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_6
     level: 6
     sprite: {fileID: 21300000, guid: 7c8632d2e76f4474596ca816d0f2d60e, type: 3}
     displayName: "\uB9D0\uB791"
     description: "6\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 3399033399876463044, guid: 9b977464d10318844b0e7e034fc4b5aa, type: 3}
+    prefab: {fileID: 5115356786511392390, guid: cbebe8208753b4b40932f0658418a49f, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_7
     level: 7
     sprite: {fileID: 21300000, guid: d4dd060704dbd0f44827fd3a25a45622, type: 3}
     displayName: "\uB9D0\uB791"
     description: "7\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 8599720459756023567, guid: dae04318e08f05b4fb03fcb6a3ba98ca, type: 3}
+    prefab: {fileID: 7451050644434702147, guid: a8d5bdb0e6cfdf04ab2e9c29cb315728, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_8
     level: 8
     sprite: {fileID: 21300000, guid: 33ec04b7a869d3644bc899bb19bd52c3, type: 3}
     displayName: "\uB9D0\uB791"
     description: "8\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 5817417383080862111, guid: 6e93937475dbc354fb2663985e03a323, type: 3}
+    prefab: {fileID: 8396487900124134675, guid: 601f5bd95c62c9c4c95c06a87e76f7f4, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_9
     level: 9
     sprite: {fileID: 21300000, guid: 8a327d87e3de14a4493274d77a409c13, type: 3}
     displayName: "\uB9D0\uB791"
     description: "9\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 2953612336926926345, guid: b41705bdc031bf647ab44bf13b730d6f, type: 3}
+    prefab: {fileID: 1978529843184305451, guid: 8c978363d0285364d92a148f9487e687, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_10
     level: 10
     sprite: {fileID: 21300000, guid: 59b5433e1a5434f4d98efae2090237a3, type: 3}
     displayName: "\uB9D0\uB791"
     description: "10\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 1762322065467694276, guid: 427e979405f2e5c4c843d32c7e49cdc0, type: 3}
+    prefab: {fileID: 8506922850998551515, guid: 0da92e1642d54a54c86142571dc6e693, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_11
     level: 11
     sprite: {fileID: 21300000, guid: 19d7744fa31f9754796a4c3fdf4f9d3a, type: 3}
     displayName: "\uB9D0\uB791"
     description: "11\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 5214608703405232565, guid: f5c17b5472e905c458cb80eb2043d2f5, type: 3}
+    prefab: {fileID: 1412134272284610439, guid: e7357e8e9627df445adf9636f4bfb735, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_12
     level: 12
     sprite: {fileID: 21300000, guid: b153805e6c628704693a11f727c56968, type: 3}
     displayName: "\uB9D0\uB791"
     description: "12\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 5226574898272867764, guid: b00525b0835eaa44682cd62f115cb75f, type: 3}
+    prefab: {fileID: 6357208417010859850, guid: e5364260a5c300c4aa56ef35cb6788e7, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_13
     level: 13
     sprite: {fileID: 21300000, guid: 238ca9970c5443a438d49f18b7ed373a, type: 3}
     displayName: "\uB9D0\uB791"
     description: "13\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 1254055942017508799, guid: 826b6a158f46440488d3f849ac223a6d, type: 3}
+    prefab: {fileID: 3818793831241843331, guid: 4b975243af318274aa4588594b6e0de1, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_14
     level: 14
     sprite: {fileID: 21300000, guid: ba95910d81d897d4eb03b31a78dc08db, type: 3}
     displayName: "\uB9D0\uB791"
     description: "14\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 2844692311727043404, guid: 3d4b698c0d2cba545a7b43f8783b9ba1, type: 3}
+    prefab: {fileID: 4794263511627725923, guid: 2be5c15c91e35a34e89fc43f66db210c, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_15
     level: 15
     sprite: {fileID: 21300000, guid: bfceb640a0e12df4496bee7fb26eec8d, type: 3}
     displayName: "\uB9D0\uB791"
     description: "15\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 5808206665283012659, guid: 0d74a0416aff67743a1b70c7252b6943, type: 3}
+    prefab: {fileID: 1115503427352394343, guid: 9f2633fd648763e40a3ff77acefd6729, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_16
     level: 16
     sprite: {fileID: 21300000, guid: b088717a04c26ee41ad4321bad10c047, type: 3}
     displayName: "\uB9D0\uB791"
     description: "16\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 3183983945376797658, guid: b5e251d6e20c10740b41d7b30df0589a, type: 3}
+    prefab: {fileID: 2622437927457420030, guid: 0cef5cf00ddba2b4faeb5925cb057d2d, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_17
     level: 17
     sprite: {fileID: 21300000, guid: eefd95874ea49c64ba3787314aa36aec, type: 3}
     displayName: "\uB9D0\uB791"
     description: "17\uB2E8"
     donutType: 1
-    prefab: {fileID: 5874772647873681843, guid: aff206e81a301434484ee7907978940e, type: 3}
+    prefab: {fileID: 9156532418340810615, guid: 37cc5b3093557224980cac38df625c36, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_18
     level: 18
     sprite: {fileID: 21300000, guid: 83791547eb803b44aa5ba2ad5415c6cb, type: 3}
     displayName: "\uB9D0\uB791"
     description: "18\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 984029528166404581, guid: a55fc4c018e2aa241a01069b293ac875, type: 3}
+    prefab: {fileID: 3656440660201137989, guid: 63a49fde19514c64c99b2326f0dff9e8, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_19
     level: 19
     sprite: {fileID: 21300000, guid: 3335138fcf46b47469bdef92cc76e0a2, type: 3}
     displayName: "\uB9D0\uB791"
     description: "19\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 1525547102394242445, guid: 2a47303cd5e80db46ac0d1c7e823356a, type: 3}
+    prefab: {fileID: 2460484533527193529, guid: f56c025cd4345f54b8e506789e19545a, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_20
     level: 20
     sprite: {fileID: 21300000, guid: bc03be97e3de6f342b17096982fa2abc, type: 3}
     displayName: "\uB9D0\uB791"
     description: "20\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 6758985202696507972, guid: 9e38c131593ac224ea99719ddf45dfc7, type: 3}
+    prefab: {fileID: 3958229861116402806, guid: 745bba777993c964e8a2457aa97dd11c, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_21
     level: 21
     sprite: {fileID: 21300000, guid: 98717019966160643a0e959ccc4e97d3, type: 3}
     displayName: "\uB9D0\uB791"
     description: "21\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 2555593644952316264, guid: 4d2f243d940814e46b02ae5fce4a9f71, type: 3}
+    prefab: {fileID: 9044600592368824808, guid: d2451e3fcae72d345bdd4444ae682b57, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_22
     level: 22
     sprite: {fileID: 21300000, guid: b1d64ebabfb2fbd47b8b80834b0c9656, type: 3}
     displayName: "\uB9D0\uB791"
     description: "22\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 4345181485142404201, guid: c8b169c98ac8b774488d1b6beffd9f03, type: 3}
+    prefab: {fileID: 3196971852358786449, guid: 5176bccb71048524093bbac03371f5e6, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_23
     level: 23
     sprite: {fileID: 21300000, guid: 39fa4c20fdeb6d14d958806ea4b00cba, type: 3}
     displayName: "\uB9D0\uB791"
     description: "23\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 2806228516680552359, guid: b1ff8de1aa5c15f4ebf09aa56664a4ad, type: 3}
+    prefab: {fileID: 6352598249539235617, guid: a3152cfb949891943831ee96975bbbe6, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_24
     level: 24
     sprite: {fileID: 21300000, guid: d95e5414e7fb2da4e92b078394d95ed1, type: 3}
     displayName: "\uB9D0\uB791"
     description: "24\uB2E8"
     donutType: 1
-    prefab: {fileID: 4703060839428881507, guid: 8b976197be0019249a015c57db15a011, type: 3}
+    prefab: {fileID: 9221416534714248471, guid: 556f120c8a848dc4a9bb5eb92023ad1a, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_25
     level: 25
     sprite: {fileID: 21300000, guid: ca1fb5101ff0d534295a755deb6b0ef3, type: 3}
     displayName: "\uB9D0\uB791"
     description: "25\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 6358879737967977651, guid: c9b815e3ca87e3947a59e09f80dc556c, type: 3}
+    prefab: {fileID: 2617543931040744430, guid: 0ad796ab55cba7944b07fd6e9f133a72, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_26
     level: 26
     sprite: {fileID: 21300000, guid: 18534c4345546c34ca382c123b7c075f, type: 3}
     displayName: "\uB9D0\uB791"
     description: "26\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 7306477785595393606, guid: 6abdf35caa70d2f40a5066b5eb45d3e6, type: 3}
+    prefab: {fileID: 386476170119042200, guid: d500f41e01a0ae84d9ee8793a5d10480, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_27
     level: 27
     sprite: {fileID: 21300000, guid: 155da5856f89a08418be57adacab5dfb, type: 3}
     displayName: "\uB9D0\uB791"
     description: "27\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 4594861816989188444, guid: 9dbc0d6c3f6cf1249a30bd8efba900aa, type: 3}
+    prefab: {fileID: 8588017335936691693, guid: 2bfb4bac9c6fdc14fa5c4a485c3735a4, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_28
     level: 28
     sprite: {fileID: 21300000, guid: 75df1c2bedf3f3e4894c273f7427a655, type: 3}
     displayName: "\uB9D0\uB791"
     description: "28\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 8005658098411602893, guid: 8308c98896be8554285c3a80180832be, type: 3}
+    prefab: {fileID: 7202008339598106316, guid: 9fbff26151f917e43b37c47c43c0dbd0, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_29
     level: 29
     sprite: {fileID: 21300000, guid: aff6d5bd06062864a97d6d160feefe3a, type: 3}
     displayName: "\uB9D0\uB791"
     description: "29\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 5260036382833618935, guid: 8d6bd0da2b386c54d9b25ce18556b0f5, type: 3}
+    prefab: {fileID: 192843987788595675, guid: 850aa7e58881cad4f86965e252e65e80, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   - id: Soft_30
     level: 30
     sprite: {fileID: 21300000, guid: 7a76043aee1b6bd46b4c57fb60bcf4da, type: 3}
     displayName: "\uB9D0\uB791"
     description: "30\uB2E8\uACC4"
     donutType: 1
-    prefab: {fileID: 7792420087827874815, guid: 25942afa4e863eb4f8c02474c214cf92, type: 3}
+    prefab: {fileID: 3118240804337138493, guid: 8a7cbe8b29a12e1469f90efd5a85f58c, type: 3}
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
   donutData:
     id: 
     level: 0
@@ -325,3 +355,4 @@ MonoBehaviour:
     weight: 0
     resilience: 0
     friction: 0
+    rewardGem: 1
