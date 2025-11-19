@@ -28,6 +28,7 @@ public enum PanelId
     ShopPopUp,
     EnergyRechargePopUp,
     NotEnoughGemPopUp,
+    OrderRefreshPopUp,
 }
 
 public class UIManager : MonoBehaviour
