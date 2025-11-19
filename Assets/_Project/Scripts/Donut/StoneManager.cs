@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -432,28 +433,9 @@ public class StoneManager : MonoBehaviour
         Rigidbody rb;
         Vector3 newPosition;
         Debug.Log($"A컨트롤러 개수 : {_stoneControllers_A.Count}");
-        //Debug.Log($"선공 플레이어 컨트롤러 개수 : {_stoneControllers_A.Count}");
-        // foreach (KeyValuePair<int, StoneForceController_Firebase> aValues in _stoneControllers_A)
-        // {
-        //     fc = aValues.Value;
-        //     rb = fc.GetComponent<Rigidbody>();
-        //     rb.isKinematic = true;
-        //     rb.velocity = Vector3.zero;
-        //     rb.angularVelocity = Vector3.zero;
-        //     fc.transform.GetComponent<MeshCollider>().isTrigger = true;
-        // }
-        //
+        
         Debug.Log($"B컨트롤러 개수 : {_stoneControllers_B.Count}");
-        //Debug.Log($"후공 플레이어 컨트롤러 개수 : {_stoneControllers_B.Count}");
-        // foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
-        // {
-        //     fc = bValues.Value;
-        //     rb = fc.GetComponent<Rigidbody>();
-        //     rb.isKinematic = true;
-        //     rb.velocity = Vector3.zero;
-        //     rb.angularVelocity = Vector3.zero;
-        //     fc.transform.GetComponent<MeshCollider>().isTrigger = true;
-        // }
+        
 
         Debug.Log($"serverPositions 개수 : {serverPositions.Count}");
         for (int i = 0; i < serverPositions.Count; i++)
@@ -461,34 +443,20 @@ public class StoneManager : MonoBehaviour
             if (serverPositions[i].Team == "A") // A 팀이면
             {
                 // StoneId를 불러와 딕셔너리에서 키값으로 넣어 밸류값(stoneforcecontrolller)을 찾는다.
-                fc = _stoneControllers_A[serverPositions[i].StoneId];
+                if (!_stoneControllers_A.TryGetValue(serverPositions[i].StoneId, out fc))
+                {
+                    Debug.Log("stoneControllers_A에서 해당 컨트롤러를 찾을 수 없음");
+                }
             }
             else // B 팀이면
             {
-                fc = _stoneControllers_B[serverPositions[i].StoneId];
+                if (!_stoneControllers_B.TryGetValue(serverPositions[i].StoneId, out fc))
+                {
+                    Debug.Log("stoneControllers_B에서 해당 컨트롤러를 찾을 수 없음");
+                }
+                
             }
-            // if (i == 0 || (i % 2 == 0))
-            // {
-            //     fc = _stoneControllers_A[i / 2];
-            //     // newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-            //     //     serverPositions[i].Position["z"]);
-            //     // fc.transform.DOMove(newPosition, 0.1f).OnComplete(() =>
-            //     // {
-            //     //     fc.GetComponent<Rigidbody>().isKinematic = false;
-            //     //     fc.transform.GetComponent<MeshCollider>().isTrigger = false;
-            //     // });
-            // }
-            // else if (i % 2 == 1)
-            // {
-            //     fc = _stoneControllers_B[i / 2];
-            //     // fc.transform.position = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-            //     //     serverPositions[i].Position["z"]);
-            // }
-            // else
-            // {
-            //     fc = _stoneControllers_A[i / 2];
-            //     Debug.Log("계산 오류");
-            // }
+            
             newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
                 serverPositions[i].Position["z"]);
 
@@ -499,7 +467,11 @@ public class StoneManager : MonoBehaviour
                 continue; // 다음 i 값으로 이동
             }
 
-            rb = fc.GetComponent<Rigidbody>();
+            //rb = fc.GetComponent<Rigidbody>();
+            if (!fc.TryGetComponent<Rigidbody>(out rb))
+            {
+                Debug.Log("fc에서 rigidbody를 불러오는데 실패했음");
+            }
             rb.isKinematic = true;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
@@ -641,36 +613,12 @@ public class StoneManager : MonoBehaviour
             Debug.Log(" 팀 설정 값이 없음");
             return null;
         }
-
-        // if (myUserId == gameReference.RoundStartingPlayerId) // 내가 선공이면
-        // {
-        //     if (!_stoneControllers_B.TryGetValue(donutId, out var forceController)) //상대는 후공 팀이니까 후공팀 리스트에서 찾음
-        //     {
-        //         Debug.LogError($"발사할 돌(ID: {donutId})을 찾을 수 없습니다!");
-        //         return null;
-        //     }
-        //
-        //     donutToLaunch = forceController;
-        // }
-        // else  // 그럼 내가 후공이니까
-        // {
-        //     if (!_stoneControllers_A.TryGetValue(donutId, out var forceController)) //상대는 선공이니까 선공팀 리스트에서 찾음
-        //     {
-        //         Debug.LogError($"발사할 돌(ID: {donutId})을 찾을 수 없습니다!");
-        //         return null;
-        //     }
-        //
-        //     donutToLaunch = forceController;
-        // }
-
-
-
         return donutToLaunch;
     }
+    
 
     public void CalculateScore(out StoneForceController_Firebase.Team team, out int score)
     {
-
 
         Vector3 housePosition = _scr_Collider_House.transform.position; // 하우스(점수중심점) 의 포지션
 
@@ -692,11 +640,15 @@ public class StoneManager : MonoBehaviour
         team = sortedDonutList[0].team; // out으로 보낼 승리팀
         sortedDonutList[0].transform.GetComponent<Outlinable>().enabled = true;
         score = 1;
+
+        int indexToHighlight = 0;
+        
         for (int i = 1; i < sortedDonutList.Count; i++)
         {
             if (sortedDonutList[i].team == team) // 승리팀의 연속된 득점 계산.
             {
-                sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
+                indexToHighlight = i;
+                //sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
                 score++; // out으로 보낼 점수
             }
             else
@@ -704,6 +656,21 @@ public class StoneManager : MonoBehaviour
                 break;
             }
         }
+        StartCoroutine(HighlightScoredDonuts(sortedDonutList, indexToHighlight));
+        
+        
+    }
+
+    IEnumerator HighlightScoredDonuts(List<StoneForceController_Firebase> sortedDonutList, int index)
+    {
+        WaitForSeconds wait = new WaitForSeconds(0.5f);
+
+        for (int i = 0; i <= index; i++)
+        {
+            yield return wait;
+            sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
+        }
+      
     }
 
     public void ClearOldDonutsInNewRound(Game newGame, int round = -99) // 새 라운드가 시작하기 전에, 기존에 생성되었던 모든 도넛들을 지움
@@ -763,90 +730,26 @@ public class StoneManager : MonoBehaviour
 
     #region 아웃 판정 관련 함수
 
-
-
-    //도넛이 양 옆의 벽에 닿았을 경우, Scr_Collider_DonutSideOut.cs 에서 호출하는 함수
-    public void DonutContactedSideWall(StoneForceController_Firebase.Team team, int donutId)
-    {
-        if (team == StoneForceController_Firebase.Team.A)
-        {
-            DonutOut(_stoneControllers_A[donutId]);
-            _stoneControllers_A.Remove(donutId);
-        }
-        else
-        {
-            DonutOut(_stoneControllers_B[donutId]);
-            _stoneControllers_B.Remove(donutId);
-        }
-        // if (team == StoneForceController_Firebase.Team.A)
-        // {
-        //     if (gameReference.PlayerIds[0] == gameReference.RoundStartingPlayerId)
-        //     {
-        //         // 방장이 이번 라운드의 선공이라면?
-        //         // 방장은 무조건 A팀이고, 인자로 받아온 팀도 A 이기 때문에, A팀을 관리하는 리스트는 _stoneControllers_StartingPlayer 이다.
-        //         
-        //         DonutOut(_stoneControllers_A[donutId]); // 아웃판정하면 destroy 될것임
-        //         _stoneControllers_A.Remove(donutId); // 리스트에서 지운다
-        //     }
-        //     else
-        //     {
-        //         //방장이 이번 라운드의 후공이다.
-        //         // 방장은 무조건 A팀이고, 인자로 받아온 팀도 A이기 때문에, A팀을 관리하는 리스트는 _stoneControllers_SecondPlayer 이다.
-        //         
-        //         DonutOut(_stoneControllers_B[donutId]); // 아웃판정하면 destroy 될것임
-        //         _stoneControllers_B.Remove(donutId); // 리스트에서 지운다
-        //     }
-        // }
-        // else
-        // {
-        //     if (gameReference.PlayerIds[1] == gameReference.RoundStartingPlayerId)
-        //     {
-        //         // 방장이 아닌 플레이어가 이번 라운드의 선공이라면?
-        //         // 방장이 아닌 플레이어는 무조건 B팀이고, 인자로 받아온 팀도 B 이기 때문에,
-        //         // B팀을 관리하는 리스트는 _stoneControllers_StartingPlayer 이다.
-        //         
-        //         DonutOut(_stoneControllers_A[donutId]); // 아웃판정하면 destroy 될것임
-        //         _stoneControllers_A.Remove(donutId); // 리스트에서 지운다
-        //     }
-        //     else
-        //     {
-        //         // 방장이 아닌 플레이어가 이번 라운드의 후공이다.
-        //         // 방장이 아닌 플레이어는 무조건 B팀이고, 인자로 받아온 팀도 B이기 때문에,
-        //         // B팀을 관리하는 리스트는 _stoneControllers_SecondPlayer 이다.
-        //         
-        //         DonutOut(_stoneControllers_B[donutId]); // 아웃 판정하면 destroy 될것임
-        //         _stoneControllers_B.Remove(donutId); // 리스트에서 지운다
-        //     }
-        // }
-    }
-
     public void DonutOut(StoneForceController_Firebase donut) //도넛의 아웃 판정
     {
-        // outText.SetActive(true);
-        // DOVirtual.DelayedCall(3f, () =>
-        // {
-        //     outText.SetActive(false);
-        // });
-        //donut.gameObject.SetActive(false);
-
         if (donut.team == StoneForceController_Firebase.Team.A)
         {
-            _stoneControllers_A.Remove(donut.donutId);
+            if (_stoneControllers_A.ContainsKey(donut.donutId))
+            {
+                _stoneControllers_A.Remove(donut.donutId);
+            }
         }
         else
         {
-            _stoneControllers_B.Remove(donut.donutId);
+            if (_stoneControllers_B.ContainsKey(donut.donutId))
+            {
+                _stoneControllers_B.Remove(donut.donutId);
+            }
         }
 
 
         Destroy(donut.gameObject);
-
-        //StoneForceController sfc = donut.GetComponent<StoneForceController>();
-        //sfc.team
-
-        //rb.gameObject.SetActive(false);
-        //forceController.enabled = false;
-        //DonutAttackFinished();
+        
     }
 
     public bool CheckDonutPassedOutLine(float positionZ) // 도넛이 엔드 호그라인보다 더 앞에 있거나, 백라인을 넘었을 경우 아웃처리를 위함
