@@ -40,9 +40,21 @@ public class EntrySlot : MonoBehaviour, IDropHandler
      
         EntrySlot fromSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
 
-        if (currentItem != null && fromSlot != null)
+        EntrySlot toSlot = this;
+
+        Cells fromCell = dragged.originalCell;
+
+        // 엔트리 <> 보드 스왑
+        if (fromCell != null && currentItem != null)
         {
-            SwapItems(fromSlot, this, dragged);
+            SwapWithCell(fromCell, this, dragged);
+            return;
+        }
+
+        // 엔트리 안에서 스왑
+        if (fromSlot != null && toSlot != null && toSlot.currentItem != null)
+        {
+            SwapItems(fromSlot, toSlot, dragged);
             return;
         }
 
@@ -68,12 +80,11 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         rt.anchoredPosition = Vector2.zero;
 
         currentItem = dragged;
-        dragged.currentCell = null;  // 보드 참조 제거
         dragged.isFromEntry = true;  // 도넛 엔트리인지
 
         dragged.UpdateOriginalParent(transform);
 
-        // ✅ 체크마크 비활성화
+        // 체크마크 비활성화
         var checkMark = dragged.transform.Find("CheckMark")?.gameObject;
         if (checkMark != null)
             checkMark.SetActive(false);
@@ -87,27 +98,66 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // Debug.Log($"IsEmpty: {IsEmpty}");
     }
 
-    private void SwapItems(EntrySlot fromSlot, EntrySlot toSlot, MergeItemUI dragged)
+    // 보드 <> 엔트리 스왑
+    private void SwapWithCell(Cells fromCell, EntrySlot toSlot, MergeItemUI dragged)
     {
-        MergeItemUI targetItem = toSlot.currentItem;  // 원래 있던 도넛
+        MergeItemUI entryItem = toSlot.currentItem;     // 엔트리에 있던 아이템
 
-        // A → B 이동
+        // 1) dragged(A) → 엔트리로 이동
         toSlot.currentItem = dragged;
         dragged.transform.SetParent(toSlot.transform, false);
+        dragged.rectTransform.anchoredPosition = Vector2.zero;
 
-        dragged.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        // EntrySlot 기준 originalParent 갱신
         dragged.UpdateOriginalParent(toSlot.transform);
+        dragged.currentCell = null; // 보드와의 연결 끊기
 
-        // B → A 이동
+        // 2) 엔트리에 있던 entryItem(B) → 보드로 이동
+        entryItem.transform.SetParent(fromCell.transform, false);
+        entryItem.rectTransform.anchoredPosition = Vector2.zero;
+
+        entryItem.currentCell = fromCell;
+        fromCell.occupant = entryItem;
+        fromCell.donutId = entryItem.donutData.id;
+
+        entryItem.UpdateOriginalParent(fromCell.transform);
+
+        // 3) 엔트리 currentItem 갱신
+        toSlot.currentItem = dragged;
+
+        Debug.Log($"[SwapWithCell] 보드 셀 {fromCell.name} ↔ {toSlot.name} 교체 완료");
+    }
+
+    // 엔트리 <> 엔트리 스왑
+    private void SwapItems(EntrySlot fromSlot, EntrySlot toSlot, MergeItemUI dragged)
+    {
+        // B 슬롯에 원래 있던 아이템
+        MergeItemUI targetItem = toSlot.currentItem;
+
+        // 1. A → B 이동
+        toSlot.currentItem = dragged;
+        dragged.transform.SetParent(toSlot.transform, false);
+        dragged.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+        // 원래 parent 갱신
+        dragged.UpdateOriginalParent(toSlot.transform);
+        dragged.isFromEntry = true;
+
+        // 2. B → A 이동
         fromSlot.currentItem = targetItem;
-        targetItem.transform.SetParent(fromSlot.transform, false);
-        
-        targetItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        targetItem.UpdateOriginalParent(fromSlot.transform);
+        if (targetItem != null)
+        {
+            targetItem.transform.SetParent(fromSlot.transform, false);
+            targetItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+            targetItem.UpdateOriginalParent(fromSlot.transform);
+            targetItem.isFromEntry = true;
+        }
 
         Debug.Log($"[Swap] {fromSlot.name} ↔ {toSlot.name} 스왑 완료");
     }
-    
+
+
     // 슬롯을 비우는 함수
     public void Clear()
     {
