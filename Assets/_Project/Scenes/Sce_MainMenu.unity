@@ -12548,7 +12548,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
-  slotIndex: 4
+  slotIndex: 3
 --- !u!222 &486568186851656044
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -21056,7 +21056,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 4
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &1267527579973793959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22749,7 +22749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
-  slotIndex: 5
+  slotIndex: 4
 --- !u!114 &1527191855148464117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25161,7 +25161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
-  slotIndex: 1
+  slotIndex: 0
 --- !u!224 &1831638507146554842
 RectTransform:
   m_ObjectHideFlags: 0
@@ -35304,7 +35304,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 5
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1001 &2938467118203964988
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37053,7 +37053,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 2
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1001 &3092159267997899562
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -41349,7 +41349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
-  slotIndex: 2
+  slotIndex: 1
 --- !u!114 &3572842140735225741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62377,7 +62377,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
-  slotIndex: 3
+  slotIndex: 2
 --- !u!224 &5838702701866320096
 RectTransform:
   m_ObjectHideFlags: 0
@@ -76770,7 +76770,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 3
+  m_PixelsPerUnitMultiplier: 1
 --- !u!224 &7485066709168026974 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3668128831786549886, guid: 5e25b52e4ac4fb3409dec32f29194056, type: 3}

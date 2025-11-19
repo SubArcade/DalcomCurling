@@ -487,7 +487,7 @@ public class DataManager : MonoBehaviour
     {
         EnsureDonutSlots();
 
-        index = index - 1;
+        //index = index - 1;
         if (index < 0 || index >= InventoryData.donutEntries.Count)
         {
             Debug.LogError($"[InventoryData] 잘못된 인덱스: {index}");
