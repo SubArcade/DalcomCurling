@@ -56,6 +56,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         originalPos = rectTransform.anchoredPosition;
         originalParent = transform.parent;
         originalCell = currentCell;
+        UpdateOriginalParent(originalParent);
 
         transform.SetParent(canvas.transform, true);
         canvasGroup.blocksRaycasts = false;
@@ -132,7 +133,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        //Cells targetCell = targetObj ? targetObj.GetComponentInParent<Cells>() : null;
+        //targetCell = targetObj ? targetObj.GetComponentInParent<Cells>() : null;
 
         // 드롭 위치에 격자 이동
         if (BoardManager.Instance.selectionHighlight != null)
@@ -175,6 +176,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     private void TryPlaceOrMerge(Cells targetCell)
     {
+        EntrySlot fromEntrySlot = null;
+        if (originalParent != null)
+            fromEntrySlot = originalParent.GetComponent<EntrySlot>();
+
         // 같은 칸이면 리셋
         if (targetCell == currentCell)
         {
@@ -183,11 +188,44 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        // 빈 칸이면 이동
         if (targetCell.IsEmpty())
         {
+            // 엔트리에서 온 도넛이면 → 보드로 꺼내기
+            if (fromEntrySlot != null || isFromEntry)
+            {
+                // 엔트리 슬롯 비우기
+                if (fromEntrySlot != null && fromEntrySlot.currentItem == this)
+                    fromEntrySlot.currentItem = null;
+
+                // 이 도넛은 이제 보드 소속
+                isFromEntry = false;
+
+                MoveToCell(targetCell);
+                BoardManager.Instance.SelectCell(targetCell);
+                return;
+            }
+
+            // 보드 도넛이면 기존 이동
             MoveToCell(targetCell);
             BoardManager.Instance.SelectCell(targetCell);
+            return;
+        }
+
+        if (isFromEntry)
+        {
+            // 엔트리 → 보드 스왑만 허용, 머지는 절대 안 됨
+            var entrySlot = originalParent.GetComponent<EntrySlot>();
+            var targetItem = targetCell.occupant;
+
+            if (entrySlot != null && targetItem != null)
+            {
+                SwapEntryAndCell(entrySlot, targetCell, this, targetItem);
+            }
+            else
+            {
+                ResetPosition();
+            }
+
             return;
         }
 
@@ -200,7 +238,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         // 스왑로직
-        var fromEntrySlot = originalParent.GetComponent<EntrySlot>();
+        //var fromEntrySlot = originalParent.GetComponent<EntrySlot>();
         if (fromEntrySlot != null)   // 엔트리에서 옴
         {
             var targetItem = targetCell.occupant;
@@ -326,6 +364,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         fromSlot.currentItem = boardItem;
         boardItem.transform.SetParent(fromSlot.transform, false);
         boardItem.rectTransform.anchoredPosition = Vector2.zero;
+        boardItem.isFromEntry = true;
 
         // EntrySlot originalParent 갱신
         boardItem.UpdateOriginalParent(fromSlot.transform);
@@ -335,6 +374,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         targetCell.SetItem(entryItem, entryItem.donutData);
         entryItem.transform.SetParent(targetCell.transform, false);
         entryItem.rectTransform.anchoredPosition = Vector2.zero;
+        entryItem.isFromEntry = false;
 
         entryItem.UpdateOriginalParent(targetCell.transform);
         entryItem.currentCell = targetCell;
@@ -350,6 +390,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public void Init(DonutData data)
     {
         donutData = data;
+        donutId = data.id; // 도넛아이디 넣기
 
         if (icon != null) icon.sprite = data.sprite;
     }

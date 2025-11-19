@@ -114,6 +114,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         toSlot.currentItem = dragged;
         dragged.transform.SetParent(toSlot.transform, false);
         dragged.rectTransform.anchoredPosition = Vector2.zero;
+        dragged.isFromEntry = true;
 
         // EntrySlot 기준 originalParent 갱신
         dragged.UpdateOriginalParent(toSlot.transform);
@@ -122,6 +123,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // 2) 엔트리에 있던 entryItem(B) → 보드로 이동
         entryItem.transform.SetParent(fromCell.transform, false);
         entryItem.rectTransform.anchoredPosition = Vector2.zero;
+        entryItem.isFromEntry = false;
 
         CheckMarkOff (dragged);
 
@@ -212,6 +214,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         Debug.Log($"[Inventory Save] 슬롯 {slotIndex} → {entry.id} 저장완료");
     }
 
+    //엔트리 도넛 불러오기
     public void LoadFromInventory()
     {
         var inv = DataManager.Instance.InventoryData.donutEntries;
