@@ -44,7 +44,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
         Cells fromCell = dragged.originalCell;
 
-        // 엔트리 <> 보드 스왑
+        // 엔트리에서 보드 스왑
         if (fromCell != null && currentItem != null)
         {
             SwapWithCell(fromCell, this, dragged);
@@ -84,10 +84,9 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
         dragged.UpdateOriginalParent(transform);
 
-        // 체크마크 비활성화
-        var checkMark = dragged.transform.Find("CheckMark")?.gameObject;
-        if (checkMark != null)
-            checkMark.SetActive(false);
+        CheckMarkOff(dragged);
+
+        SaveToInventory(); //도넛 값 넣기
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
@@ -98,7 +97,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // Debug.Log($"IsEmpty: {IsEmpty}");
     }
 
-    // 보드 <> 엔트리 스왑
+    // 엔트리에서 보드 스왑
     private void SwapWithCell(Cells fromCell, EntrySlot toSlot, MergeItemUI dragged)
     {
         MergeItemUI entryItem = toSlot.currentItem;     // 엔트리에 있던 아이템
@@ -116,6 +115,8 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         entryItem.transform.SetParent(fromCell.transform, false);
         entryItem.rectTransform.anchoredPosition = Vector2.zero;
 
+        CheckMarkOff (dragged);
+
         entryItem.currentCell = fromCell;
         fromCell.occupant = entryItem;
         fromCell.donutId = entryItem.donutData.id;
@@ -124,6 +125,11 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
         // 3) 엔트리 currentItem 갱신
         toSlot.currentItem = dragged;
+
+        SaveToInventory(); //도넛 값 넣기
+
+        // 해당 도넛 데이터 연동
+        DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
 
         Debug.Log($"[SwapWithCell] 보드 셀 {fromCell.name} ↔ {toSlot.name} 교체 완료");
     }
@@ -154,7 +160,48 @@ public class EntrySlot : MonoBehaviour, IDropHandler
             targetItem.isFromEntry = true;
         }
 
+        SaveToInventory(); //도넛 값 넣기
+
+        // 해당 도넛 데이터 연동
+        DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
+
         Debug.Log($"[Swap] {fromSlot.name} ↔ {toSlot.name} 스왑 완료");
+    }
+
+    // 체크마크 비활성화 함수
+    public void CheckMarkOff(MergeItemUI dragged)
+    {
+        var checkMark = dragged.transform.Find("CheckMark")?.gameObject;
+        if (checkMark != null)
+            checkMark.SetActive(false);
+    }
+
+    // 엔트리 저장
+    private void SaveToInventory()
+    {
+        if (currentItem == null || currentItem.donutData == null)
+        {
+            // 슬롯이 비었으면 삭제 처리
+            DataManager.Instance.InventoryData.donutEntries[slotIndex] = null;
+            return;
+        }
+
+        var d = currentItem.donutData;
+
+        // DonutEntry로 변환
+        DonutEntry entry = new DonutEntry()
+        {
+            id = d.id,
+            type = d.donutType,
+            weight = d.weight,
+            resilience = d.resilience,
+            friction = d.friction
+        };
+
+        // 저장
+        DataManager.Instance.InventoryData.donutEntries[slotIndex] = entry;
+
+        Debug.Log($"[Inventory Save] 슬롯 {slotIndex} → {entry.id} 저장완료");
     }
 
 

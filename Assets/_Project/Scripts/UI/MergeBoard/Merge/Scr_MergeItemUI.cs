@@ -342,6 +342,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         // 3) 선택 하이라이트 갱신
         BoardManager.Instance.SelectCell(targetCell);
 
+        fromSlot.CheckMarkOff(boardItem); // 체크박스 끄기
+
         Debug.Log($"[SwapEntryAndCell] 엔트리 ↔ 보드 스왑 완료");
     }
 
