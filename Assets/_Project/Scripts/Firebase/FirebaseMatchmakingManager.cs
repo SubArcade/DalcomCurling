@@ -87,6 +87,10 @@ public class Game
 
     [FirestoreProperty]
     public string FinishReason { get; set; } // 게임 종료 사유를 저장하는 속성
+    
+    [FirestoreProperty]
+    public string LastUploaderId { get; set; }
+    
 }
 
 [FirestoreData]
@@ -125,6 +129,14 @@ public class StonePosition
     public int StoneId { get; set; }
     [FirestoreProperty]
     public string Team { get; set; }
+    [FirestoreProperty]
+    public string DonutId { get; set; } // 발사된 도넛의 종류를 식별하기 위한 ID
+    [FirestoreProperty]
+    public int Weight { get; set; } // 도넛 무게
+    [FirestoreProperty]
+    public int Resilience { get; set; } // 도넛 탄성
+    [FirestoreProperty]
+    public int Friction { get; set; } // 도넛 마찰
     [FirestoreProperty]
     public Dictionary<string, float> Position { get; set; } // Vector3 저장용
 }
@@ -496,7 +508,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
     }
 
-    private async void CancelMatchmaking()
+    public async void CancelMatchmaking()
     {
         Debug.Log("매치메이킹 시간 초과 또는 취소. 매칭을 중단합니다.");
         UIManager.Instance.Close(PanelId.MatchingPopUp); //매칭팝업창 닫기

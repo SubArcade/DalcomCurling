@@ -48,6 +48,9 @@ public class BoardManager : MonoBehaviour
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
+        
+        // 불러온 데이터로 보드 복원
+        LoadBoardLocal();
 
         // 불러온 데이터로 보드 복원
         LoadBoardLocal();

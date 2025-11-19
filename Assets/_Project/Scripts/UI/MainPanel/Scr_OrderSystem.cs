@@ -226,6 +226,16 @@ public class Scr_OrderSystem : MonoBehaviour
         orderClearBtn3.SetActive(!isOrder3Complete);
     }
 
+    void OnEnable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged += RefreshAllDonutTexts;
+    }
+
+    void OnDisable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged -= RefreshAllDonutTexts;
+    }
+
     //도넛레벨별 가격 책정하기
     private int GetRewardByDonutLevel(int level)
     {
@@ -347,18 +357,12 @@ public class Scr_OrderSystem : MonoBehaviour
             int safety = 100;
             while (safety-- > 0) //100에서 점점 1회씩 빼가며 중복되지않는 도넛 탐샘
             {
-                // DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
                 DonutType randomType;
 
                 DonutType[] types = { DonutType.Hard, DonutType.Soft, DonutType.Moist };
                 randomType = types[Random.Range(0, types.Length)];
-                
                 int randomLevel = Random.Range(minLevel, maxLevel + 1); //도넛의 타입과 레벨 무작위 선택
                 string comboKey = $"{randomType}_{randomLevel}"; //타입+레벨 조합한 키 생성
-
-            //도넛 타입과 레벨을 랜덤으로 고름
-            //DonutType randomType = orderDonutTypes[Random.Range(0, orderDonutTypes.Length)];
-            //int randomLevel = Random.Range(1, 31);
 
                 if (usedDonuts.Contains(comboKey)) continue; //이미 생성된 조합이면 다시 시도
 
@@ -376,8 +380,7 @@ public class Scr_OrderSystem : MonoBehaviour
 
             //이미지, 타입, 단계 설명표시
             orderImages[i].sprite = donut.sprite;
-            textInfos[i].typeText.text = donut.displayName;
-            textInfos[i].levelText.text = donut.description;
+
             //저장
             idList.Add(donut.id);
 
@@ -392,6 +395,7 @@ public class Scr_OrderSystem : MonoBehaviour
             });
 
         }
+        SetDonutTexts(textInfos, idList);
         costText.text = $"{totalReward}";
 
         // 어떤 주문서인지에 따라 해당 퀘스트 저장
@@ -452,7 +456,7 @@ public class Scr_OrderSystem : MonoBehaviour
     }
 
     //주문서 완료시 버튼 상호작용
-    public async void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
+    public void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
     {
         //보드에서 주문서 도넛 제거
         foreach (var cell in BoardManager.Instance.GetAllCells())
@@ -479,7 +483,8 @@ public class Scr_OrderSystem : MonoBehaviour
 
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;
-        await DataManager.Instance.UpdateUserDataAsync(gold: newGold);
+        DataManager.Instance.PlayerData.gold = newGold; 
+        //await DataManager.Instance.UpdateUserDataAsync(gold: newGold);
 
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)
@@ -532,12 +537,11 @@ public class Scr_OrderSystem : MonoBehaviour
             if (donut == null) continue;
 
             orderImages[i].sprite = donut.sprite;
-            textInfos[i].typeText.text = donut.displayName;
-            textInfos[i].levelText.text = donut.description;
 
             idList.Add(donut.id);
             totalReward += quest.rewardGold;
         }
+        SetDonutTexts(textInfos, idList);
         costText.text = $"{totalReward}";
     }
 
@@ -588,4 +592,46 @@ public class Scr_OrderSystem : MonoBehaviour
         }
         return (min, Mathf.Clamp(max, min, 30));
     }
+    //로컬라이제이션을 위한 언어변경용 함수
+    private void RefreshAllDonutTexts()
+    {
+        SetDonutTexts(donutTextInfos1, orderDonutIDs1);
+        SetDonutTexts(donutTextInfos2, orderDonutIDs2);
+        SetDonutTexts(donutTextInfos3, orderDonutIDs3);
+    }
+    //도넛 텍스트 로컬라이징 설정 함수
+    private void SetDonutTexts(List<DonutTextInfo> textInfos, List<string> idList)
+    {
+        for (int i = 0; i < textInfos.Count && i < idList.Count; i++)
+        {//텍스트와 아이디 리스트 둘중 짧은쪽까지만 범위지정         
+            var donut = DataManager.Instance.GetDonutByID(idList[i]); //현재 인덱스의 도넛 ID로 DonutData를 가져옴
+
+            if (donut == null || donut.donutType == DonutType.Gift) continue;
+            //도넛이 없거나 Gift 타입이면 무시
+
+            LocalizationKey typeKey = donut.donutType switch
+            { //로컬라이제이션키 설정
+                DonutType.Hard => LocalizationKey.Label_HardDonut,
+                DonutType.Soft => LocalizationKey.Label_SoftDonut,
+                DonutType.Moist => LocalizationKey.Label_MoistDonut,
+                _ => LocalizationKey.None
+            };
+
+            string localizedType = LocalizationManager.Instance.GetText(typeKey); //설정된 키 값 저장
+            string typeText = $"{localizedType}"; //문자열로 변환후 저장
+
+            textInfos[i].typeText.text = typeText; //UI에 표시될 텍스트
+
+            string levelLabel = LocalizationManager.Instance.GetText(LocalizationKey.Order_Level);
+            string lang = LocalizationManager.Instance.CurrentLanguage; //현재 언어상태 가져옴
+
+            string levelText = lang == "ko" 
+                ? $"{donut.level}{levelLabel}"
+                : $"{levelLabel}-{donut.level}";
+            //언어상태에따라 텍스트를 변경 ex)한글이면 1단계 영어면 Level-1
+
+            textInfos[i].levelText.text = levelText;//UI에 표시될 텍스트
+        }
+    }
+
 }
