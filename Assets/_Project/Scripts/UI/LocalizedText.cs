@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 [RequireComponent(typeof(TMP_Text))]
@@ -16,6 +16,8 @@ public class LocalizedText : MonoBehaviour
     {
         if (LocalizationManager.Instance != null)
             LocalizationManager.Instance.OnLanguageChanged += UpdateText;
+
+        UpdateText();
     }
 
     void OnDisable()
