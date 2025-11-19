@@ -10,7 +10,7 @@
     "Label_DeleteAccount": "계정삭제",
     "Label_AccountLink": "Google Play 계정연동",
     "Label_GameSetting": "게임 설정",
-    "Label_AlarmSetting": "알림 설정",
+    "Label_AlarmSetting": "알림",
     "Label_AlarmText": "알림을 받으시려면 기기 설정에서 알림이 켜져있는지 확인해주세요!",
     "Label_AlarmEnergy": "에너지 모두 재충전",
     "Label_EventAlarm": "이벤트 수신 알림",
@@ -32,10 +32,49 @@
     "Label_GeneratorUgrade": "생성기 업그레이드",
     "Label_UpgradeText": "생성기 레벨은 플레이어 레벨을 초과할 수 없어요!",
 
-
     "Btn_Upgrade": "업그레이드",
-    "Label_AskUpgrade": "생성기를 업그레이드할까요?"
+    "Label_AskUpgrade": "생성기를 업그레이드할까요?",
 
+    "Label_TitleList": "칭호 목록",
+    "Label_TitleSelect": "변경할 칭호를 선택하세요.",
+    "Label_SubTitle": "환생을 진행할 때마다 칭호를 얻을 수 있어요.",
+    "Label_NoTitle": "보유하고 있는 칭호가 없어요!",
+
+    "Label_ChangeNickname": "닉네임 변경",
+    "Btn_FirstFree": "최초 1회 무료",
+    "Label_ChangeText": "새 닉네임을 입력해주세요 2~8자를 쓸 수 있어요",
+    "Label_AskChange": "변경하시겠습니까?",
+
+    "Label_Yes": "예",
+    "Label_No": "아니요",
+    "Label_NotEnough": "재화가 부족합니다. 상점으로 이동할까요?",
+
+    "Label_Reincarnate": "환생하기",
+    "Label_WarningReincarnate": "[주의] 환생을 하면 모든 게임 정보가 초기화 되고 처음부터 다시 시작합니다.",
+    "Label_AskReincarnate": "환생을 진행할까요?",
+    "Btn_Reincarnate": "환생하기!",
+    "Label_ReincarnateText": "[주의] 환생을 하면 모든 게임정보가 초기화되고 처음부터 다시 시작합니다.",
+
+    "Label_GoldShop": "일반 상점",
+    "Label_CashShop": "캐시 상점",
+    "Label_Monthly": "월정액",
+    "Label_PackageTitle": "패키지",
+    "Label_RemoveADS": "광고 제거",
+    "Label_Currency": "재화",
+    "Label_GemTitle": "젬",
+    "Label_DonutText": "도넛",
+    "Label_EffectText": "이펙트",
+    "Label_CharacterText": "캐릭터",
+    "Label_MaleText": "남성",
+    "Label_FemaleText": "여성",
+
+    "Label_Matching": "매칭중입니다",
+    "Btn_CancleMatch": "매칭 취소",
+
+    "Up_generator": "도넛생성기",
+    "Up_generatorUP" :  "도넛생성확률 증가",
+  
+      "Order_Level" :  "단계"
   },
   "en": {
     "Btn_Start": "Start",
@@ -48,7 +87,7 @@
     "Label_DeleteAccount": "Delete Account",
     "Label_AccountLink": "Google Play Link Account",
     "Label_GameSetting": "Game Setting",
-    "Label_AlarmSetting": "Alarm Setting",
+    "Label_AlarmSetting": "Alarm",
     "Label_AlarmText": "Please check your device settings to ensure notifications are turned on",
     "Label_AlarmEnergy": "Energy Fully Recharged",
     "Label_EventAlarm": "Event Notifications",
@@ -71,6 +110,46 @@
     "Label_UpgradeText": "The generator level cannot exceed the player's level!",
 
     "Btn_Upgrade": "Upgrade",
-    "Label_AskUpgrade": "Do you want to upgrade your generator?"
+    "Label_AskUpgrade": "Do you want to upgrade your generator?",
+
+    "Label_TitleList": "TitleList",
+    "Label_TitleSelect": "Select a title to change.",
+    "Label_SubTitle": "You receive a title whenever you reincarnate.",
+    "Label_NoTitle": "You don't have any titles yet!!",
+
+    "Label_ChangeNickname": "Change Nickname",
+    "Btn_FirstFree": "First use free",
+    "Label_ChangeText": "Enter a new nickname (2–8 characters).",
+    "Label_AskChange": "Are you sure you want to change this?",
+
+    "Label_Yes": "Yes",
+    "Label_No": "No",
+    "Label_NotEnough": "You're low on Currency. Would you like to visit the shop?",
+
+    "Label_Reincarnate": "Reincarnate",
+    "Label_WarningReincarnate": "[Caution] Reincarnation wipes all progress and restarts the game.",
+    "Label_AskReincarnate": "Would you like to proceed with reincarnation?",
+    "Btn_Reincarnate": "Reincarnate!",
+    "Label_ReincarnateText": "[Warning] Reincarnating will reset all game progress and start you over from the beginning.",
+
+    "Label_GoldShop": "GoldShop",
+    "Label_CashShop": "CashShop",
+    "Label_Monthly": "Monthly Plan",
+    "Label_PackageTitle": "Package",
+    "Label_RemoveADS": "Rmove Abs",
+    "Label_Currency": "Currency",
+    "Label_GemTitle": "Gem",
+    "Label_DonutText": "Donut",
+    "Label_EffectText": "Effect",
+    "Label_CharacterText": "Character",
+    "Label_MaleText": "Male",
+    "Label_FemaleText": "Female",
+
+    "Label_Matching": "Matching",
+    "Btn_CancleMatch": "Cancle",
+
+    "Up_generator": "DonutGenerator",
+    "Up_generatorUP": "Donut chance Up",
+    "Order_Level": "Level"
   }
 }

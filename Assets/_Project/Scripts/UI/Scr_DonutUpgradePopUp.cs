@@ -87,6 +87,16 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
 
         updateAllText();
     }
+    void OnEnable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged += updateAllText;
+        updateAllText(); // 팝업이 열릴 때도 즉시 반영
+    }
+
+    void OnDisable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged -= updateAllText;
+    }
 
     //단단 업글
     void OnClickHardUpgrade()
@@ -164,8 +174,30 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     //도넛 레벨에 따라 텍스트 갱신
     void UpdateDonutText(int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText) 
     {
-        createText.text = $"Lv{level} {type}도넛 생성기";
-        optionText.text = $"{level}단계 {type}도넛 생성확률 증가";
+        LocalizationKey typeKey;
+
+        switch (type)
+        {
+            case "단단":
+                typeKey = LocalizationKey.Label_HardDonut;
+                break;
+            case "촉촉":
+                typeKey = LocalizationKey.Label_MoistDonut;
+                break;
+            case "말랑":
+                typeKey = LocalizationKey.Label_SoftDonut;
+                break;
+            default:            
+                typeKey = LocalizationKey.Label_HardDonut;
+                break;
+        }
+
+        string localizedType = LocalizationManager.Instance.GetText(typeKey);
+        string generatorText = LocalizationManager.Instance.GetText(LocalizationKey.Up_generator);
+        string chanceText = LocalizationManager.Instance.GetText(LocalizationKey.Up_generatorUP);
+
+        createText.text = $"Lv{level} {localizedType} {generatorText}";
+        optionText.text = $"Lv{level} {localizedType} {chanceText}";
     }
 
     void updateAllText() 

@@ -11,31 +11,77 @@ public enum LocalizationKey
     Btn_Exit,
     Title_Main,
     Label_Gold,
-    Label_Setting,
-    Label_Account,
-    Label_DeleteAccount,
-    Label_AccountLink,
-    Label_GameSetting,
-    Label_AlarmSetting,
-    Label_AlarmText,
-    Label_AlarmEnergy,
-    Label_EventAlarm,
-    Label_Midnight,
-    Label_Service,
-    Label_Protect,
-    Label_ContactEMail,
-    Language_Select,
-    Label_Info,
-    Label_Profile,
-    Label_Rank,
-    Label_Codex,
-    Label_HardDonut,
-    Label_SoftDonut,
-    Label_MoistDonut,
-    Label_GeneratorUgrade,
-    Label_UpgradeText,
-    Btn_Upgrade,
-    Label_AskUpgrade,
+
+    Label_Setting, //환경설정
+    Label_Account, //계정
+    Label_DeleteAccount, //계정삭제
+    Label_AccountLink, //구글 계정 연동
+    Label_GameSetting, //게임설정
+    Label_AlarmSetting, //알람설정
+    Label_AlarmText, //알람설정 바로 아래 텍스트
+    Label_AlarmEnergy, //에너지 풀충전 알림
+    Label_EventAlarm, //이벤트 메시지 알림
+    Label_Midnight, //야간 알림
+    Label_Service, //서비스 이용약관
+    Label_Protect, //정보보호
+    Label_ContactEMail, //문의메일
+    Language_Select, //언어선택
+
+    Label_Info, //내정보.. 플레이어정보
+    Label_Profile, //프로필
+    Label_Rank, //랭킹
+
+    Label_Codex, //도넛 도감(스토리??)
+    Label_HardDonut, //단단도넛 
+    Label_SoftDonut, //말랑도넛
+    Label_MoistDonut, //촉촉도넛
+
+    Label_GeneratorUgrade, //생성기 업그레이드
+    Label_UpgradeText, //생성기 레벨 초과X 텍스트
+    Btn_Upgrade, //업그레이드 텍스트
+    Label_AskUpgrade, // ???
+
+    Label_TitleList, //칭호목록
+    Label_TitleSelect, //칭호선택텍스트
+    Label_SubTitle, //환생해야 칭호텍스트
+    Label_NoTitle, //칭호가없어요
+
+    Label_ChangeNickname, //닉네임 변경
+    Btn_FirstFree, //1회 무료
+    Label_ChangeText, //2~8자
+    Label_AskChange, //변경하시겠습니까?
+
+    Label_Yes,
+    Label_No,
+    Label_NotEnough, //젬이 없어요
+
+    Label_Reincarnate, //환생라벨
+    Label_WarningReincarnate, //환생경고
+    Label_AskReincarnate, //환생묻기
+    Btn_Reincarnate, //환생버튼
+    Label_ReincarnateText, //환생안내
+
+    Label_GoldShop, //일반상점
+    Label_CashShop, //캐시상점
+    Label_Monthly, //월정액라벨
+    Label_PackageTitle, //패키지 라인업텍스트
+    Label_RemoveADS, //광고제거 라인업 텍스트
+    Label_Currency, //재화라벨
+    Label_GemTitle, //보석텍스트
+
+    Label_DonutText, //상점 도넛텍스트
+    Label_EffectText, //이펙트 라인업
+    Label_CharacterText, //상점 캐릭터텍스트
+    Label_MaleText, //남성 텍스트
+    Label_FemalText, //여성 텍스트
+
+    Label_Matching, //매칭텍스트
+    Btn_CancleMatch, //취소텍스트
+
+    Up_generator, //생성기텍스트
+    Up_generatorUP, //확를증가
+
+    Order_Level, //주문서 n단계 도넛텍스트
 }
 
 public class LocalizationManager : MonoBehaviour

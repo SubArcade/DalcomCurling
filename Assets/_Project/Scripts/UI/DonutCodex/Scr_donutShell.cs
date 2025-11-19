@@ -23,6 +23,8 @@ public class Scr_donutShell : MonoBehaviour
     [Header("Reward 상태용")]
     [SerializeField] private TMP_Text rewardText;
     private int gem;
+    private DonutType donutType;
+    private int level;
     
     public event System.Action<Scr_donutShell> OnDonutClicked;
     
@@ -41,7 +43,7 @@ public class Scr_donutShell : MonoBehaviour
             questionRoot.SetActive(type == DonutDexViewState.Question);
         if (donutRoot != null)
             donutRoot.SetActive(type == DonutDexViewState.Donut);
-        if (rewardRoot != null)
+        if (rewardRoot != null) 
             rewardRoot.SetActive(type == DonutDexViewState.Reward);
 
         switch (type)
@@ -53,13 +55,19 @@ public class Scr_donutShell : MonoBehaviour
                 break;
             case DonutDexViewState.Reward:
                 gem = reward;
-                rewardText.text = $"젬 {reward}개 획";
+                rewardText.text = $"젬 {reward}개 획득";
                 break;
             default:
                 break;
         }
     }
 
+    public void SetDonut(DonutType newType, int lev)
+    {
+        donutType = newType;
+        level = lev;
+    }
+    
     /// <summary>
     /// 버튼 눌렀을 때 타입에 따라 다른 이벤트 호출
     /// </summary>
@@ -69,13 +77,17 @@ public class Scr_donutShell : MonoBehaviour
         {
             case DonutDexViewState.Question:
                 break;
-            case DonutDexViewState.Donut:
+            case DonutDexViewState.Donut: 
                 OnDonutClicked.Invoke(this);
+                
                 break;
             case DonutDexViewState.Reward:
                 DataManager.Instance.PlayerData.gem += gem;
                 // 메인호면 UI 갱신함수 필요 이벤트 함수
                 DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem);
+                // 도넛으로 변경
+                DonutData donutData = DataManager.Instance.GetDonutData(donutType, level);
+                SetType(DonutDexViewState.Donut, donutData.sprite);
                 break;
             default:
                 break;

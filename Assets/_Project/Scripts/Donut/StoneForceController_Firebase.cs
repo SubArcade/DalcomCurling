@@ -8,6 +8,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 {
     public float stoneForce;
     public int donutId;
+    public string DonutId { get; private set; } // 도넛의 종류를 식별하는 ID (예: "Soft_15")
 
     // 도넛의 물리적 속성
     public int DonutWeight { get; private set; }
@@ -135,10 +136,11 @@ public class StoneForceController_Firebase : MonoBehaviour
     }
 
     // StoneShoot.Team 대신 직접 정의한 Team enum 사용
-    public void InitializeDonut(Team team, int donutId, int weight, int resilience, int friction) // 도넛의 팀과 id, 물리 속성을 적용
+    public void InitializeDonut(Team team, int donutId, string donutTypeId, int weight, int resilience, int friction) // 도넛의 팀과 id, 물리 속성을 적용
     {
         this.team = team;
         this.donutId = donutId;
+        this.DonutId = donutTypeId;
         this.DonutWeight = weight;
         this.DonutResilience = resilience;
         this.DonutFriction = friction;

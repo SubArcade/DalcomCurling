@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +31,11 @@ public class Scr_DonutCodex : MonoBehaviour
     
     [Header("닫기 버튼")]
     [SerializeField, Tooltip("닫기")] private Button closeButton;
+    
+    [Header("도넛 정보창")]
+    [SerializeField, Tooltip("이미지")] private Image image;
+    [SerializeField, Tooltip("설명")] private TMP_Text infotext;
+    [SerializeField, Tooltip("레벨")] private TMP_Text levelText;
 
 
     private void OnEnable()
@@ -127,17 +133,29 @@ public class Scr_DonutCodex : MonoBehaviour
             {
                 case DonutDexViewState.Question:
                     shellList[i].SetType(state);
+                    shellList[i].SetDonut(donutData.donutType, donutData.level);
                     break;
                 case DonutDexViewState.Donut:
                     shellList[i].SetType(state, donutData.sprite);
+                    shellList[i].SetDonut(donutData.donutType, donutData.level);
                     break;
                 case DonutDexViewState.Reward:
                     shellList[i].SetType(state, reward: donutData.rewardGem);
+                    shellList[i].SetDonut(donutData.donutType, donutData.level);
                     break;
             }
 
            //Debug.Log($"DonutType: {donuttype}, DonutData: {donutData}");
         }
+    }
+
+    // 정보창 셋팅
+    public void InfoSet(Sprite sprite, string info, string level)
+    {  
+        image.sprite = sprite;
+        infotext.text = info;
+        // 나중에 영어 버전 처리 필요
+        levelText.text = $"{level} 단계";
     }
     
 #if UNITY_EDITOR
