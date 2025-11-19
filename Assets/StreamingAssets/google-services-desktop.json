@@ -12,33 +12,15 @@
           "package_name": "com.donutsoft.dalcomcurling"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "941793478423-sq6ikguem1f8q62vduokq6gi0jidu1uo.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.donutsoft.dalcomcurling",
-            "certificate_hash": "3188c70be260d00e8364dbd4b0245c0b06a7e5a5"
-          }
-        },
-        {
-          "client_id": "941793478423-scd3qgovjudoiu19jlvltt92ajdc6vuo.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAkBdkWxwM82v83vmnE48ne900iJBLF-1o"
+          "current_key": "AIzaSyAVaX4OruEyGq9jO7K3CpIgpsaiLi-DOtg"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "941793478423-scd3qgovjudoiu19jlvltt92ajdc6vuo.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
