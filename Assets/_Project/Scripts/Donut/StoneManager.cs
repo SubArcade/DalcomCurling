@@ -194,7 +194,7 @@ public class StoneManager : MonoBehaviour
         }
 
         // 선택된 도넛의 물리 속성을 StoneForceController_Firebase에 전달합니다.
-        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
+        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId, selectedDonut.id, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
 
         // if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.A)
         // {

@@ -130,6 +130,8 @@ public class StonePosition
     [FirestoreProperty]
     public string Team { get; set; }
     [FirestoreProperty]
+    public string DonutId { get; set; } // 발사된 도넛의 종류를 식별하기 위한 ID
+    [FirestoreProperty]
     public Dictionary<string, float> Position { get; set; } // Vector3 저장용
 }
 
