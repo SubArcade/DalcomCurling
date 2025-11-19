@@ -42,8 +42,18 @@ public class UserDataRoot
         soloTier = GameTier.Bronze,
         levelMax = 20,
     };
-    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
-   
+    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData()
+    {
+        donutEntries = new List<DonutEntry>()
+        {
+            null,
+            null,
+            null,
+            null,
+            null
+        }
+    };
+
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
         generatorLevelHard = 1,
