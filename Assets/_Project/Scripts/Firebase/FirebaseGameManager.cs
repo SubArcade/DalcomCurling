@@ -118,6 +118,12 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     async void Start() // Changed to async void
     {
+        // 새 게임 시작 시 StoneManager의 상태를 깨끗하게 초기화합니다.
+        if (stoneManager != null)
+        {
+            stoneManager.ResetForNewGame();
+        }
+
         db = FirebaseFirestore.DefaultInstance;
         gameId = FirebaseMatchmakingManager.CurrentGameId;
         roomId = FirebaseMatchmakingManager.CurrentRoomId; // RoomId 가져오기
@@ -368,6 +374,15 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleTurnChange()
     {
+        // 턴이 변경될 때, 이전 턴에서 캐시된 예측 결과가 있다면 지금 동기화합니다.
+        // 이렇게 하면 카메라가 전환된 후, 새 턴이 시작되기 직전의 자연스러운 타이밍에 위치 보정이 이루어집니다.
+        if (_cachedPrediction != null && _cachedPrediction.TurnNumber == _currentGame.TurnNumber - 1)
+        {
+            Debug.Log($"새 턴({_currentGame.TurnNumber}) 시작 전, 이전 턴({_cachedPrediction.TurnNumber})의 최종 위치를 동기화합니다.");
+            stoneManager?.SyncPositions(_cachedPrediction.FinalStonePositions);
+            _cachedPrediction = null; // 사용한 예측 결과는 비웁니다.
+        }
+
         // 턴이 변경될 때마다 UI에 현재 턴 번호를 업데이트합니다.
         UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
 
@@ -547,11 +562,16 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void ProcessPrediction(PredictedResult result)
     {
-        Debug.Log($"{result.PredictingPlayerId}로부터 받은 예측 결과 처리.");
-        stoneManager?.SyncPositions(result.FinalStonePositions);
+        Debug.Log($"{result.PredictingPlayerId}로부터 받은 예측 결과 처리. 결과를 캐시하고 턴 전환을 시작합니다.");
+
+        // 결과를 캐시하여 HandleTurnChange에서 사용하도록 함
+        _cachedPrediction = result;
+
+        // stoneManager?.SyncPositions(result.FinalStonePositions); // HandleTurnChange에서 호출하도록 이동
 
         DOVirtual.DelayedCall(1f, () =>
         {
+            // 턴 전환 로직만 남겨둠
             // 8턴(0~7)이 끝나면 라운드 전환 상태로 변경
             // 현재턴이 마지막 턴이고 선공플레이어가 아닐때 (후공 플레이이가 라운드 종료로직을 시작해야할때) true
             if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
