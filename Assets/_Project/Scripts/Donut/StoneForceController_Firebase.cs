@@ -54,31 +54,14 @@ public class StoneForceController_Firebase : MonoBehaviour
     void Awake()
     {
         rigid = GetComponent<Rigidbody>();
-    //}
-
-    //private void Start()
-    //{
-        // MeshCollider가 없을 경우를 대비한 null 체크
-        // MeshCollider meshCollider = transform.GetComponent<MeshCollider>();
-        // if (meshCollider != null)
-        // {
-        //     physicMaterial = meshCollider.material;
-        //     initialFrictionValue = physicMaterial.dynamicFriction;
-        // }
-        // else
-        // {
-        //     Debug.LogWarning("StoneForceController_Firebase: MeshCollider를 찾을 수 없습니다. 물리 재질 초기화에 실패했습니다.");
-        // }
-        CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
-        if (capsuleCollider != null)
+        //CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
+        
+        if (!transform.TryGetComponent<CapsuleCollider>(out  CapsuleCollider capsuleCollider))
         {
-            physicMaterial = capsuleCollider.material;
-            initialFrictionValue = physicMaterial.dynamicFriction;
+            Debug.Log("CapsuleCollider를 찾을 수 없음");
         }
-        else
-        {
-            Debug.LogWarning("StoneForceController_Firebase: CapsuleCollider를 찾을 수 없습니다. 물리 재질 초기화에 실패했습니다.");
-        }
+        physicMaterial = capsuleCollider.material;
+        initialFrictionValue = physicMaterial.dynamicFriction;
     }
 
 
@@ -99,10 +82,19 @@ public class StoneForceController_Firebase : MonoBehaviour
             //현재 이동 속도가 발사속도의 설정한 퍼센트 이상일때까지만 옆으로 밀리는 힘을 추가함( 이후에는 남아있는 힘으로 인해 자연스럽게 휨 )
             // float forceAmount = spinForce * sidewaysForceFactor * (velocityCalc > sidewaysForceSpeedLimit ? velocityCalc * 0.5f : 0);
             //float forceAmount = spinForce * sidewaysForceFactor * velocityCalc * 0.5f;
+            
+            
+            //////////
+            // float forceAmount = spinForce * sidewaysForceFactor;
+            // rigid.AddForce(
+            //     Vector3.right * forceAmount * Time.fixedDeltaTime * 0.01f,
+            //     ForceMode.VelocityChange); // ForceMode를 VelocityChange로 변경
             float forceAmount = spinForce * sidewaysForceFactor;
             rigid.AddForce(
-                Vector3.right * forceAmount * Time.fixedDeltaTime * 0.01f,
+                Vector3.right * forceAmount * 0.01f,
                 ForceMode.VelocityChange); // ForceMode를 VelocityChange로 변경 
+            ///////////
+            
 
             // 스위핑으로 인한 꺾임 계산
             //rigid.AddForce(
@@ -125,7 +117,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     {
         stoneForce = force;
 
-        spinForce = spin;
+        spinForce = spin * 0.01f; // fixedDaltaTime 삭제로 인한 계수 추가
         rigid.AddForce(launchDestination, ForceMode.VelocityChange);
         // DOVirtual.DelayedCall(0.2f, () =>
         // {
@@ -170,18 +162,15 @@ public class StoneForceController_Firebase : MonoBehaviour
         // 반발력과 마찰력은 PhysicMaterial을 통해 설정합니다.
         if (physicMaterial == null)
         {
-            CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
-            if (capsuleCollider != null)
-            {
-                // 다른 돌에 영향을 주지 않도록 공유된 물리 재질의 인스턴스를 생성합니다.
-                physicMaterial = new PhysicMaterial(gameObject.name + "_PhysicMaterial");
-                capsuleCollider.material = physicMaterial;
-            }
-            else
+            //CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
+            if (!transform.TryGetComponent<CapsuleCollider>(out CapsuleCollider capsuleCollider))
             {
                 Debug.LogError("InitializeDonut: CapsuleCollider가 없어 물리 속성을 적용할 수 없습니다.");
                 return;
             }
+            // 다른 돌에 영향을 주지 않도록 공유된 물리 재질의 인스턴스를 생성합니다.
+            physicMaterial = new PhysicMaterial(gameObject.name + "_PhysicMaterial");
+            capsuleCollider.material = physicMaterial;
         }
 
         // int 값을 float (0~1) 범위로 변환하여 적용합니다. (예: 10 -> 1.0, 5 -> 0.5)
