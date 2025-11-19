@@ -597,13 +597,37 @@ MonoBehaviour:
       Data3: -1107814000
       Data4: -533752183
     Path: event:/BGM 1
-  gameBGMs:
   - Guid:
       Data1: -1350119064
       Data2: 1134488051
       Data3: 1779179422
       Data4: -1284179272
     Path: event:/BGM 2
+  - Guid:
+      Data1: 1545447811
+      Data2: 1251702247
+      Data3: -1107814000
+      Data4: -533752183
+    Path: event:/BGM 1
+  gameBGMs:
+  - Guid:
+      Data1: 1545447811
+      Data2: 1251702247
+      Data3: -1107814000
+      Data4: -533752183
+    Path: event:/BGM 1
+  - Guid:
+      Data1: -1350119064
+      Data2: 1134488051
+      Data3: 1779179422
+      Data4: -1284179272
+    Path: event:/BGM 2
+  - Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   intenseMusic:
     Guid:
       Data1: -735151149
@@ -625,6 +649,13 @@ MonoBehaviour:
       Data3: -915333712
       Data4: 1884737081
     Path: event:/Ascending Mystery 1
+  spectatorSound:
+    Guid:
+      Data1: -1441451555
+      Data2: 1197112510
+      Data3: 880688275
+      Data4: -1721779308
+    Path: event:/SpectatorSound
 --- !u!1 &1137162047
 GameObject:
   m_ObjectHideFlags: 0

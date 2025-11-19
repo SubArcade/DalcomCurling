@@ -163,11 +163,11 @@ public class SoundManager : MonoBehaviour
     //-----------씬 이름 넣는 구간-----------
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "LobbyScene")
+        if (scene.name == "Sce_MainMenu")
         {
             PlayLobbyBGM();
         }
-        else if (scene.name == "GameScene")
+        else if (scene.name == "LSJ_Test")
         {
             PlayGameBGM();
         }
