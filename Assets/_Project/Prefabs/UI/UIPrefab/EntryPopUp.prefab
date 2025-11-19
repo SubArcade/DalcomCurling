@@ -75,7 +75,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 4
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &2607524010470601683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -89,6 +89,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
+  itemPrefab: {fileID: 8667966351517980942, guid: 683206ff3120e304ca1d5fd5d0a4d0f4, type: 3}
   slotIndex: 3
 --- !u!1 &2814691916824762476
 GameObject:
@@ -165,7 +166,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 5
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &4245013420819864434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,6 +180,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
+  itemPrefab: {fileID: 8667966351517980942, guid: 683206ff3120e304ca1d5fd5d0a4d0f4, type: 3}
   slotIndex: 4
 --- !u!1 &3299771628143248407
 GameObject:
@@ -269,6 +271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
+  itemPrefab: {fileID: 8667966351517980942, guid: 683206ff3120e304ca1d5fd5d0a4d0f4, type: 3}
   slotIndex: 0
 --- !u!1 &6197034461601652731
 GameObject:
@@ -345,7 +348,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 3
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &8064206332480908562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,6 +362,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
+  itemPrefab: {fileID: 8667966351517980942, guid: 683206ff3120e304ca1d5fd5d0a4d0f4, type: 3}
   slotIndex: 2
 --- !u!1 &6477502661448703570
 GameObject:
@@ -713,7 +717,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 2
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &3979986429719922953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -727,4 +731,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 0}
+  itemPrefab: {fileID: 8667966351517980942, guid: 683206ff3120e304ca1d5fd5d0a4d0f4, type: 3}
   slotIndex: 1

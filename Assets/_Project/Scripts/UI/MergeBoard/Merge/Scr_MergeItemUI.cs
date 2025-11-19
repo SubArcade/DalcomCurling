@@ -13,7 +13,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Canvas canvas;
-    private Image image;
+    private Image icon;
     public bool isFromEntry = false; //엔트리 확인용
 
     private Vector2 originalPos;
@@ -28,7 +28,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
-        image = GetComponent<Image>();
+        icon = GetComponent<Image>();
         canvas = GetComponentInParent<Canvas>();
     }
 
@@ -347,6 +347,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         Debug.Log($"[SwapEntryAndCell] 엔트리 ↔ 보드 스왑 완료");
     }
 
+    public void Init(DonutData data)
+    {
+        donutData = data;
+
+        if (icon != null) icon.sprite = data.sprite;
+    }
 
     // 나중에 이펙트 추가할거
     /*

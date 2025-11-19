@@ -134,6 +134,8 @@ public class DataManager : MonoBehaviour
         FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;
         db = FirebaseFirestore.DefaultInstance;
         //Debug.Log("[FS] Firestore instance OK");
+
+        EnsureDonutSlots();
     }
     
     // 신규 생성 시 초기 저장, 기존 계정은 불러와 갱신

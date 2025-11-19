@@ -9,6 +9,9 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     [Header("현재 슬롯에 들어있는 도넛")]
     public MergeItemUI currentItem;
 
+    [Header("엔트리에서 생성할 도넛 프리팹")]
+    [SerializeField] private MergeItemUI itemPrefab;
+
     public int slotIndex = 0;
     
     private Image slotImage;
@@ -16,6 +19,11 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     void Awake()
     {
         slotImage = GetComponent<Image>();
+    }
+    
+    void Start()
+    {
+        LoadFromInventory();
     }
 
     // 슬롯이 비었는지 여부
@@ -204,6 +212,44 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         Debug.Log($"[Inventory Save] 슬롯 {slotIndex} → {entry.id} 저장완료");
     }
 
+    public void LoadFromInventory()
+    {
+        var inv = DataManager.Instance.InventoryData.donutEntries;
+
+        if (slotIndex < 0 || slotIndex >= inv.Count)
+            return;
+
+        DonutEntry saved = inv[slotIndex];
+        if (saved == null || string.IsNullOrEmpty(saved.id))
+            return;
+
+        // 1) ID → DonutData
+        DonutData data = DataManager.Instance.GetDonutByID(saved.id);
+        if (data == null)
+        {
+            Debug.LogError($"도넛 ID {saved.id} 로 Data 못찾음");
+            return;
+        }
+
+        // 2) 프리팹 생성
+        MergeItemUI newItem = Instantiate(itemPrefab, transform);
+
+        // 3) DonutData 기반 이미지 설정
+        newItem.Init(data);
+
+        //// 4) Entry 전용 스탯 반영
+        //newItem.ApplyEntryStats(saved); 
+        // 보류 사용하는값인지 모르겠음
+
+        // 5) UI 정렬
+        RectTransform rt = newItem.GetComponent<RectTransform>();
+        rt.anchoredPosition = Vector2.zero;
+
+        // 6) 슬롯에 반영
+        currentItem = newItem;
+        newItem.isFromEntry = true;
+        newItem.UpdateOriginalParent(transform);
+    }
 
     // 슬롯을 비우는 함수
     public void Clear()
