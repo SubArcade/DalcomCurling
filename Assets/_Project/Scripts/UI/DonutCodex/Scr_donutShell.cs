@@ -23,8 +23,8 @@ public class Scr_donutShell : MonoBehaviour
     [Header("Reward 상태용")]
     [SerializeField] private TMP_Text rewardText;
     private int gem;
-    private DonutType donutType;
-    private int level;
+    public DonutType donutType;
+    public int level;
     
     public event System.Action<Scr_donutShell> OnDonutClicked;
     
@@ -79,7 +79,6 @@ public class Scr_donutShell : MonoBehaviour
                 break;
             case DonutDexViewState.Donut: 
                 OnDonutClicked.Invoke(this);
-                
                 break;
             case DonutDexViewState.Reward:
                 DataManager.Instance.PlayerData.gem += gem;

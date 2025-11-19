@@ -41,8 +41,40 @@ public class Scr_DonutCodex : MonoBehaviour
     private void OnEnable()
     {
         OnUserDataChangedHandler();
+        SubscribeList(hardShells);
+        SubscribeList(softShells);
+        SubscribeList(moistShells);
     }
 
+    private void OnDisable()
+    {
+        UnsubscribeList(hardShells);
+        UnsubscribeList(softShells);
+        UnsubscribeList(moistShells);
+    }
+
+    private void SubscribeList(List<Scr_donutShell> list)
+    {
+        if (list == null) return;
+
+        foreach (var shell in list)
+        {
+            if (shell == null) continue;
+            shell.OnDonutClicked += InfoSet;
+        }
+    }
+
+    private void UnsubscribeList(List<Scr_donutShell> list)
+    {
+        if (list == null) return;
+
+        foreach (var shell in list)
+        {
+            if (shell == null) continue;
+            shell.OnDonutClicked -= InfoSet;
+        }
+    }
+    
     private void OnUserDataChangedHandler()
     {
         // 데이터 들어온 뒤에만 호출됨
@@ -150,12 +182,13 @@ public class Scr_DonutCodex : MonoBehaviour
     }
 
     // 정보창 셋팅
-    public void InfoSet(Sprite sprite, string info, string level)
+    public void InfoSet(Scr_donutShell shell)
     {  
-        image.sprite = sprite;
-        infotext.text = info;
+        DonutData donutData = DataManager.Instance.GetDonutData(shell.donutType, shell.level);
+        image.sprite = donutData.sprite;
+        infotext.text = donutData.description;
         // 나중에 영어 버전 처리 필요
-        levelText.text = $"{level} 단계";
+        levelText.text = $"{donutData.level} 단계";
     }
     
 #if UNITY_EDITOR
