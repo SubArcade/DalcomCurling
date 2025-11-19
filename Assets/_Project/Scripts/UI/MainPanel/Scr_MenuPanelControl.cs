@@ -23,6 +23,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject MatchingPopUp;
     [SerializeField] private GameObject readyMenuPanel;
     [SerializeField] private GameObject ShopPopUp;
+    [SerializeField] private GameObject energyRechargePopUp;
+    [SerializeField] private GameObject notEnoughGemPopup;
     
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
@@ -34,6 +36,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private Button testBattle;
     [SerializeField] private Button goldShopButton;
     [SerializeField] private Button gemShopButton;
+    [SerializeField] private Button energyRechargeButton;
     
     
     [Header("플레이어 데이터 값")]
@@ -57,6 +60,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.MatchingPopUp, MatchingPopUp);
         UIManager.Instance.RegisterPanel(PanelId.ReadyMenuPanel, readyMenuPanel);
         UIManager.Instance.RegisterPanel(PanelId.ShopPopUp, ShopPopUp);
+        UIManager.Instance.RegisterPanel(PanelId.EnergyRechargePopUp, energyRechargePopUp);
+        UIManager.Instance.RegisterPanel(PanelId.NotEnoughGemPopUp, notEnoughGemPopup);
         
         
         UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
@@ -70,6 +75,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
         goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
+        energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
