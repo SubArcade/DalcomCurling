@@ -1206,17 +1206,19 @@ public class FirebaseGameManager : MonoBehaviour
             .OnComplete(() =>
             {
                 Debug.Log("카운트다운 종료!");
-                //canShotDonutNow = false;
-                inputController?.DisableInput();
-                if (SuccessfullyShotInTime == false)
-                {
-                    //lostTimeToShot = true;
-                    PlayerLostTimeToShotInTime(donutRigid);
-                }
-
-                //_localState = LocalGameState.Idle;
                 ControlCountdown(false);
                 countDownTween = null;
+
+                // 시간 내에 샷을 성공적으로 완료했으면 아무것도 하지 않음
+                if (SuccessfullyShotInTime)
+                {
+                    return;
+                }
+
+                // --- 시간 초과 처리 ---
+                Debug.Log("입력 시간 초과. 턴을 넘깁니다.");
+                inputController?.DisableInput();
+                PlayerLostTimeToShotInTime(donutRigid);
             });
     }
 
