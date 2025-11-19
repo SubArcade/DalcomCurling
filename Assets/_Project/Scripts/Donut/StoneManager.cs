@@ -194,7 +194,7 @@ public class StoneManager : MonoBehaviour
         }
 
         // 선택된 도넛의 물리 속성을 StoneForceController_Firebase에 전달합니다.
-        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
+        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId, selectedDonut.id, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
 
         // if (_currentTurnStoneTeam == StoneForceController_Firebase.Team.A)
         // {
@@ -423,123 +423,108 @@ public class StoneManager : MonoBehaviour
 
     }
 
-    // 서버에서 받은 최종 위치로 돌들을 동기화.
+    // 서버에서 받은 최종 위치로 돌들을 동기화. (누락된 돌 자동 생성 기능 포함)
     public void SyncPositions(List<StonePosition> serverPositions)
     {
-        Debug.Log("서버의 최종 위치로 모든 돌을 동기화합니다.");
-        lastStonePosition = serverPositions; //지금 받아온 포지션 정보를 로컬에 저장해둠
-        StoneForceController_Firebase fc;
-        Rigidbody rb;
-        Vector3 newPosition;
-        Debug.Log($"A컨트롤러 개수 : {_stoneControllers_A.Count}");
-        //Debug.Log($"선공 플레이어 컨트롤러 개수 : {_stoneControllers_A.Count}");
-        // foreach (KeyValuePair<int, StoneForceController_Firebase> aValues in _stoneControllers_A)
-        // {
-        //     fc = aValues.Value;
-        //     rb = fc.GetComponent<Rigidbody>();
-        //     rb.isKinematic = true;
-        //     rb.velocity = Vector3.zero;
-        //     rb.angularVelocity = Vector3.zero;
-        //     fc.transform.GetComponent<MeshCollider>().isTrigger = true;
-        // }
-        //
-        Debug.Log($"B컨트롤러 개수 : {_stoneControllers_B.Count}");
-        //Debug.Log($"후공 플레이어 컨트롤러 개수 : {_stoneControllers_B.Count}");
-        // foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
-        // {
-        //     fc = bValues.Value;
-        //     rb = fc.GetComponent<Rigidbody>();
-        //     rb.isKinematic = true;
-        //     rb.velocity = Vector3.zero;
-        //     rb.angularVelocity = Vector3.zero;
-        //     fc.transform.GetComponent<MeshCollider>().isTrigger = true;
-        // }
+        Debug.Log($"서버의 최종 위치로 모든 돌을 동기화합니다. 서버 돌 개수: {serverPositions.Count}");
+        lastStonePosition = serverPositions;
 
-        Debug.Log($"serverPositions 개수 : {serverPositions.Count}");
-        for (int i = 0; i < serverPositions.Count; i++)
+        foreach (var stonePos in serverPositions)
         {
-            if (serverPositions[i].Team == "A") // A 팀이면
+            StoneForceController_Firebase fc = null;
+            bool stoneExists = false;
+
+            // 1. 로컬에서 돌 찾기
+            if (stonePos.Team == "A")
             {
-                // StoneId를 불러와 딕셔너리에서 키값으로 넣어 밸류값(stoneforcecontrolller)을 찾는다.
-                fc = _stoneControllers_A[serverPositions[i].StoneId];
+                stoneExists = _stoneControllers_A.TryGetValue(stonePos.StoneId, out fc);
             }
-            else // B 팀이면
+            else
             {
-                fc = _stoneControllers_B[serverPositions[i].StoneId];
+                stoneExists = _stoneControllers_B.TryGetValue(stonePos.StoneId, out fc);
             }
-            // if (i == 0 || (i % 2 == 0))
-            // {
-            //     fc = _stoneControllers_A[i / 2];
-            //     // newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-            //     //     serverPositions[i].Position["z"]);
-            //     // fc.transform.DOMove(newPosition, 0.1f).OnComplete(() =>
-            //     // {
-            //     //     fc.GetComponent<Rigidbody>().isKinematic = false;
-            //     //     fc.transform.GetComponent<MeshCollider>().isTrigger = false;
-            //     // });
-            // }
-            // else if (i % 2 == 1)
-            // {
-            //     fc = _stoneControllers_B[i / 2];
-            //     // fc.transform.position = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-            //     //     serverPositions[i].Position["z"]);
-            // }
-            // else
-            // {
-            //     fc = _stoneControllers_A[i / 2];
-            //     Debug.Log("계산 오류");
-            // }
-            newPosition = new Vector3(serverPositions[i].Position["x"], serverPositions[i].Position["y"],
-                serverPositions[i].Position["z"]);
+
+            // 2. 돌이 없으면 새로 생성
+            if (!stoneExists)
+            {
+                Debug.LogWarning($"로컬에 없는 돌(Team: {stonePos.Team}, ID: {stonePos.StoneId})을 서버 데이터로 새로 생성합니다.");
+                fc = SpawnMissingStone(stonePos);
+                if (fc == null)
+                {
+                    Debug.LogError($"누락된 돌(ID: {stonePos.StoneId}) 생성에 실패했습니다. 동기화를 건너뜁니다.");
+                    continue; // 다음 돌로 넘어감
+                }
+            }
+
+            // 3. 돌 위치 및 상태 동기화
+            Vector3 newPosition = new Vector3(stonePos.Position["x"], stonePos.Position["y"], stonePos.Position["z"]);
 
             if (CheckDonutPassedOutLine(newPosition.z))
             {
+                Debug.Log($"ID: {fc.donutId} 돌이 아웃 라인을 넘었으므로 제거합니다.");
                 DonutOut(fc);
-                Debug.Log("도넛이 이동될 위치가 아웃될 위치라서 별도의 계산 없이 아웃시킴");
-                continue; // 다음 i 값으로 이동
+                continue;
             }
 
-            rb = fc.GetComponent<Rigidbody>();
+            Rigidbody rb = fc.GetComponent<Rigidbody>();
             rb.isKinematic = true;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            //fc.transform.GetComponent<MeshCollider>().isTrigger = true;
-            fc.transform.GetComponent<CapsuleCollider>().isTrigger = true;
+            
+            // isTrigger를 true로 설정하여 순간이동 중 다른 오브젝트와 충돌 방지
+            var capCollider = fc.transform.GetComponent<CapsuleCollider>();
+            if(capCollider != null) capCollider.isTrigger = true;
 
-            float distance = Vector3.Distance(fc.transform.position, newPosition);
-            if (distance > 0.1f)
-            {
-                Debug.Log($"좌표값이 크게 차이남");
-                Debug.Log($"기존 : {fc.transform.position}, 새 좌표 : {newPosition}");
-            }
-
-            Debug.Log($"도넛ID : {fc.donutId}, 팀 : {fc.team} 을 포지션 변경합니다");
-            Debug.Log($"새 포지션 : ({newPosition.x}, {newPosition.y}, {newPosition.z})");
-            // GameObject t = Instantiate(testText, content.transform);
-            // t.GetComponent<TextMeshProUGUI>().text = $"(도넛ID : {fc.donutId}, 팀 : {fc.team}" +
-            //                                          $"\n  {newPosition.x}, {newPosition.y}, {newPosition.z})";
-
-            fc.transform.DOMove(newPosition, 0.1f);
+            fc.transform.DOMove(newPosition, 0.2f).OnComplete(() => {
+                // 이동 완료 후 물리 다시 활성화
+                rb.isKinematic = false;
+                if(capCollider != null) capCollider.isTrigger = false;
+            });
         }
+    }
 
-
-        foreach (KeyValuePair<int, StoneForceController_Firebase> aValues in _stoneControllers_A)
+    // 동기화 과정에서 로컬에 존재하지 않는 돌을 생성하는 도우미 메서드
+    private StoneForceController_Firebase SpawnMissingStone(StonePosition stoneInfo)
+    {
+        if (string.IsNullOrEmpty(stoneInfo.DonutId))
         {
-            fc = aValues.Value;
-            rb = fc.GetComponent<Rigidbody>();
-            rb.isKinematic = false;
-            //fc.transform.GetComponent<MeshCollider>().isTrigger = false;
-            fc.transform.GetComponent<CapsuleCollider>().isTrigger = false;
+            Debug.LogError($"SpawnMissingStone: DonutId가 없어 누락된 돌(ID: {stoneInfo.StoneId})을 생성할 수 없습니다.");
+            return null;
         }
 
-        foreach (KeyValuePair<int, StoneForceController_Firebase> bValues in _stoneControllers_B)
+        DonutData donutDataToSpawn = DataManager.Instance.GetDonutByID(stoneInfo.DonutId);
+        if (donutDataToSpawn == null || donutDataToSpawn.prefab == null)
         {
-            fc = bValues.Value;
-            rb = fc.GetComponent<Rigidbody>();
-            rb.isKinematic = false;
-            //fc.transform.GetComponent<MeshCollider>().isTrigger = false;
-            fc.transform.GetComponent<CapsuleCollider>().isTrigger = false;
+            Debug.LogError($"SpawnMissingStone: DonutId '{stoneInfo.DonutId}'에 해당하는 프리팹을 찾을 수 없습니다.");
+            return null;
         }
+
+        // 씬에 실제로 돌을 생성
+        GameObject newStone = Instantiate(donutDataToSpawn.prefab, spawnPosition.position, spawnPosition.rotation);
+        StoneForceController_Firebase sfc = newStone.GetComponent<StoneForceController_Firebase>();
+
+        if (sfc == null)
+        {
+            Debug.LogError("SpawnMissingStone: 생성된 돌 프리팹에 StoneForceController_Firebase 컴포넌트가 없습니다.");
+            Destroy(newStone);
+            return null;
+        }
+
+        // 서버에서 받은 정보로 돌 초기화
+        StoneForceController_Firebase.Team team = (stoneInfo.Team == "A") ? StoneForceController_Firebase.Team.A : StoneForceController_Firebase.Team.B;
+        sfc.InitializeDonut(team, stoneInfo.StoneId, stoneInfo.DonutId, stoneInfo.Weight, stoneInfo.Resilience, stoneInfo.Friction);
+
+        // 올바른 딕셔너리에 추가
+        if (team == StoneForceController_Firebase.Team.A)
+        {
+            _stoneControllers_A[stoneInfo.StoneId] = sfc;
+        }
+        else
+        {
+            _stoneControllers_B[stoneInfo.StoneId] = sfc;
+        }
+
+        return sfc;
     }
 
     // 시뮬레이션 완료 시 모든 돌의 최종 위치를 수집하는 함수
@@ -564,7 +549,11 @@ public class StoneManager : MonoBehaviour
                 positions.Add(new StonePosition
                 {
                     StoneId = sfc.donutId,
-                    Team = sfc.team.ToString(), // Team enum을 문자열로 저장
+                    Team = sfc.team.ToString(),
+                    DonutId = sfc.DonutId,
+                    Weight = sfc.DonutWeight,
+                    Resilience = sfc.DonutResilience,
+                    Friction = sfc.DonutFriction,
                     Position = new Dictionary<string, float>
                     {
                         { "x", sfc.transform.position.x },
@@ -586,7 +575,11 @@ public class StoneManager : MonoBehaviour
                 positions.Add(new StonePosition
                 {
                     StoneId = sfc.donutId,
-                    Team = sfc.team.ToString(), // Team enum을 문자열로 저장
+                    Team = sfc.team.ToString(),
+                    DonutId = sfc.DonutId,
+                    Weight = sfc.DonutWeight,
+                    Resilience = sfc.DonutResilience,
+                    Friction = sfc.DonutFriction,
                     Position = new Dictionary<string, float>
                     {
                         { "x", sfc.transform.position.x },
@@ -731,6 +724,34 @@ public class StoneManager : MonoBehaviour
         _uilaunchIndicator.RoundChanged(roundCount, aScore, bScore);
     }
 
+    /// <summary>
+    /// 새 게임 시작 시 StoneManager의 모든 상태를 초기화합니다.
+    /// </summary>
+    public void ResetForNewGame()
+    {
+        Debug.Log("새 게임 시작을 위해 StoneManager 상태를 초기화합니다.");
+        foreach (var controller in _stoneControllers_A.Values)
+        {
+            if (controller != null) Destroy(controller.gameObject);
+        }
+        foreach (var controller in _stoneControllers_B.Values)
+        {
+            if (controller != null) Destroy(controller.gameObject);
+        }
+
+        _stoneControllers_A.Clear();
+        _stoneControllers_B.Clear();
+        lastStonePosition.Clear();
+
+        aShotIndex = -1;
+        bShotIndex = -1;
+        roundCount = 1;
+        aScore = 0;
+        bScore = 0;
+        myTeam = StoneForceController_Firebase.Team.None;
+        _currentTurnStone = null;
+    }
+
     #region 변수 교체 함수
 
     public void A_ShotIndexUp()
@@ -751,6 +772,11 @@ public class StoneManager : MonoBehaviour
     public void B_ShotIndexDown()
     {
         bShotIndex--;
+    }
+
+    public void RoundCountUp()
+    {
+        roundCount++;
     }
 
     #endregion
