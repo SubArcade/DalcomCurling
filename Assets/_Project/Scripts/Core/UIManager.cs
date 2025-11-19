@@ -24,7 +24,8 @@ public enum PanelId
     EntryPopUp,
     MatchingPopUp,
     TestLoginPanel,
-    ReadyMenuPanel
+    ReadyMenuPanel,
+    ShopPopUp
 }
 
 public class UIManager : MonoBehaviour
@@ -109,7 +110,6 @@ public class UIManager : MonoBehaviour
             case PanelId.TestLoginPanel:
                 break;
             case PanelId.MainPanel:
-                OnReadyPanelClose?.Invoke();
                 break;
             case PanelId.ReadyMenuPanel:
                 currentPanel[PanelId.MainPanel].SetActive(true);

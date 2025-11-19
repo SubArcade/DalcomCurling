@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("환생 토글")] private Toggle reincarnationToggle;
     [SerializeField, Tooltip("환생 설명 버튼")] private Button explanationButton;
     [SerializeField, Tooltip("경험치 게이지")] private Image expFillImage;
+    [SerializeField, Tooltip("랭킹 스크롤바")] private ScrollRect scrollRect;
     
     [Header("닉네임 변경 기능")]
     [SerializeField, Tooltip("닉네임 변경 창 버튼")] private Button renameButton;
@@ -59,10 +61,30 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("팝업창 닫기 버튼")] private Button platePopupCloseButton;
     [SerializeField, Tooltip("팝업창 닫기 버튼")] private Button nickPopupCloseButton;
     
+    [Header("환생하기")]
+    [SerializeField, Tooltip("확정 팝업")] private GameObject ReincarnationConfirmPopup;
+    [SerializeField, Tooltip("확정 닫기 버튼")] private Button ReincarnationConfirmCloseButton;
+    [SerializeField, Tooltip("환생 버튼")] private Button ReincarnationConfirmButton;
+    [SerializeField, Tooltip("설명 팝업")] private GameObject ReincarnationInfoPopup;
+    [SerializeField, Tooltip("설명 닫기 버튼")] private Button ReincarnationInfoCloseButton;
+    
     
     private void OnEnable()
     {
         TextSetUp();
+        noneNameTiltleLabel.SetActive(false);
+        changeNicknameButton.gameObject.SetActive(false);
+        gemchangeNicknameButton.gameObject.SetActive(false);
+        nickNameAnswerPopup.gameObject.SetActive(false);
+        notEnoughGemPopup.SetActive(false);
+        ReincarnationConfirmPopup.SetActive(false);
+        ReincarnationInfoPopup.SetActive(false);
+        if (DataManager.Instance.PlayerData.level == DataManager.Instance.PlayerData.levelMax)
+        {
+            reincarnationToggle.isOn = true;
+        }
+        else
+            reincarnationToggle.isOn = false;
     }
     
     // 텍스트 셋업
@@ -84,6 +106,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         gemchangeNicknameButton.gameObject.SetActive(false);
         nickNameAnswerPopup.gameObject.SetActive(false);
         notEnoughGemPopup.SetActive(false);
+        ReincarnationConfirmPopup.SetActive(false);
+        ReincarnationInfoPopup.SetActive(false);
         
         nameTitleList.Clear();
         foreach (Transform child in inputTransform)
@@ -99,11 +123,18 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         
         profileToggle.onValueChanged.AddListener(_ => UpdateBasePanels());
         rankToggle.onValueChanged.AddListener(_ => UpdateBasePanels());
-        reincarnationToggle.onValueChanged.AddListener(_ => IsreincarnationToggle());
+        reincarnationToggle.onValueChanged.AddListener(_  => IsreincarnationToggle());
         nameTitleButton.onClick.AddListener(() => NamaTitleOpen());
         platePopupCloseButton.onClick.AddListener(() => PopupPanelClose());
         nickPopupCloseButton.onClick.AddListener(() => PopupPanelClose());
-        closeButton.onClick.AddListener(()=> UIManager.Instance.Open(PanelId.MainPanel));
+        closeButton.onClick.AddListener(()=>
+        {
+            profileToggle.isOn = true;
+            rankToggle.isOn = false;
+            scrollRect.verticalNormalizedPosition = 1f; 
+            UpdateBasePanels();
+            UIManager.Instance.Open(PanelId.MainPanel);
+        });
         renameButton.onClick.AddListener(IsChangeNickname);
         changeNicknameButton.onClick.AddListener(OnAnswerPopup);
         gemchangeNicknameButton.onClick.AddListener(OnAnswerPopup);
@@ -120,6 +151,11 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             Debug.Log("상점이동");
             PopupPanelClose();
         });
+        
+        ReincarnationConfirmCloseButton.onClick.AddListener(() => ReincarnationConfirmPopup.SetActive(false));
+        ReincarnationInfoCloseButton.onClick.AddListener(() => ReincarnationInfoPopup.SetActive(false));
+        ReincarnationConfirmButton.onClick.AddListener(ReincarnationButton);
+        explanationButton.onClick.AddListener(() => ReincarnationInfoPopup.SetActive(true));
     }
 
     // 기본판넬 토글 on/off
@@ -132,12 +168,41 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     // 환생 토글버튼 on/off
     private void IsreincarnationToggle()
     {
-        if(DataManager.Instance.PlayerData.level == DataManager.Instance.PlayerData.levelMax)
+        if (DataManager.Instance.PlayerData.level == DataManager.Instance.PlayerData.levelMax)
+        {
             reincarnationToggle.isOn = true;
+            //ReincarnationButton();
+            ReincarnationConfirmPopup.SetActive(true);
+        }
         else
             reincarnationToggle.isOn = false;
     }
 
+    
+    // 환생하기 
+    private void ReincarnationButton()
+    {
+        DataManager.Instance.PlayerData.level = 1;
+        DataManager.Instance.PlayerData.exp = 0;
+        levelText.text = DataManager.Instance.PlayerData.level.ToString();
+        expText.text = $"{DataManager.Instance.PlayerData.exp}/{DataManager.Instance.PlayerData.levelMax} EXP";
+        reincarnationToggle.isOn = false;   // 토글 초기화
+        
+        int num = DataManager.Instance.PlayerData.gainNamePlateType.Count;
+        if (Enum.IsDefined(typeof(NamePlateType), num))
+        {
+            DataManager.Instance.PlayerData.gainNamePlateType.Add((NamePlateType)num);
+        }
+        else
+        {
+            Debug.LogWarning($"NamePlateType에 {num}번째 enum이 없습니다!");
+        }
+        
+        ReincarnationConfirmPopup.SetActive(false);
+    }
+    
+    // 환생하기 설명창
+    
     // 팝업창 전체 닫기
     private void PopupPanelClose()
     {
@@ -160,10 +225,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
 
         foreach (var type in DataManager.Instance.PlayerData.gainNamePlateType)
         {
-            if (type == NamePlateType.NONE)
-                continue;
-
-            stack++;
+            if (type != NamePlateType.NONE)
+                stack++;
 
             foreach (var obj in nameTitleList)
             {
@@ -199,6 +262,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
 
         if (stack == 0)
             noneNameTiltleLabel.SetActive(true);
+        else
+            noneNameTiltleLabel.SetActive(false);
     }
     
     // 선택된 토글만 활성화

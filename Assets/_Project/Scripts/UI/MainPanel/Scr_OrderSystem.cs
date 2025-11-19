@@ -12,7 +12,7 @@ public class Scr_OrderSystem : MonoBehaviour
     [SerializeField, Tooltip("주문서 안의 이미지들")] private List<Image> orderDonuts1;
     [SerializeField, Tooltip("새로고침 버튼")] private Button refreshBtn1;
     [SerializeField, Tooltip("주문도넛 가격합계")] private TextMeshProUGUI costText1;
-    [SerializeField, Tooltip("주문완료 버튼")] private Button orderClearBtn1;
+    [SerializeField, Tooltip("주문완료 버튼")] private GameObject orderClearBtn1;
     [SerializeField, Tooltip("주문서 완료확인용오브젝트")] private GameObject completeObject1; 
 
     [Header("2번 주문서")]
@@ -20,7 +20,7 @@ public class Scr_OrderSystem : MonoBehaviour
     [SerializeField] private List<Image> orderDonuts2;
     [SerializeField] private Button refreshBtn2;
     [SerializeField] private TextMeshProUGUI costText2;
-    [SerializeField] private Button orderClearBtn2;
+    [SerializeField] private GameObject orderClearBtn2;
     [SerializeField] private GameObject completeObject2;
 
     [Header("3번 주문서")]
@@ -28,8 +28,8 @@ public class Scr_OrderSystem : MonoBehaviour
     [SerializeField] private List<Image> orderDonuts3;
     [SerializeField] private Button refreshBtn3;
     [SerializeField] private TextMeshProUGUI costText3;
-    [SerializeField] private Button orderClearBtn3;
-    [SerializeField] private GameObject oompleteObject3;
+    [SerializeField] private GameObject orderClearBtn3;
+    [SerializeField] private GameObject completeObject3;
 
     [Header("갱신된 새로고침 횟수 텍스트")]
     [SerializeField] private TextMeshProUGUI refreshCountText;
@@ -71,6 +71,11 @@ public class Scr_OrderSystem : MonoBehaviour
     private int rewardGold1 = 0;
     private int rewardGold2 = 0;
     private int rewardGold3 = 0;
+
+    //주문서 완료시 자동새로고침 할동안만 컴플리트버튼을 유지하기위한 판단변수
+    private bool isRewarding1 = false;
+    private bool isRewarding2 = false;
+    private bool isRewarding3 = false;
 
 
     //저장된퀘스트가 있는지 없는지 판단용도 변수
@@ -123,6 +128,7 @@ public class Scr_OrderSystem : MonoBehaviour
     };
     }
 
+    private readonly DonutType[] orderDonutTypes = { DonutType.Hard, DonutType.Soft, DonutType.Moist };
 
     void Awake()
     {
@@ -142,16 +148,16 @@ public class Scr_OrderSystem : MonoBehaviour
         costText2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
         costText3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
 
-        orderClearBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn")?.GetComponent<Button>();
-        orderClearBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn")?.GetComponent<Button>();
-        orderClearBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn")?.GetComponent<Button>();
+        orderClearBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn")?.gameObject;
+        orderClearBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn")?.gameObject;
+        orderClearBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn")?.gameObject;
 
         refreshCountText = transform.Find("MainMenu/Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
         refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
 
         completeObject1 = transform.Find("MainMenu/Top/QuestGroup/Order1/CompleteObject")?.gameObject;
         completeObject2 = transform.Find("MainMenu/Top/QuestGroup/Order2/CompleteObject")?.gameObject;
-        oompleteObject3 = transform.Find("MainMenu/Top/QuestGroup/Order3/CompleteObject")?.gameObject;
+        completeObject3 = transform.Find("MainMenu/Top/QuestGroup/Order3/CompleteObject")?.gameObject;
 
         // orderdonuts1~3의 자식 텍스트들을 리스트에 저장
         donutTextInfos1 = FindLevelAndTypeText(orderDonuts1);
@@ -167,27 +173,24 @@ public class Scr_OrderSystem : MonoBehaviour
         DonutRewardTable();
     }
     void Start()
-    {     
+    {
+
         //새로고침버튼 연결
         refreshBtn1.onClick.AddListener(() => OnclickRefreshOrderBtn(refreshBtn1));
         refreshBtn2.onClick.AddListener(() => OnclickRefreshOrderBtn(refreshBtn2));
         refreshBtn3.onClick.AddListener(() => OnclickRefreshOrderBtn(refreshBtn3));
 
         //주문서 완료 연결
-        orderClearBtn1.onClick.AddListener(() => OnClickClearBtn(completeObject1, orderDonutIDs1));
-        orderClearBtn2.onClick.AddListener(() => OnClickClearBtn(completeObject2, orderDonutIDs2));
-        orderClearBtn3.onClick.AddListener(() => OnClickClearBtn(oompleteObject3, orderDonutIDs3));  
+        completeObject1.GetComponent<Button>().onClick.AddListener(() => OnClickCompleteObject(completeObject1, orderDonutIDs1));
+        completeObject2.GetComponent<Button>().onClick.AddListener(() => OnClickCompleteObject(completeObject2, orderDonutIDs2));
+        completeObject3.GetComponent<Button>().onClick.AddListener(() => OnClickCompleteObject(completeObject3, orderDonutIDs3));
+        
 
         //시작 시 퀘스트 완료 판떼기 비활성화
         completeObject1.SetActive(false);
         completeObject2.SetActive(false);
-        oompleteObject3.SetActive(false);
-
-        //시작 할때 버튼색 흐리게
-        SetBtnColor(orderClearBtn1);
-        SetBtnColor(orderClearBtn2);
-        SetBtnColor(orderClearBtn3);
-
+        completeObject3.SetActive(false);
+    
         // 새로고침 회복 코루틴
         refreshCoroutine = StartCoroutine(RecoveryRefreshCount());
 
@@ -211,10 +214,16 @@ public class Scr_OrderSystem : MonoBehaviour
 
         FindCheckMarkBoard();
 
-        // ✅ 보상 버튼 활성화 조건
-        orderClearBtn1.interactable = isOrder1Complete;
-        orderClearBtn2.interactable = isOrder2Complete;
-        orderClearBtn3.interactable = isOrder3Complete;
+        // 보상 UI 표시 조건
+        completeObject1.SetActive(isOrder1Complete || isRewarding1);
+        completeObject2.SetActive(isOrder2Complete || isRewarding2);
+        completeObject3.SetActive(isOrder3Complete || isRewarding3);
+
+
+        // ClearBtn은 항상 비활성화 상태 유지
+        orderClearBtn1.SetActive(!isOrder1Complete);
+        orderClearBtn2.SetActive(!isOrder2Complete);
+        orderClearBtn3.SetActive(!isOrder3Complete);
     }
 
     //도넛레벨별 가격 책정하기
@@ -315,7 +324,7 @@ public class Scr_OrderSystem : MonoBehaviour
         else if (ClickedButton == refreshBtn3)
         {
             RefreshOrderDonut(orderDonuts3, donutTextInfos3, orderDonutIDs3,costText3);
-            oompleteObject3.SetActive(false);
+            completeObject3.SetActive(false);
         }
     }
 
@@ -338,9 +347,18 @@ public class Scr_OrderSystem : MonoBehaviour
             int safety = 100;
             while (safety-- > 0) //100에서 점점 1회씩 빼가며 중복되지않는 도넛 탐샘
             {
-                DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
+                // DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
+                DonutType randomType;
+
+                DonutType[] types = { DonutType.Hard, DonutType.Soft, DonutType.Moist };
+                randomType = types[Random.Range(0, types.Length)];
+                
                 int randomLevel = Random.Range(minLevel, maxLevel + 1); //도넛의 타입과 레벨 무작위 선택
                 string comboKey = $"{randomType}_{randomLevel}"; //타입+레벨 조합한 키 생성
+
+            //도넛 타입과 레벨을 랜덤으로 고름
+            //DonutType randomType = orderDonutTypes[Random.Range(0, orderDonutTypes.Length)];
+            //int randomLevel = Random.Range(1, 31);
 
                 if (usedDonuts.Contains(comboKey)) continue; //이미 생성된 조합이면 다시 시도
 
@@ -433,20 +451,8 @@ public class Scr_OrderSystem : MonoBehaviour
         return allMatched;
     }
 
-    //주문서 퀘스트클리어 버튼 비활성화 상태일경우 버튼의 색
-    void SetBtnColor(Button button)
-    {
-        ColorBlock cb = button.colors;
-        cb.disabledColor = new Color(0.6f, 0.6f, 0.6f, 1f);
-        cb.normalColor = Color.white;
-        cb.highlightedColor = new Color(1f, 1f, 1f, 0.8f);
-        cb.pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f);
-        cb.selectedColor = Color.white;
-        button.colors = cb;
-    }
-
     //주문서 완료시 버튼 상호작용
-    public async void OnClickClearBtn(GameObject completeObject, List<string> orderDonutIDs)
+    public async void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
     {
         //보드에서 주문서 도넛 제거
         foreach (var cell in BoardManager.Instance.GetAllCells())
@@ -461,14 +467,16 @@ public class Scr_OrderSystem : MonoBehaviour
                 cell.ClearItem(); // 셀 정보 초기화
             }
         }
-        // 완료 UI 표시
-        completeObject.SetActive(true);
-
         //보상골드 지급
         int reward = 0;
         if (completeObject == completeObject1) reward = rewardGold1;
         else if (completeObject == completeObject2) reward = rewardGold2;
-        else if (completeObject == oompleteObject3) reward = rewardGold3;
+        else if (completeObject == completeObject3) reward = rewardGold3;
+        //컴플리트버튼 유지를 위해 true 적용
+        if (completeObject == completeObject1) isRewarding1 = true;
+        else if (completeObject == completeObject2) isRewarding2 = true;
+        else if (completeObject == completeObject3) isRewarding3 = true;
+
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;
         await DataManager.Instance.UpdateUserDataAsync(gold: newGold);
@@ -478,16 +486,20 @@ public class Scr_OrderSystem : MonoBehaviour
             StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));
         else if (completeObject == completeObject2)
             StartCoroutine(RefreshAfterOrderClear(orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2, completeObject2, 1.5f));
-        else if (completeObject == oompleteObject3)
-            StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, oompleteObject3, 1.5f));
+        else if (completeObject == completeObject3)
+            StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, completeObject3, 1.5f));
     }
 
     //주문서 완료 후 퀘스트 알아서 새로고침
     private IEnumerator RefreshAfterOrderClear(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText, GameObject completeObject, float delaySeconds) 
     {
         yield return new WaitForSeconds(delaySeconds);
-
         RefreshOrderDonut(orderImages, textInfos, idList, costText); // 새로고침
+        //새로고침이 되었으니 컴플리트 버튼 비활성화
+        if (completeObject == completeObject1) isRewarding1 = false;
+        else if (completeObject == completeObject2) isRewarding2 = false;
+        else if (completeObject == completeObject3) isRewarding3 = false;
+
         completeObject.SetActive(false); // 완료 UI 숨김
     }
 

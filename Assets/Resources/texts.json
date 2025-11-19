@@ -1,0 +1,76 @@
+﻿{
+  "ko": {
+    "Btn_Start": "시작하기",
+    "Btn_Exit": "종료",
+    "Title_Main": "메인 메뉴",
+    "Label_Gold": "골드",
+
+    "Label_Setting": "환경설정",
+    "Label_Account": "계정",
+    "Label_DeleteAccount": "계정삭제",
+    "Label_AccountLink": "Google Play 계정연동",
+    "Label_GameSetting": "게임 설정",
+    "Label_AlarmSetting": "알림 설정",
+    "Label_AlarmText": "알림을 받으시려면 기기 설정에서 알림이 켜져있는지 확인해주세요!",
+    "Label_AlarmEnergy": "에너지 모두 재충전",
+    "Label_EventAlarm": "이벤트 수신 알림",
+    "Label_Midnight": "야간 알림(22:00~08:00)",
+    "Label_Service": "서비스 이용 약관",
+    "Label_Protect": "개인 정보 보호",
+    "Label_ContactEMail": "문의메일 : donut@soft.com",
+    "Language_Select": "언어선택",
+
+    "Label_Info": "내 정보",
+    "Label_Profile": "프로필",
+    "Label_Rank": "랭킹",
+
+    "Label_Codex": "도넛 도감",
+    "Label_HardDonut": "단단",
+    "Label_SoftDonut": "말랑",
+    "Label_MoistDonut": "촉촉",
+
+    "Label_GeneratorUgrade": "생성기 업그레이드",
+    "Label_UpgradeText": "생성기 레벨은 플레이어 레벨을 초과할 수 없어요!",
+
+
+    "Btn_Upgrade": "업그레이드",
+    "Label_AskUpgrade": "생성기를 업그레이드할까요?"
+
+  },
+  "en": {
+    "Btn_Start": "Start",
+    "Btn_Exit": "Exit",
+    "Title_Main": "Main Menu",
+    "Label_Gold": "Gold",
+
+    "Label_Setting": "Setting",
+    "Label_Account": "Account",
+    "Label_DeleteAccount": "Delete Account",
+    "Label_AccountLink": "Google Play Link Account",
+    "Label_GameSetting": "Game Setting",
+    "Label_AlarmSetting": "Alarm Setting",
+    "Label_AlarmText": "Please check your device settings to ensure notifications are turned on",
+    "Label_AlarmEnergy": "Energy Fully Recharged",
+    "Label_EventAlarm": "Event Notifications",
+    "Label_Midnight": "Nighttime Notifications (10:00 PM – 8:00 AM)",
+    "Label_Service": "Terms of Service",
+    "Label_Protect": "Privacy Protection",
+    "Label_ContactEMail": "Contact Email : donut@soft.com",
+    "Language_Select": "Language",
+
+    "Label_Info": "My Info",
+    "Label_Profile": "ProFile",
+    "Label_Rank": "Rank",
+
+    "Label_Codex": "Donut Codex",
+    "Label_HardDonut": "Hard",
+    "Label_SoftDonut": "Soft",
+    "Label_MoistDonut": "Moist",
+
+    "Label_GeneratorUgrade": "Generator Upgrade",
+    "Label_UpgradeText": "The generator level cannot exceed the player's level!",
+
+    "Btn_Upgrade": "Upgrade",
+    "Label_AskUpgrade": "Do you want to upgrade your generator?"
+  }
+}

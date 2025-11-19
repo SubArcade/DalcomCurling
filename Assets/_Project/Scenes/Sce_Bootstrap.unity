@@ -122,6 +122,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &134594873
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 134594874}
+  - component: {fileID: 134594875}
+  m_Layer: 0
+  m_Name: LocalizationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &134594874
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134594873}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1294903637}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &134594875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134594873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84b57ce79a463ad438b7fcc0ac2cbad8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &261535947
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -294,9 +338,7 @@ MonoBehaviour:
       <donutEntries>k__BackingField: []
     <mergeBoard>k__BackingField:
       <cells>k__BackingField: []
-      <generatorLevelHard>k__BackingField: 1
-      <generatorLevelSoft>k__BackingField: 1
-      <generatorLevelMoist>k__BackingField: 1
+      <generatorLevel>k__BackingField: 0
       cellMax: 49
       cellWidth: 7
       cellLength: 7
@@ -525,7 +567,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 636202306}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -546,116 +588,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameSceneName: LSJ_Test
   menuSceneName: Sce_MainMenu
---- !u!1 &1045322146
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1045322147}
-  - component: {fileID: 1045322148}
-  m_Layer: 0
-  m_Name: SoundManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1045322147
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1045322146}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1294903637}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1045322148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1045322146}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ce46f415b3c3874ca0203db75d6bcf7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lobbyBGMs:
-  - Guid:
-      Data1: 1545447811
-      Data2: 1251702247
-      Data3: -1107814000
-      Data4: -533752183
-    Path: event:/BGM 1
-  - Guid:
-      Data1: -1350119064
-      Data2: 1134488051
-      Data3: 1779179422
-      Data4: -1284179272
-    Path: event:/BGM 2
-  - Guid:
-      Data1: 1545447811
-      Data2: 1251702247
-      Data3: -1107814000
-      Data4: -533752183
-    Path: event:/BGM 1
-  gameBGMs:
-  - Guid:
-      Data1: 1545447811
-      Data2: 1251702247
-      Data3: -1107814000
-      Data4: -533752183
-    Path: event:/BGM 1
-  - Guid:
-      Data1: -1350119064
-      Data2: 1134488051
-      Data3: 1779179422
-      Data4: -1284179272
-    Path: event:/BGM 2
-  - Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
-  intenseMusic:
-    Guid:
-      Data1: -735151149
-      Data2: 1334892724
-      Data3: -1422688327
-      Data4: -501087004
-    Path: event:/Instance Sound
-  stoneImpact:
-    Guid:
-      Data1: -942741639
-      Data2: 1327579010
-      Data3: 1505877402
-      Data4: -1154722242
-    Path: event:/Approved 1
-  buttonSound:
-    Guid:
-      Data1: 1490345431
-      Data2: 1255728207
-      Data3: -915333712
-      Data4: 1884737081
-    Path: event:/Ascending Mystery 1
-  spectatorSound:
-    Guid:
-      Data1: -1441451555
-      Data2: 1197112510
-      Data3: 880688275
-      Data4: -1721779308
-    Path: event:/SpectatorSound
 --- !u!1 &1137162047
 GameObject:
   m_ObjectHideFlags: 0
@@ -881,14 +813,14 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1478617188}
-  - {fileID: 498586538}
   - {fileID: 636202307}
+  - {fileID: 498586538}
   - {fileID: 1182476507}
   - {fileID: 262738613}
   - {fileID: 575155504}
   - {fileID: 1342822454}
   - {fileID: 1179012150}
-  - {fileID: 1045322147}
+  - {fileID: 134594874}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1342822453

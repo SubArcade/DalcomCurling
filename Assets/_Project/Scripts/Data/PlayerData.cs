@@ -10,13 +10,13 @@ public enum AuthProviderType
 
 public enum NamePlateType
 {
-    NONE, // 없음
-    NP1,
-    NP2,
-    NP3,
-    NP4,
-    NP5,
-    NP6
+    NONE = 0, // 없음
+    NP1 = 1,
+    NP2 = 2,
+    NP3 = 3,
+    NP4 = 4,
+    NP5 = 5,
+    NP6 = 6,
 }
 
 [System.Serializable, FirestoreData]
@@ -35,7 +35,7 @@ public class PlayerData
     [field: SerializeField, Tooltip("계정 연동")] [FirestoreProperty] public AuthProviderType authProviderType { get; set; }
     [field: SerializeField, Tooltip("현재 칭호")] [FirestoreProperty] public NamePlateType curNamePlateType { get; set; }
     [field: SerializeField, Tooltip("획득한 칭호")] [FirestoreProperty] public List<NamePlateType> gainNamePlateType { get; set; } = new List<NamePlateType>();
-    [field: SerializeField, Tooltip("획득한 칭호")] [FirestoreProperty] public int changeNicknameCount { get; set; }
+    [field: SerializeField, Tooltip("닉네임 변경 횟수")] [FirestoreProperty] public int changeNicknameCount { get; set; }
     
 
     // 랭크 데이터
