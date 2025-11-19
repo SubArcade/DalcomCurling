@@ -46,6 +46,9 @@ public class UserDataRoot
    
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
+        generatorLevelHard = 1,
+        generatorLevelMoist = 1,
+        generatorLevelSoft = 1,
         cellMax = 49,
         cellWidth = 7,
         cellLength = 7,
