@@ -87,6 +87,10 @@ public class Game
 
     [FirestoreProperty]
     public string FinishReason { get; set; } // 게임 종료 사유를 저장하는 속성
+    
+    [FirestoreProperty]
+    public string LastUploaderId { get; set; }
+    
 }
 
 [FirestoreData]

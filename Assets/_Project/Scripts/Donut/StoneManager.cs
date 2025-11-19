@@ -753,6 +753,11 @@ public class StoneManager : MonoBehaviour
         bShotIndex--;
     }
 
+    public void RoundCountUp()
+    {
+        roundCount++;
+    }
+
     #endregion
 
 
