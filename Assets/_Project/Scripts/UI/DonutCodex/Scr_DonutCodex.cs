@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,13 +31,50 @@ public class Scr_DonutCodex : MonoBehaviour
     
     [Header("닫기 버튼")]
     [SerializeField, Tooltip("닫기")] private Button closeButton;
+    
+    [Header("도넛 정보창")]
+    [SerializeField, Tooltip("이미지")] private Image image;
+    [SerializeField, Tooltip("설명")] private TMP_Text infotext;
+    [SerializeField, Tooltip("레벨")] private TMP_Text levelText;
 
 
     private void OnEnable()
     {
         OnUserDataChangedHandler();
+        SubscribeList(hardShells);
+        SubscribeList(softShells);
+        SubscribeList(moistShells);
     }
 
+    private void OnDisable()
+    {
+        UnsubscribeList(hardShells);
+        UnsubscribeList(softShells);
+        UnsubscribeList(moistShells);
+    }
+
+    private void SubscribeList(List<Scr_donutShell> list)
+    {
+        if (list == null) return;
+
+        foreach (var shell in list)
+        {
+            if (shell == null) continue;
+            shell.OnDonutClicked += InfoSet;
+        }
+    }
+
+    private void UnsubscribeList(List<Scr_donutShell> list)
+    {
+        if (list == null) return;
+
+        foreach (var shell in list)
+        {
+            if (shell == null) continue;
+            shell.OnDonutClicked -= InfoSet;
+        }
+    }
+    
     private void OnUserDataChangedHandler()
     {
         // 데이터 들어온 뒤에만 호출됨
@@ -127,17 +165,30 @@ public class Scr_DonutCodex : MonoBehaviour
             {
                 case DonutDexViewState.Question:
                     shellList[i].SetType(state);
+                    shellList[i].SetDonut(donutData.donutType, donutData.level);
                     break;
                 case DonutDexViewState.Donut:
                     shellList[i].SetType(state, donutData.sprite);
+                    shellList[i].SetDonut(donutData.donutType, donutData.level);
                     break;
                 case DonutDexViewState.Reward:
                     shellList[i].SetType(state, reward: donutData.rewardGem);
+                    shellList[i].SetDonut(donutData.donutType, donutData.level);
                     break;
             }
 
            //Debug.Log($"DonutType: {donuttype}, DonutData: {donutData}");
         }
+    }
+
+    // 정보창 셋팅
+    public void InfoSet(Scr_donutShell shell)
+    {  
+        DonutData donutData = DataManager.Instance.GetDonutData(shell.donutType, shell.level);
+        image.sprite = donutData.sprite;
+        infotext.text = donutData.description;
+        // 나중에 영어 버전 처리 필요
+        levelText.text = $"{donutData.level} 단계";
     }
     
 #if UNITY_EDITOR

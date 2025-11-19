@@ -87,6 +87,10 @@ public class Game
 
     [FirestoreProperty]
     public string FinishReason { get; set; } // 게임 종료 사유를 저장하는 속성
+    
+    [FirestoreProperty]
+    public string LastUploaderId { get; set; }
+    
 }
 
 [FirestoreData]
@@ -125,6 +129,14 @@ public class StonePosition
     public int StoneId { get; set; }
     [FirestoreProperty]
     public string Team { get; set; }
+    [FirestoreProperty]
+    public string DonutId { get; set; } // 발사된 도넛의 종류를 식별하기 위한 ID
+    [FirestoreProperty]
+    public int Weight { get; set; } // 도넛 무게
+    [FirestoreProperty]
+    public int Resilience { get; set; } // 도넛 탄성
+    [FirestoreProperty]
+    public int Friction { get; set; } // 도넛 마찰
     [FirestoreProperty]
     public Dictionary<string, float> Position { get; set; } // Vector3 저장용
 }
