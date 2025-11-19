@@ -23,7 +23,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject MatchingPopUp;
     [SerializeField] private GameObject readyMenuPanel;
     [SerializeField] private GameObject ShopPopUp;
-    
+    //add
+
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
     [SerializeField] private Button donutCodexButton;
@@ -57,7 +58,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.MatchingPopUp, MatchingPopUp);
         UIManager.Instance.RegisterPanel(PanelId.ReadyMenuPanel, readyMenuPanel);
         UIManager.Instance.RegisterPanel(PanelId.ShopPopUp, ShopPopUp);
-        
+        //add
         
         UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
         
@@ -70,6 +71,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
         goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
+        
     }
     
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
