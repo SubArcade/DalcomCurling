@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7df7dab93fc8fef4cb48f81da927cf06, type: 3}
+  m_Name: GiftBoxSO
+  m_EditorClassIdentifier: 
+  type: 3
+  levels:
+  - id: Gift_1
+    level: 1
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
+  - id: Gift_2
+    level: 2
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
+  - id: Gift_3
+    level: 3
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
+  - id: Gift_4
+    level: 4
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
+  giftBoxData:
+    id: 
+    level: 0
+    sprite: {fileID: 0}
+    donutType: 0
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
