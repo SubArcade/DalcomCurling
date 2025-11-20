@@ -25,7 +25,10 @@ public enum PanelId
     MatchingPopUp,
     TestLoginPanel,
     ReadyMenuPanel,
-    ShopPopUp
+    ShopPopUp,
+    EnergyRechargePopUp,
+    NotEnoughGemPopUp,
+    OrderRefreshPopUp,
 }
 
 public class UIManager : MonoBehaviour

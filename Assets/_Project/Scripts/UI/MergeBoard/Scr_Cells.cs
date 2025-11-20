@@ -43,8 +43,8 @@ public class Cells : MonoBehaviour, IPointerClickHandler
         string path = $"DonutSprite/LockImage/lock_lv{level}";
         lockSprite = Resources.Load<Sprite>(path);
 
-        if (lockSprite == null)
-            Debug.LogWarning($"잠금 이미지가 없습니다: {path}");
+        //if (lockSprite == null)
+        //    Debug.LogWarning($"잠금 이미지가 없습니다: {path}");
     }
 
     // 플레이어 레벨에 따라 활성/비활성 갱신

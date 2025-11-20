@@ -17,9 +17,9 @@ public class CellData
 public class MergeBoardData
 {
     [field: SerializeField, Tooltip("보드칸 정보")][FirestoreProperty] public List<CellData> cells { get; set; } = new();
-    [field: SerializeField, Tooltip("생성기 단단 레벨")] public int generatorLevelHard { get; set; } = 1;
-    [field: SerializeField, Tooltip("생성기 말랑 레벨")] public int generatorLevelSoft { get; set; } = 1;
-    [field: SerializeField, Tooltip("생성기 촉촉 레벨")] public int generatorLevelMoist { get; set; } = 1;
+    [field: SerializeField, Tooltip("생성기 단단 레벨")][FirestoreProperty] public int generatorLevelHard { get; set; }
+    [field: SerializeField, Tooltip("생성기 말랑 레벨")][FirestoreProperty] public int generatorLevelSoft { get; set; }
+    [field: SerializeField, Tooltip("생성기 촉촉 레벨")][FirestoreProperty] public int generatorLevelMoist { get; set; }
 
     // 로컬 머지 보드 데이터 (디비에 들어가지 않는 변수)
     [Tooltip("셀 총 칸수")] public int cellMax;
