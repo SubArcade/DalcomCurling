@@ -8,12 +8,6 @@ public class Scr_EntryPopUP : MonoBehaviour
     [Header("닫기 버튼")]
     [SerializeField] private Button CloseButton;
 
-
-
-     void Awake()
-    {
-        CloseButton = transform.Find("CloseButton")?.GetComponent<Button>();
-    }
     void Start()
     {
         CloseButton.onClick.AddListener (() => 

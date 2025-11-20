@@ -43,33 +43,7 @@ public class Scr_ShopPopUp : MonoBehaviour
 
     void Awake()
     {
-        cashShopBtn = transform.Find("BottomUI/CashShopBtn")?.GetComponent<Toggle>();
-        goldShopBtn = transform.Find("BottomUI/GoldShopBtn")?.GetComponent<Toggle>();
-        
-        robbyButton = transform.Find("TopUI/PlayerMoneyGroup/RobbyButton")?.GetComponent<Button>();
-        eneryBtn = transform.Find("TopUI/PlayerMoneyGroup/Energy")?.GetComponent<Button>();
-        goldBtn = transform.Find("TopUI/PlayerMoneyGroup/Gold")?.GetComponent<Button>();
-        gemBtn = transform.Find("TopUI/PlayerMoneyGroup/Gem")?.GetComponent<Button>();
-
-        energyText = transform.Find("TopUI/PlayerMoneyGroup/Energy/Energy_Text")?.GetComponent<TextMeshProUGUI>();
-        goldText = transform.Find("TopUI/PlayerMoneyGroup/Gold/Gold_Text")?.GetComponent<TextMeshProUGUI>();
-        gemText = transform.Find("TopUI/PlayerMoneyGroup/Gem/Gem_Text")?.GetComponent<TextMeshProUGUI>();
-
-        deleteAdsBtn1 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem1")?.GetComponent<Button>();
-        deleteAdsBtn2 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem2")?.GetComponent<Button>();
-        deleteAdsBtn3 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem3")?.GetComponent<Button>();
-        packageBtn1 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/PackageItem1")?.GetComponent<Button>();
-        packageBtn2 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/PackageItem2")?.GetComponent<Button>();
-
-        effectItem1 = transform.Find("GoldUIBackground/GoldShopUI/DonutBanner/EffectItem1")?.GetComponent<Button>();
-        effectItem2 = transform.Find("GoldUIBackground/GoldShopUI/DonutBanner/EffectItem2")?.GetComponent<Button>();
-        effectItem3 = transform.Find("GoldUIBackground/GoldShopUI/DonutBanner/EffectItem3")?.GetComponent<Button>();
-
-        characterItem1 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem1")?.GetComponent<Button>();
-        characterItem2 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem2")?.GetComponent<Button>();
-        characterItem3 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem3")?.GetComponent<Button>();
-        characterItem4 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem4")?.GetComponent<Button>();
-
+ 
     }
     void Start()
     {

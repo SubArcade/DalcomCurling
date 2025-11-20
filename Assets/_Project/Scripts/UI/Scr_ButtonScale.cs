@@ -34,26 +34,6 @@ public class Scr_ButtonScale : MonoBehaviour
 
     void Start()
     {
-        TrashCan = transform.Find("MainMenu/Bottom/ButtonGroup/basket_Button")?.gameObject;
-        TrashCanTransform = TrashCan.transform;
-        TrashCanImage = TrashCan.GetComponent<Image>();
-
-        StartPopUp = transform.Find("MainMenu/Bottom/Battle/Battle_Button")?.gameObject;
-        StartButtonTransform = StartPopUp.transform;
-        startImage = StartPopUp.GetComponent<Image>();
-        
-        Codex = transform.Find("MainMenu/Bottom/ButtonGroup/Codex_Button")?.gameObject;
-        CodexButtonTransform = Codex.transform;
-        CodexImage = Codex.GetComponent<Image>();
-
-        Entry = transform.Find("MainMenu/Bottom/ButtonGroup/Entry_Button")?.gameObject;
-        EntryTransform = Entry.transform;
-        EntryImage = Entry.GetComponent<Image>();
-
-        Upgrade = transform.Find("MainMenu/Bottom/ButtonGroup/Upgrade_Button")?.gameObject;
-        UpgradeTransform = Upgrade.transform;
-        UpgradeImage = Upgrade.GetComponent<Image>();
-
         OnMouseTrashCan();
         OnMouseStartButton();
         OnMouseCodexButton();
