@@ -98,6 +98,21 @@ public class Scr_ShopPopUp : MonoBehaviour
         });
 
         SetPlayerText(DataManager.Instance.PlayerData);
+        eneryBtn.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
+    }
+    void OnEnable()
+    {
+        DataManager.Instance.OnUserDataChanged += HandleUserDataChanged;
+        SetPlayerText(DataManager.Instance.PlayerData);
+    }
+
+    void OnDisable()
+    {
+        DataManager.Instance.OnUserDataChanged -= HandleUserDataChanged;
+    }
+    private void HandleUserDataChanged(PlayerData playerData)
+    {
+        SetPlayerText(playerData);
     }
 
     //캐시샵열기용
