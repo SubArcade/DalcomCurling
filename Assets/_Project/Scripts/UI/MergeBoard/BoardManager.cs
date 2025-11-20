@@ -201,7 +201,7 @@ public class BoardManager : MonoBehaviour
 
 
 
-        Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
+        //Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
         AutoSaveBoardLocal();
     }
 
@@ -240,7 +240,7 @@ public class BoardManager : MonoBehaviour
     //기프트박스 보상 함수
     void ClaimGiftReward(DonutData gift, Cells cell)
     {
-        Debug.Log($"기프트 박스 보상 지급: {gift.displayName}");
+        //Debug.Log($"기프트 박스 보상 지급: {gift.displayName}");
 
         //// 예시 보상
         //DataManager.Instance.PlayerData.gold += gift.rewardGold;
@@ -278,7 +278,7 @@ public class BoardManager : MonoBehaviour
             Destroy(target.occupant.gameObject);
 
         target.ClearItem();
-        Debug.Log($"도넛 '{targetID}' 삭제 완료");
+        //Debug.Log($"도넛 '{targetID}' 삭제 완료");
 
         // MergeBoardData에서 동일한 셀 데이터 제거
         var boardData = DataManager.Instance.MergeBoardData;
@@ -363,7 +363,7 @@ public class BoardManager : MonoBehaviour
             boardData.cells.Add(data);
         }
 
-        Debug.Log($"[AutoSaveBoardLocal] 저장 완료: 총 {boardData.cells.Count}칸 저장");
+        //Debug.Log($"[AutoSaveBoardLocal] 저장 완료: 총 {boardData.cells.Count}칸 저장");
     }
 
     public void LoadBoardLocal()
@@ -418,7 +418,7 @@ public class BoardManager : MonoBehaviour
             cell.SetItem(item, donut);
         }
 
-        Debug.Log("[LoadBoardLocal] 보드 로드 완료");
+        //Debug.Log("[LoadBoardLocal] 보드 로드 완료");
     }
 
 }

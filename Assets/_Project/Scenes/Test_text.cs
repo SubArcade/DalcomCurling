@@ -21,5 +21,6 @@ public class Test_text : MonoBehaviour
         count++;
         text.text = $"click {count}";
         FirebaseMatchmakingManager.Instance.StartMatchmaking();
+        DataManager.Instance.SaveAllUserDataAsync();
     }
 }

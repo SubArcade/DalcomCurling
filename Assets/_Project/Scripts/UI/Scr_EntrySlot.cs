@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -44,7 +42,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
             return;
         }
      
-        Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
+        //Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
      
         EntrySlot fromSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
 
@@ -99,7 +97,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
 
-        Debug.Log($"[MoveIn] {currentItem.donutData.id} 슬롯에 도넛 들어감");
+        //Debug.Log($"[MoveIn] {currentItem.donutData.id} 슬롯에 도넛 들어감");
         // Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
         // Debug.Log($"currentItem: {currentItem?.name}");
         // Debug.Log($"IsEmpty: {IsEmpty}");
@@ -141,7 +139,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
 
-        Debug.Log($"[SwapWithCell] 보드 셀 {fromCell.name} ↔ {toSlot.name} 교체 완료");
+        //Debug.Log($"[SwapWithCell] 보드 셀 {fromCell.name} ↔ {toSlot.name} 교체 완료");
     }
 
     // 엔트리 <> 엔트리 스왑
@@ -211,7 +209,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // 저장
         DataManager.Instance.InventoryData.donutEntries[slotIndex] = entry;
 
-        Debug.Log($"[Inventory Save] 슬롯 {slotIndex} → {entry.id} 저장완료");
+        //Debug.Log($"[Inventory Save] 슬롯 {slotIndex} → {entry.id} 저장완료");
     }
 
     //엔트리 도넛 불러오기

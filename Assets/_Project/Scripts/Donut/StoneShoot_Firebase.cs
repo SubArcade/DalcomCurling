@@ -197,7 +197,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         _isTrajectoryPreviewActive = true; // 궤적 미리보기 활성화
         if (trajectoryLine != null) trajectoryLine.enabled = true;
 
-        Debug.Log("InputController: 입력 활성화됨 (Aiming state). 힘/방향을 설정하세요.");
+        //Debug.Log("InputController: 입력 활성화됨 (Aiming state). 힘/방향을 설정하세요.");
     }
 
     /// <summary>
@@ -336,14 +336,14 @@ public class StoneShoot_Firebase : MonoBehaviour
                 Vector3 dragVector = (Vector3)touchPosition - _actualDragStartScreenPos;
                 if (dragVector.magnitude > minLaunchDragDistance)
                 {
-                    Debug.Log("힘/방향 설정 완료. 이제 회전을 설정하세요.");
+                    //Debug.Log("힘/방향 설정 완료. 이제 회전을 설정하세요.");
                     FirebaseGameManager.Instance.OnShotStepUI(); // 도넛 엔트리창만 off
 
                     _currentAimingPhase = AimingPhase.Rotation; // 다음 단계로 전환
                 }
                 else
                 {
-                    Debug.Log($"드래그 거리가 짧아 힘/방향이 설정되지 않았습니다. 다시 시도하세요. (최소 드래그 거리: {minLaunchDragDistance}px)");
+                    //Debug.Log($"드래그 거리가 짧아 힘/방향이 설정되지 않았습니다. 다시 시도하세요. (최소 드래그 거리: {minLaunchDragDistance}px)");
                     // 사용자가 다시 시도할 수 있도록 조준 값 초기화
                     _finalLaunchForce = 0f;
                     _finalLaunchForceForTrajectory = 0f;
