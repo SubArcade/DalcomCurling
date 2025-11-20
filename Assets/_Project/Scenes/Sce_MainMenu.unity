@@ -7543,6 +7543,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnergyTimer_Text
       objectReference: {fileID: 0}
+    - target: {fileID: 3471223209370912992, guid: f7b4df507629940419addc445bf17912, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3709520764564807504, guid: f7b4df507629940419addc445bf17912, type: 3}
       propertyPath: m_text
       value: 10/20
