@@ -1,7 +1,7 @@
 ﻿using System.Xml.Serialization;
 using UnityEngine;
 
-public class DonutParticleSystem : MonoBehaviour
+public class Scr_DonutParticleSystem : MonoBehaviour
 {
     public enum AuraType { None, Fire, Light, Magic, Ice, Electric }
     public enum TrailType { None, FireTail, LightTail, MagicTail, IceTail, ElectricTail }
@@ -56,11 +56,26 @@ public class DonutParticleSystem : MonoBehaviour
         {
             Debug.LogWarning($"Layer'{targetLayerName}'를 찾을 수 없습니다");
         }
+        
     }
-    private void Update()
+    
+    // private void Update()
+    // {
+    //     UpdateTrailBasedOnSpeed();
+    //     UpdateTrailDirection();
+    // }
+
+    public void InitializeDonutParticles(StoneForceController_Firebase.Team team)
     {
-        UpdateTrailBasedOnSpeed();
-        UpdateTrailDirection();
+        if (team == StoneForceController_Firebase.Team.A)
+        {
+            selectedAura = AuraType.Fire;
+        }
+        else if (team == StoneForceController_Firebase.Team.B)
+        {
+            selectedAura = AuraType.Ice;
+        }
+        ApplyAuraSettings();
     }
 
     // 충돌 파티클에 관한 부분 스크립트 작성구간
@@ -162,7 +177,8 @@ public class DonutParticleSystem : MonoBehaviour
     {
         if (donutRigidbody != null)
         {
-            return donutRigidbody.velocity.magnitude;
+            //return donutRigidbody.velocity.magnitude;
+            return donutRigidbody.velocity.sqrMagnitude;
         }
         return 0f;
     }

@@ -186,6 +186,7 @@ public class StoneManager : MonoBehaviour
 
         GameObject newStone = Instantiate(selectedPrefab, startPos, spawnPosition.rotation);
         _currentTurnStone = newStone.GetComponent<StoneForceController_Firebase>();
+        newStone.transform.GetComponent<Scr_DonutParticleSystem>().InitializeDonutParticles(_currentTurnStoneTeam);
 
         if (_currentTurnStone == null)
         {
