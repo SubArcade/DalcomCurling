@@ -7,7 +7,7 @@ using UnityEngine;
 public class StoneForceController_Firebase : MonoBehaviour
 {
     public float stoneForce;
-    public int donutId;
+    public int donutId; // 발사한 인덱스를 기준으로 인게임에서 도넛을 찾을때 쓰는 ID
     public string DonutId { get; private set; } // 도넛의 종류를 식별하는 ID (예: "Soft_15")
 
     // 도넛의 물리적 속성
