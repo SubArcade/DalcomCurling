@@ -19,6 +19,8 @@ public class QuestData
 
     // 로컬 퀘스트 데이터 (디비에 들어가지 않는 변수)
     public int refreshCount { get; set; }
+
+    public int maxCount { get; set; }
     public int baseGold { get; set; }
 
 }

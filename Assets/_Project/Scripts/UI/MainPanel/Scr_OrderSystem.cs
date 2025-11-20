@@ -34,10 +34,7 @@ public class Scr_OrderSystem : MonoBehaviour
     [Header("갱신된 새로고침 횟수 텍스트")]
     [SerializeField] private TextMeshProUGUI refreshCountText;
 
-    
-    private int refreshCount = 5; //새로고침 횟수
-    private const int maxRefreshCount = 5; //최대 새로고침 횟수
-    private Coroutine refreshCoroutine; //일정 시간마다 새로고침 횟수 회복 코루틴
+    private const string RefreshCountKey = "Quest_RefreshCount";
 
     //도넛들의 체크이미지 활성/비활성용
     public class DonutVisualInfo
@@ -132,32 +129,8 @@ public class Scr_OrderSystem : MonoBehaviour
 
     void Awake()
     {
-        orderGroup1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
-        orderGroup2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
-        orderGroup3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
-
-        orderDonuts1 = orderGroup1.GetComponentsInChildren<Image>().ToList();
-        orderDonuts2 = orderGroup2.GetComponentsInChildren<Image>().ToList();
-        orderDonuts3 = orderGroup3.GetComponentsInChildren<Image>().ToList();
-
-        refreshBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
-        refreshBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
-        refreshBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
-
-        costText1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-
-        orderClearBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn")?.gameObject;
-        orderClearBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn")?.gameObject;
-        orderClearBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn")?.gameObject;
-
-        refreshCountText = transform.Find("MainMenu/Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
-        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
-
-        completeObject1 = transform.Find("MainMenu/Top/QuestGroup/Order1/CompleteObject")?.gameObject;
-        completeObject2 = transform.Find("MainMenu/Top/QuestGroup/Order2/CompleteObject")?.gameObject;
-        completeObject3 = transform.Find("MainMenu/Top/QuestGroup/Order3/CompleteObject")?.gameObject;
+        LoadRefreshCount();
+        refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
 
         // orderdonuts1~3의 자식 텍스트들을 리스트에 저장
         donutTextInfos1 = FindLevelAndTypeText(orderDonuts1);
@@ -311,13 +284,14 @@ public class Scr_OrderSystem : MonoBehaviour
     //새로고침 버튼 상호작용
     public void OnclickRefreshOrderBtn(Button ClickedButton)
     {
-        if (refreshCount <= 0)
+        if (DataManager.Instance.QuestData.refreshCount <= 0)
         {
             return;
         }
 
-        refreshCount--;
-        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
+        DataManager.Instance.QuestData.refreshCount--;
+        SaveRefreshCount();
+        refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
 
         // 해당 주문서의 CompleteObject 비활성화
         if (ClickedButton == refreshBtn1)
@@ -476,6 +450,12 @@ public class Scr_OrderSystem : MonoBehaviour
         if (completeObject == completeObject1) reward = rewardGold1;
         else if (completeObject == completeObject2) reward = rewardGold2;
         else if (completeObject == completeObject3) reward = rewardGold3;
+
+        // 보상 지급 후 버튼 비활성화
+        var button = completeObject.GetComponent<Button>();
+        if (button != null)
+            button.interactable = false;
+
         //컴플리트버튼 유지를 위해 true 적용
         if (completeObject == completeObject1) isRewarding1 = true;
         else if (completeObject == completeObject2) isRewarding2 = true;
@@ -506,22 +486,12 @@ public class Scr_OrderSystem : MonoBehaviour
         else if (completeObject == completeObject3) isRewarding3 = false;
 
         completeObject.SetActive(false); // 완료 UI 숨김
+
+        // 버튼 다시 활성화
+        var button = completeObject.GetComponent<Button>();
+        if (button != null)
+            button.interactable = true;
     }
-
-    //새로고침횟수 회복 코루틴 원하는 시간을 직접 넣으시면됩니다.
-    //private IEnumerator RecoveryRefreshCount()
-    //{
-    //    while (true)
-    //    {
-    //        yield return new WaitForSeconds(10f);//요기!
-
-    //        if (refreshCount < maxRefreshCount)
-    //        {
-    //            refreshCount++;
-    //            refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
-    //        }
-    //    }
-    //}
 
     //게임 시작할때 이전 퀘스트정보 불러오기
     private void CallFromSavedQuest(List<QuestList> savedQuests, List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
@@ -636,13 +606,32 @@ public class Scr_OrderSystem : MonoBehaviour
 
 
     //외부 접근용 함수 
-    public int GetRefreshCount() => refreshCount; //- 외부에서 Scr_OrderSystem의 refreshCount 값을 읽을 수 있게 해주는 역할
+    public int GetRefreshCount() => DataManager.Instance.QuestData.refreshCount; //- 외부에서 Scr_OrderSystem의 refreshCount 값을 읽을 수 있게 해주는 역할
 
-    public int GetMaxRefreshCount() => maxRefreshCount;
+    public int GetMaxRefreshCount() => DataManager.Instance.QuestData.maxCount;
+
 
     public void AddRefreshCount(int amount)
     {
-        refreshCount += amount;
-        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
+        DataManager.Instance.QuestData.refreshCount += amount;
+        refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
     }
+
+    private void SaveRefreshCount()
+    {
+        PlayerPrefs.SetInt(RefreshCountKey, DataManager.Instance.QuestData.refreshCount);
+        PlayerPrefs.Save();
+    }
+    private void LoadRefreshCount()
+    {
+        if (PlayerPrefs.HasKey(RefreshCountKey))
+        {
+            DataManager.Instance.QuestData.refreshCount = PlayerPrefs.GetInt(RefreshCountKey);
+        }
+        else
+        {
+            DataManager.Instance.QuestData.refreshCount = DataManager.Instance.QuestData.maxCount;
+        }
+    }
+
 }

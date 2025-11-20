@@ -16,7 +16,7 @@ public enum PanelId
     PlayerLevelInfoPopup,
     AskUpgradePopup,
     FailUpgradePopup,
-    DonutCodexPopup,
+    DonutCodexPopup, 
     DonutUpgradePopup,
     DonutCodexClickPopup,
     RewardCheckPopup,
@@ -29,6 +29,8 @@ public enum PanelId
     EnergyRechargePopUp,
     NotEnoughGemPopUp,
     OrderRefreshPopUp,
+    UseGiftBoxPopUp,
+    LevelUpRewardPopUp,
 }
 
 public class UIManager : MonoBehaviour

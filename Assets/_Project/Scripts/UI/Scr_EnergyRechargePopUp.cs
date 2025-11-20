@@ -22,15 +22,6 @@ public class Scr_EnergyRechargePopUp : MonoBehaviour
 
     void Awake()
     {
-        gage = transform.Find("Panel/Background/EnergyBar/Gage")?.GetComponent<Image>();
-        energyCountText = transform.Find("Panel/Background/EnergyBar/EnergyCount_Text")?.GetComponent<TextMeshProUGUI>();
-
-        gemButton = transform.Find("Panel/GemRecharge/GemBtn")?.GetComponent<Button>();
-
-        adsButton = transform.Find("Panel/AdsRecharge/AdsBtn")?.GetComponent<Button>();
-        adsText = transform.Find("Panel/AdsRecharge/AdsBtn/Ads_Text")?.GetComponent<TextMeshProUGUI>();
-
-        closeButton = transform.Find("Panel/CloseButton")?.GetComponent<Button>();
     }    
     void Start()
     {
