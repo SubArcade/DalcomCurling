@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class SoundManager : MonoBehaviour
 {
-    public static SoundManager Instance;
+    public static SoundManager Instance { get; private set; }
 
     [Header("BGM Events")]
     [SerializeField] private EventReference[] lobbyBGMs;
@@ -48,8 +48,6 @@ public class SoundManager : MonoBehaviour
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
-
-
     void Start()
     {
         // 시작 시 로비 BGM 재생
@@ -69,7 +67,6 @@ public class SoundManager : MonoBehaviour
         isInGame = false;
         SwitchBGMPlaylist(new List<EventReference>(lobbyBGMs), "로비");
     }
-
     public void PlayGameBGM()
     {
         if (isInGame == true && currentPlaylist != null && currentPlaylist.Count == gameBGMs.Length)
@@ -82,7 +79,6 @@ public class SoundManager : MonoBehaviour
         isInGame = true;
         SwitchBGMPlaylist(new List<EventReference>(gameBGMs), "게임");
     }
-
     private void SwitchBGMPlaylist(List<EventReference> newPlaylist, string playlistName)
     {
         // 기존 BGM 정지
@@ -109,7 +105,6 @@ public class SoundManager : MonoBehaviour
             Debug.LogWarning($"{playlistName} BGM 플레이리스트가 비어있습니다!");
         }
     }
-
     private IEnumerator PlayBGMPlaylist(string playlistName)
     {
         Debug.Log($"{playlistName} BGM 플레이리스트 시작 (총 {currentPlaylist.Count}곡)");
@@ -149,7 +144,6 @@ public class SoundManager : MonoBehaviour
             }
         }
     }
-
     private string GetBGMName(string path)
     {
         if (string.IsNullOrEmpty(path)) return "Unknown";
@@ -172,7 +166,6 @@ public class SoundManager : MonoBehaviour
             PlayGameBGM();
         }
     }
-
     public void PlaySFX(EventReference sfx, Vector3 position)
     {
         if (!sfx.IsNull)
@@ -189,8 +182,6 @@ public class SoundManager : MonoBehaviour
     {
         PlaySFX(buttonSound, position);
     }
-
-
     public void HandleDonutCollision(GameObject source)
     {
         PlaySFX(stoneImpact, source.transform.position);

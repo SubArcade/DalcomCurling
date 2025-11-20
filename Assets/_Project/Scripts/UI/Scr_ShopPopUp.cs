@@ -82,6 +82,7 @@ public class Scr_ShopPopUp : MonoBehaviour
                 ShowCashShopUI();
             }
         });
+
         //골드상점열기
         goldShopBtn.onValueChanged.AddListener((isOn) =>
         {
