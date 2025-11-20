@@ -89,6 +89,7 @@ public class DataManager : MonoBehaviour
     
     // 도넛 기본 데이터 SO
     private readonly Dictionary<DonutType, DonutTypeSO> _donutTypeDB = new();
+    private readonly List<GiftBoxSO> _giftBoxList = new();
     
     // 랭크
     private string rankCollection = "rank";
@@ -424,6 +425,16 @@ public class DataManager : MonoBehaviour
                 //Debug.Log($"[DonutDB] Loaded {so.type} ({so.levels.Count} levels)");
             }
         }
+        
+        var allSo2 = Resources.LoadAll<GiftBoxSO>("DonutData");
+
+        foreach (var so in allSo2)
+        {
+            if (!_giftBoxList.Contains(so))
+            {
+                _giftBoxList.Add(so);
+            }
+        }
     }
    
     // DonutData 가져오기
@@ -438,6 +449,21 @@ public class DataManager : MonoBehaviour
         return null;
     }
 
+    // GiftBoxSo 데이터 가져오기
+    public GiftBoxData GetGiftBoxData(int level)
+    {
+        foreach (var so in _giftBoxList)
+        {
+            if (so.type == DonutType.Gift)
+            {
+                return so.GetLevelData(level); // GiftBoxData 반환
+            }
+        }
+
+        Debug.LogWarning($"[DonutDB] GiftBoxData not found for level {level}");
+        return null;
+    }
+    
     // ID 기반으로 DonutData 가져오기 (ex: "Hard_3")
     public DonutData GetDonutByID(string id)
     {

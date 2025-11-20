@@ -82,7 +82,8 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         nightOffbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/NightOffButton")?.GetComponent<Button>();
 
         closeButton = transform.Find("rectangle625/CloseButton")?.GetComponent<Button>();
-
+        
+        accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
     }
     void Start()
     {
