@@ -42,10 +42,23 @@ public class UserDataRoot
         soloTier = GameTier.Bronze,
         levelMax = 20,
     };
-    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
-   
+    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData()
+    {
+        donutEntries = new List<DonutEntry>()
+        {
+            null,
+            null,
+            null,
+            null,
+            null
+        }
+    };
+
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
+        generatorLevelHard = 1,
+        generatorLevelMoist = 1,
+        generatorLevelSoft = 1,
         cellMax = 49,
         cellWidth = 7,
         cellLength = 7,
@@ -487,7 +500,7 @@ public class DataManager : MonoBehaviour
     {
         EnsureDonutSlots();
 
-        index = index - 1;
+        //index = index - 1;
         if (index < 0 || index >= InventoryData.donutEntries.Count)
         {
             Debug.LogError($"[InventoryData] 잘못된 인덱스: {index}");
@@ -496,12 +509,12 @@ public class DataManager : MonoBehaviour
 
         if (isDonutEntry)
         {
-            Debug.Log("앤트리 들어옴");
+            //Debug.Log("앤트리 들어옴");
             InventoryData.donutEntries[index] = entry;
         }
         else
         {
-            Debug.Log("도넛데이터 들어옴");
+            //Debug.Log("도넛데이터 들어옴");
             Debug.Log(donutData.id);
             Debug.Log(donutData.donutType);
             Debug.Log(donutData.weight);

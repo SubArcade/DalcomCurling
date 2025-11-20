@@ -148,6 +148,7 @@ MonoBehaviour:
     resilience: 0
     friction: 0
     rewardGem: 1
+  isFromEntry: 0
 --- !u!225 &7407012077420254979
 CanvasGroup:
   m_ObjectHideFlags: 0

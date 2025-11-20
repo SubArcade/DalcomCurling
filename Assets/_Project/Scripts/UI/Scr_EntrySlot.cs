@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,6 +9,9 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     [Header("현재 슬롯에 들어있는 도넛")]
     public MergeItemUI currentItem;
 
+    [Header("엔트리에서 생성할 도넛 프리팹")]
+    [SerializeField] private MergeItemUI itemPrefab;
+
     public int slotIndex = 0;
     
     private Image slotImage;
@@ -15,6 +19,11 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     void Awake()
     {
         slotImage = GetComponent<Image>();
+    }
+    
+    void Start()
+    {
+        LoadFromInventory();
     }
 
     // 슬롯이 비었는지 여부
@@ -25,39 +34,38 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         var dragged = eventData.pointerDrag?.GetComponent<MergeItemUI>();
         if (dragged == null) return;
 
-        dragged.DetachFromCurrentCell();  // 셀 연결 제거 (필수!)
-        dragged.currentCell = null;       // 안전장치
+        dragged.DetachFromCurrentCell();  // 보드에서온거 셀 해제
         dragged.isFromEntry = true;
-
-        // 드래그된 오브젝트가 이미 내 자식이면 무시
+      
+        // 같은 슬롯이면 취소
         if (dragged.transform.parent == transform)
         {
-            Debug.Log($"{name}: 이미 같은 슬롯에 있습니다. 드롭 무시");
+            dragged.ResetPosition();
             return;
         }
-
+     
         Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
+     
+        EntrySlot fromSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
 
-        // 이미 도넛이 있으면 거부
-        if (!IsEmpty)
+        EntrySlot toSlot = this;
+
+        Cells fromCell = dragged.originalCell;
+
+        // 엔트리에서 보드 스왑
+        if (fromCell != null && currentItem != null)
         {
-            Debug.Log("이 슬롯은 이미 도넛이 들어있어요!");
-            dragged.ResetPosition();
+            SwapWithCell(fromCell, this, dragged);
             return;
         }
 
-        // 혹시 이전 슬롯이 자신이었다면 무시 (이중 드롭 방지)
-        if (dragged.OriginalParent == transform)
+        // 엔트리 안에서 스왑
+        if (fromSlot != null && toSlot != null && toSlot.currentItem != null)
         {
-            Debug.Log($"{name}: 이전 슬롯 == 현재 슬롯, 중복 드롭 방지");
-            dragged.ResetPosition();
+            SwapItems(fromSlot, toSlot, dragged);
             return;
         }
 
-        // 보드에서 왔다면 보드 점유 해제
-        dragged.DetachFromCurrentCell();
-
-        // 슬롯에 배치
         MoveIn(dragged);
     }
 
@@ -73,31 +81,177 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // 기존 슬롯의 currentItem 초기화
         var oldSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
         if (oldSlot != null && oldSlot != this)
-            oldSlot.Clear();
-
-        dragged.DetachFromCurrentCell();
+            oldSlot.currentItem = null;
 
         dragged.transform.SetParent(transform, false);
         var rt = dragged.GetComponent<RectTransform>();
         rt.anchoredPosition = Vector2.zero;
-        currentItem = dragged;
-        dragged.currentCell = null;  // 보드 참조 제거
-        dragged.isFromEntry = true;  // 도넛 
 
-        // ✅ 체크마크 비활성화
-        var checkMark = dragged.transform.Find("CheckMark")?.gameObject;
-        if (checkMark != null)
-            checkMark.SetActive(false);
+        currentItem = dragged;
+        dragged.isFromEntry = true;  // 도넛 엔트리인지
+
+        dragged.UpdateOriginalParent(transform);
+
+        CheckMarkOff(dragged);
+
+        SaveToInventory(); //도넛 값 넣기
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
-
-        dragged.UpdateOriginalParent(transform);
 
         Debug.Log($"[MoveIn] {currentItem.donutData.id} 슬롯에 도넛 들어감");
         // Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
         // Debug.Log($"currentItem: {currentItem?.name}");
         // Debug.Log($"IsEmpty: {IsEmpty}");
+    }
+
+    // 엔트리에서 보드 스왑
+    private void SwapWithCell(Cells fromCell, EntrySlot toSlot, MergeItemUI dragged)
+    {
+        MergeItemUI entryItem = toSlot.currentItem;     // 엔트리에 있던 아이템
+
+        // 1) dragged(A) → 엔트리로 이동
+        toSlot.currentItem = dragged;
+        dragged.transform.SetParent(toSlot.transform, false);
+        dragged.rectTransform.anchoredPosition = Vector2.zero;
+        dragged.isFromEntry = true;
+
+        // EntrySlot 기준 originalParent 갱신
+        dragged.UpdateOriginalParent(toSlot.transform);
+        dragged.currentCell = null; // 보드와의 연결 끊기
+
+        // 2) 엔트리에 있던 entryItem(B) → 보드로 이동
+        entryItem.transform.SetParent(fromCell.transform, false);
+        entryItem.rectTransform.anchoredPosition = Vector2.zero;
+        entryItem.isFromEntry = false;
+
+        CheckMarkOff (dragged);
+
+        entryItem.currentCell = fromCell;
+        fromCell.occupant = entryItem;
+        fromCell.donutId = entryItem.donutData.id;
+
+        entryItem.UpdateOriginalParent(fromCell.transform);
+
+        // 3) 엔트리 currentItem 갱신
+        toSlot.currentItem = dragged;
+
+        SaveToInventory(); //도넛 값 넣기
+
+        // 해당 도넛 데이터 연동
+        DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
+
+        Debug.Log($"[SwapWithCell] 보드 셀 {fromCell.name} ↔ {toSlot.name} 교체 완료");
+    }
+
+    // 엔트리 <> 엔트리 스왑
+    private void SwapItems(EntrySlot fromSlot, EntrySlot toSlot, MergeItemUI dragged)
+    {
+        // B 슬롯에 원래 있던 아이템
+        MergeItemUI targetItem = toSlot.currentItem;
+
+        // 1. A → B 이동
+        toSlot.currentItem = dragged;
+        dragged.transform.SetParent(toSlot.transform, false);
+        dragged.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+        // 원래 parent 갱신
+        dragged.UpdateOriginalParent(toSlot.transform);
+        dragged.isFromEntry = true;
+
+        // 2. B → A 이동
+        fromSlot.currentItem = targetItem;
+        if (targetItem != null)
+        {
+            targetItem.transform.SetParent(fromSlot.transform, false);
+            targetItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+            targetItem.UpdateOriginalParent(fromSlot.transform);
+            targetItem.isFromEntry = true;
+        }
+
+        SaveToInventory(); //도넛 값 넣기
+
+        // 해당 도넛 데이터 연동
+        DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
+
+        Debug.Log($"[Swap] {fromSlot.name} ↔ {toSlot.name} 스왑 완료");
+    }
+
+    // 체크마크 비활성화 함수
+    public void CheckMarkOff(MergeItemUI dragged)
+    {
+        var checkMark = dragged.transform.Find("CheckMark")?.gameObject;
+        if (checkMark != null)
+            checkMark.SetActive(false);
+    }
+
+    // 엔트리 저장
+    private void SaveToInventory()
+    {
+        if (currentItem == null || currentItem.donutData == null)
+        {
+            // 슬롯이 비었으면 삭제 처리
+            DataManager.Instance.InventoryData.donutEntries[slotIndex] = null;
+            return;
+        }
+
+        var d = currentItem.donutData;
+
+        // DonutEntry로 변환
+        DonutEntry entry = new DonutEntry()
+        {
+            id = d.id,
+            type = d.donutType,
+            weight = d.weight,
+            resilience = d.resilience,
+            friction = d.friction
+        };
+
+        // 저장
+        DataManager.Instance.InventoryData.donutEntries[slotIndex] = entry;
+
+        Debug.Log($"[Inventory Save] 슬롯 {slotIndex} → {entry.id} 저장완료");
+    }
+
+    //엔트리 도넛 불러오기
+    public void LoadFromInventory()
+    {
+        var inv = DataManager.Instance.InventoryData.donutEntries;
+
+        if (slotIndex < 0 || slotIndex >= inv.Count)
+            return;
+
+        DonutEntry saved = inv[slotIndex];
+        if (saved == null || string.IsNullOrEmpty(saved.id))
+            return;
+
+        // 1) ID → DonutData
+        DonutData data = DataManager.Instance.GetDonutByID(saved.id);
+        if (data == null)
+        {
+            Debug.LogError($"도넛 ID {saved.id} 로 Data 못찾음");
+            return;
+        }
+
+        // 2) 프리팹 생성
+        MergeItemUI newItem = Instantiate(itemPrefab, transform);
+
+        // 3) DonutData 기반 이미지 설정
+        newItem.Init(data);
+
+        //// 4) Entry 전용 스탯 반영
+        //newItem.ApplyEntryStats(saved); 
+        // 보류 사용하는값인지 모르겠음
+
+        // 5) UI 정렬
+        RectTransform rt = newItem.GetComponent<RectTransform>();
+        rt.anchoredPosition = Vector2.zero;
+
+        // 6) 슬롯에 반영
+        currentItem = newItem;
+        newItem.isFromEntry = true;
+        newItem.UpdateOriginalParent(transform);
     }
 
     // 슬롯을 비우는 함수
