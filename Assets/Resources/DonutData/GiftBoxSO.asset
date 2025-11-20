@@ -13,7 +13,39 @@ MonoBehaviour:
   m_Name: GiftBoxSO
   m_EditorClassIdentifier: 
   type: 3
-  levels: []
+  levels:
+  - id: Gift_1
+    level: 1
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
+  - id: Gift_2
+    level: 2
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
+  - id: Gift_3
+    level: 3
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
+  - id: Gift_4
+    level: 4
+    sprite: {fileID: 0}
+    donutType: 3
+    prefab: {fileID: 0}
+    rewardGold: 0
+    rewardEnergy: 0
+    rewardGem: 0
   giftBoxData:
     id: 
     level: 0
