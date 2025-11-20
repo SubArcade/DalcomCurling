@@ -192,7 +192,7 @@ public class Scr_OrderSystem : MonoBehaviour
         completeObject3.SetActive(false);
     
         // 새로고침 회복 코루틴
-        refreshCoroutine = StartCoroutine(RecoveryRefreshCount());
+        //refreshCoroutine = StartCoroutine(RecoveryRefreshCount());
 
         // 저장된 주문서 복원 시도
         bool isRestored = TryRestoreQuest();
@@ -509,19 +509,19 @@ public class Scr_OrderSystem : MonoBehaviour
     }
 
     //새로고침횟수 회복 코루틴 원하는 시간을 직접 넣으시면됩니다.
-    private IEnumerator RecoveryRefreshCount()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(10f);//요기!
+    //private IEnumerator RecoveryRefreshCount()
+    //{
+    //    while (true)
+    //    {
+    //        yield return new WaitForSeconds(10f);//요기!
 
-            if (refreshCount < maxRefreshCount)
-            {
-                refreshCount++;
-                refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
-            }
-        }
-    }
+    //        if (refreshCount < maxRefreshCount)
+    //        {
+    //            refreshCount++;
+    //            refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
+    //        }
+    //    }
+    //}
 
     //게임 시작할때 이전 퀘스트정보 불러오기
     private void CallFromSavedQuest(List<QuestList> savedQuests, List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
@@ -634,4 +634,15 @@ public class Scr_OrderSystem : MonoBehaviour
         }
     }
 
+
+    //외부 접근용 함수 
+    public int GetRefreshCount() => refreshCount; //- 외부에서 Scr_OrderSystem의 refreshCount 값을 읽을 수 있게 해주는 역할
+
+    public int GetMaxRefreshCount() => maxRefreshCount;
+
+    public void AddRefreshCount(int amount)
+    {
+        refreshCount += amount;
+        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
+    }
 }
