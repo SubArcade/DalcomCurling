@@ -201,20 +201,20 @@ public class StoneManager : MonoBehaviour
         {
             _stoneControllers_A[currentDonutId] = _currentTurnStone;
 
-            Debug.Log("A팀");
-            Debug.Log(_stoneControllers_A.Count);
-            Debug.Log($"my user id = {myUserId}");
-            Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
+            //Debug.Log("A팀");
+            //Debug.Log(_stoneControllers_A.Count);
+            //Debug.Log($"my user id = {myUserId}");
+            //Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
         }
 
         else
         {
             _stoneControllers_B[currentDonutId] = _currentTurnStone;
 
-            Debug.Log("B팀");
-            Debug.Log(_stoneControllers_B.Count);
-            Debug.Log($"my user id = {myUserId}");
-            Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
+            //Debug.Log("B팀");
+            //Debug.Log(_stoneControllers_B.Count);
+            //Debug.Log($"my user id = {myUserId}");
+            //Debug.Log($"currentTurnPlayerId = {currentTurnPlayerId}, RoundStarting = {game.RoundStartingPlayerId}");
         }
 
         return newStone.GetComponent<Rigidbody>();
@@ -252,9 +252,9 @@ public class StoneManager : MonoBehaviour
 
 
 
-        Debug.Log($"StoneManager: 샷 데이터로 돌(ID: {stoneId})을 발사합니다.");
-        Debug.Log(
-            $"stoneused , {gameReference.DonutsIndex[gameReference.PlayerIds[0]]}, {gameReference.DonutsIndex[gameReference.PlayerIds[1]]}  ");
+        //Debug.Log($"StoneManager: 샷 데이터로 돌(ID: {stoneId})을 발사합니다.");
+        //Debug.Log(
+        //    $"stoneused , {gameReference.DonutsIndex[gameReference.PlayerIds[0]]}, {gameReference.DonutsIndex[gameReference.PlayerIds[1]]}  ");
 
         // 발사 전, Rigidbody의 isKinematic을 false로 설정하여 물리 효과를 받도록 합니다.
 
@@ -403,7 +403,7 @@ public class StoneManager : MonoBehaviour
 
             if (CheckDonutPassedOutLine(newPosition.z))
             {
-                Debug.Log($"ID: {fc.donutId} 돌이 아웃 라인을 넘었으므로 제거합니다.");
+                //Debug.Log($"ID: {fc.donutId} 돌이 아웃 라인을 넘었으므로 제거합니다.");
                 DonutOut(fc);
                 continue;
             }

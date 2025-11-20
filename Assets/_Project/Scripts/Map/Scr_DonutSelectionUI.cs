@@ -87,7 +87,7 @@ public class DonutSelectionUI : MonoBehaviour
         donutSlots[_selectedIndex].SetSelected(true);
         _selectedDonutEntry = donutSlots[_selectedIndex].GetDonutEntry();
 
-        Debug.Log($"DonutSelectionUI: 도넛 슬롯 {index} 선택됨. ID: {_selectedDonutEntry?.id}");
+        //Debug.Log($"DonutSelectionUI: 도넛 슬롯 {index} 선택됨. ID: {_selectedDonutEntry?.id}");
         
         // 선택 변경 이벤트를 호출합니다.
         OnDonutSelectionChanged?.Invoke(_selectedDonutEntry);
@@ -115,7 +115,7 @@ public class DonutSelectionUI : MonoBehaviour
             {
                 donutSlots[i].SetUsed(true);
                 donutSlots[i].SetSelected(false); // 사용되었으므로 선택 해제
-                Debug.Log($"DonutSelectionUI: 도넛 {usedEntry.id} 사용됨으로 표시.");
+                //Debug.Log($"DonutSelectionUI: 도넛 {usedEntry.id} 사용됨으로 표시.");
 
                 // 현재 선택된 도넛이 방금 사용한 도넛이었다면, 다음 도넛을 선택합니다.
                 if (_selectedIndex == i)
@@ -174,6 +174,6 @@ public class DonutSelectionUI : MonoBehaviour
         }
         // 모든 도넛이 사용 가능해졌으므로, 첫 번째 사용 가능한 도넛을 다시 선택합니다.
         SelectNextAvailableDonut(-1);
-        Debug.Log("DonutSelectionUI: 도넛 사용 상태가 초기화되었습니다.");
+        //Debug.Log("DonutSelectionUI: 도넛 사용 상태가 초기화되었습니다.");
     }
 }

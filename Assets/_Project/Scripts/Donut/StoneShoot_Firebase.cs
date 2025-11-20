@@ -209,7 +209,7 @@ public class StoneShoot_Firebase : MonoBehaviour
 
         _isTrajectoryPreviewActive = false; // 궤적 미리보기 비활성화
         if (trajectoryLine != null) trajectoryLine.enabled = false; // 궤적 라인 렌더러 비활성화
-        Debug.Log("InputController: 입력 비활성화됨.");
+        //Debug.Log("InputController: 입력 비활성화됨.");
     }
 
     /// <summary>
@@ -373,7 +373,7 @@ public class StoneShoot_Firebase : MonoBehaviour
             else if (isTouchEnded && IsDragging && CurrentDragType == DragType.Rotation)
             {
                 EndDrag(); // 드래그 종료
-                Debug.Log("회전 설정 완료. 발사합니다!");
+                //Debug.Log("회전 설정 완료. 발사합니다!");
                 FirebaseGameManager.Instance.OnIdleUI();
                 ReleaseShot(); // 발사!
             }
@@ -556,20 +556,20 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     private void ReleaseShot() 
     {
-        Debug.Log($"RElesase clicked, myTurn = {FirebaseGameManager.Instance._isMyTurn}");
+        //Debug.Log($"RElesase clicked, myTurn = {FirebaseGameManager.Instance._isMyTurn}");
         //미리 보기 궤적 비활성화
         _isTrajectoryPreviewActive = false;
         if (trajectoryLine != null) trajectoryLine.enabled = false;
 
         FirebaseGameManager.Instance.ChangeCameraRelease(); // 스톤에 카메라 부착
         LastShot shotData = CalculateShotData();
-        Debug.Log(FirebaseGameManager.Instance.CurrentLocalState);
+        //Debug.Log(FirebaseGameManager.Instance.CurrentLocalState);
         FirebaseGameManager.Instance.Change_SuccessfullyShotInTime_To_True();
 
         if (FirebaseGameManager.Instance.CurrentLocalState == "WaitingForInput" && FirebaseGameManager.Instance._isMyTurn == false)
         {
             _preparedShotData = shotData;
-            Debug.Log("샷 준비 완료. 턴 시작을 기다립니다.");
+            //Debug.Log("샷 준비 완료. 턴 시작을 기다립니다.");
             DisableInput();
             //카운트다운 제거
             //FirebaseGameManager.Instance.ControlCountdown(false);
@@ -577,7 +577,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         }
         else if (FirebaseGameManager.Instance.CurrentLocalState == "WaitingForInput" && FirebaseGameManager.Instance._isMyTurn == true)
         {
-            Debug.Log("여기까지는 옴");
+            //Debug.Log("여기까지는 옴");
             CurrentState = LaunchState.MovingToHogLine;
             MoveDonutToHogLine(shotData);
             _needToTap = true;
@@ -619,7 +619,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 if (_currentStoneRb != null) _currentStoneRb.DOKill(); // DOTween 애니메이션 중지
 
                 OnShotConfirmed?.Invoke(shotData); // 샷 데이터 확정 이벤트 발생
-                Debug.Log("샷 정보 전송 완료.");
+                //Debug.Log("샷 정보 전송 완료.");
 
                 FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot(); // 로컬 상태를 시뮬레이션 중으로 변경               
                 FirebaseGameManager.Instance.ChangeFixedDeltaTime(); // FixedDeltaTime 변경 (시뮬레이션 속도 조절)
@@ -684,12 +684,12 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (zPos >= perfectZoneLine.position.z && zPos <= startHogLine.position.z)
         {
             weights = perfectZoneRandomWeights; // 퍼펙트존 가중치 사용
-            Debug.Log("퍼펙트존");
+            //Debug.Log("퍼펙트존");
         }
         else if (zPos >= earlyZoneLine.position.z && zPos < perfectZoneLine.position.z)
         {
             weights = earlyZoneRandomWeights; // 얼리존 가중치 사용
-            Debug.Log("얼리존");
+            //Debug.Log("얼리존");
         }
 
         if (weights != null) // 가중치 리스트가 유효하면
@@ -701,14 +701,14 @@ public class StoneShoot_Firebase : MonoBehaviour
             foreach (var item in weights) // 가중치 리스트 순회
             {
                 cumulativeWeight += (int)(item.weight * 10); // 가중치 적용
-                Debug.Log($"itemweight : {item.weight}");
+                //Debug.Log($"itemweight : {item.weight}");
                 if (randomPoint * 10 <= cumulativeWeight) // 랜덤 값이 누적 가중치 범위 안에 들면
                 {
                     _releaseRandomValue = item.value; // 해당 랜덤 값 적용
                     break; // 루프 종료
                 }
             }
-            Debug.Log($"releaseRandomValue: {_releaseRandomValue}");
+            //Debug.Log($"releaseRandomValue: {_releaseRandomValue}");
         }
     }
     #endregion

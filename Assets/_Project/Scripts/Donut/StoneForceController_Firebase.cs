@@ -124,7 +124,7 @@ public class StoneForceController_Firebase : MonoBehaviour
         //     isShooted = true;
         // });
         isShooted = true;
-        Debug.Log($"[StoneForceController_Firebase] Force: {force}, Spin: {spin}");
+        //Debug.Log($"[StoneForceController_Firebase] Force: {force}, Spin: {spin}");
     }
 
     // StoneShoot.Team 대신 직접 정의한 Team enum 사용
@@ -185,7 +185,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     {
         attackMoveFinished = true;
         rigid.angularVelocity = Vector3.zero;
-        Debug.Log($"sidewaysForceAddCount = {sidewaysForceAddCount}");
+        //Debug.Log($"sidewaysForceAddCount = {sidewaysForceAddCount}");
     }
 
     public void PassedEndHogLine() // 엔드 호그라인 콜라이더가 자신과 충돌한 적이 있음을 알림 ( 최소로 넘어가야 할 선을 넘김 )
