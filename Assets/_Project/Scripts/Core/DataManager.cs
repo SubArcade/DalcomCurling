@@ -30,22 +30,35 @@ public class UserDataRoot
     [field: SerializeField] [FirestoreProperty] public PlayerData player { get; set; } = new PlayerData(){
         email = "test@test.com",
         nickname = "test",
-        gold = 250,
-        gem = 7,
-        energy = 10,
+        gold = 5000,
+        gem = 1000,
+        energy = 2000,
         level = 1,
         exp = 0,
         lastAt = 0,
-        maxEnergy = 20,
+        maxEnergy = 50,
         perSecEnergy = 10,
         soloScore = 0,
         soloTier = GameTier.Bronze,
         levelMax = 20,
     };
-    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
-   
+    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData()
+    {
+        donutEntries = new List<DonutEntry>()
+        {
+            null,
+            null,
+            null,
+            null,
+            null
+        }
+    };
+
     [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
     {
+        generatorLevelHard = 1,
+        generatorLevelMoist = 1,
+        generatorLevelSoft = 1,
         cellMax = 49,
         cellWidth = 7,
         cellLength = 7,
@@ -173,6 +186,7 @@ public class DataManager : MonoBehaviour
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             FirstBasePlayerData();
             BaseInventoryData();
+            FirstBaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             FirstBaseMergeBoardData();
             BaseQuestData(baseGold);
@@ -209,6 +223,10 @@ public class DataManager : MonoBehaviour
     private void FirstBasePlayerData()
     {
         PlayerData.gainNamePlateType.Add(NamePlateType.NONE);
+        
+        // 임시용
+        PlayerData.gem = 1000;
+        PlayerData.energy = 2000;
     }
     
     // 기본 인벤토리 데이터
@@ -246,6 +264,12 @@ public class DataManager : MonoBehaviour
         }
         //Debug.Log("실행완료");
     }
+
+    private void FirstBaseInventoryData()
+    {
+        EnsureDonutSlots();
+    }
+    
     
     // 기본 머지보드 데이터
     private void BaseMergeBoardData(int cellMax, int cellWidth, int cellLength)
@@ -470,7 +494,7 @@ public class DataManager : MonoBehaviour
             {
                 InventoryData.donutEntries.Add(new DonutEntry()
                 {
-                    id = null,
+                    id = "Hard_1",
                     type = DonutType.Hard,   // 너가 정의한 기본값
                     weight = 0,
                     resilience = 0,
@@ -487,7 +511,7 @@ public class DataManager : MonoBehaviour
     {
         EnsureDonutSlots();
 
-        index = index - 1;
+        //index = index - 1;
         if (index < 0 || index >= InventoryData.donutEntries.Count)
         {
             Debug.LogError($"[InventoryData] 잘못된 인덱스: {index}");
@@ -496,12 +520,12 @@ public class DataManager : MonoBehaviour
 
         if (isDonutEntry)
         {
-            Debug.Log("앤트리 들어옴");
+            //Debug.Log("앤트리 들어옴");
             InventoryData.donutEntries[index] = entry;
         }
         else
         {
-            Debug.Log("도넛데이터 들어옴");
+            //Debug.Log("도넛데이터 들어옴");
             Debug.Log(donutData.id);
             Debug.Log(donutData.donutType);
             Debug.Log(donutData.weight);
