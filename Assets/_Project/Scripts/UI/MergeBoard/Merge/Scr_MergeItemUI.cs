@@ -103,6 +103,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         {
             Debug.Log($"{name} 휴지통으로 삭제됨");
 
+            //TODO: 여기에서 삭제여부 팝업 추가예정
+
             // 셀 참조 초기화
             if (currentCell != null)
                 currentCell.ClearItem();
@@ -118,22 +120,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        //// EntrySlot 우선 체크
-        //var entrySlot = targetObj ? targetObj.GetComponentInParent<EntrySlot>() : null;
-        //if (entrySlot != null)
-        //{
-        //    entrySlot.OnDrop(eventData);
-        //    return;
-        //}
-
         // === 2️⃣ EntrySlot 우선 처리 ===
         if (entrySlot != null)
         {
             entrySlot.OnDrop(eventData);
             return;
         }
-
-        //targetCell = targetObj ? targetObj.GetComponentInParent<Cells>() : null;
 
         // 드롭 위치에 격자 이동
         if (BoardManager.Instance.selectionHighlight != null)
@@ -238,7 +230,6 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         // 스왑로직
-        //var fromEntrySlot = originalParent.GetComponent<EntrySlot>();
         if (fromEntrySlot != null)   // 엔트리에서 옴
         {
             var targetItem = targetCell.occupant;

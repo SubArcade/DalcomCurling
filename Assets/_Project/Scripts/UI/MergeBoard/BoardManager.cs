@@ -43,6 +43,7 @@ public class BoardManager : MonoBehaviour
     void Start()
     {
         selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
+        if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
 
         GenerateBoard();
         UpdateBoardUnlock(1);
@@ -54,7 +55,6 @@ public class BoardManager : MonoBehaviour
         // 불러온 데이터로 보드 복원
         LoadBoardLocal();
 
-        if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
     }
 
     public void OnCellClicked(Cells cell)
@@ -143,8 +143,10 @@ public class BoardManager : MonoBehaviour
 
         // 중앙 칸은 항상 활성화하지만 도넛은 못 들어오게 잠금 표시 꺼둠
         generatorCell.SetActive(true);
+        SelectCell(generatorCell);
     }
 
+    // 빈칸 찾는셀
     private Cells FindEmptyActiveCell()
     {
         List<Cells> available = new();
@@ -342,12 +344,7 @@ public class BoardManager : MonoBehaviour
         if (boardData == null) return;
 
         boardData.cells.Clear();
-        //for(int x = 0; x < boardSize; x++)
-        //{
-        //    boardData.cells[x] = ;
-        //}
-       
-
+        
         foreach (var cell in GetAllCells())
         {
             CellData data = new CellData
