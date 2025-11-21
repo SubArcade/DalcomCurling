@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 98a2c83b6dbb3a849b8182d96df1a041, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e9d0c864fba885a45bcb513a3d0becbf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2517,11 +2517,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3794062186906681930}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 57, y: -1.1450195}
-  m_SizeDelta: {x: 44, y: 41}
-  m_Pivot: {x: 1, y: 0.5}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 70, y: 8.855011}
+  m_SizeDelta: {x: 56, y: 56}
+  m_Pivot: {x: 1, y: 1}
 --- !u!222 &7042134391911113691
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3205,7 +3205,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5c02f55c5ff3aa340afd47375d27ea7e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0558c151e5e5cac4cb474b329d6816e2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5977,7 +5977,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1397504718182368209
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6066,9 +6066,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cashShopBtn: {fileID: 457506812577573283}
+  cashShopOutline: {fileID: 1311358886325417224}
   goldShopBtn: {fileID: 7380325773927181849}
+  goldShopOutline: {fileID: 8945509062030224678}
   robbyButton: {fileID: 3062166236793480152}
-  eneryBtn: {fileID: 3558584162878754045}
+  energyBtn: {fileID: 3558584162878754045}
   goldBtn: {fileID: 7297424715144633229}
   gemBtn: {fileID: 1429168567985425340}
   energyText: {fileID: 7069196249876675585}
@@ -7561,7 +7563,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b0b6aa731d9ffb244b66392b3826b5f5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6af6f10dcf8e5204b9b971f4ff11c8c6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
