@@ -15,6 +15,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private Canvas canvas;
     private Image icon;
     public bool isFromEntry = false; //엔트리 확인용
+    public bool isFromTemp = false;  //임시 보관칸 확인용
 
     private Vector2 originalPos;
     private Transform originalParent;
@@ -117,6 +118,14 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             }
 
             Destroy(gameObject); // 오브젝트 삭제
+            return;
+        }
+
+        // 임시보관칸에 드래그 금지
+        var tempSlot = targetObj?.GetComponentInParent<TempStorageSlot>();
+        if (tempSlot != null)
+        {
+            ResetPosition();
             return;
         }
 

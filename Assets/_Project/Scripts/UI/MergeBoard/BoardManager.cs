@@ -35,6 +35,8 @@ public class BoardManager : MonoBehaviour
         {10,10,10,10,10,10,10 }
     };
 
+    [Tooltip("임시 보관칸")] public TempStorageSlot tempStorageSlot;
+
     void Awake()
     {
         Instance = this;
@@ -44,7 +46,7 @@ public class BoardManager : MonoBehaviour
     {
         selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
-
+        tempStorageSlot = FindObjectOfType<TempStorageSlot>();
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
@@ -211,14 +213,17 @@ public class BoardManager : MonoBehaviour
     {
         // 빈 활성 셀 찾기
         var cell = FindEmptyActiveCell();
-        if (cell == null)
-        {
-            Debug.Log("빈 칸 없음 → 기프트박스 생성 불가");
-            return;
-        }
 
         // GiftBox Level 1 데이터 가져오기
         var giftData = DataManager.Instance.GetDonutData(DonutType.Gift, 1);
+
+        if (cell == null)
+        {
+            tempStorageSlot.Add(giftData);
+            Debug.Log("빈 칸 없음, 임시칸에 생성");
+            return;
+        }
+       
         if (giftData == null)
         {
             Debug.LogError("GiftBox 데이터 없음! DonutGiftSO를 확인하세요.");
@@ -253,7 +258,6 @@ public class BoardManager : MonoBehaviour
         Destroy(cell.occupant.gameObject);
     }
 
-
     // 도넛 찾기
     public Cells FindCellByDonutID(string targetID)
     {
@@ -265,31 +269,7 @@ public class BoardManager : MonoBehaviour
         }
         return null;
     }
-
-    //도넛 삭제
-    public void RemoveDonutByID(string targetID)
-    {
-        Cells target = FindCellByDonutID(targetID);
-        if (target == null)
-        {
-            Debug.LogWarning($"도넛 ID '{targetID}'를 찾을 수 없습니다.");
-            return;
-        }
-
-        if (target.occupant != null)
-            Destroy(target.occupant.gameObject);
-
-        target.ClearItem();
-        //Debug.Log($"도넛 '{targetID}' 삭제 완료");
-
-        // MergeBoardData에서 동일한 셀 데이터 제거
-        var boardData = DataManager.Instance.MergeBoardData;
-        var cellData = boardData.cells.Find(c => c.donutId == targetID);
-        if (cellData != null)
-            boardData.cells.Remove(cellData);
-
-        AutoSaveBoardLocal();
-    }
+    
     public void RefreshBoardUnlock() // 플레이어 레벨로 보드 갱신
     {
         int playerLevel = DataManager.Instance.PlayerData.level;
@@ -416,6 +396,26 @@ public class BoardManager : MonoBehaviour
         }
 
         //Debug.Log("[LoadBoardLocal] 보드 로드 완료");
+    }
+
+    // 임시보관칸에서 보드판에 생성
+    public void SpawnFromTempStorage(DonutData data)
+    {
+        Cells cell = FindEmptyActiveCell();
+        if (cell == null)
+        {
+            Debug.Log("빈 칸이 없습니다.");
+            return;
+        }
+
+        GameObject obj = Instantiate(donutPrefab, cell.transform);
+        var item = obj.GetComponent<MergeItemUI>();
+
+        item.donutId = data.id;
+        item.donutData = data;
+
+        obj.GetComponent<Image>().sprite = data.sprite;
+        cell.SetItem(item, data);
     }
 
 }

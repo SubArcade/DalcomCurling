@@ -415,8 +415,8 @@ public class DataManager : MonoBehaviour
 
         foreach (var so in allSO)
         {
-            if (so.type == DonutType.Gift)
-                continue; // Gift 타입 완전 제외
+            //if (so.type == DonutType.Gift)
+            //    continue; // Gift 타입 완전 제외
 
             if (!_donutTypeDB.ContainsKey(so.type))
             {
