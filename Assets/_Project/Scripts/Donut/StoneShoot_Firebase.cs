@@ -205,6 +205,10 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     public void DisableInput()
     {
+        DOTween.Kill("GuideTimer1");
+        DOTween.Kill("GuideTimer2");
+        DOTween.Kill("GuideTimer3");
+
         _inputEnabled = false; // 입력 비활성화 플래그
 
         _isTrajectoryPreviewActive = false; // 궤적 미리보기 비활성화
@@ -340,6 +344,15 @@ public class StoneShoot_Firebase : MonoBehaviour
                     FirebaseGameManager.Instance.OnShotStepUI(); // 도넛 엔트리창만 off
 
                     _currentAimingPhase = AimingPhase.Rotation; // 다음 단계로 전환
+
+                    // 2초 동안 추가 입력이 없으면 회전 가이드 표시
+                    DOVirtual.DelayedCall(2f, () =>
+                    {
+                        if (_inputEnabled && _currentAimingPhase == AimingPhase.Rotation && !IsDragging)
+                        {
+                            uiLaunch?.SHowGuideUI(2);
+                        }
+                    }).SetId("GuideTimer2");
                 }
                 else
                 {
@@ -400,6 +413,10 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// <param name="dragType">드래그 종류 (힘/방향 또는 회전).</param>
     private void StartDrag(Vector3 screenPosition, DragType dragType)
     {
+        DOTween.Kill("GuideTimer1");
+        DOTween.Kill("GuideTimer2");
+        DOTween.Kill("GuideTimer3");
+
         IsDragging = true;
         CurrentDragType = dragType;
 
@@ -556,6 +573,10 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     private void ReleaseShot() 
     {
+        DOTween.Kill("GuideTimer1");
+        DOTween.Kill("GuideTimer2");
+        DOTween.Kill("GuideTimer3");
+
         //Debug.Log($"RElesase clicked, myTurn = {FirebaseGameManager.Instance._isMyTurn}");
         //미리 보기 궤적 비활성화
         _isTrajectoryPreviewActive = false;
@@ -595,6 +616,8 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// <param name="shotData">발사할 샷 데이터.</param>
     private void MoveDonutToHogLine(LastShot shotData)
     {
+        uiLaunch?.SHowGuideUI(3);
+
         if (_currentStoneRb == null)
         {
             Debug.LogError("오류: _currentStoneRb가 null입니다!"); // 오류 로그 추가
@@ -646,7 +669,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("미리 준비된 샷이 없어 일반 입력 모드로 전환됩니다.");
+            //Debug.LogWarning("미리 준비된 샷이 없어 일반 입력 모드로 전환됩니다.");
             //EnableInput(this._currentStoneRb); // 준비된 샷 없으면 일반 입력 활성화
             return false; // 샷 실행 안됨
         }
@@ -696,7 +719,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             _needToTap = false; // 탭 이벤트 비활성화
             int randomPoint = Random.Range(1, 101); // 1~100 사이의 랜덤 값
-            Debug.Log($"randomPoint : {randomPoint}");
+            //Debug.Log($"randomPoint : {randomPoint}");
             int cumulativeWeight = 0; // 누적 가중치
             foreach (var item in weights) // 가중치 리스트 순회
             {

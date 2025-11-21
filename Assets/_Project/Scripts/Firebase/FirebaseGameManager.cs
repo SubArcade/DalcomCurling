@@ -424,10 +424,10 @@ public class FirebaseGameManager : MonoBehaviour
                 _localState = LocalGameState.WaitingForInput;
         
                 UI_LaunchIndicator_Firebase.FireShotReadyUI(); //입력준비 UI
-        
+
                 //카운트다운 활성화
                 //ControlCountdown(true);
-        
+
                 // UI에서 선택된 도넛 엔트리를 가져옵니다.
                 DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
                 if (selectedDonut == null)
@@ -663,6 +663,8 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleGameFinished()
     {
+        _localState = LocalGameState.InTimeline; // TODO : 로컬 스테이트를 게임종료로 설정하고 현재씬을 종료하고 메인씬으로 넘어가는 처리는 UI버튼에 연결하도록 변경
+
         if (aTeamScore > bTeamScore)
         {
             if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
@@ -1227,6 +1229,16 @@ public class FirebaseGameManager : MonoBehaviour
 
         _localState = LocalGameState.WaitingForInput;
         inputController?.EnableInput(_currentTurnDonutRigid);
+
+        // 3초 동안 입력이 없으면 가이드 표시
+        DOVirtual.DelayedCall(3f, () =>
+        {
+            if (_localState == LocalGameState.WaitingForInput && inputController != null && inputController.CurrentDragType == StoneShoot_Firebase.DragType.None)
+            {
+                UI_LaunchIndicator_Firebase?.SHowGuideUI(1);
+            }
+        }).SetId("GuideTimer1");
+        
         int _remainingTime = (int)time;
         ControlCountdown(true);
         countDownTween = DOTween.To(
