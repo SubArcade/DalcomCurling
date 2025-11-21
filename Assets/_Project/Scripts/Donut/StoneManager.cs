@@ -604,11 +604,13 @@ public class StoneManager : MonoBehaviour
     }
 
 
-    public void CalculateScore(out StoneForceController_Firebase.Team team, out int score, bool needNearest = false)
+    public void CalculateScore(out StoneForceController_Firebase.Team team, out int score, out List<int> idList, bool needNearest = false)
     {
 
         Vector3 housePosition = _scr_Collider_House.transform.position; // 하우스(점수중심점) 의 포지션
 
+        List<int> scoredIds = new List<int>();
+        idList = null;
         //하우스 콜라이더로부터 닿아있는 도넛들을 가져옴
         List<StoneForceController_Firebase> inHouseDonutList = _scr_Collider_House.GetInHouseDonutList();
 
@@ -632,8 +634,10 @@ public class StoneManager : MonoBehaviour
             return;
         }
         team = sortedDonutList[0].team; // out으로 보낼 승리팀
+        scoredIds.Add(sortedDonutList[0].donutId);
         //sortedDonutList[0].transform.GetComponent<Outlinable>().enabled = true;
         score = 1;
+        
 
         int indexToHighlight = 0;
         
@@ -644,15 +648,51 @@ public class StoneManager : MonoBehaviour
                 indexToHighlight = i;
                 //sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
                 score++; // out으로 보낼 점수
+                scoredIds.Add(sortedDonutList[i].donutId);
             }
             else
             {
+                idList = null;
                 break;
             }
         }
+
+        idList = scoredIds;
         StartCoroutine(HighlightScoredDonuts(sortedDonutList, indexToHighlight));
         
         
+    }
+
+    public void VisualizeScoreDonuts(string team, List<int> idList)
+    {
+        List<StoneForceController_Firebase> sfc =  new List<StoneForceController_Firebase>();
+        if (team == StoneForceController_Firebase.Team.A.ToString())
+        {
+            foreach (int id in idList)
+            {
+                for (int i = 0; i < _stoneControllers_A.Count; i++)
+                {
+                    if (_stoneControllers_A[i].donutId == id)
+                    {
+                        sfc.Add(_stoneControllers_A[i]);
+                    }
+                }
+            }            
+        }
+        else if (team == StoneForceController_Firebase.Team.B.ToString())
+        {
+            foreach (int id in idList)
+            {
+                for (int i = 0; i < _stoneControllers_B.Count; i++)
+                {
+                    if (_stoneControllers_B[i].donutId == id)
+                    {
+                        sfc.Add(_stoneControllers_B[i]);
+                    }
+                }
+            }       
+        }
+        StartCoroutine(HighlightScoredDonuts(sfc, sfc.Count - 1));
     }
 
     IEnumerator HighlightScoredDonuts(List<StoneForceController_Firebase> sortedDonutList, int index, bool needToDisable = false)

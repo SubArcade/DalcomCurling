@@ -460,7 +460,7 @@ public class FirebaseGameManager : MonoBehaviour
             StoneForceController_Firebase.Team team = StoneForceController_Firebase.Team.None;
             int score = 0;
             float delayTime = 0;
-            stoneManager?.CalculateScore(out team, out score, true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
+            stoneManager?.CalculateScore(out team, out score, out List<int> donutIds,true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
             if (team == StoneForceController_Firebase.Team.None && score == -99) //하우스에 도넛이 없으면 score를 0반환, 있으면 -99반환 
             {
                 delayTime = 2f; //도넛 하이라이트 지속해줄 시간
@@ -604,7 +604,7 @@ public class FirebaseGameManager : MonoBehaviour
                 //Debug.Log("게임 종료를 위한 계산 시작");
                 gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
                 // 호스트가 점수를 기반으로 다음 라운드 시작 플레이어를 결정하고 DB를 업데이트합니다.
-                stoneManager.CalculateScore(out StoneForceController_Firebase.Team winnerTeam, out int score);
+                stoneManager.CalculateScore(out StoneForceController_Firebase.Team winnerTeam, out int score, out List<int> donutIds);
                 UpdateScoreInLocal(winnerTeam, score); // 계산된 점수를 로컬상에서 변경
                 //Debug.Log($"{winnerTeam}: {score}");
                 string winnerId = null;
@@ -632,11 +632,11 @@ public class FirebaseGameManager : MonoBehaviour
                  if (_currentGame.RoundNumber >= 3 || 
                      (_currentGame.RoundNumber == 2 && Math.Abs(aTeamScore - bTeamScore) >= 5))
                  {
-                     ResetGameDatas(nextRoundStarterId, true); // 게임 끝내기 위한 정보들도 전송해야함
+                     ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds,true); // 게임 끝내기 위한 정보들도 전송해야함
                  }
                  else
                  {
-                     ResetGameDatas(nextRoundStarterId, false); // 다음 라운드를 위한 정보들 전송
+                     ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds,false); // 다음 라운드를 위한 정보들 전송
                  }
                 
             }
@@ -846,7 +846,7 @@ public class FirebaseGameManager : MonoBehaviour
             StoneForceController_Firebase.Team team = StoneForceController_Firebase.Team.None;
             int score = 0;
             float delayTime = 0;
-            stoneManager?.CalculateScore(out team, out score, true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
+            stoneManager?.CalculateScore(out team, out score, out List<int> donutIds,true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
             if (team == StoneForceController_Firebase.Team.None && score == -99) //하우스에 도넛이 없으면 score를 0반환, 있으면 -99반환 
             {
                 delayTime = 2f; //도넛 하이라이트 지속해줄 시간
@@ -939,7 +939,8 @@ public class FirebaseGameManager : MonoBehaviour
         gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
         roundDataUpdated = true;
 
-        stoneManager.CalculateScore(out StoneForceController_Firebase.Team team, out int score);
+        //stoneManager.CalculateScore(out StoneForceController_Firebase.Team team, out int score, out List<int> donutIds);
+        stoneManager?.VisualizeScoreDonuts(_currentGame.ScoredDonuts.Team,  _currentGame.ScoredDonuts.StoneId);
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         string nextState;
@@ -967,6 +968,7 @@ public class FirebaseGameManager : MonoBehaviour
             {
                 { "LastUploaderId", myUserId },
                 { "PredictedResult", result },
+                { "ScoredDonuts", null},
                 { "GameState", nextState } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
             };
             //stoneManager?.ClearOldDonutsInNewRound(_currentGame);
@@ -995,7 +997,8 @@ public class FirebaseGameManager : MonoBehaviour
         //Debug.Log($"승리팀 : {winner}, 점수 : {score}");
     }
 
-    private void ResetGameDatas(string nextPlayerId, bool isFinished = false) // 다음 라운드 시작 플레이어를 파라미터로 받음
+    private void ResetGameDatas(string nextPlayerId, StoneForceController_Firebase.Team team, 
+        List<int> scoredDonutIds,bool isFinished = false) // 다음 라운드 시작 플레이어를 파라미터로 받음
     {
         
         if (isFinished) // 만약 게임이 끝났다면
@@ -1011,6 +1014,12 @@ public class FirebaseGameManager : MonoBehaviour
         //     FinalStonePositions = new List<StonePosition>()
         // };
 
+        var scoredDonuts = new ScoredDonuts
+        {
+            StoneId = scoredDonutIds,
+            Team = team.ToString(),
+        };
+
         currentRound = _currentGame.RoundNumber;
         var updates = new Dictionary<string, object>
         {
@@ -1024,6 +1033,7 @@ public class FirebaseGameManager : MonoBehaviour
             { "BTeamScore", bTeamScore },
             //{ "PredictedResult", result },
             { "LastUploaderId", myUserId },
+            { "ScoredDonuts", scoredDonuts },
             { "GameState", "RoundChanging" } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
         };
         currentRound++;

@@ -91,6 +91,9 @@ public class Game
     [FirestoreProperty]
     public string LastUploaderId { get; set; }
     
+    [FirestoreProperty]
+    public ScoredDonuts ScoredDonuts { get; set; }
+    
 }
 
 [FirestoreData]
@@ -139,6 +142,16 @@ public class StonePosition
     public int Friction { get; set; } // 도넛 마찰
     [FirestoreProperty]
     public Dictionary<string, float> Position { get; set; } // Vector3 저장용
+}
+
+[FirestoreData]
+public class ScoredDonuts
+{
+    [FirestoreProperty]
+    public List<int> StoneId { get; set; }
+    
+    [FirestoreProperty]
+    public string Team { get; set; }
 }
 
 
@@ -481,7 +494,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                 { room.PlayerIds[1], 0 }
             },
             LastShot = null,
-            PredictedResult = null
+            PredictedResult = null,
+            ScoredDonuts = null
         };
 
         // "games" 컬렉션에 새 게임 문서를 추가합니다.
