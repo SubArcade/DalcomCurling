@@ -11,12 +11,11 @@ public enum AuthProviderType
 public enum NamePlateType
 {
     NONE = 0, // 없음
-    NP1 = 1,
-    NP2 = 2,
-    NP3 = 3,
-    NP4 = 4,
-    NP5 = 5,
-    NP6 = 6,
+    DoughNewbie = 1, // 초보 조물러
+    SoftTouch = 2,  // 말랑 조작자
+    DoughHandler = 3,   // 반죽 핸들러
+    DonutPilot = 4, // 도넛 파일럿
+    DonutMaster = 5,    // 도넛 마스터
 }
 
 [System.Serializable, FirestoreData]

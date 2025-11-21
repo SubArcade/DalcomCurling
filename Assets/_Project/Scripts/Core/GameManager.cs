@@ -31,6 +31,16 @@ public class GameManager : MonoBehaviour
         FirebaseAuthManager.Instance.Init();
     }
     
+    // 안드리오드 기계 뒤로가기 버튼 처리
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape) && GameState.Lobby == State)
+        {
+            Debug.Log("뒤로가기 눌림!");
+            // 팝업 띄우기
+        }
+    }
+    
     public void EndGame()
     {
         SetState(GameState.Result);

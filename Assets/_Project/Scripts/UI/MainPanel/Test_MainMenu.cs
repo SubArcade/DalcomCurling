@@ -97,10 +97,10 @@ public class Test_MainMenu : MonoBehaviour
 
     void addNameTitle()
     {
-        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP1);
-        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP2);
-        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP3);
-        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP5);
-        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.NP6);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.DoughNewbie);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.SoftTouch);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.DoughHandler);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.DonutPilot);
+        DataManager.Instance.PlayerData.gainNamePlateType.Add(NamePlateType.DonutMaster);
     }
 }

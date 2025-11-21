@@ -52,7 +52,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 
     void Awake()
     {
-        accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
+       accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
     }
     void Start()
     {
