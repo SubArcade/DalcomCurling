@@ -369,7 +369,7 @@ public class StoneManager : MonoBehaviour
     // 서버에서 받은 최종 위치로 돌들을 동기화. (누락된 돌 자동 생성 기능 포함)
     public void SyncPositions(List<StonePosition> serverPositions)
     {
-        Debug.Log($"서버의 최종 위치로 모든 돌을 동기화합니다. 서버 돌 개수: {serverPositions.Count}");
+        //Debug.Log($"서버의 최종 위치로 모든 돌을 동기화합니다. 서버 돌 개수: {serverPositions.Count}");
         lastStonePosition = serverPositions;
 
         foreach (var stonePos in serverPositions)
@@ -415,9 +415,9 @@ public class StoneManager : MonoBehaviour
                 Debug.Log("Rigidbody를 찾을 수 없음");
                 continue;
             }
-            rb.isKinematic = true;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
             
             // isTrigger를 true로 설정하여 순간이동 중 다른 오브젝트와 충돌 방지
             //var capCollider = fc.transform.GetComponent<CapsuleCollider>();
@@ -515,7 +515,7 @@ public class StoneManager : MonoBehaviour
                         { "z", sfc.transform.position.z }
                     }
                 });
-                Debug.Log($"donutId = {sfc.donutId}, Team = {sfc.team}, Position = ({sfc.transform.position.x}, {sfc.transform.position.y}, {sfc.transform.position.z})");
+                //Debug.Log($"donutId = {sfc.donutId}, Team = {sfc.team}, Position = ({sfc.transform.position.x}, {sfc.transform.position.y}, {sfc.transform.position.z})");
             }
 
             //if (i < _stoneControllers_B.Count && _stoneControllers_B.ContainsKey(i))
@@ -541,7 +541,7 @@ public class StoneManager : MonoBehaviour
                         { "z", sfc.transform.position.z }
                     }
                 });
-                Debug.Log($"donutId = {sfc.donutId}, Team = {sfc.team}, Position = ({sfc.transform.position.x}, {sfc.transform.position.y}, {sfc.transform.position.z})");
+                //Debug.Log($"donutId = {sfc.donutId}, Team = {sfc.team}, Position = ({sfc.transform.position.x}, {sfc.transform.position.y}, {sfc.transform.position.z})");
 
             }
         }

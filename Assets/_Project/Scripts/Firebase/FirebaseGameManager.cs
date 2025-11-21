@@ -355,7 +355,7 @@ public class FirebaseGameManager : MonoBehaviour
                 // }
                 if (roundDataUpdated == false)
                 {
-                    Debug.Log("OnRoundEnd 호출되었음");
+                    //Debug.Log("OnRoundEnd 호출되었음");
                     OnRoundEnd();
                 }
                 
@@ -587,7 +587,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void ProcessPrediction(PredictedResult result)
     {
-        Debug.Log($"{result.PredictingPlayerId}로부터 받은 예측 결과 처리. 결과를 캐시하고 턴 전환을 시작합니다.");
+        //Debug.Log($"{result.PredictingPlayerId}로부터 받은 예측 결과 처리. 결과를 캐시하고 턴 전환을 시작합니다.");
 
         // 결과를 캐시하여 HandleTurnChange에서 사용하도록 함
         _cachedPrediction = result;
@@ -838,7 +838,7 @@ public class FirebaseGameManager : MonoBehaviour
     {
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = initialFixedDeltaTime;
-        Debug.Log("시뮬레이션 완료.");
+        //Debug.Log("시뮬레이션 완료.");
 
         //시뮬레이션 완료 후 딜레이주기
         DOVirtual.DelayedCall(1.5f, () =>
