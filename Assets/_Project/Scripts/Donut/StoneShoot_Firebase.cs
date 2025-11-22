@@ -350,7 +350,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                     {
                         if (_inputEnabled && _currentAimingPhase == AimingPhase.Rotation && !IsDragging)
                         {
-                            uiLaunch?.SHowGuideUI(2);
+                            uiLaunch?.ShowGuideUI(2);
                         }
                     }).SetId("GuideTimer2");
                 }
@@ -416,6 +416,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         DOTween.Kill("GuideTimer1");
         DOTween.Kill("GuideTimer2");
         DOTween.Kill("GuideTimer3");
+        uiLaunch?.HideGuideUI();
 
         IsDragging = true;
         CurrentDragType = dragType;
@@ -576,6 +577,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         DOTween.Kill("GuideTimer1");
         DOTween.Kill("GuideTimer2");
         DOTween.Kill("GuideTimer3");
+        uiLaunch?.HideGuideUI();
 
         //Debug.Log($"RElesase clicked, myTurn = {FirebaseGameManager.Instance._isMyTurn}");
         //미리 보기 궤적 비활성화
@@ -616,7 +618,7 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// <param name="shotData">발사할 샷 데이터.</param>
     private void MoveDonutToHogLine(LastShot shotData)
     {
-        uiLaunch?.SHowGuideUI(3);
+        uiLaunch?.ShowGuideUI(3);
 
         if (_currentStoneRb == null)
         {
@@ -642,6 +644,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 if (_currentStoneRb != null) _currentStoneRb.DOKill(); // DOTween 애니메이션 중지
 
                 OnShotConfirmed?.Invoke(shotData); // 샷 데이터 확정 이벤트 발생
+                uiLaunch?.HideGuideUI();
                 //Debug.Log("샷 정보 전송 완료.");
 
                 FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot(); // 로컬 상태를 시뮬레이션 중으로 변경               

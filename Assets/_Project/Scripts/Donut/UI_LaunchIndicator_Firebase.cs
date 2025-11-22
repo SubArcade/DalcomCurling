@@ -202,9 +202,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         minimap.SetActive(false);
         result.SetActive(false);
     }
-    public void SHowGuideUI(int select)
+    public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
      // 반복 횟수 , 속도 거리등은 해당 객체 인스펙터에서 조절
+        guide.gameObject.SetActive(true);
 
         if (select == 1) {
             guide.PlayVerticalDrag();
@@ -220,6 +221,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         {
             Debug.Log("올바른 가이드 출력 번호가 아닙니다.");
         }
+    }
+    public void HideGuideUI()
+    {
+        guide.gameObject.SetActive(false);
     }
 
     /// <summary>

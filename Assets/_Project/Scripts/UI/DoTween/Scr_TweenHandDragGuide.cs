@@ -4,8 +4,8 @@ using DG.Tweening;
 public class Scr_TweenHandDragGuide : MonoBehaviour
 {
     [Header("드래그 설정")]
-    [SerializeField] private float dragDistance = 200f; // 얼마나 이동할지(px or world)
-    [SerializeField] private float dragTime = 1f;       // 1회 드래그 시간
+    [SerializeField] private float dragDistance = 180f; // 얼마나 이동할지(px or world)
+    [SerializeField] private float dragTime = 0.6f;       // 1회 드래그 시간
     [SerializeField] private int loopCount = 2;         // 반복 횟수(PingPong 포함)
 
     private RectTransform handRect;
@@ -38,11 +38,14 @@ public class Scr_TweenHandDragGuide : MonoBehaviour
         PlayDragAnimation(direction: Vector2.right);
     }
 
+    /// <summary>
+    /// 탭 하는 움직임
+    /// </summary>
     public void PlayTouchMove()
     {
         transform.localScale = originalScale;
         Sequence sequence = DOTween.Sequence();
-        sequence.AppendInterval(delay);
+        sequence.AppendInterval(dragTime);
         sequence.Append(transform.DOPunchScale( Vector3.one * 1.2f - originalScale, dragTime, 7, 1f));
         sequence.SetLoops(loopCount, LoopType.Restart);
         

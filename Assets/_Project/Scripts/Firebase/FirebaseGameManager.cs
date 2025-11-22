@@ -1235,7 +1235,7 @@ public class FirebaseGameManager : MonoBehaviour
         {
             if (_localState == LocalGameState.WaitingForInput && inputController != null && inputController.CurrentDragType == StoneShoot_Firebase.DragType.None)
             {
-                UI_LaunchIndicator_Firebase?.SHowGuideUI(1);
+                UI_LaunchIndicator_Firebase?.ShowGuideUI(1);
             }
         }).SetId("GuideTimer1");
         
