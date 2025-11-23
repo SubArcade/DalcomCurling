@@ -255,10 +255,14 @@ public class BoardManager : MonoBehaviour
             return;
         }
         //변수에 보상값+기존값 더해서 저장
-        int newGold =DataManager.Instance.PlayerData.gold += giftData.rewardGold;
-        int newEnergy =DataManager.Instance.PlayerData.energy += giftData.rewardEnergy;
-        int newGem = DataManager.Instance.PlayerData.gem += giftData.rewardGem;
+        int gold = Random.Range(giftData.minGold, giftData.maxGold + 1);
+        int energy = Random.Range(giftData.minEnergy, giftData.maxEnergy + 1);
+        int gem = Random.Range(giftData.minGem, giftData.maxGem);
 
+
+        int newGold = DataManager.Instance.PlayerData.gold + gold;
+        int newEnergy = DataManager.Instance.PlayerData.energy + energy;
+        int newGem = DataManager.Instance.PlayerData.gem + gem;
         //change함수로 갱신해줘야 UI즉각 반영됨
         DataManager.Instance.GoldChange(newGold);
         DataManager.Instance.EnergyChange(newEnergy);
@@ -272,7 +276,7 @@ public class BoardManager : MonoBehaviour
         {
             var popup = usegiftbox.GetComponent<Scr_UseGiftBoxPopUp>();
             if (popup != null)
-                popup.SetRewardTexts(newGold, newEnergy, newGem);
+                popup.SetRewardTexts(gold, energy,gem);
         }
 
         // 보상 후 기프트 박스 삭제
