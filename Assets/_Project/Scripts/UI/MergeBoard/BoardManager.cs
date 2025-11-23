@@ -254,8 +254,8 @@ public class BoardManager : MonoBehaviour
         //DataManager.Instance.PlayerData.energy += gift.rewardEnergy;
 
         // 보상 후 기프트 박스 삭제
-        cell.ClearItem();
         Destroy(cell.occupant.gameObject);
+        cell.ClearItem();
     }
 
     // 도넛 찾기

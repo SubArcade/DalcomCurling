@@ -42,7 +42,10 @@ public class TempStorageSlot : MonoBehaviour
     {
         if (storage.Count == 0)
             return null;
-        // TODO : Dequeue 하기전에 보드판 빈칸있으면 리턴 
+
+        var emptyCell = BoardManager.Instance.FindEmptyActiveCell();
+
+        if (emptyCell == null) return null;
 
         var item = storage.Dequeue();
         RefreshUI();

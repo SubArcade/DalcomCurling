@@ -170,7 +170,7 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
@@ -202,7 +202,7 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
