@@ -267,6 +267,36 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
         if (myData == null || otherData == null)
         {
+            int myLevel = ParseGiftLevel(donutId);
+            int otherLevel = ParseGiftLevel(otherItem.donutId);
+
+            if (myLevel > 0 && otherLevel > 0 && myLevel == otherLevel)
+            {
+                var nextGift = DataManager.Instance.GetGiftBoxData(myLevel + 1);
+                if (nextGift == null)
+                {
+                    Debug.LogWarning($"[MERGE] 다음 단계 GiftBox 없음 ({donutId})");
+                    ResetPosition();
+                    return;
+                }
+
+                // 머지 성공 → 상위 GiftBox로 교체
+                otherItem.GetComponent<Image>().sprite = nextGift.sprite;
+                otherItem.donutId = nextGift.id;
+                otherItem.donutData = null; // GiftBox는 DonutData 아님
+
+                if (otherItem.currentCell != null)
+                    otherItem.currentCell.donutId = nextGift.id;
+
+                currentCell.ClearItem();
+                Destroy(gameObject);
+
+                Debug.Log($"[MERGE] GiftBox {donutId} → {nextGift.id} 머지 성공");
+                BoardManager.Instance.AutoSaveBoardLocal();
+                return;
+            }
+
+
             Debug.LogWarning($"[MERGE] 도넛 데이터가 존재하지 않습니다. ({donutId})");
             ResetPosition();
             return;
@@ -410,4 +440,14 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         yield return null;
     }
     */
+   public int ParseGiftLevel(string id) //유틸 함수
+    {
+        if (string.IsNullOrEmpty(id)) return -1;
+        var parts = id.Split('_');
+        if (parts.Length != 2) return -1;
+        if (parts[0] != "Gift") return -1;
+        if (int.TryParse(parts[1], out int level)) return level;
+        return -1;
+    }
+
 }

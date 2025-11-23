@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class BoardManager : MonoBehaviour
 {
@@ -74,18 +76,18 @@ public class BoardManager : MonoBehaviour
 
         // 기프트박스인지 확인
         var item = cell.occupant;
-        if (item != null)
+        if (item != null && item.donutId.StartsWith("Gift"))
         {
-            var data = DataManager.Instance.GetDonutByID(item.donutId);
-
-            if (data.donutType == DonutType.Gift)
+            // 첫 번째 터치 → 선택만
+            if (!isSameCell)
             {
-                if (isSameCell)
-                {
-                    ClaimGiftReward(data, cell);
-                }
+                SelectCell(cell); // 선택만 하고 리턴
                 return;
             }
+            // 두 번째 터치 → 보상 지급
+            ClaimGiftReward(item.donutId, cell);
+            return;
+
         }
     }
 
@@ -216,10 +218,9 @@ public class BoardManager : MonoBehaviour
         }
 
         // GiftBox Level 1 데이터 가져오기
-        var giftData = DataManager.Instance.GetDonutData(DonutType.Gift, 1);
+        var giftData = DataManager.Instance.GetGiftBoxData(1);
         if (giftData == null)
         {
-            Debug.LogError("GiftBox 데이터 없음! DonutGiftSO를 확인하세요.");
             return;
         }
 
@@ -231,24 +232,56 @@ public class BoardManager : MonoBehaviour
         // GiftBox 아이콘/ID 설정
         img.sprite = giftData.sprite;
         item.donutId = giftData.id;
-        item.donutData = giftData;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
+        item.donutData = null;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
 
         // 셀에 등록
-        cell.SetItem(item, giftData);
+        cell.SetItem(item, giftData.id);
     }
 
     //기프트박스 보상 함수
-    void ClaimGiftReward(DonutData gift, Cells cell)
+    void ClaimGiftReward(string giftId, Cells cell)
     {
-        //Debug.Log($"기프트 박스 보상 지급: {gift.displayName}");
+        // giftId가 GiftBox인지 확인
+        int level = ParseGiftLevel(giftId);
+        if (level <= 0)
+        {
+            return;
+        }
 
-        //// 예시 보상
-        //DataManager.Instance.PlayerData.gold += gift.rewardGold;
-        //DataManager.Instance.PlayerData.energy += gift.rewardEnergy;
+        // GiftBox 데이터 가져오기
+        var giftData = DataManager.Instance.GetGiftBoxData(level);
+        if (giftData == null)
+        {
+            return;
+        }
+        //변수에 보상값+기존값 더해서 저장
+        int newGold =DataManager.Instance.PlayerData.gold += giftData.rewardGold;
+        int newEnergy =DataManager.Instance.PlayerData.energy += giftData.rewardEnergy;
+        int newGem = DataManager.Instance.PlayerData.gem += giftData.rewardGem;
+
+        //change함수로 갱신해줘야 UI즉각 반영됨
+        DataManager.Instance.GoldChange(newGold);
+        DataManager.Instance.EnergyChange(newEnergy);
+        DataManager.Instance.GemChange(newGem);
+
+        UIManager.Instance.Open(PanelId.UseGiftBoxPopUp);
+
+        //팝업에 각 보상별로 텍스트 적용
+        GameObject usegiftbox = GameObject.Find("UseGiftBoxPopUp");
+        if (usegiftbox != null)
+        {
+            var popup = usegiftbox.GetComponent<Scr_UseGiftBoxPopUp>();
+            if (popup != null)
+                popup.SetRewardTexts(newGold, newEnergy, newGem);
+        }
 
         // 보상 후 기프트 박스 삭제
+        if (cell.occupant != null)
+        { 
+            Destroy(cell.occupant.gameObject);
+        }
         cell.ClearItem();
-        Destroy(cell.occupant.gameObject);
+        BoardManager.Instance.AutoSaveBoardLocal();
     }
 
 
@@ -419,6 +452,16 @@ public class BoardManager : MonoBehaviour
         }
 
         //Debug.Log("[LoadBoardLocal] 보드 로드 완료");
+    }
+
+    private int ParseGiftLevel(string id) //기프트박스의 id문자열에서 레벨숫자만 추출하는 유틸함수
+    {
+        if (string.IsNullOrEmpty(id)) return -1; //null이거나 빈 문자열이면 잘못된 입력 -1 반환
+        var parts = id.Split('_'); //gift와 1로 나눠서 배열로 저장 part[0] = gift, part[1] = 1
+        if (parts.Length != 2) return -1; //gift_1 처럼 정확히 두 부분으로 나뉘지 않으면 잘못된 형식 -1 반환
+        if (parts[0] != "Gift") return -1;  //첫번째 부분이 gift가 아니면 -1 반환
+        if (int.TryParse(parts[1], out int level)) return level; //두번째 부분이 숫자면 level 저장하고 반환
+        return -1;
     }
 
 }

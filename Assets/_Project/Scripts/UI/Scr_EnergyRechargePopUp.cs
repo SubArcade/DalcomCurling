@@ -82,9 +82,9 @@ public class Scr_EnergyRechargePopUp : MonoBehaviour
         // 보석 차감 + 에너지 회복
         int newGem = currentGem - 10;
         int newEnergy = Energy + 50;
-       
-        DataManager.Instance.PlayerData.gem = newGem;
-        DataManager.Instance.PlayerData.energy = newEnergy;
+
+        DataManager.Instance.GemChange(newGem);
+        DataManager.Instance.EnergyChange(newEnergy);
     }
    
     //광고버튼 에너지충전
