@@ -176,7 +176,8 @@ public class BoardManager : MonoBehaviour
         }
 
         //에너지 차감
-        playerData.energy -= 1;
+        int useEnergy = playerData.energy -= 1;
+        DataManager.Instance.EnergyChange(useEnergy);
 
         // 생성기에서 도넛 정보 랜덤 선택 (DonutGenerator 내부 확률 계산)
         var generator = generatorCell.GetComponentInChildren<DonutGenerator>();
