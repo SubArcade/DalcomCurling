@@ -42,13 +42,13 @@ public class BoardManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        tempStorageSlot = FindObjectOfType<TempStorageSlot>();
     }
 
     void Start()
     {
         selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
-        tempStorageSlot = FindObjectOfType<TempStorageSlot>();
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
@@ -216,9 +216,30 @@ public class BoardManager : MonoBehaviour
     {
         // 빈 활성 셀 찾기
         var cell = FindEmptyActiveCell();
+        Debug.Log("CHECK cell : " + (cell != null));
         // GiftBox Level 1 데이터 가져오기
         var giftData = DataManager.Instance.GetGiftBoxData(1);
         if (giftData == null)
+        {
+            Debug.LogError("❌ GiftBoxData Level 1 NOT FOUND");
+            return;
+        }
+        else
+        {
+            Debug.Log($"Gift Loaded: {giftData.id}, sprite:{giftData.sprite}");
+        }
+
+        // GiftBoxData → DonutData 로 변환
+        DonutData fakeDonut = new DonutData()
+        {
+            id = giftData.id,
+            sprite = giftData.sprite,
+            donutType = DonutType.Gift,   // 반드시 Gift 타입
+            level = giftData.level        // 기프트박스 레벨 = 도넛레벨
+        };
+
+        Debug.Log("CHECK donutPrefab : " + donutPrefab);
+
         if (cell == null)
         {
             tempStorageSlot.Add(giftData);
@@ -226,22 +247,21 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
-        {
-            return;
-        }
-
         // 프리팹 생성
         GameObject obj = Instantiate(donutPrefab, cell.transform);
+        Debug.Log("CHECK obj : " + obj);
         var item = obj.GetComponent<MergeItemUI>();
+        Debug.Log("CHECK MergeItemUI : " + item);
         var img = obj.GetComponent<Image>();
 
         // GiftBox 아이콘/ID 설정
-        img.sprite = giftData.sprite;
-        item.donutId = giftData.id;
-        item.donutData = null;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
+        img.sprite = fakeDonut.sprite;
+        item.donutId = fakeDonut.id;
+        item.donutData = fakeDonut;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
 
         // 셀에 등록
-        cell.SetItem(item, giftData.id);
+        cell.SetItem(item, fakeDonut.id);
+
     }
 
     //기프트박스 보상 함수
@@ -435,7 +455,7 @@ public class BoardManager : MonoBehaviour
     }
 
     // 임시보관칸에서 보드판에 생성
-    public void SpawnFromTempStorage(DonutData data)
+    public void SpawnFromTempStorage(GiftBoxData giftData)
     {
         Cells cell = FindEmptyActiveCell();
         if (cell == null)
@@ -444,14 +464,32 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
+        DonutData fakeDonut = new DonutData()
+        {
+            id = giftData.id,
+            sprite = giftData.sprite,
+            donutType = DonutType.Gift,
+            level = giftData.level            // GiftBox 레벨과 일치
+        };
+
         GameObject obj = Instantiate(donutPrefab, cell.transform);
         var item = obj.GetComponent<MergeItemUI>();
 
-        item.donutId = data.id;
-        item.donutData = data;
+        item.donutId = fakeDonut.id;
+        item.donutData = fakeDonut;
 
-        obj.GetComponent<Image>().sprite = data.sprite;
-        cell.SetItem(item, data);
+        obj.GetComponent<Image>().sprite = fakeDonut.sprite;
+        cell.SetItem(item, fakeDonut);
+    }
+
+    private int ParseGiftLevel(string id) //기프트박스의 id문자열에서 레벨숫자만 추출하는 유틸함수
+    {
+        if (string.IsNullOrEmpty(id)) return -1; //null이거나 빈 문자열이면 잘못된 입력 -1 반환
+        var parts = id.Split('_'); //gift와 1로 나눠서 배열로 저장 part[0] = gift, part[1] = 1
+        if (parts.Length != 2) return -1; //gift_1 처럼 정확히 두 부분으로 나뉘지 않으면 잘못된 형식 -1 반환
+        if (parts[0] != "Gift") return -1;  //첫번째 부분이 gift가 아니면 -1 반환
+        if (int.TryParse(parts[1], out int level)) return level; //두번째 부분이 숫자면 level 저장하고 반환
+        return -1;
     }
 
 }

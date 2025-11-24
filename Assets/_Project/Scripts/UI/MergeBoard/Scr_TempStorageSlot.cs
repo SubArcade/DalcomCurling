@@ -7,7 +7,7 @@ public class TempStorageSlot : MonoBehaviour
 {
     [SerializeField] private const int MAX_STACK = 7;
 
-    private Queue<DonutData> storage = new Queue<DonutData>();
+    private Queue<GiftBoxData> storage = new Queue<GiftBoxData>();
 
     [SerializeField] private Button tempButton;
     public Image tempIcon; // 보관칸에 있을떄 출력할 이미지
@@ -23,7 +23,7 @@ public class TempStorageSlot : MonoBehaviour
     }
 
     // 임시보관칸에 넣기
-    public bool Add(DonutData data)
+    public bool Add(GiftBoxData data)
     {
         if (storage.Count >= MAX_STACK)
         {
@@ -38,7 +38,7 @@ public class TempStorageSlot : MonoBehaviour
     }
 
     // 꺼내기
-    public DonutData Pop()
+    public GiftBoxData Pop()
     {
         if (storage.Count == 0)
             return null;
