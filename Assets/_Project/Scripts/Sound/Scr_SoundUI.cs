@@ -16,8 +16,8 @@ public class Scr_SoundUI : MonoBehaviour
     void Start()
     {
         // 버튼 이벤트 연결
-        lobbyBGMButton.onClick.AddListener(() => SoundManager.Instance.PlayLobbyBGM());
-        gameBGMButton.onClick.AddListener(() => SoundManager.Instance.PlayGameBGM());
+        //lobbyBGMButton.onClick.AddListener(() => SoundManager.Instance.PlayLobbyBGM());
+        //gameBGMButton.onClick.AddListener(() => SoundManager.Instance.PlayGameBGM());
 
         // 슬라이더 초기값 설정 (필요 시 저장된 값 불러오기)
         bgmSlider.value = 1f;

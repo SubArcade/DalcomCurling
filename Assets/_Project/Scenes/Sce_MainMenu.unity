@@ -3258,7 +3258,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &728120154
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3360,7 +3360,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 728120156}
   toggleTransition: 1
   graphic: {fileID: 0}
-  m_Group: {fileID: 6225161331728860527}
+  m_Group: {fileID: 8818140610458471167}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -6414,9 +6414,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'effect
-
-'
+  m_Text: charcater
 --- !u!222 &1485928655
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6561,8 +6559,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -172.00005, y: -36.000027}
-  m_SizeDelta: {x: 172.00003, y: 144}
+  m_AnchoredPosition: {x: -172.00003, y: -36.000027}
+  m_SizeDelta: {x: 172.00006, y: 144}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1548628847
 MonoBehaviour:
@@ -6760,7 +6758,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0.000015258789, y: -36.00004}
-  m_SizeDelta: {x: 172.7142, y: 143.2858}
+  m_SizeDelta: {x: 172.71417, y: 143.2858}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1610766899
 MonoBehaviour:
@@ -8255,7 +8253,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2006517501}
   toggleTransition: 1
   graphic: {fileID: 0}
-  m_Group: {fileID: 6225161331728860527}
+  m_Group: {fileID: 8818140610458471167}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -11057,10 +11055,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6225161331728860525}
   - component: {fileID: 3450853416212043573}
-  - component: {fileID: 6225161331728860528}
   - component: {fileID: 1267527579973793959}
   - component: {fileID: 6225161331728860526}
-  - component: {fileID: 6225161331728860527}
   m_Layer: 5
   m_Name: CharacterEffectSelector
   m_TagString: Untagged
@@ -62877,6 +62873,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8818140610458471165}
+  - component: {fileID: 8818140610458471166}
+  - component: {fileID: 8818140610458471167}
   m_Layer: 5
   m_Name: ReadyMenu
   m_TagString: Untagged
@@ -66779,8 +66777,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2006517499}
-  - {fileID: 425814916}
   - {fileID: 728120154}
+  - {fileID: 425814916}
   - {fileID: 882755765}
   m_Father: {fileID: 684372045222895876}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -66804,33 +66802,6 @@ MonoBehaviour:
   m_EffectColor: {r: 0.5411765, g: 0.5411765, b: 0.5411765, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
---- !u!114 &6225161331728860527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 247142006952431290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AllowSwitchOff: 0
---- !u!114 &6225161331728860528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 247142006952431290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1a85592d9fe534438573f973571b7fa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  effectToggle: {fileID: 0}
-  characterToggle: {fileID: 0}
 --- !u!114 &6226288847001965504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90571,6 +90542,33 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -45.432}
   m_SizeDelta: {x: 412, y: 733.14}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8818140610458471166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5785762235561244320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a85592d9fe534438573f973571b7fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectToggle: {fileID: 2006517503}
+  characterToggle: {fileID: 728120158}
+--- !u!114 &8818140610458471167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5785762235561244320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AllowSwitchOff: 0
 --- !u!1 &8847396597299174291
 GameObject:
   m_ObjectHideFlags: 0
