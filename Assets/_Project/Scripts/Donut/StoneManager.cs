@@ -135,6 +135,7 @@ public class StoneManager : MonoBehaviour
             Debug.LogError($"선택된 도넛({selectedDonut.id})에 해당하는 프리팹을 찾을 수 없습니다!");
             return null;
         }
+        DonutType type = donutDataToSpawn.donutType;
         selectedPrefab = donutDataToSpawn.prefab;
 
         if (playerId == null)
@@ -196,7 +197,7 @@ public class StoneManager : MonoBehaviour
         }
 
         // 선택된 도넛의 물리 속성을 StoneForceController_Firebase에 전달합니다.
-        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, currentDonutId, selectedDonut.id, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
+        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, type,currentDonutId, selectedDonut.id, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
 
         if (currentTurnPlayerId == game.PlayerIds[0]) // 현재 턴의 주인이 A팀(방장) 이면
         {
@@ -284,7 +285,7 @@ public class StoneManager : MonoBehaviour
     private IEnumerator MonitorSimulation(StoneForceController_Firebase.Team team)
     {
         yield return new WaitForSeconds(0.5f); // 물리 시뮬레이션이 안정적으로 시작될 때까지 잠시 대기
-        WaitForSeconds wait = new WaitForSeconds(0.2f);
+        WaitForSeconds wait = new WaitForSeconds(0.5f); // 모든 도넛들의 위치를 이 주기마다 확인하며 정지상태를 확인함
 
         while (true)
         {
@@ -334,7 +335,7 @@ public class StoneManager : MonoBehaviour
                 break; // 모든 돌이 멈췄으면 루프 탈출
             }
 
-            yield return wait; // 0.2초 간격으로 다시 확인
+            yield return wait; // 0.5초 간격으로 다시 확인
         }
 
         // 시뮬레이션 완료 후 서버에 위치 전송
@@ -455,6 +456,7 @@ public class StoneManager : MonoBehaviour
 
         // 씬에 실제로 돌을 생성
         GameObject newStone = Instantiate(donutDataToSpawn.prefab, spawnPosition.position, spawnPosition.rotation);
+        DonutType type = donutDataToSpawn.donutType;
         StoneForceController_Firebase sfc = newStone.GetComponent<StoneForceController_Firebase>();
 
         if (sfc == null)
@@ -466,7 +468,7 @@ public class StoneManager : MonoBehaviour
 
         // 서버에서 받은 정보로 돌 초기화
         StoneForceController_Firebase.Team team = (stoneInfo.Team == "A") ? StoneForceController_Firebase.Team.A : StoneForceController_Firebase.Team.B;
-        sfc.InitializeDonut(team, stoneInfo.StoneId, stoneInfo.DonutId, stoneInfo.Weight, stoneInfo.Resilience, stoneInfo.Friction);
+        sfc.InitializeDonut(team, type, stoneInfo.StoneId, stoneInfo.DonutId, stoneInfo.Weight, stoneInfo.Resilience, stoneInfo.Friction);
 
         // 올바른 딕셔너리에 추가
         if (team == StoneForceController_Firebase.Team.A)
@@ -600,6 +602,63 @@ public class StoneManager : MonoBehaviour
         if (inHouseDonutList.Count == 0) // 만약 아무도 하우스에 도넛을 못올렸으면 무승부
         {
             return;
+        }
+    }
+
+    
+    // 공격자의 도넛 종류에 따라 다른 도넛들의 수치를 모두 바꾸는 함수
+    public void ChangeDonutValuesRelatedToAttackDonut(StoneForceController_Firebase attacker) 
+    {
+        foreach (KeyValuePair<int, StoneForceController_Firebase> dictA in _stoneControllers_A)
+        {
+            if (dictA.Value != attacker)
+            {
+                switch (attacker.type)
+                {
+                    case DonutType.Hard :
+                        if (dictA.Value.type == DonutType.Hard)
+                        {
+                            
+                        }
+                        else if (dictA.Value.type == DonutType.Moist)
+                        {
+                            
+                        }
+                        else if (dictA.Value.type == DonutType.Soft)
+                        {
+                            
+                        }
+                        break;
+                    case DonutType.Moist :
+                        if (dictA.Value.type == DonutType.Hard)
+                        {
+                            
+                        }
+                        else if (dictA.Value.type == DonutType.Moist)
+                        {
+                            
+                        }
+                        else if (dictA.Value.type == DonutType.Soft)
+                        {
+                            
+                        }
+                        break;
+                    case DonutType.Soft :
+                        if (dictA.Value.type == DonutType.Hard)
+                        {
+                            
+                        }
+                        else if (dictA.Value.type == DonutType.Moist)
+                        {
+                            
+                        }
+                        else if (dictA.Value.type == DonutType.Soft)
+                        {
+                            
+                        }
+                        break;
+                }
+            }
         }
     }
 

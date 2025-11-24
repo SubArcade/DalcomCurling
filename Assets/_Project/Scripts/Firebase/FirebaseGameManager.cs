@@ -29,7 +29,8 @@ public class FirebaseGameManager : MonoBehaviour
         SimulatingMyShot, // 내가 쏜 돌이 움직이는 중인 상태
         WaitingForPrediction, // 시뮬레이션이 끝나고 상대방의 예측 결과를 기다리는 상태
         SimulatingOpponentShot, // 상대방이 쏜 돌을 시뮬레이션 중인 상태 (예측자 역할)
-        InTimeline // 연출 재생 중임을 나타내는 상태
+        InTimeline, // 연출 재생 중임을 나타내는 상태
+        FinishedGame // 서버로부터 종료 요청을 수신받고 종료처리를 하는 상태
     }
 
     private LocalGameState _localState = LocalGameState.Idle; // 현재 게임의 로컬 상태
@@ -663,8 +664,8 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleGameFinished()
     {
-        _localState = LocalGameState.InTimeline; // TODO : 로컬 스테이트를 게임종료로 설정하고 현재씬을 종료하고 메인씬으로 넘어가는 처리는 UI버튼에 연결하도록 변경
-
+        //_localState = LocalGameState.InTimeline; // TODO : 로컬 스테이트를 게임종료로 설정하고 현재씬을 종료하고 메인씬으로 넘어가는 처리는 UI버튼에 연결하도록 변경
+        _localState = LocalGameState.FinishedGame; // 서버로부터 게임 종료 명령을 받으면 자신의 로컬 상태도 종료 상태로 변경
         if (aTeamScore > bTeamScore)
         {
             if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)

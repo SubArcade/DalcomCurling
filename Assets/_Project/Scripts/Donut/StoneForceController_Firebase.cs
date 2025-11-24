@@ -19,6 +19,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 
     // StoneShoot.Team 대신 직접 Team enum을 정의하거나, FirebaseGameManager에서 팀 정보를 관리하도록 변경
     public Team team { get; private set; }
+    public DonutType type { get; private set; } // 이 도넛의 타입 ( 단단, 말랑, 촉촉 )
     public float spinForce;
     private float velocityCalc; // 발사 파워와 현재 속도를 1로 노멀라이징한 변수
     private float spinAmountFactor = 300f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
@@ -128,9 +129,10 @@ public class StoneForceController_Firebase : MonoBehaviour
     }
 
     // StoneShoot.Team 대신 직접 정의한 Team enum 사용
-    public void InitializeDonut(Team team, int donutId, string donutTypeId, int weight, int resilience, int friction) // 도넛의 팀과 id, 물리 속성을 적용
+    public void InitializeDonut(Team team, DonutType type,int donutId, string donutTypeId, int weight, int resilience, int friction) // 도넛의 팀과 id, 물리 속성을 적용
     {
         this.team = team;
+        this.type = type;
         this.donutId = donutId;
         this.DonutId = donutTypeId;
         this.DonutWeight = weight;
@@ -191,6 +193,58 @@ public class StoneForceController_Firebase : MonoBehaviour
     public void PassedEndHogLine() // 엔드 호그라인 콜라이더가 자신과 충돌한 적이 있음을 알림 ( 최소로 넘어가야 할 선을 넘김 )
     {
         isPassedEndHogLine = true;
+    }
+
+    public void ChangeMassByCompatibility(DonutType attackerType) // 공격자와의 속성 상성관계에 따라 현재 도넛의 질량을 바꿈
+    {
+        switch (attackerType)
+        {
+            case DonutType.Hard:
+                if (type == DonutType.Hard) // 단단
+                {
+                    rigid.mass = 4f; // 단단이 단단한테 비김
+                }
+                else if (type == DonutType.Moist) // 촉촉
+                {
+                    rigid.mass = 2f; // 단단이 촉촉한테 이김
+                }
+                else if (type == DonutType.Soft) // 말랑
+                {
+                    rigid.mass = 8f; // 단단이 말랑한테 짐
+                }
+
+                break;
+            case DonutType.Moist:
+                if (type == DonutType.Hard)
+                {
+                    rigid.mass = 8f; // 촉촉이 단단한테 짐
+                }
+                else if (type == DonutType.Moist)
+                {
+                    rigid.mass = 4f; // 촉촉이 촉촉한테 비김
+                }
+                else if (type == DonutType.Soft)
+                {
+                    rigid.mass = 2f; // 촉촉이 
+                }
+
+                break;
+            case DonutType.Soft:
+                if (type == DonutType.Hard)
+                {
+                    rigid.mass = 2f;
+                }
+                else if (type == DonutType.Moist)
+                {
+                    rigid.mass = 8f;
+                }
+                else if (type == DonutType.Soft)
+                {
+                    rigid.mass = 4f;
+                }
+
+                break;
+        }
     }
 
     private void OnCollisionEnter(Collision other)
