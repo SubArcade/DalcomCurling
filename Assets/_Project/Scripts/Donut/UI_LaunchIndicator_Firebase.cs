@@ -35,7 +35,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
     [Header("플로팅 텍스트")]
-    [SerializeField] private GameObject floatingTextPrefab; // 플로팅 텍스트 프리팹
+    [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
 
     //내부변수
     private int displayTurn = 0;
@@ -65,6 +65,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         else
         {
             Debug.LogError("UI_LaunchIndicator_Firebase: Start()에서 FirebaseGameManager.Instance를 찾을 수 없습니다.");
+        }
+
+        if (floatingText != null)
+        {
+            // 이 플로팅 텍스트는 파괴하지 않고 계속 재사용할 것이므로, destroyOnComplete 값을 false로 설정합니다.
+            floatingText.destroyOnComplete = false;
+            floatingText.gameObject.SetActive(false);
         }
     }
 
@@ -178,23 +185,20 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     /// <param name="screenPosition">텍스트가 나타날 스크린 좌표</param>
     public void ShowFloatingText(string message, Vector3 screenPosition)
     {
-        if (floatingTextPrefab == null)
+        if (floatingText == null)
         {
-            Debug.LogError("Floating text prefab이 할당되지 않았습니다!");
+            Debug.LogError("FloatingText 컴포넌트가 할당되지 않았습니다!");
             return;
         }
 
-        GameObject textGO = Instantiate(floatingTextPrefab, transform);
-        textGO.transform.position = screenPosition;
+        // 1. 위치 설정
+        floatingText.transform.position = screenPosition;
+        
+        // 2. 텍스트 설정
+        floatingText.SetText(message);
 
-        TextMeshProUGUI tmp = textGO.GetComponent<TextMeshProUGUI>();
-        tmp.text = message;
-
-        // 애니메이션 시퀀스
-        Sequence sequence = DOTween.Sequence();
-        sequence.Append(textGO.transform.DOMoveY(screenPosition.y + 100f, 1.5f).SetEase(Ease.OutQuad)); // 위로 100픽셀 이동
-        sequence.Join(tmp.DOFade(0f, 1.5f).SetEase(Ease.InQuad)); // 동시에 페이드 아웃
-        sequence.OnComplete(() => Destroy(textGO)); // 애니메이션 완료 후 오브젝트 파괴
+        // 3. 활성화 (활성화 시 FloatingText.cs의 OnEnable에서 애니메이션이 자동 시작됨)
+        floatingText.gameObject.SetActive(true);
     }
 
 
@@ -240,15 +244,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         if (select == 1) {
             guide.PlayVerticalDrag();
         }
-        if (select == 2) { 
+        else if (select == 2) { 
             guide.PlayHorizontalDrag();
         }
-        if (select == 3)
-        {
+        else if (select == 3) {
             guide.PlayTouchMove();
         }
-        else
-        {
+        else {
             Debug.Log("올바른 가이드 출력 번호가 아닙니다.");
         }
     }

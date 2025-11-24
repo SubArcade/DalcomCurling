@@ -421,7 +421,7 @@ public class FirebaseGameManager : MonoBehaviour
             else if (_localState == LocalGameState.Idle || _localState == LocalGameState.InTimeline)
             {
                 Debug.Log("내 턴 시작. 입력을 준비합니다.");
-                UI_LaunchIndicator_Firebase.ShowFloatingText("Your Turn", new Vector3(Screen.width / 2, Screen.height * 0.6f, 0));
+                UI_LaunchIndicator_Firebase.ShowFloatingText("Your Turn", new Vector3(Screen.width / 2, Screen.height * 0.4f, 0));
                 _localState = LocalGameState.WaitingForInput;
         
                 UI_LaunchIndicator_Firebase.FireShotReadyUI(); //입력준비 UI
@@ -453,7 +453,7 @@ public class FirebaseGameManager : MonoBehaviour
         }
         else if (!_isMyTurn)
         {
-            UI_LaunchIndicator_Firebase.ShowFloatingText("Opponent's Turn", new Vector3(Screen.width / 2, Screen.height * 0.6f, 0));
+            UI_LaunchIndicator_Firebase.ShowFloatingText("Opponent's Turn", new Vector3(Screen.width / 2, Screen.height * 0.4f, 0));
             //canShotDonutNow = false;
         
             SuccessfullyShotInTime = false;
@@ -922,7 +922,7 @@ public class FirebaseGameManager : MonoBehaviour
     public void ChangeState_To_WaitingForPrediction()
     {
         _localState = LocalGameState.WaitingForPrediction;
-        UI_LaunchIndicator_Firebase.ShowFloatingText("Waiting...", new Vector3(Screen.width / 2, Screen.height / 2, 0));
+        UI_LaunchIndicator_Firebase.ShowFloatingText("Waiting...", new Vector3(Screen.width / 2, Screen.height * 0.4f, 0));
         //Debug.Log("내 샷 시뮬레이션 완료. 상대방의 예측 결과를 기다립니다.");
 
         if (_cachedPrediction != null && _cachedPrediction.TurnNumber == _currentGame.TurnNumber)

@@ -714,13 +714,13 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (zPos >= perfectZoneLine.position.z && zPos <= startHogLine.position.z)
         {
             weights = perfectZoneRandomWeights; // 퍼펙트존 가중치 사용
-            //Debug.Log("퍼펙트존");
+            Debug.Log("퍼펙트존");
             uiLaunch.ShowFloatingText("Perfect", Input.mousePosition);
         }
         else if (zPos >= earlyZoneLine.position.z && zPos < perfectZoneLine.position.z)
         {
             weights = earlyZoneRandomWeights; // 얼리존 가중치 사용
-            //Debug.Log("얼리존");
+            Debug.Log("얼리존");
             uiLaunch.ShowFloatingText("Early", Input.mousePosition);
         }
 
