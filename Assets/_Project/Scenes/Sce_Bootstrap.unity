@@ -318,6 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   docId: ZflvQAZZmYj1SKj8mZKZ
+  isLogin: 0
   userData:
     <player>k__BackingField:
       <email>k__BackingField: test@test.com
@@ -334,11 +335,19 @@ MonoBehaviour:
       <changeNicknameCount>k__BackingField: 0
       <soloScore>k__BackingField: 0
       <soloTier>k__BackingField: 0
+      <maxEnergy>k__BackingField: 50
+      <perSecEnergy>k__BackingField: 10
+      <levelMax>k__BackingField: 20
     <inventory>k__BackingField:
       <donutEntries>k__BackingField: []
+      <hardDonutCodexDataList>k__BackingField: []
+      <softDonutCodexDataList>k__BackingField: []
+      <moistDnutCodexDataList>k__BackingField: []
     <mergeBoard>k__BackingField:
       <cells>k__BackingField: []
-      <generatorLevel>k__BackingField: 0
+      <generatorLevelHard>k__BackingField: 1
+      <generatorLevelSoft>k__BackingField: 1
+      <generatorLevelMoist>k__BackingField: 1
       cellMax: 49
       cellWidth: 7
       cellLength: 7
@@ -347,6 +356,11 @@ MonoBehaviour:
       <questList2>k__BackingField: []
       <questList3>k__BackingField: []
   Season: 2025
+  rankData:
+    <nickname>k__BackingField: 
+    <score>k__BackingField: 0
+    <tier>k__BackingField: 0
+    <uid>k__BackingField: 
 --- !u!1001 &469480491
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -926,9 +940,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5918d220a71efb42a692be7c4bd22cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &2131067576
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2131067578}
+  - component: {fileID: 2131067577}
+  m_Layer: 0
+  m_Name: testLog
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2131067577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2131067576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b87e33ee4a3e84d9268d6e77fa60e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2131067578
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2131067576}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 157.86125, y: 724.7756, z: 0.022967275}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1294903637}
   - {fileID: 1137162051}
+  - {fileID: 2131067578}

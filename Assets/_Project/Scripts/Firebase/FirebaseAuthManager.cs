@@ -163,6 +163,7 @@ public class FirebaseAuthManager
         if (_gpgsActivated) return;
     
         // 필요하면 나중에 config 도 넣을 수 있음
+        Debug.Log("[GPGS] 초기화");
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
     

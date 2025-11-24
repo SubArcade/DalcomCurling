@@ -42,7 +42,7 @@ public class PlayerData
     [field: SerializeField, Tooltip("솔로 티어")] [FirestoreProperty] public GameTier soloTier { get; set; }
 
     // 로컬 플레이어 데이터 (디비에 들어가지 않는 변수)
-    [Tooltip("최대 에너지")] public int maxEnergy { get; set; }
-    [Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
-    [Tooltip("플레이어 만랩")] public int levelMax { get; set; }
+    [field: SerializeField, Tooltip("최대 에너지")] public int maxEnergy { get; set; }
+    [field: SerializeField, Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
+    [field: SerializeField, Tooltip("플레이어 만랩")] public int levelMax { get; set; }
 }

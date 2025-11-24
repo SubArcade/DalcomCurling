@@ -57,7 +57,11 @@ public class Test_MainMenu : MonoBehaviour
         // 값 변경 시 호출될 이벤트 등록
         dropdown.onValueChanged.AddListener(OnDropdownChanged);
         testDBSaveButton.onClick.AddListener(async () => await DataManager.Instance.SaveAllUserDataAsync());
-        testLogoutButton.onClick.AddListener(FirebaseAuthManager.Instance.Logout);
+        testLogoutButton.onClick.AddListener(() =>
+        {
+            DataManager.Instance.isLogin = false;
+            FirebaseAuthManager.Instance.Logout();
+        });
         //testLogoutButton.onClick.AddListener(addNameTitle);
     }
     
