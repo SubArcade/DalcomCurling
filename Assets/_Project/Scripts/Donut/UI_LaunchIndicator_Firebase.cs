@@ -14,20 +14,22 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
     // UI Slider 컴포넌트를 드래그 앤 드롭으로 연결
     [Header("RoundPanel 노출변수")]
-    public TextMeshProUGUI aScoreText;
-    public TextMeshProUGUI bScoreText;
-    public TextMeshProUGUI roundText;
-    public TextMeshProUGUI roundChangeText;
-    // 현재 턴 번호를 표시하는 TextMeshProUGUI 객체
-    public TextMeshProUGUI turnText;
-    public GameObject CountDownText;
-    [Header("Debug")]
+    [SerializeField] private TextMeshProUGUI aScoreText;
+    [SerializeField] private TextMeshProUGUI bScoreText;
+    [SerializeField] private TextMeshProUGUI roundText;
+    [SerializeField] private TextMeshProUGUI roundChangeText;
+    [SerializeField] private TextMeshProUGUI turnText;
+    [SerializeField] private GameObject CountDownText;
+
+    [Header("디버그 텍스트")]
     public TextMeshProUGUI debugStateText;
     [Header("UI 제어 객체 (on/off)")]
     [SerializeField] private GameObject roundPanel;
     [SerializeField] private GameObject donutEntry;
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject result;
+    [SerializeField] private Scr_TweenHandDragGuide guide;
+    [Header("도넛 엔트리 항목")]
     [SerializeField] private DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
@@ -84,10 +86,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         if (MyProfile != null && OpponentProfile != null)
         {
-            // TODO: 여기에 닉네임, 인벤토리 정보를 UI에 표시하는 로직 추가
-            Debug.Log($"UI_LaunchIndicator_Firebase: 내 닉네임: {MyProfile.Nickname}, 상대 닉네임: {OpponentProfile.Nickname}");
-
-            // 1. (선택 가능) 내 인벤토리 UI 채우기
+            // 내 인벤토리 UI 채우기
             if (donutSelectionUI != null)
             {
                 donutSelectionUI.Populate(MyProfile.Inventory.donutEntries);
@@ -97,10 +96,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 Debug.LogWarning("UI_LaunchIndicator_Firebase: donutSelectionUI가 할당되지 않았습니다.");
             }
 
-            // 2. (표시 전용) 내 인벤토리 UI 채우기
+            // 내 인벤토리 UI 채우기 (오프닝 타임라인)
             PopulateDisplayDonuts(myDisplayDonutSlots, MyProfile.Inventory.donutEntries);
 
-            // 3. (표시 전용) 상대방 인벤토리 UI 채우기
+            // 상대방 인벤토리 UI 채우기 (오프닝 타임라인) 
             PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
         }
         else
@@ -175,7 +174,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     /// </summary>
 
 
-    public void FinishedUI() // 결과창
+    public void FinishedUI() // 게임종료 - 결과창
     {
         AllcloseUI();
         result.SetActive(true);
@@ -202,6 +201,30 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
+    }
+    public void ShowGuideUI(int select)
+    {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
+     // 반복 횟수 , 속도 거리등은 해당 객체 인스펙터에서 조절
+        guide.gameObject.SetActive(true);
+
+        if (select == 1) {
+            guide.PlayVerticalDrag();
+        }
+        if (select == 2) { 
+            guide.PlayHorizontalDrag();
+        }
+        if (select == 3)
+        {
+            guide.PlayTouchMove();
+        }
+        else
+        {
+            Debug.Log("올바른 가이드 출력 번호가 아닙니다.");
+        }
+    }
+    public void HideGuideUI()
+    {
+        guide.gameObject.SetActive(false);
     }
 
     /// <summary>
