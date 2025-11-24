@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class BoardManager : MonoBehaviour
 {
@@ -76,18 +78,18 @@ public class BoardManager : MonoBehaviour
 
         // 기프트박스인지 확인
         var item = cell.occupant;
-        if (item != null)
+        if (item != null && item.donutId.StartsWith("Gift"))
         {
-            var data = DataManager.Instance.GetDonutByID(item.donutId);
-
-            if (data.donutType == DonutType.Gift)
+            // 첫 번째 터치 → 선택만
+            if (!isSameCell)
             {
-                if (isSameCell)
-                {
-                    ClaimGiftReward(data, cell);
-                }
+                SelectCell(cell); // 선택만 하고 리턴
                 return;
             }
+            // 두 번째 터치 → 보상 지급
+            ClaimGiftReward(item.donutId, cell);
+            return;
+
         }
     }
 
@@ -178,7 +180,8 @@ public class BoardManager : MonoBehaviour
         }
 
         //에너지 차감
-        playerData.energy -= 1;
+        int useEnergy = playerData.energy -= 1;
+        DataManager.Instance.EnergyChange(useEnergy);
 
         // 생성기에서 도넛 정보 랜덤 선택 (DonutGenerator 내부 확률 계산)
         var generator = generatorCell.GetComponentInChildren<DonutGenerator>();
@@ -213,20 +216,17 @@ public class BoardManager : MonoBehaviour
     {
         // 빈 활성 셀 찾기
         var cell = FindEmptyActiveCell();
-
         // GiftBox Level 1 데이터 가져오기
-        var giftData = DataManager.Instance.GetDonutData(DonutType.Gift, 1);
-
+        var giftData = DataManager.Instance.GetGiftBoxData(1);
+        if (giftData == null)
         if (cell == null)
         {
             tempStorageSlot.Add(giftData);
             Debug.Log("빈 칸 없음, 임시칸에 생성");
             return;
         }
-       
-        if (giftData == null)
+
         {
-            Debug.LogError("GiftBox 데이터 없음! DonutGiftSO를 확인하세요.");
             return;
         }
 
@@ -238,24 +238,60 @@ public class BoardManager : MonoBehaviour
         // GiftBox 아이콘/ID 설정
         img.sprite = giftData.sprite;
         item.donutId = giftData.id;
-        item.donutData = giftData;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
+        item.donutData = null;   // 반드시 넣기 (MergeItemUI가 Data 기반으로 동작)
 
         // 셀에 등록
-        cell.SetItem(item, giftData);
+        cell.SetItem(item, giftData.id);
     }
 
     //기프트박스 보상 함수
-    void ClaimGiftReward(DonutData gift, Cells cell)
+    void ClaimGiftReward(string giftId, Cells cell)
     {
-        //Debug.Log($"기프트 박스 보상 지급: {gift.displayName}");
+        // giftId가 GiftBox인지 확인
+        int level = ParseGiftLevel(giftId);
+        if (level <= 0)
+        {
+            return;
+        }
 
-        //// 예시 보상
-        //DataManager.Instance.PlayerData.gold += gift.rewardGold;
-        //DataManager.Instance.PlayerData.energy += gift.rewardEnergy;
+        // GiftBox 데이터 가져오기
+        var giftData = DataManager.Instance.GetGiftBoxData(level);
+        if (giftData == null)
+        {
+            return;
+        }
+        //변수에 보상값+기존값 더해서 저장
+        int gold = Random.Range(giftData.minGold, giftData.maxGold + 1);
+        int energy = Random.Range(giftData.minEnergy, giftData.maxEnergy + 1);
+        int gem = Random.Range(giftData.minGem, giftData.maxGem);
+
+
+        int newGold = DataManager.Instance.PlayerData.gold + gold;
+        int newEnergy = DataManager.Instance.PlayerData.energy + energy;
+        int newGem = DataManager.Instance.PlayerData.gem + gem;
+        //change함수로 갱신해줘야 UI즉각 반영됨
+        DataManager.Instance.GoldChange(newGold);
+        DataManager.Instance.EnergyChange(newEnergy);
+        DataManager.Instance.GemChange(newGem);
+
+        UIManager.Instance.Open(PanelId.UseGiftBoxPopUp);
+
+        //팝업에 각 보상별로 텍스트 적용
+        GameObject usegiftbox = GameObject.Find("UseGiftBoxPopUp");
+        if (usegiftbox != null)
+        {
+            var popup = usegiftbox.GetComponent<Scr_UseGiftBoxPopUp>();
+            if (popup != null)
+                popup.SetRewardTexts(gold, energy,gem);
+        }
 
         // 보상 후 기프트 박스 삭제
-        Destroy(cell.occupant.gameObject);
+        if (cell.occupant != null)
+        { 
+            Destroy(cell.occupant.gameObject);
+        }
         cell.ClearItem();
+        BoardManager.Instance.AutoSaveBoardLocal();
     }
 
     // 도넛 찾기

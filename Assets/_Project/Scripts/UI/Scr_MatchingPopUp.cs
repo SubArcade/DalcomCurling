@@ -7,10 +7,6 @@ public class Scr_MatchingPopUp : MonoBehaviour
 {
     [SerializeField] private Button cancleButton;
 
-    void Awake()
-    {
-        cancleButton = transform.Find("background/CancleButton")?.GetComponent<Button>();
-    }
     void Start()
     {
         cancleButton.onClick.AddListener(() =>

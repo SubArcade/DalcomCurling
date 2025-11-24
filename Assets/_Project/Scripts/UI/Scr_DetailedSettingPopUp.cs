@@ -30,11 +30,10 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     [SerializeField] private Button OFFBGM;
     [SerializeField] private Button OFFSFX;
     [SerializeField] private Button OFFvibration;
-    [SerializeField] private Button OFFquestion;
     [SerializeField] private Button ONBGM;
     [SerializeField] private Button ONSFX;
     [SerializeField] private Button ONvibration;
-    [SerializeField] private Button ONquestion;
+    [SerializeField] private Button gameHelpBtn;
 
     [Header("언어설정")]
     [SerializeField] private TMP_Dropdown languageDropDown;
@@ -52,37 +51,9 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 
     void Awake()
     {
-        // AccountLink = transform.Find("Rectangle625/UIBackground/settingUI/account/AccountLink")?.GetComponent<Button>();
-        // AccountExit = transform.Find("Rectangle625/UIBackground/settingUI/account/AccountExit")?.GetComponent<Button>();
-        accountIdText = transform.Find("rectangle625/UIBackground/settingUI/account/accountID_Text")?.GetComponent<TextMeshProUGUI>();
-
-        BGMsliderBar = transform.Find("rectangle625/UIBackground/settingUI/setting/BGMsliderBar")?.GetComponent<Scrollbar>();
-        SFXsliderBar = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXsliderBar")?.GetComponent<Scrollbar>();
-        BGMvolumeText = transform.Find("rectangle625/UIBackground/settingUI/setting/BGMvolume_Text")?.GetComponent<TextMeshProUGUI>();
-        SFXvolumeText = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXvolume_Text")?.GetComponent<TextMeshProUGUI>();
-        BGMGage = transform.Find("rectangle625/UIBackground/settingUI/setting/BGMsliderBar/Gage")?.GetComponent<Image>();
-        SFXGage = transform.Find("rectangle625/UIBackground/settingUI/setting/SFXsliderBar/Gage")?.GetComponent<Image>();
-
-        OFFBGM = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFBGM")?.GetComponent<Button>();
-        OFFSFX = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFSFX")?.GetComponent<Button>();
-        OFFvibration = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFvibration")?.GetComponent<Button>();
-        OFFquestion = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/OFFquestion")?.GetComponent<Button>();
-        ONBGM = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/ONBGM")?.GetComponent<Button>();
-        ONSFX = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/ONSFX")?.GetComponent<Button>();
-        ONvibration = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/ONvibration")?.GetComponent<Button>();
-        ONquestion = transform.Find("rectangle625/UIBackground/settingUI/setting/optionGroup/ONquestion")?.GetComponent<Button>();
-
-        languageDropDown = transform.Find("rectangle625/UIBackground/settingUI/LanguageDropDown")?.GetComponent<TMP_Dropdown>();
-        
-        energyONbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/EnergyOnButton")?.GetComponent<Button>();
-        energyOFFbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/EnergyOffButton")?.GetComponent<Button>();
-        eventOnbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/EventOnButton")?.GetComponent<Button>();
-        eventOffbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/EventOffButton")?.GetComponent<Button>();
-        nightOnbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/NightOnButton")?.GetComponent<Button>();
-        nightOffbutton = transform.Find("rectangle625/UIBackground/settingUI/alarm/NightOffButton")?.GetComponent<Button>();
-
-        closeButton = transform.Find("rectangle625/CloseButton")?.GetComponent<Button>();
-
+        accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
+        accountExit.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DeleteAccountPopUp));
+        gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));          
     }
     void Start()
     {
@@ -123,19 +94,6 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             OFFvibration.gameObject.SetActive(false);
             ONvibration.gameObject.SetActive(true);
-        });
-
-        // 질문 도움말 설정
-        ONquestion.onClick.AddListener(() =>
-        {
-            ONquestion.gameObject.SetActive(false);
-            OFFquestion.gameObject.SetActive(true);
-        });
-
-        OFFquestion.onClick.AddListener(() =>
-        {
-            OFFquestion.gameObject.SetActive(false);
-            ONquestion.gameObject.SetActive(true);
         });
 
         // 알림 설정 (에너지, 이벤트, 야간)

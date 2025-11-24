@@ -64,8 +64,9 @@ public class UserDataRoot
         cellLength = 7,
     };
     [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData()
-    { 
-        refreshCount = 0,
+    {   
+        maxCount = 5,
+        refreshCount =5,
         baseGold = 0,
     };
 }
@@ -89,6 +90,7 @@ public class DataManager : MonoBehaviour
     
     // 도넛 기본 데이터 SO
     private readonly Dictionary<DonutType, DonutTypeSO> _donutTypeDB = new();
+    private readonly List<GiftBoxSO> _giftBoxList = new();
     
     // 랭크
     private string rankCollection = "rank";
@@ -160,6 +162,8 @@ public class DataManager : MonoBehaviour
         int cellLength = MergeBoardData.cellLength;
         
         int baseGold = QuestData.baseGold;
+        int RefreshCount = QuestData.refreshCount;
+        int maxCount = QuestData.maxCount;
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
@@ -170,8 +174,8 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
-            BaseQuestData(baseGold);
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"자동 로그인: /{userCollection}/{uId}");
@@ -189,7 +193,7 @@ public class DataManager : MonoBehaviour
             FirstBaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             FirstBaseMergeBoardData();
-            BaseQuestData(baseGold);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
@@ -202,8 +206,8 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
-            BaseQuestData(baseGold);
+            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 기존 유저 로드/갱신 완료: /{userCollection}/{uId}");
@@ -303,9 +307,11 @@ public class DataManager : MonoBehaviour
     }
 
     // 기본 퀘스트 데이터
-    private void BaseQuestData(int baseGold)
+    private void BaseQuestData(int baseGold, int RefreshCount, int MaxCount)
     {
         QuestData.baseGold = baseGold;
+        QuestData.refreshCount = RefreshCount;
+        QuestData.maxCount = MaxCount;
     }
     // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
@@ -424,6 +430,16 @@ public class DataManager : MonoBehaviour
                 //Debug.Log($"[DonutDB] Loaded {so.type} ({so.levels.Count} levels)");
             }
         }
+        
+        var allSo2 = Resources.LoadAll<GiftBoxSO>("DonutData");
+
+        foreach (var so in allSo2)
+        {
+            if (!_giftBoxList.Contains(so))
+            {
+                _giftBoxList.Add(so);
+            }
+        }
     }
    
     // DonutData 가져오기
@@ -438,6 +454,21 @@ public class DataManager : MonoBehaviour
         return null;
     }
 
+    // GiftBoxSo 데이터 가져오기
+    public GiftBoxData GetGiftBoxData(int level)
+    {
+        foreach (var so in _giftBoxList)
+        {
+            if (so.type == DonutType.Gift)
+            {
+                return so.GetLevelData(level); // GiftBoxData 반환
+            }
+        }
+
+        Debug.LogWarning($"[DonutDB] GiftBoxData not found for level {level}");
+        return null;
+    }
+    
     // ID 기반으로 DonutData 가져오기 (ex: "Hard_3")
     public DonutData GetDonutByID(string id)
     {
