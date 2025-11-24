@@ -72,11 +72,11 @@ public class StoneShoot_Firebase : MonoBehaviour
     public Color max_Color = Color.red;
 
     [Header("설정 변수")] // 게임 플레이 조작 관련 변수 헤더
-    public float launchForceMultiplier = 6f; // 드래그 거리를 발사 힘으로 변환하는 계수, 4에서 8로 수정(11/16), 4에서 6로 수정 11/17
+    public float launchForceMultiplier = 9f; // 드래그 거리를 발사 힘으로 변환하는 계수, 4에서 8로 수정(11/16), 4에서 6로 수정 11/17, 9로수정 (11/20)
     public float maxDragDistance = 0.25f; // 초기 드래그의 최대 거리 (정규화된 화면 높이 기준) , 0.5에서 0.25로 수정(11/16)
-    public float maxRotationDragDistance = 0.5f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준) , 1에서 0.5로 수정(11/16)
+    public float maxRotationDragDistance = 0.25f; // 회전 입력 드래그의 최대 거리 (정규화된 화면 폭 기준) , 1에서 0.5로 수정(11/16), 0.25수정 (11/20)
     public float maxRotationValue = 5f; // 스핀의 최대 값
-    public float autoMoveToHogLineSpeed = 4f; // 도넛이 호그 라인까지 자동 이동하는 속도, 6에서 4로 수정 11/17
+    public float autoMoveToHogLineSpeed = 4f; // 도넛이 호그 라인까지 자동 이동하는 속도, 6에서 4로 수정 11/17, 5로수정 (11/20)
     public float maxUIDirectionAngle = 60f; // UI 화살표가 표시할 수 있는 최대 각도
     public float minLaunchDragDistance = 50f; // 발사로 인정할 최소 드래그 거리 (픽셀)
 
@@ -205,11 +205,15 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     public void DisableInput()
     {
+        DOTween.Kill("GuideTimer1");
+        DOTween.Kill("GuideTimer2");
+        DOTween.Kill("GuideTimer3");
+
         _inputEnabled = false; // 입력 비활성화 플래그
 
         _isTrajectoryPreviewActive = false; // 궤적 미리보기 비활성화
         if (trajectoryLine != null) trajectoryLine.enabled = false; // 궤적 라인 렌더러 비활성화
-        Debug.Log("InputController: 입력 비활성화됨.");
+        //Debug.Log("InputController: 입력 비활성화됨.");
     }
 
     /// <summary>
@@ -340,6 +344,15 @@ public class StoneShoot_Firebase : MonoBehaviour
                     FirebaseGameManager.Instance.OnShotStepUI(); // 도넛 엔트리창만 off
 
                     _currentAimingPhase = AimingPhase.Rotation; // 다음 단계로 전환
+
+                    // 2초 동안 추가 입력이 없으면 회전 가이드 표시
+                    DOVirtual.DelayedCall(2f, () =>
+                    {
+                        if (_inputEnabled && _currentAimingPhase == AimingPhase.Rotation && !IsDragging)
+                        {
+                            uiLaunch?.ShowGuideUI(2);
+                        }
+                    }).SetId("GuideTimer2");
                 }
                 else
                 {
@@ -373,7 +386,7 @@ public class StoneShoot_Firebase : MonoBehaviour
             else if (isTouchEnded && IsDragging && CurrentDragType == DragType.Rotation)
             {
                 EndDrag(); // 드래그 종료
-                Debug.Log("회전 설정 완료. 발사합니다!");
+                //Debug.Log("회전 설정 완료. 발사합니다!");
                 FirebaseGameManager.Instance.OnIdleUI();
                 ReleaseShot(); // 발사!
             }
@@ -400,6 +413,11 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// <param name="dragType">드래그 종류 (힘/방향 또는 회전).</param>
     private void StartDrag(Vector3 screenPosition, DragType dragType)
     {
+        DOTween.Kill("GuideTimer1");
+        DOTween.Kill("GuideTimer2");
+        DOTween.Kill("GuideTimer3");
+        uiLaunch?.HideGuideUI();
+
         IsDragging = true;
         CurrentDragType = dragType;
 
@@ -556,20 +574,25 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// </summary>
     private void ReleaseShot() 
     {
-        Debug.Log($"RElesase clicked, myTurn = {FirebaseGameManager.Instance._isMyTurn}");
+        DOTween.Kill("GuideTimer1");
+        DOTween.Kill("GuideTimer2");
+        DOTween.Kill("GuideTimer3");
+        uiLaunch?.HideGuideUI();
+
+        //Debug.Log($"RElesase clicked, myTurn = {FirebaseGameManager.Instance._isMyTurn}");
         //미리 보기 궤적 비활성화
         _isTrajectoryPreviewActive = false;
         if (trajectoryLine != null) trajectoryLine.enabled = false;
 
         FirebaseGameManager.Instance.ChangeCameraRelease(); // 스톤에 카메라 부착
         LastShot shotData = CalculateShotData();
-        Debug.Log(FirebaseGameManager.Instance.CurrentLocalState);
+        //Debug.Log(FirebaseGameManager.Instance.CurrentLocalState);
         FirebaseGameManager.Instance.Change_SuccessfullyShotInTime_To_True();
 
         if (FirebaseGameManager.Instance.CurrentLocalState == "WaitingForInput" && FirebaseGameManager.Instance._isMyTurn == false)
         {
             _preparedShotData = shotData;
-            Debug.Log("샷 준비 완료. 턴 시작을 기다립니다.");
+            //Debug.Log("샷 준비 완료. 턴 시작을 기다립니다.");
             DisableInput();
             //카운트다운 제거
             //FirebaseGameManager.Instance.ControlCountdown(false);
@@ -577,7 +600,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         }
         else if (FirebaseGameManager.Instance.CurrentLocalState == "WaitingForInput" && FirebaseGameManager.Instance._isMyTurn == true)
         {
-            Debug.Log("여기까지는 옴");
+            //Debug.Log("여기까지는 옴");
             CurrentState = LaunchState.MovingToHogLine;
             MoveDonutToHogLine(shotData);
             _needToTap = true;
@@ -595,6 +618,8 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// <param name="shotData">발사할 샷 데이터.</param>
     private void MoveDonutToHogLine(LastShot shotData)
     {
+        uiLaunch?.ShowGuideUI(3);
+
         if (_currentStoneRb == null)
         {
             Debug.LogError("오류: _currentStoneRb가 null입니다!"); // 오류 로그 추가
@@ -604,6 +629,7 @@ public class StoneShoot_Firebase : MonoBehaviour
 
         // DOTween을 사용하여 호그 라인까지 돌을 이동시킵니다.
         _currentStoneRb.DOMove(startHogLine.position, autoMoveToHogLineSpeed).SetSpeedBased(true).SetEase(Ease.Linear)
+            .SetUpdate(UpdateType.Fixed)
             .OnComplete(() => // 이동 완료 시 호출되는 콜백 함수
             {
                 if (_needToTap)
@@ -618,7 +644,8 @@ public class StoneShoot_Firebase : MonoBehaviour
                 if (_currentStoneRb != null) _currentStoneRb.DOKill(); // DOTween 애니메이션 중지
 
                 OnShotConfirmed?.Invoke(shotData); // 샷 데이터 확정 이벤트 발생
-                Debug.Log("샷 정보 전송 완료.");
+                uiLaunch?.HideGuideUI();
+                //Debug.Log("샷 정보 전송 완료.");
 
                 FirebaseGameManager.Instance.ChangeLocalStateToSimulatingMyShot(); // 로컬 상태를 시뮬레이션 중으로 변경               
                 FirebaseGameManager.Instance.ChangeFixedDeltaTime(); // FixedDeltaTime 변경 (시뮬레이션 속도 조절)
@@ -645,7 +672,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("미리 준비된 샷이 없어 일반 입력 모드로 전환됩니다.");
+            //Debug.LogWarning("미리 준비된 샷이 없어 일반 입력 모드로 전환됩니다.");
             //EnableInput(this._currentStoneRb); // 준비된 샷 없으면 일반 입력 활성화
             return false; // 샷 실행 안됨
         }
@@ -683,31 +710,31 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (zPos >= perfectZoneLine.position.z && zPos <= startHogLine.position.z)
         {
             weights = perfectZoneRandomWeights; // 퍼펙트존 가중치 사용
-            Debug.Log("퍼펙트존");
+            //Debug.Log("퍼펙트존");
         }
         else if (zPos >= earlyZoneLine.position.z && zPos < perfectZoneLine.position.z)
         {
             weights = earlyZoneRandomWeights; // 얼리존 가중치 사용
-            Debug.Log("얼리존");
+            //Debug.Log("얼리존");
         }
 
         if (weights != null) // 가중치 리스트가 유효하면
         {
             _needToTap = false; // 탭 이벤트 비활성화
             int randomPoint = Random.Range(1, 101); // 1~100 사이의 랜덤 값
-            Debug.Log($"randomPoint : {randomPoint}");
+            //Debug.Log($"randomPoint : {randomPoint}");
             int cumulativeWeight = 0; // 누적 가중치
             foreach (var item in weights) // 가중치 리스트 순회
             {
                 cumulativeWeight += (int)(item.weight * 10); // 가중치 적용
-                Debug.Log($"itemweight : {item.weight}");
+                //Debug.Log($"itemweight : {item.weight}");
                 if (randomPoint * 10 <= cumulativeWeight) // 랜덤 값이 누적 가중치 범위 안에 들면
                 {
                     _releaseRandomValue = item.value; // 해당 랜덤 값 적용
                     break; // 루프 종료
                 }
             }
-            Debug.Log($"releaseRandomValue: {_releaseRandomValue}");
+            //Debug.Log($"releaseRandomValue: {_releaseRandomValue}");
         }
     }
     #endregion
