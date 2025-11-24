@@ -39,7 +39,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         transform.SetParent(cell.transform, false);
 
         // 셀과 도넛ID 연결
-        cell.donutId = donutData != null ? donutData.id : null;
+        //cell.donutId = donutData != null ? donutData.id : null;
         cell.occupant = this;
     }
 
@@ -196,7 +196,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             {
                 // 엔트리 슬롯 비우기
                 if (fromEntrySlot != null && fromEntrySlot.currentItem == this)
+                {
                     fromEntrySlot.currentItem = null;
+                    fromEntrySlot.SaveToInventory();
+                }
 
                 // 이 도넛은 이제 보드 소속
                 isFromEntry = false;
@@ -217,6 +220,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             // 엔트리 → 보드 스왑만 허용, 머지는 절대 안 됨
             var entrySlot = originalParent.GetComponent<EntrySlot>();
             var targetItem = targetCell.occupant;
+            
+            if (targetItem != null && targetItem.donutId.StartsWith("Gift"))
+            {
+                ResetPosition();
+                return;
+            }
 
             if (entrySlot != null && targetItem != null)
             {
@@ -369,16 +378,25 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         transform.SetParent(originalParent, false);
         rectTransform.anchoredPosition = originalPos;
 
-        // 엔트리 슬롯이면 currentItem 복원
+        // 1) 엔트리슬롯이었다면 그냥 복구
         var slot = originalParent.GetComponent<EntrySlot>();
         if (slot != null)
         {
-            slot.currentItem = this;     // 다시 넣어줌
-            isFromEntry = true;          // 엔트리 표시 유지
+            slot.currentItem = this;
+            isFromEntry = true;
+            currentCell = null;
+            return;
         }
 
+        // 2) 원래 셀이 있었다면 셀 점유 복구
         if (originalCell != null)
-            BoardManager.Instance.SelectCell(originalCell); //격자 원위치
+        {
+            currentCell = originalCell;
+            originalCell.occupant = this;
+            originalCell.donutId = donutData != null ? donutData.id : donutId;
+        }
+
+        BoardManager.Instance.SelectCell(originalCell);
     }
 
     //엔트리 슬롯 참조용
