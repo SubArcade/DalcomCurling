@@ -636,6 +636,10 @@ public class StoneShoot_Firebase : MonoBehaviour
                 {
                     // 탭을 못했으면 FirebaseGameManager의 실패 처리 메서드를 호출합니다. 아웃처리 후 다음 상태로 넘어가도록 HandleTapFailed()호출.
                     Debug.Log("호그라인 전까지 탭하지 않았기에 턴을 넘깁니다.");
+                    if (uiLaunch != null && _currentStoneRb != null && _mainCamera != null)
+                    {
+                        uiLaunch.ShowFloatingText("Failed", _mainCamera.WorldToScreenPoint(_currentStoneRb.transform.position));
+                    }
                     FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, shotData.DonutId);
                     DisableInput();
                     return;
@@ -711,11 +715,13 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             weights = perfectZoneRandomWeights; // 퍼펙트존 가중치 사용
             //Debug.Log("퍼펙트존");
+            uiLaunch.ShowFloatingText("Perfect", Input.mousePosition);
         }
         else if (zPos >= earlyZoneLine.position.z && zPos < perfectZoneLine.position.z)
         {
             weights = earlyZoneRandomWeights; // 얼리존 가중치 사용
             //Debug.Log("얼리존");
+            uiLaunch.ShowFloatingText("Early", Input.mousePosition);
         }
 
         if (weights != null) // 가중치 리스트가 유효하면
