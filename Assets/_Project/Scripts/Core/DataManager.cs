@@ -64,8 +64,9 @@ public class UserDataRoot
         cellLength = 7,
     };
     [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData()
-    { 
-        refreshCount = 0,
+    {   
+        maxCount = 5,
+        refreshCount =5,
         baseGold = 0,
     };
 }
@@ -89,6 +90,7 @@ public class DataManager : MonoBehaviour
     
     // 도넛 기본 데이터 SO
     private readonly Dictionary<DonutType, DonutTypeSO> _donutTypeDB = new();
+    private readonly List<GiftBoxSO> _giftBoxList = new();
     
     // 랭크
     private string rankCollection = "rank";
@@ -101,7 +103,8 @@ public class DataManager : MonoBehaviour
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
     public event Action<UserDataRoot> OnUserDataRootChanged;
-    
+    public event Action OnBoardDataLoaded;
+
     // 백그라운드 이벤트
     public event Action PauseChanged;
 
@@ -122,6 +125,12 @@ public class DataManager : MonoBehaviour
     public void EnergyChange(int energy)
     {
         PlayerData.energy = energy;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
+    public void LevelChange(int level) 
+    {
+        PlayerData.level = level;
         OnUserDataChanged?.Invoke(PlayerData);
     }
     
@@ -160,6 +169,8 @@ public class DataManager : MonoBehaviour
         int cellLength = MergeBoardData.cellLength;
         
         int baseGold = QuestData.baseGold;
+        int RefreshCount = QuestData.refreshCount;
+        int maxCount = QuestData.maxCount;
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
@@ -170,8 +181,8 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
-            BaseQuestData(baseGold);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"자동 로그인: /{userCollection}/{uId}");
@@ -189,7 +200,7 @@ public class DataManager : MonoBehaviour
             FirstBaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             FirstBaseMergeBoardData();
-            BaseQuestData(baseGold);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
@@ -202,14 +213,15 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
-            BaseQuestData(baseGold);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 기존 유저 로드/갱신 완료: /{userCollection}/{uId}");
         }
         OnUserDataChanged?.Invoke(PlayerData);
         OnUserDataRootChanged?.Invoke(userData);
+        OnBoardDataLoaded?.Invoke();
     }
     
     // 기본 데이터 적용
@@ -303,9 +315,11 @@ public class DataManager : MonoBehaviour
     }
 
     // 기본 퀘스트 데이터
-    private void BaseQuestData(int baseGold)
+    private void BaseQuestData(int baseGold, int RefreshCount, int MaxCount)
     {
         QuestData.baseGold = baseGold;
+        QuestData.refreshCount = RefreshCount;
+        QuestData.maxCount = MaxCount;
     }
     // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
@@ -415,13 +429,23 @@ public class DataManager : MonoBehaviour
 
         foreach (var so in allSO)
         {
-            if (so.type == DonutType.Gift)
-                continue; // Gift 타입 완전 제외
+            //if (so.type == DonutType.Gift)
+            //    continue; // Gift 타입 완전 제외
 
             if (!_donutTypeDB.ContainsKey(so.type))
             {
                 _donutTypeDB.Add(so.type, so);
                 //Debug.Log($"[DonutDB] Loaded {so.type} ({so.levels.Count} levels)");
+            }
+        }
+        
+        var allSo2 = Resources.LoadAll<GiftBoxSO>("DonutData");
+
+        foreach (var so in allSo2)
+        {
+            if (!_giftBoxList.Contains(so))
+            {
+                _giftBoxList.Add(so);
             }
         }
     }
@@ -435,6 +459,41 @@ public class DataManager : MonoBehaviour
         }
 
         //Debug.LogWarning($"[DonutDB] No data found for {type} level {level}");
+        return null;
+    }
+
+    // GiftBoxSo 데이터 가져오기
+    public GiftBoxData GetGiftBoxData(int level)
+    {
+        foreach (var so in _giftBoxList)
+        {
+            if (so.type == DonutType.Gift)
+            {
+                return so.GetLevelData(level); // GiftBoxData 반환
+            }
+        }
+
+        Debug.LogWarning($"[DonutDB] GiftBoxData not found for level {level}");
+        return null;
+    }
+
+    public GiftBoxData GetGiftBoxDataByID(string id) //기프트박스 데이터 변환
+    {
+        // id 형식이 "Gift_1", "Gift_2" 이런 형태라고 가정
+        if (string.IsNullOrEmpty(id))
+            return null;
+
+        if (id.StartsWith("Gift_"))
+        {
+            string levelStr = id.Replace("Gift_", "");
+
+            if (int.TryParse(levelStr, out int level))
+            {
+                // ⭐ 기존 함수 그대로 호출
+                return GetGiftBoxData(level);
+            }
+        }
+
         return null;
     }
 

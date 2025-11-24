@@ -3,7 +3,9 @@ using UnityEngine;
 using System;
 using System.Threading.Tasks;
 using Firebase;
-using Google; 
+using Google;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 
 public class FirebaseAuthManager
 {
@@ -48,6 +50,10 @@ public class FirebaseAuthManager
         OnChanged(this, null);
         
         await FirebaseApp.CheckAndFixDependenciesAsync();
+        
+        // GPGS 초기화
+        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.Activate();
         
         if (auth.CurrentUser != null)
         {
@@ -202,4 +208,42 @@ public class FirebaseAuthManager
             Debug.LogError($"[Auth] 연동 실패: {e.Message}");
         }
     }
+    
+    public void ConnectGpgsAccount()
+    {
+        PlayGamesPlatform.Instance.ManuallyAuthenticate(status =>
+        {
+            if (status != SignInStatus.Success)
+            {
+                Debug.LogError($"[GPGS] 로그인 실패: {status}");
+                return;
+            }
+
+            Debug.Log("[GPGS] 로그인 성공");
+            PlayGamesPlatform.Instance.RequestServerSideAccess(true, async authCode =>
+            {
+                if (string.IsNullOrEmpty(authCode))
+                {
+                    Debug.LogError("[GPGS] authCode 비어 있음");
+                    return;
+                }
+
+                Debug.Log("[GPGS] authCode: " + authCode);
+                var cred = PlayGamesAuthProvider.GetCredential(authCode);
+
+                try
+                {
+                    // 계정 연동
+                    await auth.CurrentUser.LinkWithCredentialAsync(cred);
+                    Debug.Log("[Firebase] GPGS 계정 연동 완료");
+                    
+                }
+                catch (FirebaseException e)
+                {
+                    Debug.LogError("[Firebase] GPGS 연동 실패: " + e.Message);
+                }
+            });
+        });
+    }
+    
 }

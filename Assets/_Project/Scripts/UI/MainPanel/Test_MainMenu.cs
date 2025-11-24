@@ -7,7 +7,10 @@ using UnityEngine.UI;
 public class Test_MainMenu : MonoBehaviour
 {
     public Button energyButton;
-    public TMP_Text energyText;
+    public TextMeshProUGUI energyText;
+    public GameObject energyTimer_Text;
+    public TextMeshProUGUI goldText;
+    public TextMeshProUGUI gemText;
     
     public Button loginButton;
     
@@ -60,15 +63,32 @@ public class Test_MainMenu : MonoBehaviour
         testLogoutButton.onClick.AddListener(FirebaseAuthManager.Instance.Logout);
         //testLogoutButton.onClick.AddListener(addNameTitle);
     }
+
+    void OnEnable() 
+    {
+        DataManager.Instance.OnUserDataChanged += see;
+        see(DataManager.Instance.PlayerData);
+    }
+    void OnDisable() =>  DataManager.Instance.OnUserDataChanged -= see;
     
-    private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += see;
-    private void Disable() =>  DataManager.Instance.OnUserDataChanged -= see;
-    
+
     // 데이터 UI 노출
     public void see(PlayerData playerData)
     {
         Debug.Log("에너지 셋업");
         energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        if (playerData.energy >= playerData.maxEnergy)
+        {
+            energyTimer_Text.SetActive(true);
+            TextMeshProUGUI t = energyTimer_Text.GetComponent<TextMeshProUGUI>();
+            t.text = "가득참!";
+        }
+        else 
+        {
+            energyTimer_Text.SetActive(false);
+        }
+        goldText.text = $"{playerData.gold}";
+        gemText.text = $"{playerData.gem}";
     }
     
     // 에너지 추가
@@ -78,7 +98,7 @@ public class Test_MainMenu : MonoBehaviour
         //DataManager.Instance.UpdateUserDataAsync(energy: energy);
         energyText.text = $"{ DataManager.Instance.PlayerData.energy}/{DataManager.Instance.PlayerData.maxEnergy}";
     }
-    
+
     // 테스트 계정 로그인
     void TestLogin()
     {

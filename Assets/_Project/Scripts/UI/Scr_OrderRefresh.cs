@@ -22,11 +22,6 @@ public class Scr_OrderRefresh : MonoBehaviour
 
     void Awake()
     {
-        closeButton = transform.Find("Panel/CloseButton")?.GetComponent<Button>();
-        Btn = transform.Find("Panel/Btn")?.GetComponent<Button>();
-        adsText = transform.Find("Panel/Btn/Ads_Text")?.GetComponent<TextMeshProUGUI>();
-        countText = transform.Find("Panel/Background/RefreshImage/Count_Text")?.GetComponent<TextMeshProUGUI>();
-       
         var mainPanel = GameObject.Find("Canvas/GameObject/Main_Panel");
         if (mainPanel != null)
         {

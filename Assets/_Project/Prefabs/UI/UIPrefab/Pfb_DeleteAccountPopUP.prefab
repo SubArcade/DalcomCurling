@@ -990,13 +990,14 @@ GameObject:
   - component: {fileID: 6052212534318254672}
   - component: {fileID: 2496883053451904361}
   - component: {fileID: 5424674377959306728}
+  - component: {fileID: 3416788031466468276}
   m_Layer: 5
   m_Name: Pfb_DeleteAccountPopUP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6052212534318254672
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1055,6 +1056,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3416788031466468276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7270065615463671714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9807d72235cfeec4ea6fbecd3dc7267e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8158435168814992062
 GameObject:
   m_ObjectHideFlags: 0
