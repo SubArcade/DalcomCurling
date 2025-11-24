@@ -55,10 +55,6 @@ public class BoardManager : MonoBehaviour
         
         // 불러온 데이터로 보드 복원
         LoadBoardLocal();
-
-        // 불러온 데이터로 보드 복원
-        LoadBoardLocal();
-
     }
 
     public void OnCellClicked(Cells cell)
@@ -402,6 +398,7 @@ public class BoardManager : MonoBehaviour
     public void LoadBoardLocal()
     {
         var boardData = DataManager.Instance.MergeBoardData;
+
         if (boardData == null || boardData.cells == null || boardData.cells.Count == 0)
         {
             Debug.LogWarning("[LoadBoardLocal] 저장된 보드 데이터가 없습니다.");
@@ -413,46 +410,65 @@ public class BoardManager : MonoBehaviour
             Cells cell = GetCell(data.x, data.y);
             if (cell == null) continue;
 
-            // 저장된 활성상태 그대로 복구
+            // 1) 셀 활성/비활성 복구
             cell.isActive = data.isCellActive;
 
-            // 락 UI 갱신 (잠금 또는 잠금 해제)
             if (cell.LockOverlay != null)
                 cell.LockOverlay.gameObject.SetActive(!cell.isActive);
 
-            // 기존 도넛 제거
+            // 2) 기존 도넛 제거
             if (cell.occupant != null)
             {
                 Destroy(cell.occupant.gameObject);
                 cell.ClearItem();
             }
 
-            // 도넛 없으면 빈칸으로 유지
+            // 3) 도넛 없음 → 빈칸 유지
             if (string.IsNullOrEmpty(data.donutId))
                 continue;
 
-            // 도넛 데이터 찾기
+            // 4) 도넛 데이터 불러오기 (일반 도넛 / Gift 모두 포함)
             DonutData donut = DataManager.Instance.GetDonutByID(data.donutId);
+
+            // 💥 GiftBox였다면 DonutData가 null일 수 있음
+            // → GiftBoxData → DonutData 변환
             if (donut == null)
             {
-                Debug.LogWarning($"[LoadBoardLocal] 도넛 ID '{data.donutId}' 를 찾을 수 없습니다.");
-                continue;
+                GiftBoxData gift = DataManager.Instance.GetGiftBoxDataByID(data.donutId);
+                if (gift != null)
+                {
+                    donut = new DonutData()
+                    {
+                        id = gift.id,
+                        sprite = gift.sprite,
+                        donutType = DonutType.Gift,
+                        level = gift.level
+                    };
+                }
+                else
+                {
+                    Debug.LogWarning($"[LoadBoardLocal] 저장된 도넛ID '{data.donutId}' 를 찾을 수 없습니다.");
+                    continue;
+                }
             }
 
-            // 도넛 프리팹 생성
+            // 5) 도넛 프리팹 생성 및 설정
             GameObject obj = Instantiate(donutPrefab, cell.transform);
             var item = obj.GetComponent<MergeItemUI>();
             var img = obj.GetComponent<Image>();
 
             img.sprite = donut.sprite;
+
             item.donutId = donut.id;
             item.donutData = donut;
 
+            // 6) 셀 등록
             cell.SetItem(item, donut);
         }
 
-        //Debug.Log("[LoadBoardLocal] 보드 로드 완료");
+        Debug.Log("[LoadBoardLocal] 보드 로드 완료");
     }
+
 
     // 임시보관칸에서 보드판에 생성
     public void SpawnFromTempStorage(GiftBoxData giftData)

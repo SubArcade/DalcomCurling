@@ -468,7 +468,27 @@ public class DataManager : MonoBehaviour
         Debug.LogWarning($"[DonutDB] GiftBoxData not found for level {level}");
         return null;
     }
-    
+
+    public GiftBoxData GetGiftBoxDataByID(string id) //기프트박스 데이터 변환
+    {
+        // id 형식이 "Gift_1", "Gift_2" 이런 형태라고 가정
+        if (string.IsNullOrEmpty(id))
+            return null;
+
+        if (id.StartsWith("Gift_"))
+        {
+            string levelStr = id.Replace("Gift_", "");
+
+            if (int.TryParse(levelStr, out int level))
+            {
+                // ⭐ 기존 함수 그대로 호출
+                return GetGiftBoxData(level);
+            }
+        }
+
+        return null;
+    }
+
     // ID 기반으로 DonutData 가져오기 (ex: "Hard_3")
     public DonutData GetDonutByID(string id)
     {
