@@ -41,7 +41,13 @@ public class BoardManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
+
         tempStorageSlot = FindObjectOfType<TempStorageSlot>();
     }
 
@@ -49,12 +55,31 @@ public class BoardManager : MonoBehaviour
     {
         selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
-        GenerateBoard();
-        UpdateBoardUnlock(1);
+        //GenerateBoard();
+        //UpdateBoardUnlock(1);
+        if (cells == null || cells.Length == 0) GenerateBoard();
+
         CreateDonutButtonAtCenter();
-        
-        // 불러온 데이터로 보드 복원
+
+        // DataManager가 로드 완료될 때 보드 채우기
+        DataManager.Instance.OnBoardDataLoaded += HandleBoardLoaded;
+
+        //재입장시 로드
+        RefreshBoardUnlock();
         LoadBoardLocal();
+    }
+
+    // 로드 기다리기
+    void HandleBoardLoaded()
+    {
+        RefreshBoardUnlock();
+        LoadBoardLocal();
+    }
+
+    void OnDestroy()
+    {
+        if (DataManager.Instance != null)
+            DataManager.Instance.OnBoardDataLoaded -= HandleBoardLoaded;
     }
 
     public void OnCellClicked(Cells cell)
@@ -234,8 +259,6 @@ public class BoardManager : MonoBehaviour
             level = giftData.level        // 기프트박스 레벨 = 도넛레벨
         };
 
-        Debug.Log("CHECK donutPrefab : " + donutPrefab);
-
         if (cell == null)
         {
             tempStorageSlot.Add(giftData);
@@ -245,9 +268,7 @@ public class BoardManager : MonoBehaviour
 
         // 프리팹 생성
         GameObject obj = Instantiate(donutPrefab, cell.transform);
-        Debug.Log("CHECK obj : " + obj);
         var item = obj.GetComponent<MergeItemUI>();
-        Debug.Log("CHECK MergeItemUI : " + item);
         var img = obj.GetComponent<Image>();
 
         // GiftBox 아이콘/ID 설정
@@ -257,7 +278,7 @@ public class BoardManager : MonoBehaviour
 
         // 셀에 등록
         cell.SetItem(item, fakeDonut.id);
-
+        AutoSaveBoardLocal(); // 보드 저장
     }
 
     //기프트박스 보상 함수
@@ -376,7 +397,7 @@ public class BoardManager : MonoBehaviour
         if (boardData == null) return;
 
         boardData.cells.Clear();
-        
+
         foreach (var cell in GetAllCells())
         {
             CellData data = new CellData
@@ -398,7 +419,6 @@ public class BoardManager : MonoBehaviour
     public void LoadBoardLocal()
     {
         var boardData = DataManager.Instance.MergeBoardData;
-
         if (boardData == null || boardData.cells == null || boardData.cells.Count == 0)
         {
             Debug.LogWarning("[LoadBoardLocal] 저장된 보드 데이터가 없습니다.");
@@ -410,11 +430,11 @@ public class BoardManager : MonoBehaviour
             Cells cell = GetCell(data.x, data.y);
             if (cell == null) continue;
 
-            // 1) 셀 활성/비활성 복구
-            cell.isActive = data.isCellActive;
+            //// 1) 셀 활성/비활성 복구
+            //cell.isActive = data.isCellActive;
 
-            if (cell.LockOverlay != null)
-                cell.LockOverlay.gameObject.SetActive(!cell.isActive);
+            //if (cell.LockOverlay != null)
+            //    cell.LockOverlay.gameObject.SetActive(!cell.isActive);
 
             // 2) 기존 도넛 제거
             if (cell.occupant != null)
@@ -487,7 +507,7 @@ public class BoardManager : MonoBehaviour
             donutType = DonutType.Gift,
             level = giftData.level            // GiftBox 레벨과 일치
         };
-
+         
         GameObject obj = Instantiate(donutPrefab, cell.transform);
         var item = obj.GetComponent<MergeItemUI>();
 

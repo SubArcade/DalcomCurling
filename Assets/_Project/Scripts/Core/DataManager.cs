@@ -103,7 +103,8 @@ public class DataManager : MonoBehaviour
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
     public event Action<UserDataRoot> OnUserDataRootChanged;
-    
+    public event Action OnBoardDataLoaded;
+
     // 백그라운드 이벤트
     public event Action PauseChanged;
 
@@ -174,7 +175,7 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
@@ -206,7 +207,7 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
@@ -214,6 +215,7 @@ public class DataManager : MonoBehaviour
         }
         OnUserDataChanged?.Invoke(PlayerData);
         OnUserDataRootChanged?.Invoke(userData);
+        OnBoardDataLoaded?.Invoke();
     }
     
     // 기본 데이터 적용
