@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 using UnityEngine.UI;
+using static Cinemachine.DocumentationSortingAttribute;
 using static UnityEngine.EventSystems.EventTrigger;
 
 public class BoardManager : MonoBehaviour
@@ -217,7 +217,7 @@ public class BoardManager : MonoBehaviour
         var giftData = DataManager.Instance.GetGiftBoxData(1);
         if (giftData == null)
         {
-            Debug.LogError("❌ GiftBoxData Level 1 NOT FOUND");
+            Debug.LogError("❌GiftBoxData Level 1 NOT FOUND");
             return;
         }
         else
@@ -240,13 +240,6 @@ public class BoardManager : MonoBehaviour
         {
             tempStorageSlot.Add(giftData);
             Debug.Log("빈 칸 없음, 임시칸에 생성");
-            return;
-        }
-
-        // GiftBox Level 1 데이터 가져오기
-        var giftData = DataManager.Instance.GetGiftBoxData(1);
-        if (giftData == null)
-        {
             return;
         }
 

@@ -126,6 +126,12 @@ public class DataManager : MonoBehaviour
         PlayerData.energy = energy;
         OnUserDataChanged?.Invoke(PlayerData);
     }
+
+    public void LevelChange(int level) 
+    {
+        PlayerData.level = level;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
     
     void Awake()
     {

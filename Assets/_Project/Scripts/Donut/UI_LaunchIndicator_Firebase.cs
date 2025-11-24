@@ -34,6 +34,11 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
+    [Header("결과창 보상 텍스트 갱신을 위한 변수")]
+    [SerializeField] private TextMeshProUGUI expText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI pointText;
+
     //내부변수
     private int displayTurn = 0;
 
@@ -178,6 +183,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     {
         AllcloseUI();
         result.SetActive(true);
+        ResultRewardView();
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
@@ -253,4 +259,26 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         }
     }
 
+    public void ResultRewardView() 
+    {
+        int levelUp = 1;
+
+
+        // 골드는 100~300 랜덤
+        int rewardGold = Random.Range(100, 301);
+
+        // 포인트는 10~20 랜덤
+        int rewardPoint = Random.Range(10, 21);
+
+        // UI 텍스트 갱신
+        int previewLevel = DataManager.Instance.PlayerData.level + levelUp;
+
+        if (expText != null) expText.text = $"+{levelUp}";
+        if (goldText != null) goldText.text = $"+{rewardGold}";
+        if (pointText != null) pointText.text = $"+{rewardPoint}";
+
+        GameManager.Instance.SetResultRewards(1, rewardGold, rewardPoint);
+        //일단 게임종료후 레벨과 경험치 골드를 받는지만 확인하는 함수,
+        //나중에 패배, 탈주, 강종 등  승,패,무 고려해서 두명이 서로 다르게 나오도록 해야함
+    }
 }
