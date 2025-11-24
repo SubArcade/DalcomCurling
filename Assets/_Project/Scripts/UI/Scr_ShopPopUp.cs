@@ -92,6 +92,7 @@ public class Scr_ShopPopUp : MonoBehaviour
                 ShowGoldShopUI();
             }
         });
+
         //로비로 돌아가버리는 버튼
         robbyButton.onClick.AddListener(() =>
         {

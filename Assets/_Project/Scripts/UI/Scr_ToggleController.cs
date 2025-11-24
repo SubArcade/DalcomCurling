@@ -3,35 +3,32 @@ using UnityEngine.UI;
 
 public class ToggleController : MonoBehaviour
 {
-    [SerializeField] private Toggle toggle1; // effectToggle
-    [SerializeField] private Toggle toggle2; // characterToggle
+    [SerializeField] private Toggle effectToggle; // effectToggle
+    [SerializeField] private Toggle characterToggle; // characterToggle
 
     private void Start()
     {
-        //toggle1.onValueChanged.AddListener((isOn) =>
+        //effectToggle.onValueChanged.AddListener((isOn) =>
+        //{
+        //    characterToggle.isOn = false;
+            
+        //}
+
+        //characterToggle.onValueChanged.AddListener((isOn) =>
         //{
 
         //}
-
-        //toggle2.onValueChanged.AddListener((isOn) =>
-        //{
-
-        //} 
     }
 
-    private void OnToggle1Changed(bool isOn)
+    private void EffectUI()
     {
-        //if (isOn)
-        //{
-        //    Debug.Log("effect 켜짐");
-        //}
+        transform.Find("EffectToggle").gameObject.SetActive(true);
+        transform.Find("CharacterToggle").gameObject.SetActive(false);
     }
 
-    private void OnToggle2Changed(bool isOn)
+    private void CharacterUI()
     {
-        if (isOn)
-        {
-            Debug.Log("character 켜짐");
-        }
+        transform.Find("EffectToggle").gameObject.SetActive(false);
+        transform.Find("CharacterToggle").gameObject.SetActive(true);
     }
 }
