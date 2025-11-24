@@ -33,7 +33,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         if (dragged == null) return;
 
         dragged.DetachFromCurrentCell();  // 보드에서온거 셀 해제
-        dragged.isFromEntry = true;
+        //dragged.isFromEntry = true;
       
         // 같은 슬롯이면 취소
         if (dragged.transform.parent == transform)
@@ -55,6 +55,12 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         EntrySlot toSlot = this;
 
         Cells fromCell = dragged.originalCell;
+
+        if (fromSlot != null && fromCell != null) // 엔트리에서 보드로 이동
+        {
+            fromSlot.currentItem = null;
+            fromSlot.SaveToInventory();   // ← null 저장
+        }
 
         // 엔트리에서 보드 스왑
         if (fromCell != null && currentItem != null)
@@ -112,6 +118,13 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     // 엔트리에서 보드 스왑
     private void SwapWithCell(Cells fromCell, EntrySlot toSlot, MergeItemUI dragged)
     {
+        // Gift 타입은 차단
+        if (dragged.donutData != null && dragged.donutData.donutType == DonutType.Gift)
+        {
+            dragged.ResetPosition();
+            return;
+        }
+
         MergeItemUI entryItem = toSlot.currentItem;     // 엔트리에 있던 아이템
 
         // 1) dragged(A) → 엔트리로 이동
@@ -140,7 +153,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // 3) 엔트리 currentItem 갱신
         toSlot.currentItem = dragged;
 
-        SaveToInventory(); //도넛 값 넣기
+        toSlot.SaveToInventory();
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
@@ -191,7 +204,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     }
 
     // 엔트리 저장
-    private void SaveToInventory()
+    public void SaveToInventory()
     {
         if (currentItem == null || currentItem.donutData == null)
         {

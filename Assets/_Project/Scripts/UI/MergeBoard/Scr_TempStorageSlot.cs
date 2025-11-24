@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,13 +14,22 @@ public class TempStorageSlot : MonoBehaviour
     public Image tempIcon; // 보관칸에 있을떄 출력할 이미지
 
     public Image tempTextBox; // 보관칸 텍스트박스
-    public Text countText;
+    public TMP_Text countText;
 
     void Start()
     {
         tempButton = GetComponent<Button>();
         if (tempButton != null) tempButton.onClick.AddListener(OnClick);
         tempButton.gameObject.SetActive(false);
+
+        DataManager.Instance.OnBoardDataLoaded += HandleBoardLoaded;
+    }
+
+    // 데이터 대기
+    private void HandleBoardLoaded()
+    {
+        LoadFromBoardData();
+        RefreshUI();
     }
 
     // 임시보관칸에 넣기
@@ -32,6 +42,7 @@ public class TempStorageSlot : MonoBehaviour
         }
 
         storage.Enqueue(data);
+        SaveToBoardData();
         RefreshUI();
         Debug.Log($"storage.Count : {storage.Count}");
         return true;
@@ -48,8 +59,35 @@ public class TempStorageSlot : MonoBehaviour
         if (emptyCell == null) return null;
 
         var item = storage.Dequeue();
+        SaveToBoardData();
         RefreshUI();
         return item;
+    }
+
+    private void SaveToBoardData()
+    {
+        var board = DataManager.Instance.MergeBoardData;
+
+        board.tempGiftIds.Clear();
+        foreach (var item in storage)
+            board.tempGiftIds.Add(item.id);   // "Gift_1"
+    }
+
+    private void LoadFromBoardData()
+    {
+        var board = DataManager.Instance.MergeBoardData;
+
+        storage.Clear();
+        foreach (var id in board.tempGiftIds)
+        {
+            var gift = DataManager.Instance.GetGiftBoxDataByID(id);
+            if (gift == null) continue;
+
+            // 여기서는 GiftBoxData 그대로 큐에 넣으면 됨
+            storage.Enqueue(gift);
+        }
+
+        RefreshUI();
     }
 
     private void RefreshUI()
