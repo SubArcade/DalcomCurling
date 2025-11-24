@@ -149,7 +149,7 @@ public class BoardManager : MonoBehaviour
     }
 
     // 빈칸 찾는셀
-    private Cells FindEmptyActiveCell()
+    public Cells FindEmptyActiveCell()
     {
         List<Cells> available = new();
         foreach (var c in cells)
