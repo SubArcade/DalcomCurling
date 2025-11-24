@@ -41,9 +41,15 @@ public class EntrySlot : MonoBehaviour, IDropHandler
             dragged.ResetPosition();
             return;
         }
-     
+
+        if (dragged.isFromTemp) //임시보관칸에서 온거 차단
+        {
+            dragged.ResetPosition();
+            return;
+        }
+
         //Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
-     
+
         EntrySlot fromSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
 
         EntrySlot toSlot = this;

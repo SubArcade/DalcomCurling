@@ -37,6 +37,8 @@ public class BoardManager : MonoBehaviour
         {10,10,10,10,10,10,10 }
     };
 
+    [Tooltip("임시 보관칸")] public TempStorageSlot tempStorageSlot;
+
     void Awake()
     {
         Instance = this;
@@ -45,7 +47,8 @@ public class BoardManager : MonoBehaviour
     void Start()
     {
         selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
-
+        if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
+        tempStorageSlot = FindObjectOfType<TempStorageSlot>();
         GenerateBoard();
         UpdateBoardUnlock(1);
         CreateDonutButtonAtCenter();
@@ -56,7 +59,6 @@ public class BoardManager : MonoBehaviour
         // 불러온 데이터로 보드 복원
         LoadBoardLocal();
 
-        if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
     }
 
     public void OnCellClicked(Cells cell)
@@ -145,9 +147,11 @@ public class BoardManager : MonoBehaviour
 
         // 중앙 칸은 항상 활성화하지만 도넛은 못 들어오게 잠금 표시 꺼둠
         generatorCell.SetActive(true);
+        SelectCell(generatorCell);
     }
 
-    private Cells FindEmptyActiveCell()
+    // 빈칸 찾는셀
+    public Cells FindEmptyActiveCell()
     {
         List<Cells> available = new();
         foreach (var c in cells)
@@ -212,9 +216,14 @@ public class BoardManager : MonoBehaviour
     {
         // 빈 활성 셀 찾기
         var cell = FindEmptyActiveCell();
+
+        // GiftBox Level 1 데이터 가져오기
+        var giftData = DataManager.Instance.GetDonutData(DonutType.Gift, 1);
+
         if (cell == null)
         {
-            Debug.Log("빈 칸 없음 → 기프트박스 생성 불가");
+            tempStorageSlot.Add(giftData);
+            Debug.Log("빈 칸 없음, 임시칸에 생성");
             return;
         }
 
@@ -289,7 +298,6 @@ public class BoardManager : MonoBehaviour
         BoardManager.Instance.AutoSaveBoardLocal();
     }
 
-
     // 도넛 찾기
     public Cells FindCellByDonutID(string targetID)
     {
@@ -301,31 +309,7 @@ public class BoardManager : MonoBehaviour
         }
         return null;
     }
-
-    //도넛 삭제
-    public void RemoveDonutByID(string targetID)
-    {
-        Cells target = FindCellByDonutID(targetID);
-        if (target == null)
-        {
-            Debug.LogWarning($"도넛 ID '{targetID}'를 찾을 수 없습니다.");
-            return;
-        }
-
-        if (target.occupant != null)
-            Destroy(target.occupant.gameObject);
-
-        target.ClearItem();
-        //Debug.Log($"도넛 '{targetID}' 삭제 완료");
-
-        // MergeBoardData에서 동일한 셀 데이터 제거
-        var boardData = DataManager.Instance.MergeBoardData;
-        var cellData = boardData.cells.Find(c => c.donutId == targetID);
-        if (cellData != null)
-            boardData.cells.Remove(cellData);
-
-        AutoSaveBoardLocal();
-    }
+    
     public void RefreshBoardUnlock() // 플레이어 레벨로 보드 갱신
     {
         int playerLevel = DataManager.Instance.PlayerData.level;
@@ -380,12 +364,7 @@ public class BoardManager : MonoBehaviour
         if (boardData == null) return;
 
         boardData.cells.Clear();
-        //for(int x = 0; x < boardSize; x++)
-        //{
-        //    boardData.cells[x] = ;
-        //}
-       
-
+        
         foreach (var cell in GetAllCells())
         {
             CellData data = new CellData
@@ -467,6 +446,26 @@ public class BoardManager : MonoBehaviour
         if (parts[0] != "Gift") return -1;  //첫번째 부분이 gift가 아니면 -1 반환
         if (int.TryParse(parts[1], out int level)) return level; //두번째 부분이 숫자면 level 저장하고 반환
         return -1;
+    }
+
+    // 임시보관칸에서 보드판에 생성
+    public void SpawnFromTempStorage(DonutData data)
+    {
+        Cells cell = FindEmptyActiveCell();
+        if (cell == null)
+        {
+            Debug.Log("빈 칸이 없습니다.");
+            return;
+        }
+
+        GameObject obj = Instantiate(donutPrefab, cell.transform);
+        var item = obj.GetComponent<MergeItemUI>();
+
+        item.donutId = data.id;
+        item.donutData = data;
+
+        obj.GetComponent<Image>().sprite = data.sprite;
+        cell.SetItem(item, data);
     }
 
 }

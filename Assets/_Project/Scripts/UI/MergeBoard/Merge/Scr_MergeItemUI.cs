@@ -15,6 +15,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private Canvas canvas;
     private Image icon;
     public bool isFromEntry = false; //엔트리 확인용
+    public bool isFromTemp = false;  //임시 보관칸 확인용
 
     private Vector2 originalPos;
     private Transform originalParent;
@@ -103,6 +104,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         {
             Debug.Log($"{name} 휴지통으로 삭제됨");
 
+            //TODO: 여기에서 삭제여부 팝업 추가예정
+
             // 셀 참조 초기화
             if (currentCell != null)
                 currentCell.ClearItem();
@@ -118,13 +121,13 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        //// EntrySlot 우선 체크
-        //var entrySlot = targetObj ? targetObj.GetComponentInParent<EntrySlot>() : null;
-        //if (entrySlot != null)
-        //{
-        //    entrySlot.OnDrop(eventData);
-        //    return;
-        //}
+        // 임시보관칸에 드래그 금지
+        var tempSlot = targetObj?.GetComponentInParent<TempStorageSlot>();
+        if (tempSlot != null)
+        {
+            ResetPosition();
+            return;
+        }
 
         // === 2️⃣ EntrySlot 우선 처리 ===
         if (entrySlot != null)
@@ -132,8 +135,6 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             entrySlot.OnDrop(eventData);
             return;
         }
-
-        //targetCell = targetObj ? targetObj.GetComponentInParent<Cells>() : null;
 
         // 드롭 위치에 격자 이동
         if (BoardManager.Instance.selectionHighlight != null)
@@ -238,7 +239,6 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         // 스왑로직
-        //var fromEntrySlot = originalParent.GetComponent<EntrySlot>();
         if (fromEntrySlot != null)   // 엔트리에서 옴
         {
             var targetItem = targetCell.occupant;
