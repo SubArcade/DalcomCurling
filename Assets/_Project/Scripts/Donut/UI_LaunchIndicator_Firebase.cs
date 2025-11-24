@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {
@@ -33,6 +33,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
+
+    [Header("플로팅 텍스트")]
+    [SerializeField] private GameObject floatingTextPrefab; // 플로팅 텍스트 프리팹
 
     //내부변수
     private int displayTurn = 0;
@@ -167,6 +170,33 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             CountDownText.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// 지정된 위치에 플로팅 텍스트를 표시합니다.
+    /// </summary>
+    /// <param name="message">표시할 메시지</param>
+    /// <param name="screenPosition">텍스트가 나타날 스크린 좌표</param>
+    public void ShowFloatingText(string message, Vector3 screenPosition)
+    {
+        if (floatingTextPrefab == null)
+        {
+            Debug.LogError("Floating text prefab이 할당되지 않았습니다!");
+            return;
+        }
+
+        GameObject textGO = Instantiate(floatingTextPrefab, transform);
+        textGO.transform.position = screenPosition;
+
+        TextMeshProUGUI tmp = textGO.GetComponent<TextMeshProUGUI>();
+        tmp.text = message;
+
+        // 애니메이션 시퀀스
+        Sequence sequence = DOTween.Sequence();
+        sequence.Append(textGO.transform.DOMoveY(screenPosition.y + 100f, 1.5f).SetEase(Ease.OutQuad)); // 위로 100픽셀 이동
+        sequence.Join(tmp.DOFade(0f, 1.5f).SetEase(Ease.InQuad)); // 동시에 페이드 아웃
+        sequence.OnComplete(() => Destroy(textGO)); // 애니메이션 완료 후 오브젝트 파괴
+    }
+
 
     /// <summary>
     /// UI 제어 메서드입니다.
