@@ -8,15 +8,17 @@ public class Scr_ShopPopUp : MonoBehaviour
 {
     [Header("캐시상점 토글")]
     [SerializeField] private Toggle cashShopBtn;
+    [SerializeField] private Outline cashShopOutline;
 
     [Header("골드상점 토글")]
     [SerializeField] private Toggle goldShopBtn;
+    [SerializeField] private Outline goldShopOutline;
 
     [Header("로비로 돌아가기 버튼")]
     [SerializeField] private Button robbyButton;
 
     [Header("에너지 골드 보석")]
-    [SerializeField] private Button eneryBtn;
+    [SerializeField] private Button energyBtn;
     [SerializeField] private Button goldBtn;
     [SerializeField] private Button gemBtn;
     [SerializeField] private TextMeshProUGUI energyText;
@@ -39,40 +41,26 @@ public class Scr_ShopPopUp : MonoBehaviour
     [SerializeField] private Button characterItem3;
     [SerializeField] private Button characterItem4;
 
-    //미완성된 보석 현질 버튼 추가해야함
+    private readonly Color activeColor = new Color(1f, 1f, 0f, 1f); // 노란색
+    private readonly Color inactiveColor = new Color32(0xAD, 0x2E, 0x78, 0xFF);
+    private readonly Vector2 activeThickness = new Vector2(5f, 5f);
+    private readonly Vector2 inactiveThickness = new Vector2(2f, 2f);
+    //상점 토글의 아웃라인 관리용 변수들
 
     void Awake()
     {
-        cashShopBtn = transform.Find("BottomUI/CashShopBtn")?.GetComponent<Toggle>();
-        goldShopBtn = transform.Find("BottomUI/GoldShopBtn")?.GetComponent<Toggle>();
-        
-        robbyButton = transform.Find("TopUI/PlayerMoneyGroup/RobbyButton")?.GetComponent<Button>();
-        eneryBtn = transform.Find("TopUI/PlayerMoneyGroup/Energy")?.GetComponent<Button>();
-        goldBtn = transform.Find("TopUI/PlayerMoneyGroup/Gold")?.GetComponent<Button>();
-        gemBtn = transform.Find("TopUI/PlayerMoneyGroup/Gem")?.GetComponent<Button>();
-
-        energyText = transform.Find("TopUI/PlayerMoneyGroup/Energy/Energy_Text")?.GetComponent<TextMeshProUGUI>();
-        goldText = transform.Find("TopUI/PlayerMoneyGroup/Gold/Gold_Text")?.GetComponent<TextMeshProUGUI>();
-        gemText = transform.Find("TopUI/PlayerMoneyGroup/Gem/Gem_Text")?.GetComponent<TextMeshProUGUI>();
-
-        deleteAdsBtn1 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem1")?.GetComponent<Button>();
-        deleteAdsBtn2 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem2")?.GetComponent<Button>();
-        deleteAdsBtn3 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/DeleteAdsItem3")?.GetComponent<Button>();
-        packageBtn1 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/PackageItem1")?.GetComponent<Button>();
-        packageBtn2 = transform.Find("CashUIBackground/CashShopUI/MonthlyPlanBanner/PackageItem2")?.GetComponent<Button>();
-
-        effectItem1 = transform.Find("GoldUIBackground/GoldShopUI/DonutBanner/EffectItem1")?.GetComponent<Button>();
-        effectItem2 = transform.Find("GoldUIBackground/GoldShopUI/DonutBanner/EffectItem2")?.GetComponent<Button>();
-        effectItem3 = transform.Find("GoldUIBackground/GoldShopUI/DonutBanner/EffectItem3")?.GetComponent<Button>();
-
-        characterItem1 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem1")?.GetComponent<Button>();
-        characterItem2 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem2")?.GetComponent<Button>();
-        characterItem3 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem3")?.GetComponent<Button>();
-        characterItem4 = transform.Find("GoldUIBackground/GoldShopUI/CharacterBanner/CharacterItem4")?.GetComponent<Button>();
-
+ 
     }
     void Start()
     {
+        bool isCashOn = cashShopBtn.isOn;
+
+        cashShopOutline.effectColor = isCashOn ? activeColor : inactiveColor;
+        cashShopOutline.effectDistance = isCashOn ? activeThickness : inactiveThickness;
+
+        goldShopOutline.effectColor = isCashOn ? inactiveColor : activeColor;
+        goldShopOutline.effectDistance = isCashOn ? inactiveThickness : activeThickness;
+
         //캐시상점 열기
         cashShopBtn.onValueChanged.AddListener((isOn) =>
         {
@@ -80,6 +68,12 @@ public class Scr_ShopPopUp : MonoBehaviour
             {
                 goldShopBtn.isOn = false;
                 ShowCashShopUI();
+
+                cashShopOutline.effectColor = activeColor;
+                cashShopOutline.effectDistance = activeThickness;
+
+                goldShopOutline.effectColor = inactiveColor;
+                goldShopOutline.effectDistance = inactiveThickness;
             }
         });
         //골드상점열기
@@ -89,6 +83,12 @@ public class Scr_ShopPopUp : MonoBehaviour
             {
                 cashShopBtn.isOn = false;
                 ShowGoldShopUI();
+
+                goldShopOutline.effectColor = activeColor;
+                goldShopOutline.effectDistance = activeThickness;
+
+                cashShopOutline.effectColor = inactiveColor;
+                cashShopOutline.effectDistance = inactiveThickness;
             }
         });
         //로비로 돌아가버리는 버튼
@@ -98,7 +98,7 @@ public class Scr_ShopPopUp : MonoBehaviour
         });
 
         SetPlayerText(DataManager.Instance.PlayerData);
-        eneryBtn.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
+        energyBtn.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
     }
     void OnEnable()
     {

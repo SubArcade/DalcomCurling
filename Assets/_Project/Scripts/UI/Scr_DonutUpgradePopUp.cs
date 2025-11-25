@@ -42,31 +42,7 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     private const int MaxLevel = 20;
     void Awake()
     {
-        //업글버튼 누르면 바로 업글 되게 해놓음
-        //데이터베이스에서 돈이랑 연결해서 업글버튼누르면
-        //돈이 있다면 askupgrade팝업
-        //돈이없다면 failupgrade팝업 뜨도록 코드 추가
-        //각 팝업에 존재하는 버튼들과 텍스트 인스펙터에 자동으로 잡히고 애드리스너등록
-        Transform canvas = GameObject.Find("Canvas")?.transform;
-        CloseButton = transform.Find("Panel/CloseButton")?.GetComponent<Button>();
-        HardUpgradeButton = transform.Find("Panel/ButtonPanel/HardUpgradePanel/HardUpgradeButton")?.GetComponent<Button>();
-        MoistUpgradeButton = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/MoistUpgradeButton")?.GetComponent<Button>();
-        SoftUpgradeButton = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/SoftUpgradeButton")?.GetComponent<Button>();
 
-        HardUpgradeMax = transform.Find("Panel/ButtonPanel/HardUpgradePanel/HardUpgradeMax")?.gameObject;
-        MoistUpgradeMax = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/MoistUpgradeMax")?.gameObject;
-        SoftUpgradeMax = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/SoftUpgradeMax")?.gameObject;
-
-        HardDonutCreatText = transform.Find("Panel/ButtonPanel/HardUpgradePanel/HardDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
-        MoistDonutCreatText = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/MoistDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
-        SoftDonutCreatText = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/SoftDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
-
-        HardDonutOptionText = transform.Find("Panel/ButtonPanel/HardUpgradePanel/UpgradeOptionLabel/HardDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
-        MoistDonutOptionText = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/UpgradeOptionLabel/MoistDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
-        SoftDonutOptionText = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/UpgradeOptionLabel/SoftDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
-
-        AskUpgradePopUp = canvas.Find("AskUpgradePopup")?.gameObject;
-        FailUpgradePopUp = canvas.Find("FailUpgradePopup")?.gameObject;
     }
 
     void Start()

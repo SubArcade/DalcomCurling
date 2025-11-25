@@ -29,13 +29,18 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject result;
     [SerializeField] private Scr_TweenHandDragGuide guide;
+    [SerializeField] private GameObject settingsPanel;
     [Header("도넛 엔트리 항목")]
     [SerializeField] private DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
+    [Header("결과창 보상 텍스트 갱신을 위한 변수")]
+    [SerializeField] private TextMeshProUGUI expText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI pointText;
     [Header("플로팅 텍스트")]
-    [SerializeField] private GameObject floatingTextPrefab; // 플로팅 텍스트 프리팹
+    [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
 
     //내부변수
     private int displayTurn = 0;
@@ -65,6 +70,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         else
         {
             Debug.LogError("UI_LaunchIndicator_Firebase: Start()에서 FirebaseGameManager.Instance를 찾을 수 없습니다.");
+        }
+
+        if (floatingText != null)
+        {
+            // 이 플로팅 텍스트는 파괴하지 않고 계속 재사용할 것이므로, destroyOnComplete 값을 false로 설정합니다.
+            floatingText.destroyOnComplete = false;
+            floatingText.gameObject.SetActive(false);
         }
     }
 
@@ -131,6 +143,12 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             string gameState = FirebaseGameManager.Instance.CurrentGameState;
             debugStateText.text = $"Local State: {localState}\nGame State: {gameState}";
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) //세팅창열고닫기 [안드로이드는 뒤로가기 버튼]
+        {
+            if (settingsPanel.activeSelf) settingsPanel.SetActive(false);   // 닫기
+            else settingsPanel.SetActive(true); // 열기
+        }
     }
 
 
@@ -178,23 +196,20 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     /// <param name="screenPosition">텍스트가 나타날 스크린 좌표</param>
     public void ShowFloatingText(string message, Vector3 screenPosition)
     {
-        if (floatingTextPrefab == null)
+        if (floatingText == null)
         {
-            Debug.LogError("Floating text prefab이 할당되지 않았습니다!");
+            Debug.LogError("FloatingText 컴포넌트가 할당되지 않았습니다!");
             return;
         }
 
-        GameObject textGO = Instantiate(floatingTextPrefab, transform);
-        textGO.transform.position = screenPosition;
+        // 1. 위치 설정
+        floatingText.transform.position = screenPosition;
+        
+        // 2. 텍스트 설정
+        floatingText.SetText(message);
 
-        TextMeshProUGUI tmp = textGO.GetComponent<TextMeshProUGUI>();
-        tmp.text = message;
-
-        // 애니메이션 시퀀스
-        Sequence sequence = DOTween.Sequence();
-        sequence.Append(textGO.transform.DOMoveY(screenPosition.y + 100f, 1.5f).SetEase(Ease.OutQuad)); // 위로 100픽셀 이동
-        sequence.Join(tmp.DOFade(0f, 1.5f).SetEase(Ease.InQuad)); // 동시에 페이드 아웃
-        sequence.OnComplete(() => Destroy(textGO)); // 애니메이션 완료 후 오브젝트 파괴
+        // 3. 활성화 (활성화 시 FloatingText.cs의 OnEnable에서 애니메이션이 자동 시작됨)
+        floatingText.gameObject.SetActive(true);
     }
 
 
@@ -208,6 +223,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     {
         AllcloseUI();
         result.SetActive(true);
+        ResultRewardView();
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
@@ -231,6 +247,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
+        settingsPanel.SetActive(false);
     }
     public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
@@ -240,15 +257,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         if (select == 1) {
             guide.PlayVerticalDrag();
         }
-        if (select == 2) { 
+        else if (select == 2) { 
             guide.PlayHorizontalDrag();
         }
-        if (select == 3)
-        {
+        else if (select == 3) {
             guide.PlayTouchMove();
         }
-        else
-        {
+        else {
             Debug.Log("올바른 가이드 출력 번호가 아닙니다.");
         }
     }
@@ -283,4 +298,26 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         }
     }
 
+    public void ResultRewardView() 
+    {
+        int exp = 10;
+
+
+        // 골드는 100~300 랜덤
+        int rewardGold = Random.Range(100, 150);
+
+        // 포인트는 10~20 랜덤
+        int rewardPoint = Random.Range(10, 20);
+
+        // UI 텍스트 갱신
+        int previewLevel = DataManager.Instance.PlayerData.exp + exp;
+
+        if (expText != null) expText.text = $"+{exp}";
+        if (goldText != null) goldText.text = $"+{rewardGold}";
+        if (pointText != null) pointText.text = $"+{rewardPoint}";
+
+        GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
+        //일단 게임종료후 레벨과 경험치 골드를 받는지만 확인하는 함수,
+        //나중에 패배, 탈주, 강종 등  승,패,무 고려해서 두명이 서로 다르게 나오도록 해야함
+    }
 }

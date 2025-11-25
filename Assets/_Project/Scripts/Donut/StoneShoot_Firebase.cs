@@ -672,7 +672,7 @@ public class StoneShoot_Firebase : MonoBehaviour
             Debug.Log("미리 입력된 샷으로 발사를 시작합니다.");
             CurrentState = LaunchState.MovingToHogLine; // 호그 라인 이동 상태로 변경
             MoveDonutToHogLine(_preparedShotData); // 미리 준비된 샷 데이터로 돌 이동
-            _needToTap = false; // 미리 준비된 샷은 탭 입력 필요 없음
+            _needToTap = false; // 미리 준비된 샷은 탭 입력이 필요없도록 
             _preparedShotData = null; // 사용한 샷 데이터 초기화
             return true; // 샷 실행됨
         }
@@ -718,13 +718,13 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (zPos >= perfectZoneLine.position.z && zPos <= startHogLine.position.z)
         {
             weights = perfectZoneRandomWeights; // 퍼펙트존 가중치 사용
-            //Debug.Log("퍼펙트존");
+            Debug.Log("퍼펙트존");
             uiLaunch.ShowFloatingText("Perfect", Input.mousePosition);
         }
         else if (zPos >= earlyZoneLine.position.z && zPos < perfectZoneLine.position.z)
         {
             weights = earlyZoneRandomWeights; // 얼리존 가중치 사용
-            //Debug.Log("얼리존");
+            Debug.Log("얼리존");
             uiLaunch.ShowFloatingText("Early", Input.mousePosition);
         }
 

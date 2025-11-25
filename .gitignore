@@ -95,6 +95,9 @@ Assets/Firebase/Plugins
 Assets/Firebase/Plugins.meta
 Assets/google-services.json
 Assets/google-services.json.meta
+# FMOD banks
+Assets/StreamingAssets/FMOBanks/*
+*.bank
 
 # 프로젝트 셋팅
 ProjectSettings/Packages/com.unity.polybrush/*
