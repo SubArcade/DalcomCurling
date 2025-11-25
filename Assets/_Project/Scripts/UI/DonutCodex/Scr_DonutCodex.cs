@@ -36,7 +36,8 @@ public class Scr_DonutCodex : MonoBehaviour
     [SerializeField, Tooltip("이미지")] private Image image;
     [SerializeField, Tooltip("설명")] private TMP_Text infotext;
     [SerializeField, Tooltip("레벨")] private TMP_Text levelText;
-
+    [SerializeField, Tooltip("도넛 종류")] private TMP_Text titleText;
+    
 
     private void OnEnable()
     {
@@ -103,6 +104,7 @@ public class Scr_DonutCodex : MonoBehaviour
     {
         RefreshType(DonutType.Hard, hardShells);
         OnPanel(DonutType.Hard);
+        titleText.text = "단단 도넛";
     }
 
     // 촉촉 버튼
@@ -110,6 +112,7 @@ public class Scr_DonutCodex : MonoBehaviour
     {
         RefreshType(DonutType.Soft, softShells);
         OnPanel(DonutType.Soft);
+        titleText.text = "말랑 도넛";
     }
 
     
@@ -118,6 +121,7 @@ public class Scr_DonutCodex : MonoBehaviour
     {
         RefreshType(DonutType.Moist, moistShells);
         OnPanel(DonutType.Moist);
+        titleText.text = "촉촉 도넛";
     }
     
     private void OnPanel(DonutType donutType)
