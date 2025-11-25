@@ -407,7 +407,7 @@ public class StoneManager : MonoBehaviour
             if (!stoneExists)
             {
                 // 서버가 보내준 위치가 아웃라인 밖인지 확인
-                Vector3 serverPos = new Vector3(stonePos.Position["x"], stonePos.Position["y"], stonePos.Position["z"]);
+                Vector3 serverPos = new Vector3(stonePos.Position["x"], spawnPosition.position.y, stonePos.Position["z"]);
                 if (CheckDonutPassedOutLine(serverPos.z))
                 {
                     // 로컬에 없는 돌이 서버에서도 아웃된 위치라면, 이미 클라이언트에서 정상적으로 아웃 처리된 것이므로 건너뛴다.

@@ -761,7 +761,7 @@ public class FirebaseGameManager : MonoBehaviour
         Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
         if (donutRigid != null)
         {
-            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "TimeOut");
+            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "Tap Failed");
         }
 
         _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
@@ -798,16 +798,20 @@ public class FirebaseGameManager : MonoBehaviour
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
 
-        // 현재 선택된 도넛을 가져옵니다.
-        DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
-        
-        // LastShot 데이터에 도넛 ID를 저장합니다.
-        shotData.DonutId = selectedDonut?.id;
-
-        // 사용한 도넛을 UI에서 '사용됨'으로 표시하고 다음 도넛을 선택합니다.
-        if (donutSelectionUI != null && selectedDonut != null)
+        // shotData에 DonutId가 아직 설정되지 않은 경우에만 UI에서 가져옵니다.
+        if (string.IsNullOrEmpty(shotData.DonutId))
         {
-            donutSelectionUI.MarkDonutAsUsed(selectedDonut);
+            // 현재 선택된 도넛을 가져옵니다.
+            DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+        
+            // LastShot 데이터에 도넛 ID를 저장합니다.
+            shotData.DonutId = selectedDonut?.id;
+            
+            // 사용한 도넛을 UI에서 '사용됨'으로 표시하고 다음 도넛을 선택합니다.
+            if (donutSelectionUI != null && selectedDonut != null)
+            {
+                donutSelectionUI.MarkDonutAsUsed(selectedDonut);
+            }
         }
         
         int count = stoneManager.myTeam == StoneForceController_Firebase.Team.A
@@ -1086,8 +1090,9 @@ public class FirebaseGameManager : MonoBehaviour
 
     private void PlayerLostTimeToShotInTime(Rigidbody donutRigid)
     {
+        _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
         StoneForceController_Firebase sfc = donutRigid.transform.GetComponent<StoneForceController_Firebase>();
-        stoneManager.DonutOut(sfc);
+        stoneManager.DonutOut(sfc, "Timeout");
         var zeroDict = new Dictionary<string, float>
         {
             { "x", 0 },
@@ -1101,7 +1106,7 @@ public class FirebaseGameManager : MonoBehaviour
             Team = stoneManager.myTeam, // 발사하는 팀
             Spin = -999f, // 최종 스핀 값
             Direction = zeroDict, // 발사 방향
-            //ReleasePosition = zeroDict // 릴리즈 위치
+            DonutId = sfc.DonutId // 시간 초과된 도넛의 ID를 명시적으로 전달
         };
         SubmitShot(shotData);
         _localState = LocalGameState.WaitingForPrediction;
@@ -1304,6 +1309,7 @@ public class FirebaseGameManager : MonoBehaviour
 
                 // --- 시간 초과 처리 ---
                 Debug.Log("입력 시간 초과. 턴을 넘깁니다.");
+
                 inputController?.DisableInput();
                 PlayerLostTimeToShotInTime(_currentTurnDonutRigid);
             });
