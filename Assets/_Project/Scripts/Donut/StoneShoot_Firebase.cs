@@ -68,8 +68,12 @@ public class StoneShoot_Firebase : MonoBehaviour
     [SerializeField, Range(0.1f, 2.0f)] private float trajectoryForceMultiplier = 0.5f; // 궤적 예측의 힘 계수 (1.0이 기본)
     [SerializeField, Range(0.001f, 0.1f)] private float trajectoryCurlFactor = 0.05f; // 궤적 예측의 휨 계수
     [SerializeField, Range(0.1f, 2.0f)] private float horizontalDragSensitivity = 0.5f; // 좌우 드래그 방향 민감도 (낮을수록 덜 꺾임)
-    public Color min_Color = Color.white;
-    public Color max_Color = Color.red;
+    public Color min_Yellow_Color = Color.yellow;
+    public Color max_Yellow_Color = Color.red;
+    public Color min_Green_Color = Color.green;
+    public Color max_Green_Color;
+    public Color min_Red_Color = Color.red;
+    public Color max_Red_Color;
 
     [Header("설정 변수")] // 게임 플레이 조작 관련 변수 헤더
     public float launchForceMultiplier = 9f; // 드래그 거리를 발사 힘으로 변환하는 계수, 4에서 8로 수정(11/16), 4에서 6로 수정 11/17, 9로수정 (11/20)
@@ -515,8 +519,25 @@ public class StoneShoot_Firebase : MonoBehaviour
         }
 
         float t = Mathf.InverseLerp(0, maxDragDistance, draggedDistanceForTrajectory); // 드래그한 거리를 비율화
-        Color resultColor = Color.Lerp(min_Color, max_Color, t); // 그 비율에 따라 시작 색상과 종료 색상 믹싱
-        
+        //Color resultColor = Color.Lerp(min_Color, max_Color, t); // 그 비율에 따라 시작 색상과 종료 색상 믹싱
+
+        float alpha = Mathf.Lerp(0.3f, 1f, t);
+        Color resultColor;
+        if (t > 0.6f && t < 0.75f)
+        {
+            resultColor = new Color(min_Green_Color.r, min_Green_Color.g, min_Green_Color.b, t);
+            resultColor = Color.green;
+        }
+        else if (t >= 0.75f)
+        {
+            resultColor = new Color(min_Red_Color.r, min_Red_Color.g, min_Red_Color.b, t);
+            //resultColor = Color.red;
+        }
+        else
+        {
+            resultColor = new Color(min_Yellow_Color.r, min_Yellow_Color.g, min_Yellow_Color.b, t);
+            //resultColor = Color.yellow;
+        }
         // 시작 컬러와 끝 컬러를 일단 통일하여 표시
         trajectoryLine.startColor = resultColor;
         //trajectoryLine.endColor = resultColor;
