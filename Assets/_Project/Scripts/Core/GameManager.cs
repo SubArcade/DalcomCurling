@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     public GameState State { get; private set; } = GameState.Lobby;
     public string gameSceneName;
     public string menuSceneName;
+    [SerializeField] private GameObject notifier;
+    
     private void Awake()
     {
         if (Instance == null)
@@ -44,10 +46,21 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive);
         
         FirebaseAuthManager.Instance.Init();
+
+        //StartCoroutine(Delay(2f));
     }
+    
+    
+    private IEnumerator Delay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        notifier.SetActive(true);
+    }
+    
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // ✅ 씬 이름이 menuSceneName일 때만 보상 반영
+        // 씬 이름이 menuSceneName일 때만 보상 반영
         if (scene.name == menuSceneName)
         {
             SetState(GameState.Lobby);
@@ -114,7 +127,7 @@ public class GameManager : MonoBehaviour
             DataManager.Instance.GoldChange(DataManager.Instance.PlayerData.gold);
             DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);
 
-            // ✅ 레벨업 팝업 조건
+            // 레벨업 팝업 조건
             if (DataManager.Instance.PlayerData.level > oldLevel)
             {
                 UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);

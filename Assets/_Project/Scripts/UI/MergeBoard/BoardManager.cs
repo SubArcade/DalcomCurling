@@ -242,7 +242,7 @@ public class BoardManager : MonoBehaviour
         var giftData = DataManager.Instance.GetGiftBoxData(1);
         if (giftData == null)
         {
-            Debug.LogError("❌GiftBoxData Level 1 NOT FOUND");
+            Debug.LogError("GiftBoxData Level 1 NOT FOUND");
             return;
         }
         else

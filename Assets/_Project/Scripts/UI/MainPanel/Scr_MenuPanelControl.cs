@@ -120,8 +120,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
             
             SetPlayerText(DataManager.Instance.PlayerData);
             // 레벨업 보상상자
-            
-            
+            BoardManager.Instance.SpawnGiftBox();
         }
                 
         

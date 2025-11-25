@@ -25,11 +25,6 @@ public class EnergyRegenNotifier : MonoBehaviour
     // 프로젝트의 싱글톤/데이터 접근은 여기에 맞춰주세요
     private PlayerData playerData => DataManager.Instance.PlayerData;
 
-    // playerData 가정:
-    // int    energy;        // 현재 에너지
-    // long   lastAt;        // 마지막 회복 '틱' 기준 시간(UTC seconds)
-    // ※ lastAt가 0이면 초기화가 필요합니다. (아래에서 처리)
-
     private void Awake()
     {
 #if UNITY_ANDROID

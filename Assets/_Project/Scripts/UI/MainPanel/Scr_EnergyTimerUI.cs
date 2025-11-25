@@ -13,7 +13,7 @@ public class Scr_EnergyTimerUI : MonoBehaviour
 
     private void Awake()
     { 
-        notifier = FindObjectOfType<EnergyRegenNotifier>();
+        //notifier = FindObjectOfType<EnergyRegenNotifier>();
     }
 
     private void OnEnable()
