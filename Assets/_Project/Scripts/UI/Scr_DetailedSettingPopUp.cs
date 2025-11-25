@@ -51,7 +51,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 
     void Awake()
     {
-        accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
+        //accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
         accountExit.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DeleteAccountPopUp));
         gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));          
     }

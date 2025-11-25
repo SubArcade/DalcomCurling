@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {
@@ -38,6 +38,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private TextMeshProUGUI expText;
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI pointText;
+    [Header("플로팅 텍스트")]
+    [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
 
     //내부변수
     private int displayTurn = 0;
@@ -67,6 +69,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         else
         {
             Debug.LogError("UI_LaunchIndicator_Firebase: Start()에서 FirebaseGameManager.Instance를 찾을 수 없습니다.");
+        }
+
+        if (floatingText != null)
+        {
+            // 이 플로팅 텍스트는 파괴하지 않고 계속 재사용할 것이므로, destroyOnComplete 값을 false로 설정합니다.
+            floatingText.destroyOnComplete = false;
+            floatingText.gameObject.SetActive(false);
         }
     }
 
@@ -174,6 +183,30 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     }
 
     /// <summary>
+    /// 지정된 위치에 플로팅 텍스트를 표시합니다.
+    /// </summary>
+    /// <param name="message">표시할 메시지</param>
+    /// <param name="screenPosition">텍스트가 나타날 스크린 좌표</param>
+    public void ShowFloatingText(string message, Vector3 screenPosition)
+    {
+        if (floatingText == null)
+        {
+            Debug.LogError("FloatingText 컴포넌트가 할당되지 않았습니다!");
+            return;
+        }
+
+        // 1. 위치 설정
+        floatingText.transform.position = screenPosition;
+        
+        // 2. 텍스트 설정
+        floatingText.SetText(message);
+
+        // 3. 활성화 (활성화 시 FloatingText.cs의 OnEnable에서 애니메이션이 자동 시작됨)
+        floatingText.gameObject.SetActive(true);
+    }
+
+
+    /// <summary>
     /// UI 제어 메서드입니다.
     /// AllcloseUI() 먼저 호출하고 필요한UI만 켜지는 메서드 생성하여 호출 하면됩니다.
     /// </summary>
@@ -216,15 +249,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         if (select == 1) {
             guide.PlayVerticalDrag();
         }
-        if (select == 2) { 
+        else if (select == 2) { 
             guide.PlayHorizontalDrag();
         }
-        if (select == 3)
-        {
+        else if (select == 3) {
             guide.PlayTouchMove();
         }
-        else
-        {
+        else {
             Debug.Log("올바른 가이드 출력 번호가 아닙니다.");
         }
     }
