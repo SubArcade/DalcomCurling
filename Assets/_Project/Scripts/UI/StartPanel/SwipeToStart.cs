@@ -14,6 +14,9 @@ public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     [SerializeField] private float duration = 1.0f;   // 애니메이션 시간
     [SerializeField] private float dealyTime = 0.5f;   // 애니메이션 시간
     
+    [Header("Analytics")]
+    [SerializeField] private GameObject appLunch;
+    
 
     private Vector2 startTouchPos;
     private bool isSwiped = false;
@@ -71,6 +74,9 @@ public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             //donut.gameObject.SetActive(false);
             UIManager.Instance.Open(PanelId.MainPanel);
+            
+            // 애널리틱 종료
+            appLunch.gameObject.SetActive(false);
         });
     }
     
