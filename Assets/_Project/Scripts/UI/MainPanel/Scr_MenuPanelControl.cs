@@ -54,7 +54,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
     
     public GameObject testLoginPanel;
     public Button testLevelUpButton;
-    
+   
+
     void Awake()
     {
         UIManager.Instance.RegisterPanel(PanelId.StartPanel,startPanel);    
@@ -94,7 +95,11 @@ public class Scr_MenuPanelControl : MonoBehaviour
         
         testLevelUpButton.onClick.AddListener(LevelUp);
     }
-    
+
+    private void Start()
+    {
+        SoundManager.Instance.PlayBGMGroup("BGM");
+    }
     private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
     
     public void SetPlayerText(PlayerData playerData)

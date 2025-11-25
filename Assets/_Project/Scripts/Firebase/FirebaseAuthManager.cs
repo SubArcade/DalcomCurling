@@ -188,10 +188,10 @@ public class FirebaseAuthManager
     
         // 2. GPGS 준비
         EnsureGpgsActivated();
-    
+
         // (선택) 혹시 이전에 이상하게 캐싱된 로그인 상태 있으면 한번 SignOut
         //PlayGamesPlatform.Instance.SignOut();
-    
+
         // 3. ManuallyAuthenticate 호출 → 이 타이밍에 팝업이 떠야 함
         PlayGamesPlatform.Instance.ManuallyAuthenticate(async status =>
         {

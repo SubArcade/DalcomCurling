@@ -59,7 +59,6 @@ public class SoundManager : MonoBehaviour
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
-        StopAllCoroutines();
         StopBGMInternal();
     }
 

@@ -318,7 +318,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   docId: ZflvQAZZmYj1SKj8mZKZ
-  isLogin: 0
   userData:
     <player>k__BackingField:
       <email>k__BackingField: test@test.com
@@ -335,9 +334,6 @@ MonoBehaviour:
       <changeNicknameCount>k__BackingField: 0
       <soloScore>k__BackingField: 0
       <soloTier>k__BackingField: 0
-      <maxEnergy>k__BackingField: 50
-      <perSecEnergy>k__BackingField: 10
-      <levelMax>k__BackingField: 20
     <inventory>k__BackingField:
       <donutEntries>k__BackingField: []
       <hardDonutCodexDataList>k__BackingField: []
@@ -345,7 +341,6 @@ MonoBehaviour:
       <moistDnutCodexDataList>k__BackingField: []
     <mergeBoard>k__BackingField:
       <cells>k__BackingField: []
-      <tempGiftIds>k__BackingField: []
       <generatorLevelHard>k__BackingField: 1
       <generatorLevelSoft>k__BackingField: 1
       <generatorLevelMoist>k__BackingField: 1
@@ -603,7 +598,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameSceneName: LSJ_Test
   menuSceneName: Sce_MainMenu
-  notifier: {fileID: 0}
 --- !u!1 &1137162047
 GameObject:
   m_ObjectHideFlags: 0
@@ -838,6 +832,7 @@ Transform:
   - {fileID: 1179012150}
   - {fileID: 134594874}
   - {fileID: 1700842877}
+  - {fileID: 1847927176}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1342822453
@@ -987,6 +982,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b87e33ee4a3e84d9268d6e77fa60e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1847927175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1847927176}
+  - component: {fileID: 1847927177}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1847927176
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847927175}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1294903637}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1847927177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1847927175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99b0e3e14aca1b844a00d8c6d8f53279, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allSoundGroups:
+  - Name: BGM
+    Events:
+    - Guid:
+        Data1: -888270042
+        Data2: 1294993507
+        Data3: 2086759590
+        Data4: 892043932
+      Path: event:/music_comedy_quirky_fun_knockout
+  - Name: 
+    Events: []
+  - Name: 
+    Events: []
+  - Name: 
+    Events: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
