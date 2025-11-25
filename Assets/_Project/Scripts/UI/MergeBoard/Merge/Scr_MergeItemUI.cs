@@ -129,9 +129,19 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        // === 2️⃣ EntrySlot 우선 처리 ===
+        // EntrySlot 우선 처리
         if (entrySlot != null)
         {
+            // 엔트리 슬롯에도 격자 표시
+            var highlight = BoardManager.Instance.selectionHighlight;
+            if (highlight != null)
+            {
+                highlight.gameObject.SetActive(true);
+                highlight.transform.SetParent(entrySlot.transform, false);
+                highlight.rectTransform.anchoredPosition = Vector2.zero;
+                highlight.rectTransform.localScale = Vector3.one;
+            }
+
             entrySlot.OnDrop(eventData);
             return;
         }
@@ -350,8 +360,9 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        // 머지 불가 → 원래 자리로 복귀
-        ResetPosition();
+        // 머지안되면 스왑
+        TrySwap(targetCell);
+        return;
     }
 
 
@@ -434,6 +445,44 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
         Debug.Log($"[SwapEntryAndCell] 엔트리 ↔ 보드 스왑 완료");
     }
+
+    // 보드 <> 보드 스왑
+    private void TrySwap(Cells targetCell)
+    {
+        MergeItemUI other = targetCell.occupant;
+
+        if (other == null)
+        {
+            ResetPosition();
+            return;
+        }
+
+        Cells cellA = currentCell;
+        Cells cellB = targetCell;
+
+        // 서로 아이템 교환
+        cellA.occupant = other;
+        cellB.occupant = this;
+
+        // currentCell 변경
+        other.currentCell = cellA;
+        this.currentCell = cellB;
+
+        // donutId 변경
+        cellA.donutId = other.donutId;
+        cellB.donutId = this.donutId;
+
+        // 부모 변경
+        other.transform.SetParent(cellA.transform, false);
+        this.transform.SetParent(cellB.transform, false);
+
+        // 위치 중앙으로
+        other.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        this.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+        Debug.Log($"[SWAP] {cellA.gridX},{cellA.gridY} <-> {cellB.gridX},{cellB.gridY}");
+    }
+
 
     public void Init(DonutData data)
     {
