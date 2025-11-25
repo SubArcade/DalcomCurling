@@ -87,6 +87,7 @@ public class FirebaseGameManager : MonoBehaviour
     private Rigidbody _currentTurnDonutRigid;
     private Coroutine _heartbeatCoroutine; // 생존 신호 코루틴 참조
     private bool roundDataUpdated = false;
+    private bool _justTimedOut = false; // 마지막 턴이 타임아웃으로 실패했는지 여부
 
     // --- 공유 가능한 게임 변수 ---
     public int aTeamScore { get; private set; } = 0;
@@ -273,7 +274,6 @@ public class FirebaseGameManager : MonoBehaviour
                     // [짧은 타임라인 실행 > InProgress로 상태 변경] 로직을 Action으로 묶어 재사용.
                     Action playShortTimelineAndStartGame = () =>
                     {
-                        Debug.Log($"[{_currentGame.RoundNumber} 라운드 시작!] 연출 (2.5초)");
                         gameCamControl?.PlayRoundTimeline(); // 라운드시작 연출
 
                         DOVirtual.DelayedCall(2.5f, () =>
@@ -301,7 +301,7 @@ public class FirebaseGameManager : MonoBehaviour
 
                         // 8.5초의 연출 대기시간을 기다림
                         DOVirtual.DelayedCall(8.5f, () => {
-                            Debug.Log("<<<<<< 첫턴 긴 타임라인 이후 짧은 타임라인 실행 >>>>>>");
+                            
                             playShortTimelineAndStartGame(); 
                         });
                     }
@@ -309,7 +309,7 @@ public class FirebaseGameManager : MonoBehaviour
                     {
                         // 짧은 연출 로직만 실행합니다.
 
-                        Debug.Log("<<<<<< 라운드 변경의 짧은 타임라인 실행 >>>>>>");
+                        
                         stoneManager.ClearOldDonutsInNewRound(_currentGame);
                         gameCamControl.SwitchCamera(START_VIEW_CAM);
                         _cachedPrediction = null;
@@ -764,6 +764,8 @@ public class FirebaseGameManager : MonoBehaviour
             stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "TimeOut");
         }
 
+        _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
+
         var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
         LastShot failedShotData = new LastShot()
         {
@@ -897,32 +899,42 @@ public class FirebaseGameManager : MonoBehaviour
                     };
                     db.Collection("games").Document(gameId).UpdateAsync(updates);
 
-                    //Debug.Log("상대 턴 시뮬레이션 완료. 내 샷을 미리 준비합니다.");
-
-                    if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
-                         && stoneManager.aShotIndex >= shotsPerRound - 1)
-                        || (stoneManager.myTeam == StoneForceController_Firebase.Team.B
-                            && stoneManager.bShotIndex >= shotsPerRound - 1))
+                    if (_justTimedOut)
                     {
-                        //Debug.Log("라운드에 발사가능한 횟수가 끝나서 내 턴으로 돌아오지 않습니다");
+                        // 이전 턴이 타임아웃으로 실패했다면, 다음 돌을 미리 생성하지 않고 기다립니다.
+                        _localState = LocalGameState.Idle; // 상태를 Idle로 변경하여 실제 턴 시작을 기다림
+                        _justTimedOut = false; // 플래그 초기화
+                        //Debug.Log("타임아웃으로 인한 턴 종료. 다음 돌 미리 생성 건너뛰기.");
                     }
                     else
                     {
-                        DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
-                        if (selectedDonut == null)
+                        // 일반적인 상대 턴 종료 후, 내 샷을 미리 준비합니다.
+                        //Debug.Log("상대 턴 시뮬레이션 완료. 내 샷을 미리 준비합니다.");
+                        if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
+                             && stoneManager.aShotIndex >= shotsPerRound - 1)
+                            || (stoneManager.myTeam == StoneForceController_Firebase.Team.B
+                                && stoneManager.bShotIndex >= shotsPerRound - 1))
                         {
-                            //Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
-                            return;
-                        }
-
-                        _currentTurnDonutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut, myUserId);
-                        if (_currentTurnDonutRigid != null)
-                        {
-                            CountDownStart(10f); // Use the new signature
+                            //Debug.Log("라운드에 발사가능한 횟수가 끝나서 내 턴으로 돌아오지 않습니다");
                         }
                         else
                         {
-                            //Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
+                            DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+                            if (selectedDonut == null)
+                            {
+                                //Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
+                                return;
+                            }
+
+                            _currentTurnDonutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut, myUserId);
+                            if (_currentTurnDonutRigid != null)
+                            {
+                                CountDownStart(10f); // Use the new signature
+                            }
+                            else
+                            {
+                                //Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
+                            }
                         }
                     }
                 }
