@@ -69,7 +69,8 @@ public class FirebaseGameManager : MonoBehaviour
     [Header("게임 플레이 옵션")] public bool usePreparedShot = true; // 미리 조작한 샷 즉시 발사 기능 사용 여부
 
     // --- 게임 시스템 변수 ---
-    public float timeMultiplier { get; private set; } = 5f; //게임 빨리감기 속도를 결정할 변수, 읽기전용 (기본값 5)
+    public float timeMultiplier { get; private set; } = 4f; //게임 빨리감기 속도를 결정할 변수, 읽기전용 (기본값 5)
+    public float fixedTimeMultiplier { get; private set; } = 0.0025f;
 
     // --- 게임 연결 상태 변수 ---
     [Header("연결 상태 관리")]
@@ -131,7 +132,10 @@ public class FirebaseGameManager : MonoBehaviour
         roomId = FirebaseMatchmakingManager.CurrentRoomId; // RoomId 가져오기
         myUserId = FirebaseAuthManager.Instance.UserId;
 
-        initialFixedDeltaTime = Time.fixedDeltaTime;
+        initialFixedDeltaTime = 0.02f;
+
+        //Time.fixedDeltaTime /= timeMultiplier;
+        //Time.fixedDeltaTime = fixedTimeMultiplier;
 
         // 게임 ID, 사용자 ID, 룸 ID 중 하나라도 없으면 게임을 진행할 수 없습니다.
         if (string.IsNullOrEmpty(gameId) || string.IsNullOrEmpty(myUserId) || string.IsNullOrEmpty(roomId))
@@ -226,6 +230,10 @@ public class FirebaseGameManager : MonoBehaviour
         {
             newPredictionReceived = true;
         }
+        else if (newGameData.PredictedResult == null && newGameData.RoundNumber != 1)
+        {
+            newPredictionReceived = false;
+        }
 
         bool roundFinished = _currentGame?.RoundNumber != newGameData.RoundNumber;
 
@@ -304,6 +312,7 @@ public class FirebaseGameManager : MonoBehaviour
                         Debug.Log("<<<<<< 라운드 변경의 짧은 타임라인 실행 >>>>>>");
                         stoneManager.ClearOldDonutsInNewRound(_currentGame);
                         gameCamControl.SwitchCamera(START_VIEW_CAM);
+                        _cachedPrediction = null;
                         roundDataUpdated = false;
                         playShortTimelineAndStartGame();
                         
@@ -554,7 +563,8 @@ public class FirebaseGameManager : MonoBehaviour
             //float simulationSpeed = (_currentGame.TurnNumber > 1) ? 2.0f : timeMultiplier;
 
             Time.timeScale = timeMultiplier;
-            Time.fixedDeltaTime = initialFixedDeltaTime / 2f;
+            Time.fixedDeltaTime = fixedTimeMultiplier;
+            //Debug.Log($"FixedDeltaTime = {Time.fixedDeltaTime}");
             Rigidbody rb = stoneManager.GetDonutToLaunch(stoneIdToLaunch).GetComponent<Rigidbody>();
             inputController.SimulateStone(rb, _currentGame.LastShot, stoneIdToLaunch);
             //stoneManager?.LaunchStone(_currentGame.LastShot, stoneIdToLaunch);
@@ -668,6 +678,9 @@ public class FirebaseGameManager : MonoBehaviour
     {
         //_localState = LocalGameState.InTimeline; // TODO : 로컬 스테이트를 게임종료로 설정하고 현재씬을 종료하고 메인씬으로 넘어가는 처리는 UI버튼에 연결하도록 변경
         _localState = LocalGameState.FinishedGame; // 서버로부터 게임 종료 명령을 받으면 자신의 로컬 상태도 종료 상태로 변경
+        Time.fixedDeltaTime = initialFixedDeltaTime;
+        //Debug.Log($"FixedDeltaTime = {Time.fixedDeltaTime}");
+        Time.timeScale = 1f;
         if (aTeamScore > bTeamScore)
         {
             if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
@@ -759,7 +772,7 @@ public class FirebaseGameManager : MonoBehaviour
             Team = stoneManager.myTeam,
             Spin = -999f,
             Direction = zeroDict,
-            ReleasePosition = zeroDict,
+            //ReleasePosition = zeroDict,
             DonutId = donutId
         };
 
@@ -832,7 +845,7 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void ChangeFixedDeltaTime()
     {
-        Time.fixedDeltaTime = initialFixedDeltaTime / 2f;
+        Time.fixedDeltaTime = fixedTimeMultiplier;
     }
 
     /// <summary>
@@ -843,6 +856,7 @@ public class FirebaseGameManager : MonoBehaviour
     {
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = initialFixedDeltaTime;
+        //Debug.Log($"FixedDeltaTime = {Time.fixedDeltaTime}");
         //Debug.Log("시뮬레이션 완료.");
 
         //시뮬레이션 완료 후 딜레이주기
@@ -1075,7 +1089,7 @@ public class FirebaseGameManager : MonoBehaviour
             Team = stoneManager.myTeam, // 발사하는 팀
             Spin = -999f, // 최종 스핀 값
             Direction = zeroDict, // 발사 방향
-            ReleasePosition = zeroDict // 릴리즈 위치
+            //ReleasePosition = zeroDict // 릴리즈 위치
         };
         SubmitShot(shotData);
         _localState = LocalGameState.WaitingForPrediction;

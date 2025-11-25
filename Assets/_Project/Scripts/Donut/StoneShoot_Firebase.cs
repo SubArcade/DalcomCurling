@@ -542,30 +542,32 @@ public class StoneShoot_Firebase : MonoBehaviour
         // 샷 방향 데이터를 Dictionary 형태로 저장 (Firestore 호환성)
         var directionDict = new Dictionary<string, float>
         {
-            { "x", finalDirection.x * calculatedRandomValue },
-            { "y", finalDirection.y * calculatedRandomValue },
-            { "z", finalDirection.z * calculatedRandomValue }
+            //Mathf.Round(originalValue * 10f) /10f;
+            { "x", Mathf.Round(finalDirection.x * calculatedRandomValue * 10f) / 10f }, // 소숫점 1째 까지만
+            //{ "y", finalDirection.y * calculatedRandomValue },
+           // { "y", 0 },
+            { "z", Mathf.Round(finalDirection.z * calculatedRandomValue * 10f) / 10f }
         };
 
         // 돌의 릴리즈 위치 데이터를 Dictionary 형태로 저장 (Firestore 호환성)
-        var releasePosDict = new Dictionary<string, float>
-        {
-            { "x", _currentStoneRb.transform.position.x },
-            { "y", _currentStoneRb.transform.position.y },
-            { "z", _currentStoneRb.transform.position.z }
-        };
+        // var releasePosDict = new Dictionary<string, float>
+        // {
+        //     { "x", _currentStoneRb.transform.position.x },
+        //     { "y", _currentStoneRb.transform.position.y },
+        //     { "z", _currentStoneRb.transform.position.z }
+        // };
 
         // LastShot 객체를 생성하여 반환
         return new LastShot
         {
             // 좌우 회전값에 따라 발사 힘을 아주 살짝 약하게 줌으로써 최종 전진거리 감소 효과
-            Force = finalForce * calculatedRandomValue * (1 - (draggedAmountBetween_0_Or_1 * 0.1f)), // 최종 힘
-            
+            Force = Mathf.Round(finalForce * calculatedRandomValue * (1 - (draggedAmountBetween_0_Or_1 * 0.1f)) * 100f) / 100f, // 최종 힘
+            // 소숫점 1째까지만
             PlayerId = stoneManager.myUserId,
             Team = stoneManager.myTeam, // 발사하는 팀
-            Spin = FinalRotationValue * calculatedRandomValue, // 최종 스핀 값
+            Spin = Mathf.Round(FinalRotationValue * calculatedRandomValue * 100f) / 100f, // 최종 스핀 값
             Direction = directionDict, // 발사 방향
-            ReleasePosition = releasePosDict // 릴리즈 위치
+            //ReleasePosition = releasePosDict // 릴리즈 위치
         };
     }
 
@@ -695,6 +697,8 @@ public class StoneShoot_Firebase : MonoBehaviour
         currentDonut.DOMove(startHogLine.position, autoMoveToHogLineSpeed).SetSpeedBased(true).SetEase(Ease.Linear)
             .OnComplete(() => // 이동 완료 시 호출되는 콜백 함수
             {
+                //Time.fixedDeltaTime = FirebaseGameManager.Instance.fixedTimeMultiplier;
+                //Debug.Log($"FixedDeltaTime = 0.01");
                 stoneManager.LaunchStone(shotData, stoneId); // 돌 발사
             });
     }

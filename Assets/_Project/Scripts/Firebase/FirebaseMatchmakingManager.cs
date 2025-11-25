@@ -107,7 +107,7 @@ public class LastShot
     public float Force { get; set; }
     [FirestoreProperty] public float Spin { get; set; }
     [FirestoreProperty] public Dictionary<string, float> Direction { get; set; }
-    [FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
+    //[FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
     [FirestoreProperty, ServerTimestamp] public Timestamp Timestamp { get; set; }
     [FirestoreProperty] public string DonutId { get; set; } // 발사된 도넛의 ID
 }
