@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {
@@ -34,6 +34,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
+    [Header("결과창 보상 텍스트 갱신을 위한 변수")]
+    [SerializeField] private TextMeshProUGUI expText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI pointText;
+    [Header("플로팅 텍스트")]
+    [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
+
     //내부변수
     private int displayTurn = 0;
 
@@ -62,6 +69,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         else
         {
             Debug.LogError("UI_LaunchIndicator_Firebase: Start()에서 FirebaseGameManager.Instance를 찾을 수 없습니다.");
+        }
+
+        if (floatingText != null)
+        {
+            // 이 플로팅 텍스트는 파괴하지 않고 계속 재사용할 것이므로, destroyOnComplete 값을 false로 설정합니다.
+            floatingText.destroyOnComplete = false;
+            floatingText.gameObject.SetActive(false);
         }
     }
 
@@ -169,6 +183,30 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     }
 
     /// <summary>
+    /// 지정된 위치에 플로팅 텍스트를 표시합니다.
+    /// </summary>
+    /// <param name="message">표시할 메시지</param>
+    /// <param name="screenPosition">텍스트가 나타날 스크린 좌표</param>
+    public void ShowFloatingText(string message, Vector3 screenPosition)
+    {
+        if (floatingText == null)
+        {
+            Debug.LogError("FloatingText 컴포넌트가 할당되지 않았습니다!");
+            return;
+        }
+
+        // 1. 위치 설정
+        floatingText.transform.position = screenPosition;
+        
+        // 2. 텍스트 설정
+        floatingText.SetText(message);
+
+        // 3. 활성화 (활성화 시 FloatingText.cs의 OnEnable에서 애니메이션이 자동 시작됨)
+        floatingText.gameObject.SetActive(true);
+    }
+
+
+    /// <summary>
     /// UI 제어 메서드입니다.
     /// AllcloseUI() 먼저 호출하고 필요한UI만 켜지는 메서드 생성하여 호출 하면됩니다.
     /// </summary>
@@ -178,6 +216,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     {
         AllcloseUI();
         result.SetActive(true);
+        ResultRewardView();
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
@@ -210,15 +249,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         if (select == 1) {
             guide.PlayVerticalDrag();
         }
-        if (select == 2) { 
+        else if (select == 2) { 
             guide.PlayHorizontalDrag();
         }
-        if (select == 3)
-        {
+        else if (select == 3) {
             guide.PlayTouchMove();
         }
-        else
-        {
+        else {
             Debug.Log("올바른 가이드 출력 번호가 아닙니다.");
         }
     }
@@ -253,4 +290,26 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         }
     }
 
+    public void ResultRewardView() 
+    {
+        int levelUp = 1;
+
+
+        // 골드는 100~300 랜덤
+        int rewardGold = Random.Range(100, 301);
+
+        // 포인트는 10~20 랜덤
+        int rewardPoint = Random.Range(10, 21);
+
+        // UI 텍스트 갱신
+        int previewLevel = DataManager.Instance.PlayerData.level + levelUp;
+
+        if (expText != null) expText.text = $"+{levelUp}";
+        if (goldText != null) goldText.text = $"+{rewardGold}";
+        if (pointText != null) pointText.text = $"+{rewardPoint}";
+
+        GameManager.Instance.SetResultRewards(1, rewardGold, rewardPoint);
+        //일단 게임종료후 레벨과 경험치 골드를 받는지만 확인하는 함수,
+        //나중에 패배, 탈주, 강종 등  승,패,무 고려해서 두명이 서로 다르게 나오도록 해야함
+    }
 }

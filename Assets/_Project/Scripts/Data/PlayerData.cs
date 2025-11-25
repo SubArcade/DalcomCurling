@@ -11,12 +11,11 @@ public enum AuthProviderType
 public enum NamePlateType
 {
     NONE = 0, // 없음
-    NP1 = 1,
-    NP2 = 2,
-    NP3 = 3,
-    NP4 = 4,
-    NP5 = 5,
-    NP6 = 6,
+    DoughNewbie = 1, // 초보 조물러
+    SoftTouch = 2,  // 말랑 조작자
+    DoughHandler = 3,   // 반죽 핸들러
+    DonutPilot = 4, // 도넛 파일럿
+    DonutMaster = 5,    // 도넛 마스터
 }
 
 [System.Serializable, FirestoreData]
@@ -43,7 +42,7 @@ public class PlayerData
     [field: SerializeField, Tooltip("솔로 티어")] [FirestoreProperty] public GameTier soloTier { get; set; }
 
     // 로컬 플레이어 데이터 (디비에 들어가지 않는 변수)
-    [Tooltip("최대 에너지")] public int maxEnergy { get; set; }
-    [Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
-    [Tooltip("플레이어 만랩")] public int levelMax { get; set; }
+    [field: SerializeField, Tooltip("최대 에너지")] public int maxEnergy { get; set; }
+    [field: SerializeField, Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
+    [field: SerializeField, Tooltip("플레이어 만랩")] public int levelMax { get; set; }
 }

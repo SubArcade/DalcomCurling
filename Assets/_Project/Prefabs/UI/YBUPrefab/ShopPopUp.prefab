@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 98a2c83b6dbb3a849b8182d96df1a041, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e9d0c864fba885a45bcb513a3d0becbf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2517,11 +2517,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3794062186906681930}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 57, y: -1.1450195}
-  m_SizeDelta: {x: 44, y: 41}
-  m_Pivot: {x: 1, y: 0.5}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 70, y: 8.855011}
+  m_SizeDelta: {x: 56, y: 56}
+  m_Pivot: {x: 1, y: 1}
 --- !u!222 &7042134391911113691
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3205,7 +3205,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5c02f55c5ff3aa340afd47375d27ea7e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0558c151e5e5cac4cb474b329d6816e2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5977,7 +5977,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1397504718182368209
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6065,27 +6065,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68c6e3a8cd9779742a5d564866a5eff5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cashShopBtn: {fileID: 0}
-  goldShopBtn: {fileID: 0}
-  robbyButton: {fileID: 0}
-  eneryBtn: {fileID: 0}
-  goldBtn: {fileID: 0}
-  gemBtn: {fileID: 0}
-  energyText: {fileID: 0}
-  goldText: {fileID: 0}
-  gemText: {fileID: 0}
-  deleteAdsBtn1: {fileID: 0}
-  deleteAdsBtn2: {fileID: 0}
-  deleteAdsBtn3: {fileID: 0}
-  packageBtn1: {fileID: 0}
-  packageBtn2: {fileID: 0}
-  effectItem1: {fileID: 0}
-  effectItem2: {fileID: 0}
-  effectItem3: {fileID: 0}
-  characterItem1: {fileID: 0}
-  characterItem2: {fileID: 0}
-  characterItem3: {fileID: 0}
-  characterItem4: {fileID: 0}
+  cashShopBtn: {fileID: 457506812577573283}
+  cashShopOutline: {fileID: 1311358886325417224}
+  goldShopBtn: {fileID: 7380325773927181849}
+  goldShopOutline: {fileID: 8945509062030224678}
+  robbyButton: {fileID: 3062166236793480152}
+  energyBtn: {fileID: 3558584162878754045}
+  goldBtn: {fileID: 7297424715144633229}
+  gemBtn: {fileID: 1429168567985425340}
+  energyText: {fileID: 7069196249876675585}
+  goldText: {fileID: 3597633219130841563}
+  gemText: {fileID: 3073192750064132716}
+  deleteAdsBtn1: {fileID: 6047844465066119654}
+  deleteAdsBtn2: {fileID: 7954590184100305915}
+  deleteAdsBtn3: {fileID: 8568969574141464608}
+  packageBtn1: {fileID: 7640607545095268232}
+  packageBtn2: {fileID: 5846927190005608722}
+  effectItem1: {fileID: 7062296169081611746}
+  effectItem2: {fileID: 5723939228098012560}
+  effectItem3: {fileID: 8089618096615548372}
+  characterItem1: {fileID: 1008910681786964031}
+  characterItem2: {fileID: 7847281822882003634}
+  characterItem3: {fileID: 3307150566294653313}
+  characterItem4: {fileID: 3287396210335783181}
 --- !u!114 &3833299611957627801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7561,7 +7563,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b0b6aa731d9ffb244b66392b3826b5f5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6af6f10dcf8e5204b9b971f4ff11c8c6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8389,6 +8391,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f7b4df507629940419addc445bf17912, type: 3}
+--- !u!114 &3597633219130841563 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3709520764564807504, guid: f7b4df507629940419addc445bf17912, type: 3}
+  m_PrefabInstance: {fileID: 186759889511663243}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7194549053950362434 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7012013490533025225, guid: f7b4df507629940419addc445bf17912, type: 3}
@@ -9692,6 +9705,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f7b4df507629940419addc445bf17912, type: 3}
+--- !u!114 &3073192750064132716 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3709520764564807504, guid: f7b4df507629940419addc445bf17912, type: 3}
+  m_PrefabInstance: {fileID: 1863630416149413180}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &8688390236629448949 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7012013490533025225, guid: f7b4df507629940419addc445bf17912, type: 3}
@@ -12641,6 +12665,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7012013490533025225, guid: f7b4df507629940419addc445bf17912, type: 3}
   m_PrefabInstance: {fileID: 5863697657267888977}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7069196249876675585 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3709520764564807504, guid: f7b4df507629940419addc445bf17912, type: 3}
+  m_PrefabInstance: {fileID: 5863697657267888977}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6020176158186537942
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -15,6 +15,7 @@ public class StoneManager : MonoBehaviour
     //[SerializeField] private GameObject stonePrefabB; // 플레이어 B의 돌 프리팹
     [SerializeField] private Transform spawnPosition; // 돌이 생성될 위치
     [SerializeField] private GameObject donutSamplePrefab; // 도넛 반지름을 미리 계산해놓기 위한 프리팹.
+    [SerializeField] private GameObject worldSpaceFeedbackPrefab; // 월드 공간에 표시될 피드백 UI 프리팹 (Out, +1 등)
 
     private Game gameReference;
 
@@ -718,6 +719,7 @@ public class StoneManager : MonoBehaviour
             if (sortedDonutList[i].transform.TryGetComponent<Outlinable>(out var outline))
             {
                 outline.enabled = true;
+                ShowWorldSpaceFeedback(sortedDonutList[i].transform.position, "+1");
             }
             //sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
         }
@@ -811,6 +813,9 @@ public class StoneManager : MonoBehaviour
 
     public void DonutOut(StoneForceController_Firebase donut) //도넛의 아웃 판정
     {
+        if (donut == null) return;
+        ShowWorldSpaceFeedback(donut.transform.position, "Out");
+
         if (donut.team == StoneForceController_Firebase.Team.A)
         {
             if (_stoneControllers_A.ContainsKey(donut.donutId))
@@ -845,4 +850,29 @@ public class StoneManager : MonoBehaviour
         }
     }
     #endregion
+
+    /// <summary>
+    /// 지정된 월드 위치에 피드백 텍스트를 생성합니다.
+    /// </summary>
+    /// <param name="position">텍스트가 생성될 월드 좌표</param>
+    /// <param name="message">표시할 메시지</param>
+    private void ShowWorldSpaceFeedback(Vector3 position, string message)
+    {
+        if (worldSpaceFeedbackPrefab == null)
+        {
+            Debug.LogWarning("worldSpaceFeedbackPrefab이 할당되지 않았습니다.");
+            return;
+        }
+
+        // 프리팹을 인스턴스화하고, 위치를 살짝 위로 조정하여 돌과 겹치지 않게 합니다.
+        GameObject feedbackInstance = Instantiate(worldSpaceFeedbackPrefab, position + Vector3.up * 0.5f, Quaternion.identity);
+        
+        // 자식 오브젝트에서 FloatingText 컴포넌트를 찾아 텍스트를 설정합니다.
+        // 프리팹 구조가 'Canvas > Text' 이므로 GetComponentInChildren 사용
+        FloatingText floatingText = feedbackInstance.GetComponentInChildren<FloatingText>();
+        if (floatingText != null)
+        {
+            floatingText.SetText(message);
+        }
+    }
 }

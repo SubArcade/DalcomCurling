@@ -17,6 +17,7 @@ public class CellData
 public class MergeBoardData
 {
     [field: SerializeField, Tooltip("보드칸 정보")][FirestoreProperty] public List<CellData> cells { get; set; } = new();
+    [field: SerializeField, Tooltip("임시 보관칸")][FirestoreProperty] public List<string> tempGiftIds { get; set; } = new();
     [field: SerializeField, Tooltip("생성기 단단 레벨")][FirestoreProperty] public int generatorLevelHard { get; set; }
     [field: SerializeField, Tooltip("생성기 말랑 레벨")][FirestoreProperty] public int generatorLevelSoft { get; set; }
     [field: SerializeField, Tooltip("생성기 촉촉 레벨")][FirestoreProperty] public int generatorLevelMoist { get; set; }
