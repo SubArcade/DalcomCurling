@@ -62,12 +62,18 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             ONBGM.gameObject.SetActive(false);
             OFFBGM.gameObject.SetActive(true);
+
+            // BGM 끄기  
+            RestoreVolume("BGMVolume", BGMsliderBar, BGMvolumeText, BGMGage, SoundManager.Instance.SetBGMVolume);
         });
 
         OFFBGM.onClick.AddListener(() =>
         {
             OFFBGM.gameObject.SetActive(false);
             ONBGM.gameObject.SetActive(true);
+
+            // BGM 켜기 
+            SetVolumeSilent("BGMVolume", BGMsliderBar, BGMvolumeText, BGMGage);
         });
 
         // SFX 설정
@@ -75,12 +81,18 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             ONSFX.gameObject.SetActive(false);
             OFFSFX.gameObject.SetActive(true);
+
+            // SFX 끄기
+            RestoreVolume("SFXVolume", SFXsliderBar, SFXvolumeText, SFXGage, SoundManager.Instance.SetSFXVolume);
         });
 
         OFFSFX.onClick.AddListener(() =>
         {
             OFFSFX.gameObject.SetActive(false);
             ONSFX.gameObject.SetActive(true);
+
+            // SFX 켜기
+            SetVolumeSilent("SFXVolume", SFXsliderBar, SFXvolumeText, SFXGage);
         });
 
         // 진동 설정
@@ -158,6 +170,13 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         float savedBGM = PlayerPrefs.GetFloat("BGMVolume", 1f); // 기본값 100%
         float savedSFX = PlayerPrefs.GetFloat("SFXVolume", 1f);
 
+        // FMOD 연결 추가 +
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.SetBGMVolume(savedBGM);
+            SoundManager.Instance.SetSFXVolume(savedSFX);
+        }
+
         //슬라이더에 적용
         BGMsliderBar.value = savedBGM;
         SFXsliderBar.value = savedSFX;
@@ -175,6 +194,13 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
             int volume = Mathf.RoundToInt(value * 100f);
             BGMvolumeText.text = volume.ToString();
             BGMGage.fillAmount = value; // 게이지 채우기
+
+            // FMOD 연결 추가 +
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.SetBGMVolume(value);
+            }
+
             PlayerPrefs.SetFloat("BGMVolume", value);
             PlayerPrefs.Save();
         });
@@ -184,6 +210,13 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
             int volume = Mathf.RoundToInt(value * 100f);
             SFXvolumeText.text = volume.ToString();
             SFXGage.fillAmount = value; // 게이지 채우기
+
+            // FMOD 연결 추가 +
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.SetSFXVolume(value);
+            }
+
             PlayerPrefs.SetFloat("SFXVolume", value);
             PlayerPrefs.Save();
         });
@@ -203,4 +236,48 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         LocalizationManager.Instance.SetLanguage(selectedLang);
     }
 
+    // 볼륨 끄기 버튼 스크립트
+    private void SetVolumeSilent(string key, Scrollbar slider, TextMeshProUGUI text, Image gage)
+    {
+        if (SoundManager.Instance == null) return;
+
+        // 사운드 끄기 명령 및 UI 업데이트
+        float value = 0f;
+        if (key == "BGMVolume")
+        {
+            SoundManager.Instance.SetBGMVolume(value);
+        }
+        else
+        {
+            SoundManager.Instance.SetSFXVolume(value);
+        }
+
+        slider.value = value;
+        text.text = "0";
+        gage.fillAmount = value;
+
+        // 0 볼륨 값을 저장합니다. (켜기 버튼이 다시 눌리기 전까지 0 유지)
+        PlayerPrefs.SetFloat(key, value);
+        PlayerPrefs.Save();
+    }
+
+    // 다시 끄기 전 저장된 값의 볼륨으로 키는 버튼
+    private void RestoreVolume(string key, Scrollbar slider, TextMeshProUGUI text, Image gage, System.Action<float> setVolumeAction)
+    {
+        if (SoundManager.Instance == null || setVolumeAction == null) return;
+
+        float restoredValue = PlayerPrefs.GetFloat(key, 1f);
+
+        if (restoredValue == 0f) restoredValue = 1f;
+
+        setVolumeAction(restoredValue);
+
+        slider.value = restoredValue;
+        text.text = Mathf.RoundToInt(restoredValue * 100f).ToString();
+        gage.fillAmount = restoredValue;
+
+        // 복구된 값으로 저장합니다.
+        PlayerPrefs.SetFloat(key, restoredValue);
+        PlayerPrefs.Save();
+    }
 }

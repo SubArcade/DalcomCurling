@@ -3,26 +3,20 @@ using UnityEngine.UI;
 
 public class ButtonSound : MonoBehaviour
 {
-    private Button button;
-
-    void Awake()
+    private void Start()
     {
-        button = GetComponent<Button>();
+        Button button = GetComponent<Button>();
         if (button != null)
         {
-            button.onClick.AddListener(PlayClickSound);
-        }
-        else
-        {
-            Debug.LogWarning("ButtonSound 스크립트가 Button 컴포넌트에 붙어있지 않습니다.");
+            button.onClick.AddListener(OnButtonClicked);
         }
     }
 
-    private void PlayClickSound()
+    private void OnButtonClicked()
     {
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.PlayButtonClickSound(transform.position);
+            SoundManager.Instance.buttonClick();
         }
     }
 }

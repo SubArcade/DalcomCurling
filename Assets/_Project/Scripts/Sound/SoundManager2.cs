@@ -1,8 +1,10 @@
 ﻿using FMODUnity;
-using UnityEngine;
+using GoogleMobileAds.Api;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// FMOD 이벤트를 이름으로 관리하고, BGM/SFX 및 인게임/아웃게임 사운드를 구분하여 재생하는 싱글톤 SoundManager.
@@ -20,13 +22,10 @@ public class SoundManager : MonoBehaviour
         public EventReference[] Events;
     }
 
-    // 이 배열에 OutGameBGM, InGameBGM, OutGameSFX, InGameSFX 그룹을 모두 설정합니다.
     [Header("모든 사운드 그룹 설정")]
     [Tooltip("모든 FMOD EventReference를 그룹별로 분류하여 설정합니다.")]
     [SerializeField]
     private SoundGroup[] allSoundGroups;
-
-    // 모든 SFX 및 개별 BGM 이벤트를 이름(키)으로 저장하는 딕셔너리
     private Dictionary<string, EventReference> soundEventMap = new Dictionary<string, EventReference>();
 
     // BGM 재생 관리 필드
@@ -49,23 +48,6 @@ public class SoundManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        StopBGMInternal();
-    }
-
-    void Start()
-    {
-        // 초기 시작 BGM 설정 (Inspector에서 정의한 'OutGameBGMs' 그룹이 있다고 가정)
-        PlayBGMGroup("OutGameBGMs");
     }
 
     /// <summary>
@@ -118,13 +100,9 @@ public class SoundManager : MonoBehaviour
 
     #endregion
 
+    // BGM 재생 (그룹/플레이리스트 관리)
 
-
-    // 🎶 BGM 재생 (그룹/플레이리스트 관리)
-
-    /// <summary>
-    /// SoundGroup 이름으로 BGM 플레이리스트를 시작합니다.
-    /// </summary>
+    /// SoundGroup 이름으로 BGM 플레이리스트를 시작합니다
     /// <param name="groupName">설정에서 정의된 BGM SoundGroup의 이름입니다 (예: OutGameBGMs, InGameBGMs).</param>
     public void PlayBGMGroup(string groupName)
     {
@@ -230,9 +208,7 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// 현재 재생 중인 BGM을 정지합니다.
-    /// </summary>
     public void StopBGM()
     {
         if (bgmCoroutine != null)
@@ -246,16 +222,15 @@ public class SoundManager : MonoBehaviour
         Debug.Log("[SoundManager] BGM 정지됨.");
     }
 
-    
 
-    // 🔊 SFX 재생 (세분화된 호출)
+    #region SFX 사운드 모음
 
-    /// <summary>
+    // SFX 재생 (세분화된 호출)
+
     /// 딕셔너리에 등록된 이벤트 이름으로 SFX를 재생합니다.
     /// 모든 인게임/아웃게임 SFX는 이 메서드를 통해 이름으로 호출됩니다.
-    /// </summary>
+    /// 
     /// <param name="eventName">InitializeSoundMap에서 등록된 이벤트의 이름입니다.</param>
-    /// <param name="position">SFX 재생 위치 (3D 사운드용).</param>
     public void PlaySFX(string eventName, Vector3 position = default(Vector3))
     {
         EventReference sfxRef = GetEventReference(eventName);
@@ -266,48 +241,75 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    // --- 외부 호출 API (예시: 세분화된 SFX 호출) ---
-
-    // 아웃게임 SFX 예시 1: 버튼 클릭
-    public void PlayButtonClickSound(Vector3 position = default(Vector3))
+    // 일반 버튼 누를 시
+    public void buttonClick(Vector3 position = default(Vector3))
     {
-        // "ButtonClick"은 Inspector의 FMOD 이벤트 이름과 일치해야 합니다.
-        PlaySFX("ButtonClick", position);
+        PlaySFX("01_ui_menu_button_beep_19", position);
     }
 
-    // 아웃게임 SFX 예시 2: 물체 생성 (도넛 생산)
-    public void PlayProductionSound(Vector3 position = default(Vector3))
+    // 컨 선택 시 / 새로운 주문서 등장 시
+    public void selectSlotScroll(Vector3 position = default(Vector3))
     {
-        PlaySFX("ProductionDonutSound", position);
+        PlaySFX("02_item_pickup_swipe_01", position);
     }
 
-    // 아웃게임 SFX 예시 3: 물체 합쳐짐 (도넛 병합)
-    public void PlayMergeSound(Vector3 position = default(Vector3))
+    // 도넛 생성 시
+    public void createDonut(Vector3 position = default(Vector3))
     {
-        PlaySFX("MergeDonutSound", position);
+        PlaySFX("03_collect_item_13", position);
     }
 
-    // 인게임 SFX 예시: 물체 충돌
-    public void PlayStoneImpact(Vector3 position)
+    // 도넛 머지 시 
+    public void mergeDonut(Vector3 position = default(Vector3))
     {
-        PlaySFX("StoneImpact", position);
+        PlaySFX("04_happy_collect_item_01", position);
     }
 
-    // 인게임 BGM 예시: 인텐스 음악 재생 (단일 이벤트)
-    public FMOD.Studio.EventInstance PlayIntenseMusic()
+    // 기프트박스 머지 시
+    public void mergeGiftBox(Vector3 position = default(Vector3))
     {
-        EventReference intenseRef = GetEventReference("IntenseMusic");
-        if (!intenseRef.IsNull)
-        {
-            FMOD.Studio.EventInstance instance = RuntimeManager.CreateInstance(intenseRef);
-            instance.start();
-            return instance;
-        }
-        return new FMOD.Studio.EventInstance();
+        PlaySFX("05_collect_item_11", position);
     }
 
+    // 포화상태 시 더 생성하려고 시도할 때
+    public void saturation(Vector3 position)
+    {
+        PlaySFX("06_jingle_chime_16_negative", position);
+    }
 
-    #region Volume and Scene Controls
+    // 유닛 이동 시 (유닛끼리 자리 바뀔 시)
+    public void moveUnit(Vector3 position)
+    {
+        PlaySFX("02_item_pickup_swipe_01", position);
+    }
+
+    // 도넛 판매 시
+    public void sellDonut(Vector3 position)
+    {
+        PlaySFX("07_ui_menu_button_beep_23", position);
+    }
+
+    // 보상 수령 창 노출 시
+    public void receiptReward(Vector3 position)
+    {
+        PlaySFX("08_collectable_item_bonus_03", position);
+    }
+
+    // 주문서 complete 버튼 터치 시
+    public void completeScroll(Vector3 position)
+    {
+        PlaySFX("09_collect_item_15", position);
+    }
+
+    // complete 버튼 터치 후 골드 획득 시
+    public void getGold(Vector3 position)
+    {
+        PlaySFX("10_coin_bag_ring_gemstone_item_15", position);
+    }
+
+    #endregion
+
+    #region 사운드 볼륨 조절
 
     public void SetBGMVolume(float volume)
     {
@@ -323,24 +325,6 @@ public class SoundManager : MonoBehaviour
         FMOD.Studio.Bus sfxBus = RuntimeManager.GetBus("bus:/SFX");
         sfxBus.setVolume(volume);
         Debug.Log($"[SoundManager] SFX Bus 볼륨 설정됨: {volume}");
-    }
-
-    // --- 씬 로드 처리 ---
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // 씬 이름에 따라 BGM 그룹을 재생하도록 수정 (OutGame/InGame 구분)
-        if (scene.name == "Sce_MainMenu")
-        {
-            PlayBGMGroup("OutGameBGMs"); // 아웃게임 BGM 그룹 이름
-        }
-        else if (scene.name == "LSJ_Test")
-        {
-            PlayBGMGroup("InGameBGMs"); // 인게임 BGM 그룹 이름
-        }
-        else
-        {
-            StopBGM();
-        }
     }
 
     #endregion
