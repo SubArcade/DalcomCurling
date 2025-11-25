@@ -80,7 +80,8 @@ public class DataManager : MonoBehaviour
     private string userCollection = "user";   // 컬랙션(테이블) 이름
     [Header("플레이어 데이터 (신규 생성 시 초기 저장, 기존 계정은 불러와 갱신)")]
     [SerializeField, Tooltip("프리미어키(PK)")] private string docId = "ZflvQAZZmYj1SKj8mZKZ";
-    
+
+    public bool isLogin = false;
     [SerializeField]private UserDataRoot userData = new UserDataRoot();
 
     public PlayerData PlayerData => userData.player;
@@ -106,7 +107,7 @@ public class DataManager : MonoBehaviour
     public event Action OnBoardDataLoaded;
 
     // 백그라운드 이벤트
-    public event Action PauseChanged;
+    public event Action<bool> PauseChanged;
 
     // 바뀐 데이터 이벤트 함수 실행용 함수
     // 텍스트를 바꿔줄꺼다
@@ -125,6 +126,12 @@ public class DataManager : MonoBehaviour
     public void EnergyChange(int energy)
     {
         PlayerData.energy = energy;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
+    public void LevelChange(int level) 
+    {
+        PlayerData.level = level;
         OnUserDataChanged?.Invoke(PlayerData);
     }
     
@@ -172,6 +179,7 @@ public class DataManager : MonoBehaviour
         if (isAutoLogin)
         {
             userData = snap.ConvertTo<UserDataRoot>();
+            isLogin = true;
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
@@ -187,6 +195,7 @@ public class DataManager : MonoBehaviour
             // 처음 로그인 시
             PlayerData.email = userEmail;
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
+            isLogin = true;
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             FirstBasePlayerData();
@@ -204,6 +213,7 @@ public class DataManager : MonoBehaviour
             // 기존 유저 로드
             PlayerData.email = userEmail;
             userData = snap.ConvertTo<UserDataRoot>();
+            isLogin = true;
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
@@ -755,8 +765,8 @@ public class DataManager : MonoBehaviour
         if (pause)
         {
             _ = SaveAllUserDataAsync();
-            PauseChanged?.Invoke();
         }
+        PauseChanged?.Invoke(pause);
     }
 
     // 포커스 잃을 떄

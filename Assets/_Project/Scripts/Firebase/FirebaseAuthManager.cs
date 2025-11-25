@@ -52,8 +52,8 @@ public class FirebaseAuthManager
         await FirebaseApp.CheckAndFixDependenciesAsync();
         
         // GPGS 초기화
-        PlayGamesPlatform.DebugLogEnabled = true;
-        PlayGamesPlatform.Activate();
+        // PlayGamesPlatform.DebugLogEnabled = true;
+        // PlayGamesPlatform.Activate();
         
         if (auth.CurrentUser != null)
         {
@@ -147,42 +147,7 @@ public class FirebaseAuthManager
             Debug.LogException(e);
         }
     }
-
-    /*public async void LoginWithGoogle()
-    {
-        try
-        {
-            GoogleSignInConfiguration config = new GoogleSignInConfiguration
-            {
-                WebClientId = "941793478423-sq6ikguem1f8q62vduokq6gi0jidu1uo.apps.googleusercontent.com",
-                RequestIdToken = true
-            };
-
-            GoogleSignIn.Configuration = config;
-            GoogleSignIn.DefaultInstance.SignOut();
-
-            Debug.Log("[Google] 로그인 시도");
-            var googleUser = await GoogleSignIn.DefaultInstance.SignIn();
-
-            if (googleUser == null)
-            {
-                Debug.LogWarning("[Google] 로그인 취소됨");
-                return;
-            }
-
-            Debug.Log($"[Google] 로그인 성공: {googleUser.Email}");
-
-            var credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
-
-            user = await auth.SignInWithCredentialAsync(credential);
-            Debug.Log($"[Firebase] 구글 로그인 완료: {user.Email} / {user.UserId}");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[Google/Firebase] 로그인 실패: {e.Message}");
-        }
-    }*/
-
+    
     public void Logout()
     {
         auth.SignOut();
@@ -190,60 +155,83 @@ public class FirebaseAuthManager
         LoginState?.Invoke(false);
         UIManager.Instance.Open(PanelId.LoginPanel);
     }
-
-    public async Task ConnectAccountAsync(string email, string password)
+    
+    private bool _gpgsActivated = false;
+    
+    private void EnsureGpgsActivated()
     {
-        var cred = EmailAuthProvider.GetCredential(email, password);
-
-        try
-        {
-            // UID 유지한 채 게스트 → 정식 계정 승격
-            await auth.CurrentUser.LinkWithCredentialAsync(cred);
-            
-            DataManager.Instance.PlayerData.email = email;
-            Debug.Log($"[Auth] 게스트 계정이 {email}로 연동 완료");
-        }
-        catch (FirebaseException e)
-        {
-            Debug.LogError($"[Auth] 연동 실패: {e.Message}");
-        }
+        if (_gpgsActivated) return;
+    
+        // 필요하면 나중에 config 도 넣을 수 있음
+        Debug.Log("[GPGS] 초기화");
+        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.Activate();
+    
+        _gpgsActivated = true;
     }
     
     public void ConnectGpgsAccount()
     {
-        PlayGamesPlatform.Instance.ManuallyAuthenticate(status =>
+        // 1. 현재 Firebase 유저 확인 (게스트인지)
+        if (auth == null || auth.CurrentUser == null)
         {
+            Debug.LogError("[GPGS] Firebase 유저가 없음. 먼저 게스트 로그인부터 해야 함");
+            return;
+        }
+    
+        if (!auth.CurrentUser.IsAnonymous)
+        {
+            Debug.LogWarning("[GPGS] 이미 비게스트 계정임. 연동 대상이 아님");
+            // UI로 "이미 계정 연동됨" 같은 토스트 띄워도 됨
+            return;
+        }
+    
+        // 2. GPGS 준비
+        EnsureGpgsActivated();
+    
+        // (선택) 혹시 이전에 이상하게 캐싱된 로그인 상태 있으면 한번 SignOut
+        //PlayGamesPlatform.Instance.SignOut();
+    
+        // 3. ManuallyAuthenticate 호출 → 이 타이밍에 팝업이 떠야 함
+        PlayGamesPlatform.Instance.ManuallyAuthenticate(async status =>
+        {
+            Debug.Log($"[GPGS] ManuallyAuthenticate status: {status}");
+    
             if (status != SignInStatus.Success)
             {
-                Debug.LogError($"[GPGS] 로그인 실패: {status}");
+                Debug.LogError($"[GPGS] 로그인 실패 또는 취소: {status}");
+                // Canceled 같은 경우: 유저가 창 닫았거나, 예전에 '다시 묻지 않기' 했을 가능성
                 return;
             }
-
+    
             Debug.Log("[GPGS] 로그인 성공");
+    
             PlayGamesPlatform.Instance.RequestServerSideAccess(true, async authCode =>
             {
                 if (string.IsNullOrEmpty(authCode))
                 {
-                    Debug.LogError("[GPGS] authCode 비어 있음");
+                    Debug.LogError("[GPGS] authCode 비어있음");
                     return;
                 }
-
+    
                 Debug.Log("[GPGS] authCode: " + authCode);
                 var cred = PlayGamesAuthProvider.GetCredential(authCode);
-
+    
                 try
                 {
-                    // 계정 연동
+                    // 🔹 지금 유저는 게스트(익명)이므로, 이 계정에 GPGS를 '연동'하는 것이 포인트
                     await auth.CurrentUser.LinkWithCredentialAsync(cred);
-                    Debug.Log("[Firebase] GPGS 계정 연동 완료");
-                    
+                    Debug.Log("[GPGS] 게스트 계정에 GPGS 연동 완료");
+    
+                    // 이후 유저 데이터 보장
+                    await DataManager.Instance.EnsureUserDocAsync(auth.CurrentUser.UserId, isAutoLogin: true);
                 }
-                catch (FirebaseException e)
+                catch (System.Exception e)
                 {
-                    Debug.LogError("[Firebase] GPGS 연동 실패: " + e.Message);
+                    Debug.LogError("[GPGS] Firebase 연동 중 오류: " + e);
                 }
             });
         });
     }
-    
+
 }
