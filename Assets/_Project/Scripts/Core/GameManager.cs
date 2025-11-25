@@ -106,13 +106,13 @@ public class GameManager : MonoBehaviour
     }
 
     //게임종료시의 UI로부터 받아올 보상 값들을 담을 변수
-    private int pendingLevel;
+    private int pendingExp;
     private int pendingGold;
     private int pendingPoint;
 
-    public void SetResultRewards(int level, int gold, int point) 
+    public void SetResultRewards(int level, int gold, int point) //이부분을 호출
     {
-        pendingLevel = level;
+        pendingExp = level;
         pendingGold = gold;
         pendingPoint = point;
     }
@@ -123,12 +123,12 @@ public class GameManager : MonoBehaviour
             int oldLevel = DataManager.Instance.PlayerData.level;
 
             // 실제 데이터 반영
-            DataManager.Instance.PlayerData.level += pendingLevel;
+            DataManager.Instance.PlayerData.exp += pendingExp;
             DataManager.Instance.PlayerData.gold += pendingGold;
             DataManager.Instance.PlayerData.soloScore += pendingPoint;
 
             DataManager.Instance.GoldChange(DataManager.Instance.PlayerData.gold);
-            DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);
+            DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);            
 
             // 레벨업 팝업 조건
             if (DataManager.Instance.PlayerData.level > oldLevel)
@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
             }
 
             // pending 값 초기화
-            pendingLevel = 0;
+            pendingExp = 0;
             pendingGold = 0;
             pendingPoint = 0;
         }

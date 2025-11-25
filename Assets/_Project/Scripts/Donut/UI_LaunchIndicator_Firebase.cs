@@ -29,6 +29,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject result;
     [SerializeField] private Scr_TweenHandDragGuide guide;
+    [SerializeField] private GameObject settingsPanel;
     [Header("도넛 엔트리 항목")]
     [SerializeField] private DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
@@ -142,6 +143,12 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             string gameState = FirebaseGameManager.Instance.CurrentGameState;
             debugStateText.text = $"Local State: {localState}\nGame State: {gameState}";
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) //세팅창열고닫기 [안드로이드는 뒤로가기 버튼]
+        {
+            if (settingsPanel.activeSelf) settingsPanel.SetActive(false);   // 닫기
+            else settingsPanel.SetActive(true); // 열기
+        }
     }
 
 
@@ -240,6 +247,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
+        settingsPanel.SetActive(false);
     }
     public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
@@ -292,23 +300,23 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
     public void ResultRewardView() 
     {
-        int levelUp = 1;
+        int exp = 10;
 
 
         // 골드는 100~300 랜덤
-        int rewardGold = Random.Range(100, 301);
+        int rewardGold = Random.Range(100, 150);
 
         // 포인트는 10~20 랜덤
-        int rewardPoint = Random.Range(10, 21);
+        int rewardPoint = Random.Range(10, 20);
 
         // UI 텍스트 갱신
-        int previewLevel = DataManager.Instance.PlayerData.level + levelUp;
+        int previewLevel = DataManager.Instance.PlayerData.exp + exp;
 
-        if (expText != null) expText.text = $"+{levelUp}";
+        if (expText != null) expText.text = $"+{exp}";
         if (goldText != null) goldText.text = $"+{rewardGold}";
         if (pointText != null) pointText.text = $"+{rewardPoint}";
 
-        GameManager.Instance.SetResultRewards(1, rewardGold, rewardPoint);
+        GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
         //일단 게임종료후 레벨과 경험치 골드를 받는지만 확인하는 함수,
         //나중에 패배, 탈주, 강종 등  승,패,무 고려해서 두명이 서로 다르게 나오도록 해야함
     }

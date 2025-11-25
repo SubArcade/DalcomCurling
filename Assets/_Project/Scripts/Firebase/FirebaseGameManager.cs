@@ -747,7 +747,7 @@ public class FirebaseGameManager : MonoBehaviour
         Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
         if (donutRigid != null)
         {
-            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>());
+            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "TimeOut");
         }
 
         var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };

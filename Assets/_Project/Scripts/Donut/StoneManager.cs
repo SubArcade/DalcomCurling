@@ -811,10 +811,10 @@ public class StoneManager : MonoBehaviour
 
     #region 아웃 판정 관련 함수
 
-    public void DonutOut(StoneForceController_Firebase donut) //도넛의 아웃 판정
+    public void DonutOut(StoneForceController_Firebase donut, string message = "Out") //도넛의 아웃 판정
     {
         if (donut == null) return;
-        ShowWorldSpaceFeedback(donut.transform.position, "Out");
+        ShowWorldSpaceFeedback(donut.transform.position, message); //도넛이 아웃판정 받았을때 UI처리
 
         if (donut.team == StoneForceController_Firebase.Team.A)
         {
