@@ -32,7 +32,7 @@ public class TempStorageSlot : MonoBehaviour
         RefreshUI();
     }
 
-    // 임시보관칸에 넣기
+    // 기프트박스 임시보관칸에 넣기
     public bool Add(GiftBoxData data)
     {
         if (storage.Count >= MAX_STACK)
@@ -44,7 +44,28 @@ public class TempStorageSlot : MonoBehaviour
         storage.Enqueue(data);
         SaveToBoardData();
         RefreshUI();
-        Debug.Log($"storage.Count : {storage.Count}");
+        Debug.Log($"임시보관칸 : {storage.Count}");
+        return true;
+    }
+
+    // 도넛 임시보관칸에 넣기 
+    public bool Add(DonutData data)
+    {
+        if (storage.Count >= MAX_STACK)
+            return false;
+
+        // DonutData → GiftBoxData 변환 후 저장
+        GiftBoxData fakeGift = new GiftBoxData()
+        {
+            id = data.id,
+            sprite = data.sprite,
+            level = data.level,
+            donutType = data.donutType
+        };
+
+        storage.Enqueue(fakeGift);
+        SaveToBoardData();
+        RefreshUI();
         return true;
     }
 
@@ -81,10 +102,26 @@ public class TempStorageSlot : MonoBehaviour
         foreach (var id in board.tempGiftIds)
         {
             var gift = DataManager.Instance.GetGiftBoxDataByID(id);
-            if (gift == null) continue;
-
-            // 여기서는 GiftBoxData 그대로 큐에 넣으면 됨
-            storage.Enqueue(gift);
+            if (gift != null)
+            {
+                storage.Enqueue(gift);
+            }
+            else
+            {
+                // 저 id가 실제 도넛일 수도 있다면?
+                DonutData donut = DataManager.Instance.GetDonutByID(id);
+                if (donut != null)
+                {
+                    GiftBoxData fake = new GiftBoxData()
+                    {
+                        id = donut.id,
+                        sprite = donut.sprite,
+                        level = donut.level,
+                        donutType = donut.donutType
+                    };
+                    storage.Enqueue(fake);
+                }
+            }
         }
 
         RefreshUI();

@@ -233,6 +233,45 @@ public class BoardManager : MonoBehaviour
         AutoSaveBoardLocal();
     }
 
+    //인게임 도넛 획득
+    public void AddRewardDonut(DonutData rewardData)
+    {
+        if (rewardData == null)
+        {
+            Debug.LogError("Reward DonutData is null");
+            return;
+        }
+
+        // 빈 활성 칸 찾기
+        Cells target = FindEmptyActiveCell();
+
+        if (target == null)
+        {
+            Debug.Log("보드가 꽉 찼습니다 → 임시보관칸 이동");
+
+            bool added = tempStorageSlot.Add(rewardData);
+
+            if (!added)
+                Debug.LogWarning("임시보관칸도 가득 찼습니다!");
+
+            return; // 도넛 생성하지 않고 종료
+        }
+
+        // 보드에 도넛 생성
+        GameObject obj = Instantiate(donutPrefab, target.transform);
+        var item = obj.GetComponent<MergeItemUI>();
+        var img = obj.GetComponent<Image>();
+
+        img.sprite = rewardData.sprite;
+        item.donutData = rewardData;
+        item.donutId = rewardData.id;
+
+        target.SetItem(item, rewardData);
+
+        AutoSaveBoardLocal();
+    }
+
+
     public void SpawnGiftBox()
     {
         // 빈 활성 셀 찾기
