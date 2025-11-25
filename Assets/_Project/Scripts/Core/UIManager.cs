@@ -30,7 +30,10 @@ public enum PanelId
     NotEnoughGemPopUp,
     OrderRefreshPopUp,
     UseGiftBoxPopUp,
+    DeleteAccountPopUp,
+    GameHelpPopup,
     LevelUpRewardPopUp,
+    UseGiftBoxPopup,
 }
 
 public class UIManager : MonoBehaviour

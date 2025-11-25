@@ -30,11 +30,10 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     [SerializeField] private Button OFFBGM;
     [SerializeField] private Button OFFSFX;
     [SerializeField] private Button OFFvibration;
-    [SerializeField] private Button OFFquestion;
     [SerializeField] private Button ONBGM;
     [SerializeField] private Button ONSFX;
     [SerializeField] private Button ONvibration;
-    [SerializeField] private Button ONquestion;
+    [SerializeField] private Button gameHelpBtn;
 
     [Header("언어설정")]
     [SerializeField] private TMP_Dropdown languageDropDown;
@@ -52,7 +51,9 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 
     void Awake()
     {
-       accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
+        accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
+        accountExit.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DeleteAccountPopUp));
+        gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));          
     }
     void Start()
     {
@@ -93,19 +94,6 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             OFFvibration.gameObject.SetActive(false);
             ONvibration.gameObject.SetActive(true);
-        });
-
-        // 질문 도움말 설정
-        ONquestion.onClick.AddListener(() =>
-        {
-            ONquestion.gameObject.SetActive(false);
-            OFFquestion.gameObject.SetActive(true);
-        });
-
-        OFFquestion.onClick.AddListener(() =>
-        {
-            OFFquestion.gameObject.SetActive(false);
-            ONquestion.gameObject.SetActive(true);
         });
 
         // 알림 설정 (에너지, 이벤트, 야간)

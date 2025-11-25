@@ -104,7 +104,8 @@ public class DataManager : MonoBehaviour
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
     public event Action<UserDataRoot> OnUserDataRootChanged;
-    
+    public event Action OnBoardDataLoaded;
+
     // 백그라운드 이벤트
     public event Action<bool> PauseChanged;
 
@@ -125,6 +126,12 @@ public class DataManager : MonoBehaviour
     public void EnergyChange(int energy)
     {
         PlayerData.energy = energy;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
+    public void LevelChange(int level) 
+    {
+        PlayerData.level = level;
         OnUserDataChanged?.Invoke(PlayerData);
     }
     
@@ -176,7 +183,7 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
@@ -210,7 +217,7 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
@@ -218,6 +225,7 @@ public class DataManager : MonoBehaviour
         }
         OnUserDataChanged?.Invoke(PlayerData);
         OnUserDataRootChanged?.Invoke(userData);
+        OnBoardDataLoaded?.Invoke();
     }
     
     // 기본 데이터 적용
@@ -425,8 +433,8 @@ public class DataManager : MonoBehaviour
 
         foreach (var so in allSO)
         {
-            if (so.type == DonutType.Gift)
-                continue; // Gift 타입 완전 제외
+            //if (so.type == DonutType.Gift)
+            //    continue; // Gift 타입 완전 제외
 
             if (!_donutTypeDB.ContainsKey(so.type))
             {
@@ -472,7 +480,27 @@ public class DataManager : MonoBehaviour
         Debug.LogWarning($"[DonutDB] GiftBoxData not found for level {level}");
         return null;
     }
-    
+
+    public GiftBoxData GetGiftBoxDataByID(string id) //기프트박스 데이터 변환
+    {
+        // id 형식이 "Gift_1", "Gift_2" 이런 형태라고 가정
+        if (string.IsNullOrEmpty(id))
+            return null;
+
+        if (id.StartsWith("Gift_"))
+        {
+            string levelStr = id.Replace("Gift_", "");
+
+            if (int.TryParse(levelStr, out int level))
+            {
+                // ⭐ 기존 함수 그대로 호출
+                return GetGiftBoxData(level);
+            }
+        }
+
+        return null;
+    }
+
     // ID 기반으로 DonutData 가져오기 (ex: "Hard_3")
     public DonutData GetDonutByID(string id)
     {

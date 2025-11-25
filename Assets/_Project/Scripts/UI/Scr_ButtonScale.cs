@@ -7,6 +7,9 @@ using UnityEngine.UI;
 
 public class Scr_ButtonScale : MonoBehaviour
 {
+    [Header("상점버튼 연결")]
+    [SerializeField] private Button marketBtn;
+
     [Header("휴지통 관련")]
     [SerializeField] private GameObject TrashCan;
     [SerializeField] private Transform TrashCanTransform;
@@ -34,6 +37,7 @@ public class Scr_ButtonScale : MonoBehaviour
 
     void Start()
     {
+        marketBtn.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         OnMouseTrashCan();
         OnMouseStartButton();
         OnMouseCodexButton();

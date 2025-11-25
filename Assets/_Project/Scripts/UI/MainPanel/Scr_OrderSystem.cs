@@ -463,8 +463,7 @@ public class Scr_OrderSystem : MonoBehaviour
 
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;
-        DataManager.Instance.PlayerData.gold = newGold; 
-        //await DataManager.Instance.UpdateUserDataAsync(gold: newGold);
+        DataManager.Instance.GoldChange(newGold);
 
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)

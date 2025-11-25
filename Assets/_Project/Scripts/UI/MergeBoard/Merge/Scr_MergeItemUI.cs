@@ -15,6 +15,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private Canvas canvas;
     private Image icon;
     public bool isFromEntry = false; //엔트리 확인용
+    public bool isFromTemp = false;  //임시 보관칸 확인용
 
     private Vector2 originalPos;
     private Transform originalParent;
@@ -38,7 +39,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         transform.SetParent(cell.transform, false);
 
         // 셀과 도넛ID 연결
-        cell.donutId = donutData != null ? donutData.id : null;
+        //cell.donutId = donutData != null ? donutData.id : null;
         cell.occupant = this;
     }
 
@@ -103,6 +104,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         {
             Debug.Log($"{name} 휴지통으로 삭제됨");
 
+            //TODO: 여기에서 삭제여부 팝업 추가예정
+
             // 셀 참조 초기화
             if (currentCell != null)
                 currentCell.ClearItem();
@@ -118,13 +121,13 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             return;
         }
 
-        //// EntrySlot 우선 체크
-        //var entrySlot = targetObj ? targetObj.GetComponentInParent<EntrySlot>() : null;
-        //if (entrySlot != null)
-        //{
-        //    entrySlot.OnDrop(eventData);
-        //    return;
-        //}
+        // 임시보관칸에 드래그 금지
+        var tempSlot = targetObj?.GetComponentInParent<TempStorageSlot>();
+        if (tempSlot != null)
+        {
+            ResetPosition();
+            return;
+        }
 
         // === 2️⃣ EntrySlot 우선 처리 ===
         if (entrySlot != null)
@@ -132,8 +135,6 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             entrySlot.OnDrop(eventData);
             return;
         }
-
-        //targetCell = targetObj ? targetObj.GetComponentInParent<Cells>() : null;
 
         // 드롭 위치에 격자 이동
         if (BoardManager.Instance.selectionHighlight != null)
@@ -195,7 +196,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             {
                 // 엔트리 슬롯 비우기
                 if (fromEntrySlot != null && fromEntrySlot.currentItem == this)
+                {
                     fromEntrySlot.currentItem = null;
+                    fromEntrySlot.SaveToInventory();
+                }
 
                 // 이 도넛은 이제 보드 소속
                 isFromEntry = false;
@@ -216,6 +220,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             // 엔트리 → 보드 스왑만 허용, 머지는 절대 안 됨
             var entrySlot = originalParent.GetComponent<EntrySlot>();
             var targetItem = targetCell.occupant;
+            
+            if (targetItem != null && targetItem.donutId.StartsWith("Gift"))
+            {
+                ResetPosition();
+                return;
+            }
 
             if (entrySlot != null && targetItem != null)
             {
@@ -238,7 +248,6 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         }
 
         // 스왑로직
-        //var fromEntrySlot = originalParent.GetComponent<EntrySlot>();
         if (fromEntrySlot != null)   // 엔트리에서 옴
         {
             var targetItem = targetCell.occupant;
@@ -267,6 +276,36 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
         if (myData == null || otherData == null)
         {
+            int myLevel = ParseGiftLevel(donutId);
+            int otherLevel = ParseGiftLevel(otherItem.donutId);
+
+            if (myLevel > 0 && otherLevel > 0 && myLevel == otherLevel)
+            {
+                var nextGift = DataManager.Instance.GetGiftBoxData(myLevel + 1);
+                if (nextGift == null)
+                {
+                    Debug.LogWarning($"[MERGE] 다음 단계 GiftBox 없음 ({donutId})");
+                    ResetPosition();
+                    return;
+                }
+
+                // 머지 성공 → 상위 GiftBox로 교체
+                otherItem.GetComponent<Image>().sprite = nextGift.sprite;
+                otherItem.donutId = nextGift.id;
+                otherItem.donutData = null; // GiftBox는 DonutData 아님
+
+                if (otherItem.currentCell != null)
+                    otherItem.currentCell.donutId = nextGift.id;
+
+                currentCell.ClearItem();
+                Destroy(gameObject);
+
+                Debug.Log($"[MERGE] GiftBox {donutId} → {nextGift.id} 머지 성공");
+                BoardManager.Instance.AutoSaveBoardLocal();
+                return;
+            }
+
+
             Debug.LogWarning($"[MERGE] 도넛 데이터가 존재하지 않습니다. ({donutId})");
             ResetPosition();
             return;
@@ -339,16 +378,25 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         transform.SetParent(originalParent, false);
         rectTransform.anchoredPosition = originalPos;
 
-        // 엔트리 슬롯이면 currentItem 복원
+        // 1) 엔트리슬롯이었다면 그냥 복구
         var slot = originalParent.GetComponent<EntrySlot>();
         if (slot != null)
         {
-            slot.currentItem = this;     // 다시 넣어줌
-            isFromEntry = true;          // 엔트리 표시 유지
+            slot.currentItem = this;
+            isFromEntry = true;
+            currentCell = null;
+            return;
         }
 
+        // 2) 원래 셀이 있었다면 셀 점유 복구
         if (originalCell != null)
-            BoardManager.Instance.SelectCell(originalCell); //격자 원위치
+        {
+            currentCell = originalCell;
+            originalCell.occupant = this;
+            originalCell.donutId = donutData != null ? donutData.id : donutId;
+        }
+
+        BoardManager.Instance.SelectCell(originalCell);
     }
 
     //엔트리 슬롯 참조용
@@ -410,4 +458,14 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         yield return null;
     }
     */
+   public int ParseGiftLevel(string id) //유틸 함수
+    {
+        if (string.IsNullOrEmpty(id)) return -1;
+        var parts = id.Split('_');
+        if (parts.Length != 2) return -1;
+        if (parts[0] != "Gift") return -1;
+        if (int.TryParse(parts[1], out int level)) return level;
+        return -1;
+    }
+
 }
