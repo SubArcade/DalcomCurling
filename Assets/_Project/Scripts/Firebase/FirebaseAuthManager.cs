@@ -3,7 +3,9 @@ using UnityEngine;
 using System;
 using System.Threading.Tasks;
 using Firebase;
-using Google; 
+using Google;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 
 public class FirebaseAuthManager
 {
@@ -50,8 +52,8 @@ public class FirebaseAuthManager
         await FirebaseApp.CheckAndFixDependenciesAsync();
         
         // GPGS 초기화
-        PlayGamesPlatform.DebugLogEnabled = true;
-        PlayGamesPlatform.Activate();
+        // PlayGamesPlatform.DebugLogEnabled = true;
+        // PlayGamesPlatform.Activate();
         
         if (auth.CurrentUser != null)
         {
