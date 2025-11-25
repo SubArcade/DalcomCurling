@@ -15,9 +15,17 @@ public class Scr_EnergyTimerUI : MonoBehaviour
     { 
         //notifier = FindObjectOfType<EnergyRegenNotifier>();
     }
+    
+    void OnDisable() => DataManager.Instance.PauseChanged -= pauseChanged;
 
+    private void pauseChanged(bool paused)
+    {
+        UpdateTexts();
+    }
+    
     private void OnEnable()
     {
+        DataManager.Instance.PauseChanged += pauseChanged;
         StartCoroutine(UpdateRoutine());
     }
 
