@@ -92,10 +92,15 @@ public class Scr_MenuPanelControl : MonoBehaviour
         energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
         
-        testLevelUpButton.onClick.AddListener(LevelUp);
+        testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
     }
     
-    private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
+    //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
+    private void OnEnable()
+    {
+        DataManager.Instance.OnUserDataChanged += SetPlayerText;
+        GameManager.Instance.LevelUpdate += SetPlayerText;
+    }
     
     public void SetPlayerText(PlayerData playerData)
     {
@@ -103,27 +108,6 @@ public class Scr_MenuPanelControl : MonoBehaviour
         energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
         goldText.text = $"{playerData.gold}";
         gemText.text = $"{playerData.gem}";
-    }
-
-    public void LevelUp()
-    {
-        if(DataManager.Instance.PlayerData.level >= 20)
-            return;
-        
-        DataManager.Instance.PlayerData.exp += 20;
-    
-        // 100 이 넘으면 레벨업
-        if (DataManager.Instance.PlayerData.exp >= 100)
-        {
-            DataManager.Instance.PlayerData.level += 1;
-            DataManager.Instance.PlayerData.exp -= 100;
-            
-            SetPlayerText(DataManager.Instance.PlayerData);
-            // 레벨업 보상상자
-            BoardManager.Instance.SpawnGiftBox();
-        }
-                
-        
     }
     
 }

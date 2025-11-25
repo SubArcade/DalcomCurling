@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,6 +18,8 @@ public class GameManager : MonoBehaviour
     public string gameSceneName;
     public string menuSceneName;
     [SerializeField] private GameObject notifier;
+    
+    public event Action<PlayerData> LevelUpdate;
     
     private void Awake()
     {
@@ -145,4 +148,25 @@ public class GameManager : MonoBehaviour
         ApplyResultRewards();
     }
 
+    // 레벨업 로직
+    public void LevelUp()
+    {
+        if(DataManager.Instance.PlayerData.level >= 20)
+            return;
+        
+        DataManager.Instance.PlayerData.exp += 20;
+    
+        // 100 이 넘으면 레벨업
+        if (DataManager.Instance.PlayerData.exp >= 100)
+        {
+            DataManager.Instance.PlayerData.level += 1;
+            DataManager.Instance.PlayerData.exp -= 100;
+            
+            LevelUpdate.Invoke(DataManager.Instance.PlayerData);
+            // 레벨업 보상상자
+            BoardManager.Instance.SpawnGiftBox();
+        }
+        
+    }
+    
 }
