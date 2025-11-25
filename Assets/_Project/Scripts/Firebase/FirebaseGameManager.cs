@@ -8,13 +8,19 @@ using UnityEngine.PlayerLoop;
 
 /// <summary>
 /// 이 스크립트는 컬링 게임의 전체적인 흐름(상태)을 관리하는 중요한 역할을 합니다.
-/// Firebase Firestore와 연동하여 게임의 상태를 실시간으로 업데이트하고,
+    /// Firebase Firestore와 연동하여 게임의 상태를 실시간으로 업데이트하고,
 /// 플레이어의 행동(샷 발사, 예측 결과 전송 등)에 따라 게임을 진행합니다.
 /// </summary>
 public class FirebaseGameManager : MonoBehaviour
 {
-    public static FirebaseGameManager Instance { get; private set; }
+    // 게임 결과를 나타내는 열거형
+    public enum GameOutcome {
+        Win,
+        Lose,
+        Draw
+    }
 
+    public static FirebaseGameManager Instance { get; private set; }
     // 플레이어 프로필 로딩이 완료되었을 때 발생하는 이벤트
     public event Action OnProfilesLoaded;
 
@@ -88,6 +94,7 @@ public class FirebaseGameManager : MonoBehaviour
     private Coroutine _heartbeatCoroutine; // 생존 신호 코루틴 참조
     private bool roundDataUpdated = false;
     private bool _justTimedOut = false; // 마지막 턴이 타임아웃으로 실패했는지 여부
+    private bool penaltyApplied = false; // 게임 시작 시의 페널티가 적용되었는지 확인하는 플래그
 
     // --- 공유 가능한 게임 변수 ---
     public int aTeamScore { get; private set; } = 0;
@@ -294,6 +301,8 @@ public class FirebaseGameManager : MonoBehaviour
 
                     if (isFirstTurn)
                     {
+                        ApplyInitialPenalty(); // 로컬 페널티 적용
+
                         Debug.Log("[플레이어1 VS 플레이어2] 연출 시작 (8.5초)");
                         isFirstTurn = false;
                         roundDataUpdated = false;
@@ -681,17 +690,20 @@ public class FirebaseGameManager : MonoBehaviour
         Time.fixedDeltaTime = initialFixedDeltaTime;
         //Debug.Log($"FixedDeltaTime = {Time.fixedDeltaTime}");
         Time.timeScale = 1f;
+        
+        GameOutcome outcome;
+
         if (aTeamScore > bTeamScore)
         {
             if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
             {
                 Debug.Log("승리");
-                UI_LaunchIndicator_Firebase.FinishedUI();
+                outcome = GameOutcome.Win;
             }
             else
             {
                 Debug.Log("패배");
-                UI_LaunchIndicator_Firebase.FinishedUI();
+                outcome = GameOutcome.Lose;
             }
         }
         else if (bTeamScore > aTeamScore)
@@ -699,19 +711,21 @@ public class FirebaseGameManager : MonoBehaviour
             if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
             {
                 Debug.Log("패배");
-                UI_LaunchIndicator_Firebase.FinishedUI();
+                outcome = GameOutcome.Lose;
             }
             else
             {
                 Debug.Log("승리");
-                UI_LaunchIndicator_Firebase.FinishedUI();
+                outcome = GameOutcome.Win;
             }
         }
         else // 비겼을때 ( 연장전을 이때 시작하거나, 이미 연장전을 해서 이게 없어질 수도 있음 )
         {
             Debug.Log("비김");
-            UI_LaunchIndicator_Firebase.FinishedUI();
+            outcome = GameOutcome.Draw;
         }
+
+        UI_LaunchIndicator_Firebase.FinishedUI(outcome);
         
         // 리스너를 즉시 중지하여 추가 데이터 변경 감지를 막습니다.
         gameListener?.Stop();
@@ -1325,6 +1339,26 @@ public class FirebaseGameManager : MonoBehaviour
     public void Change_SuccessfullyShotInTime_To_True()
     {
         SuccessfullyShotInTime = true;
+    }
+
+    /// <summary>
+    /// 게임 시작 시 페널티를 로컬에서 생성 및 적용합니다.
+    /// </summary>
+    private void ApplyInitialPenalty()
+    {
+        if (penaltyApplied) return;
+
+        // 0-4 사이에서 중복되지 않는 랜덤 인덱스 2개 생성
+        int index1 = UnityEngine.Random.Range(0, 5);
+        int index2;
+        do
+        {
+            index2 = UnityEngine.Random.Range(0, 5);
+        } while (index1 == index2);
+
+        GameManager.Instance.ApplyStartGamePenalty(index1, index2);
+        penaltyApplied = true;
+        Debug.Log($"게임 시작 페널티 로직 실행. 인덱스 {index1}, {index2}의 도넛이 제거됩니다.");
     }
 
     #endregion
