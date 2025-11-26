@@ -18,7 +18,10 @@ public class LoginSystem : MonoBehaviour
     
     [SerializeField] private Button googlePlayButton;
     [SerializeField] private Button guestButtontest;
-    
+
+    [Header("게스트로그인 팝업")]
+    [SerializeField] private GameObject guestPopup;
+    [SerializeField] private Button guestPopupButton;
     
     void Start()
     {
@@ -40,6 +43,8 @@ public class LoginSystem : MonoBehaviour
         
         googlePlayButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.TestLoginPanel));
         guestButtontest.onClick.AddListener(AnonymousLogin);
+
+        guestPopupButton.onClick.AddListener(() => guestPopup.SetActive(true)); //게스트 확인 팝업
         
         //FirebaseAuthManager.Instance.Init();
     }

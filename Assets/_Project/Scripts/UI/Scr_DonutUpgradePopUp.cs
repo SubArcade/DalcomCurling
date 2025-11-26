@@ -167,7 +167,7 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             return level * 1000;
         }
 
-        return 10000 + (level * 5000);
+        return 10000 + ((level - 10) * 5000);
     }
 
     ////도넛 업그레이드 시 레벨업 & 만렙 도달시 업그레이드 비활성화

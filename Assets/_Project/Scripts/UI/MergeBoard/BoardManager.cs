@@ -367,7 +367,7 @@ public class BoardManager : MonoBehaviour
             Destroy(cell.occupant.gameObject);
         }
         cell.ClearItem();
-        BoardManager.Instance.AutoSaveBoardLocal();
+        AutoSaveBoardLocal();
     }
 
     // 도넛 찾기
