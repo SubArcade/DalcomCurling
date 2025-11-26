@@ -1,4 +1,4 @@
-using System; // 기본적인 시스템 기능을 사용하기 위해 필요합니다.
+﻿using System; // 기본적인 시스템 기능을 사용하기 위해 필요합니다.
 using System.Collections.Generic; // 리스트, 딕셔너리 같은 컬렉션 사용을 위해 필요합니다.
 using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
 using UnityEngine; // Unity 엔진의 기능을 사용하기 위해 필요합니다.
@@ -667,8 +667,8 @@ public class StoneShoot_Firebase : MonoBehaviour
                     {
                         uiLaunch.ShowFloatingText("Failed", _mainCamera.WorldToScreenPoint(_currentStoneRb.transform.position));
                     }
-                    var stoneController = _currentStoneRb.GetComponent<StoneForceController_Firebase>();
-                    FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, stoneController.DonutId);
+                    //FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, shotData.DonutTypeAndNumber);
+                    FirebaseGameManager.Instance.PlayerLostTimeToShotInTime(_currentStoneRb, "TapFailed");
                     DisableInput();
                     return;
                 }
@@ -695,16 +695,15 @@ public class StoneShoot_Firebase : MonoBehaviour
     {
         if (_preparedShotData != null) // 미리 준비된 샷 데이터가 있다면
         {
+
             Debug.Log("미리 입력된 샷으로 발사를 시작합니다.");
             CurrentState = LaunchState.MovingToHogLine; // 호그 라인 이동 상태로 변경
-            
+
             // 미리 준비된 샷에서는 어떤 도넛을 사용했는지 정보가 없으므로, 현재 선택된 도넛의 인덱스를 가져옵니다.
             int selectedIndex = uiLaunch.donutSelectionUI.GetSelectedDonutIndex();
             MoveDonutToHogLine(_preparedShotData, selectedIndex);
-            
+
             _needToTap = false; // 미리 준비된 샷은 탭 입력이 필요없도록 
-            _needToTap = true; // 미리 준비된 샷은 탭 입력이 필요없도록 
-            MoveDonutToHogLine(_preparedShotData); // 미리 준비된 샷 데이터로 돌 이동
             _preparedShotData = null; // 사용한 샷 데이터 초기화
             return true; // 샷 실행됨
         }

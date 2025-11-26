@@ -1,4 +1,4 @@
-using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
+﻿using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
 using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 필요합니다.
 using System;
 using System.Collections.Generic; // 리스트나 딕셔너리 같은 자료구조를 사용하기 위해 필요합니다.
@@ -822,12 +822,12 @@ public class FirebaseGameManager : MonoBehaviour
     public void SubmitShot(LastShot shotData)
     {
         // 이 오버로드는 인덱스를 모르므로, ID 기반으로 UI 업데이트를 시도합니다. (중복 도넛 문제 가능성 있음)
-        if (donutSelectionUI != null && !string.IsNullOrEmpty(shotData.DonutId))
+        if (donutSelectionUI != null && !string.IsNullOrEmpty(shotData.DonutTypeAndNumber))
         {
             var myDonutEntries = _playerProfiles[myUserId]?.Inventory?.donutEntries;
             if (myDonutEntries != null)
             {
-                var donutToMark = myDonutEntries.FirstOrDefault(e => e.id == shotData.DonutId);
+                var donutToMark = myDonutEntries.FirstOrDefault(e => e.id == shotData.DonutTypeAndNumber);
                 if (donutToMark != null)
                 {
                     // donutSelectionUI.MarkDonutAsUsed(donutToMark); // 이 메서드는 이제 int를 받음
@@ -1197,7 +1197,7 @@ public class FirebaseGameManager : MonoBehaviour
             Direction = zeroDict, // 발사 방향
             DonutTypeAndNumber = donutTypeAndNumber// 시간 초과된 도넛의 ID를 명시적으로 전달
         };
-        SubmitShot(shotData, -1); // 인덱스를 모르므로 -1 전달
+        SubmitShot(failedShotData); 
         _localState = LocalGameState.WaitingForPrediction;
         // DOVirtual.DelayedCall(1.0f, () =>
         // {
