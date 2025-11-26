@@ -1,4 +1,4 @@
-﻿using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
+using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
 using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 필요합니다.
 using System;
 using System.Collections.Generic; // 리스트나 딕셔너리 같은 자료구조를 사용하기 위해 필요합니다.
@@ -95,7 +95,6 @@ public class FirebaseGameManager : MonoBehaviour
     private bool roundDataUpdated = false;
     private bool _justTimedOut = false; // 마지막 턴이 타임아웃으로 실패했는지 여부
     private bool penaltyApplied = false; // 게임 시작 시의 페널티가 적용되었는지 확인하는 플래그
-    private DonutEntry _currentTurnDonutEntry; // 현재 턴에 사용하기 위해 선택된 도넛의 정확한 인스턴스
 
     // --- 공유 가능한 게임 변수 ---
     public int aTeamScore { get; private set; } = 0;
@@ -456,8 +455,6 @@ public class FirebaseGameManager : MonoBehaviour
                     Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
                     return;
                 }
-                
-                _currentTurnDonutEntry = selectedDonut; // 턴 시작 시 사용될 도넛 인스턴스를 저장
         
                 Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut);
                 if (donutRigid != null)
@@ -811,15 +808,39 @@ public class FirebaseGameManager : MonoBehaviour
             DonutId = donutId
         };
 
-        SubmitShot(failedShotData);
+        SubmitShot(failedShotData); // MODIFIED: 인덱스가 없으므로 이 오버로드를 호출
         _localState = LocalGameState.WaitingForPrediction;
     }
 
     /// <summary>
-    /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다.
+    /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다. (인덱스가 없는 경우의 오버로드)
     /// 샷 데이터를 Firebase에 전송하고 입력을 비활성화합니다.
     /// </summary>
     public void SubmitShot(LastShot shotData)
+    {
+        // 이 오버로드는 인덱스를 모르므로, ID 기반으로 UI 업데이트를 시도합니다. (중복 도넛 문제 가능성 있음)
+        if (donutSelectionUI != null && !string.IsNullOrEmpty(shotData.DonutId))
+        {
+            var myDonutEntries = _playerProfiles[myUserId]?.Inventory?.donutEntries;
+            if (myDonutEntries != null)
+            {
+                var donutToMark = myDonutEntries.FirstOrDefault(e => e.id == shotData.DonutId);
+                if (donutToMark != null)
+                {
+                    // donutSelectionUI.MarkDonutAsUsed(donutToMark); // 이 메서드는 이제 int를 받음
+                }
+            }
+        }
+        
+        // 공통 로직 호출
+        ProcessShotSubmission(shotData);
+    }
+    
+    /// <summary>
+    /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다.
+    /// 샷 데이터를 Firebase에 전송하고 입력을 비활성화합니다.
+    /// </summary>
+    public void SubmitShot(LastShot shotData, int usedIndex)
     {
         bool isFailedShot = shotData.Force == -999f;
         //상태 변경을 바로 해주어 다음 인덱스 도넛이 생성되는 오류 방지
@@ -830,32 +851,33 @@ public class FirebaseGameManager : MonoBehaviour
 
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
-
-        // 턴 시작 시 저장해둔 DonutEntry 인스턴스를 사용합니다.
-        var donutToUse = _currentTurnDonutEntry;
-
-        // shotData에 ID가 없는 경우 채워줍니다.
-        if (string.IsNullOrEmpty(shotData.DonutId) && donutToUse != null)
+        
+        // 인덱스를 사용하여 정확한 DonutEntry를 찾고 ID를 설정합니다.
+        if (usedIndex >= 0 && usedIndex < _playerProfiles[myUserId].Inventory.donutEntries.Count)
         {
+            DonutEntry donutToUse = _playerProfiles[myUserId].Inventory.donutEntries[usedIndex];
             shotData.DonutId = donutToUse.id;
-        }
-
-        // UI에서 사용된 도넛을 비활성화 처리합니다.
-        if (donutSelectionUI != null && donutToUse != null)
-        {
-            donutSelectionUI.MarkDonutAsUsed(donutToUse);
+            
+            // UI에서 사용된 도넛을 비활성화 처리합니다.
+            donutSelectionUI?.MarkDonutAsUsed(usedIndex);
         }
         else
         {
-            Debug.LogWarning($"SubmitShot: UI에서 비활성화할 도넛을 찾지 못했습니다. Stored Entry: {_currentTurnDonutEntry?.id}, ShotData ID: {shotData.DonutId}");
+            Debug.LogError($"SubmitShot: 유효하지 않은 인덱스({usedIndex})를 받아 샷을 처리할 수 없습니다.");
         }
 
-        _currentTurnDonutEntry = null; // 사용 후에는 참조를 제거합니다.
+        // 공통 로직 호출
+        ProcessShotSubmission(shotData);
+    }
 
+    /// <summary>
+    /// 샷 데이터를 Firestore에 업데이트하는 공통 로직
+    /// </summary>
+    private void ProcessShotSubmission(LastShot shotData)
+    {
         int count = stoneManager.myTeam == StoneForceController_Firebase.Team.A
             ? stoneManager.aShotIndex
             : stoneManager.bShotIndex;
-
 
         var updates = new Dictionary<string, object>
         {
@@ -864,11 +886,10 @@ public class FirebaseGameManager : MonoBehaviour
             { "LastUploaderId", myUserId }
         };
 
-        //Debug.Log($"SubmitShot.count = {count}");
-
         db.Collection("games").Document(gameId).UpdateAsync(updates);
         inputController?.DisableInput();
     }
+
 
     /// <summary>
     /// 플레이어가 중간에 게임을 나갈 때 호출됩니다.
@@ -1160,7 +1181,7 @@ public class FirebaseGameManager : MonoBehaviour
             Direction = zeroDict, // 발사 방향
             DonutId = sfc.DonutId // 시간 초과된 도넛의 ID를 명시적으로 전달
         };
-        SubmitShot(shotData);
+        SubmitShot(shotData, -1); // 인덱스를 모르므로 -1 전달
         _localState = LocalGameState.WaitingForPrediction;
         // DOVirtual.DelayedCall(1.0f, () =>
         // {
@@ -1247,7 +1268,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void ReplaceCurrentStone(DonutEntry newDonut)
     {
-        _currentTurnDonutEntry = newDonut; // 교체된 도넛 인스턴스로 업데이트
+        //_currentTurnDonutEntry = newDonut; // 교체된 도넛 인스턴스로 업데이트
 
         if (stoneManager == null || inputController == null) return;
 

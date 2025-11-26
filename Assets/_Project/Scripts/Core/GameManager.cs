@@ -128,8 +128,10 @@ public class GameManager : MonoBehaviour
     {
         if (State == GameState.Lobby)
         {
-            int oldLevel = DataManager.Instance.PlayerData.level;
+            UIManager.Instance.Open(PanelId.MainPanel);
 
+            int oldLevel = DataManager.Instance.PlayerData.level;
+            Debug.Log(">>>>>> 게임보상을 반영합니다.");
             // 실제 데이터 반영
             DataManager.Instance.PlayerData.exp += pendingExp;
             DataManager.Instance.PlayerData.gold += pendingGold;

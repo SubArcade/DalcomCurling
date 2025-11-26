@@ -1,4 +1,4 @@
-﻿using System; // 기본적인 시스템 기능을 사용하기 위해 필요합니다.
+using System; // 기본적인 시스템 기능을 사용하기 위해 필요합니다.
 using System.Collections.Generic; // 리스트, 딕셔너리 같은 컬렉션 사용을 위해 필요합니다.
 using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
 using UnityEngine; // Unity 엔진의 기능을 사용하기 위해 필요합니다.
@@ -13,10 +13,10 @@ using Random = UnityEngine.Random; // UnityEngine.Random을 명시적으로 사�
 public class StoneShoot_Firebase : MonoBehaviour
 {
     /// <summary>
-    /// 입력이 완료되면 계산된 샷 데이터를 담아 이 이벤트를 발생시킵니다.
+    /// 입력이 완료되면 계산된 샷 데이터와 사용된 도넛 슬롯의 인덱스를 담아 이 이벤트를 발생시킵니다.
     /// FirebaseGameManager가 이 이벤트를 구독하여 샷 데이터를 Firestore에 전송합니다.
     /// </summary>
-    public event Action<LastShot> OnShotConfirmed;
+    public event Action<LastShot, int> OnShotConfirmed;
 
     /// <summary>
     /// 돌 발사 과정의 현재 상태를 나타내는 열거형입니다.
@@ -587,7 +587,10 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (trajectoryLine != null) trajectoryLine.enabled = false;
 
         FirebaseGameManager.Instance.ChangeCameraRelease(); // 스톤에 카메라 부착
+        
+        int selectedIndex = uiLaunch.donutSelectionUI.GetSelectedDonutIndex();
         LastShot shotData = CalculateShotData();
+        
         //Debug.Log(FirebaseGameManager.Instance.CurrentLocalState);
         FirebaseGameManager.Instance.Change_SuccessfullyShotInTime_To_True();
 
@@ -604,7 +607,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             //Debug.Log("여기까지는 옴");
             CurrentState = LaunchState.MovingToHogLine;
-            MoveDonutToHogLine(shotData);
+            MoveDonutToHogLine(shotData, selectedIndex);
             _needToTap = true;
 
             //카운트다운 제거
@@ -618,7 +621,8 @@ public class StoneShoot_Firebase : MonoBehaviour
     /// 돌을 호그 라인까지 자동으로 이동시킵니다.
     /// </summary>
     /// <param name="shotData">발사할 샷 데이터.</param>
-    private void MoveDonutToHogLine(LastShot shotData)
+    /// <param name="usedIndex">사용된 도넛의 슬롯 인덱스.</param>
+    private void MoveDonutToHogLine(LastShot shotData, int usedIndex)
     {
         uiLaunch?.ShowGuideUI(3);
 
@@ -650,7 +654,7 @@ public class StoneShoot_Firebase : MonoBehaviour
 
                 if (_currentStoneRb != null) _currentStoneRb.DOKill(); // DOTween 애니메이션 중지
 
-                OnShotConfirmed?.Invoke(shotData); // 샷 데이터 확정 이벤트 발생
+                OnShotConfirmed?.Invoke(shotData, usedIndex); // 샷 데이터와 사용된 인덱스 확정 이벤트 발생
                 uiLaunch?.HideGuideUI();
                 //Debug.Log("샷 정보 전송 완료.");
 
@@ -672,7 +676,11 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             Debug.Log("미리 입력된 샷으로 발사를 시작합니다.");
             CurrentState = LaunchState.MovingToHogLine; // 호그 라인 이동 상태로 변경
-            MoveDonutToHogLine(_preparedShotData); // 미리 준비된 샷 데이터로 돌 이동
+            
+            // 미리 준비된 샷에서는 어떤 도넛을 사용했는지 정보가 없으므로, 현재 선택된 도넛의 인덱스를 가져옵니다.
+            int selectedIndex = uiLaunch.donutSelectionUI.GetSelectedDonutIndex();
+            MoveDonutToHogLine(_preparedShotData, selectedIndex);
+            
             _needToTap = false; // 미리 준비된 샷은 탭 입력이 필요없도록 
             _preparedShotData = null; // 사용한 샷 데이터 초기화
             return true; // 샷 실행됨

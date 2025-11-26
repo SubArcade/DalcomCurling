@@ -31,7 +31,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
     [Header("도넛 엔트리 항목")]
-    [SerializeField] private DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
+    public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
