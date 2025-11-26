@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class Scr_RewardButton : MonoBehaviour
 {
-    public TMP_Text statusText;
+    //public TMP_Text statusText;
     
     void Awake()
     {
@@ -27,7 +27,7 @@ public class Scr_RewardButton : MonoBehaviour
 
     public void OnClick_WatchAd()
     {
-        Debug.Log("광고 보기 버튼 클릭됨!");
+        //Debug.Log("광고 보기 버튼 클릭됨!");
         if (AdsRewarded.Instance.IsReady())
         {
             //statusText.text = "광고 표시 중...";
