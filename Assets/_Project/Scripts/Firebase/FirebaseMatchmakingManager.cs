@@ -194,10 +194,16 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    void Start()
+    
+    async void Start()
     {
         // Firestore 인스턴스를 초기화합니다.
+        
+        while (!FirebaseInitializer.IsInitialized)
+        {
+            await System.Threading.Tasks.Task.Yield();
+        }
+        
         db = FirebaseFirestore.DefaultInstance;
         //matchmakingButton.onClick.AddListener(()=>StartMatchmaking());
     }

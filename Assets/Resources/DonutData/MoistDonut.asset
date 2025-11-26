@@ -18,7 +18,8 @@ MonoBehaviour:
     level: 1
     sprite: {fileID: 21300000, guid: 6ceffdeb33c333b4792707edda86fa87, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "1\uB2E8\uACC4"
+    description: "Lv1\uC740 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218 \uC5C6\uC5B4\uC694"
+    descriptionEnglish: "Lv1 can\u2019t adjust weight"
     donutType: 2
     prefab: {fileID: 2931537195914527195, guid: 08ee9bfde53e76646ab4b4a3bb6f22c0, type: 3}
     weight: 0
@@ -29,7 +30,9 @@ MonoBehaviour:
     level: 2
     sprite: {fileID: 21300000, guid: bb52029c21491ed499bd5a89ef7aee28, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "2\uB2E8\uACC4"
+    description: "Lv2\uB294 2\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv2 can adjust weight up to 2
     donutType: 2
     prefab: {fileID: 7365671759680038930, guid: 4fc5f01109754e44b9a6a7e820192f11, type: 3}
     weight: 0
@@ -40,7 +43,9 @@ MonoBehaviour:
     level: 3
     sprite: {fileID: 21300000, guid: a0fd460fc5c6eda4eb31030080d02088, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "3\uB2E8\uACC4"
+    description: "Lv3\uC740 3\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv3 can adjust weight up to 3
     donutType: 2
     prefab: {fileID: 2900691293653107202, guid: 447b3ba0602ad6e4f98b0cb2c0f911f3, type: 3}
     weight: 0
@@ -51,7 +56,9 @@ MonoBehaviour:
     level: 4
     sprite: {fileID: 21300000, guid: 51127f64c61e12a46b10f889e46a938c, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "4\uB2E8\uACC4"
+    description: "Lv4\uB294 4\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv4 can adjust weight up to 4
     donutType: 2
     prefab: {fileID: 6887439718951720149, guid: 1dbcab2a64b2d4947aca0dcca1b65c6b, type: 3}
     weight: 0
@@ -62,7 +69,9 @@ MonoBehaviour:
     level: 5
     sprite: {fileID: 21300000, guid: 90c294db430e2df48a76cd187a9eb6a6, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "5\uB2E8\uACC4"
+    description: "Lv5\uB294 5\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv5 can adjust weight up to 5
     donutType: 2
     prefab: {fileID: 299775851241638803, guid: 5be2e5cc71e777b4ea7dddc832df0fd1, type: 3}
     weight: 0
@@ -73,7 +82,9 @@ MonoBehaviour:
     level: 6
     sprite: {fileID: 21300000, guid: c44b51f4dd0898d4d878a28d8a9ffbea, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "6\uB2E8\uACC4"
+    description: "Lv6\uC740 6\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv6 can adjust weight up to 6
     donutType: 2
     prefab: {fileID: 3399033399876463044, guid: 9b977464d10318844b0e7e034fc4b5aa, type: 3}
     weight: 0
@@ -84,7 +95,9 @@ MonoBehaviour:
     level: 7
     sprite: {fileID: 21300000, guid: 95011a1e9f937b14188a6592e23505ff, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "7\uB2E8\uACC4"
+    description: "Lv7\uC740 7\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv7 can adjust weight up to 7
     donutType: 2
     prefab: {fileID: 8599720459756023567, guid: dae04318e08f05b4fb03fcb6a3ba98ca, type: 3}
     weight: 0
@@ -95,7 +108,9 @@ MonoBehaviour:
     level: 8
     sprite: {fileID: 21300000, guid: d0dc89d8910ddff45be5b16eb2fbd1c8, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "8\uB2E8\uACC4"
+    description: "Lv8\uC740 8\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv8 can adjust weight up to 8
     donutType: 2
     prefab: {fileID: 5817417383080862111, guid: 6e93937475dbc354fb2663985e03a323, type: 3}
     weight: 0
@@ -106,7 +121,9 @@ MonoBehaviour:
     level: 9
     sprite: {fileID: 21300000, guid: a03ba7b275df8874f89930cf4a7dbf02, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "9\uB2E8\uACC4"
+    description: "Lv9\uB294 9\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
+      \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv9 can adjust weight up to 9
     donutType: 2
     prefab: {fileID: 2953612336926926345, guid: b41705bdc031bf647ab44bf13b730d6f, type: 3}
     weight: 0
@@ -117,7 +134,9 @@ MonoBehaviour:
     level: 10
     sprite: {fileID: 21300000, guid: 79444458256a5374b89f60e362fb807b, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "10\uB2E8\uACC4"
+    description: "Lv10\uC740 10\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv10 can adjust weight up to 10
     donutType: 2
     prefab: {fileID: 1762322065467694276, guid: 427e979405f2e5c4c843d32c7e49cdc0, type: 3}
     weight: 0
@@ -128,7 +147,9 @@ MonoBehaviour:
     level: 11
     sprite: {fileID: 21300000, guid: edc93549227b39848b47627d92687aa7, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "11\uB2E8\uACC4"
+    description: "Lv11\uC740 11\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv11 can adjust weight up to 11
     donutType: 2
     prefab: {fileID: 5214608703405232565, guid: f5c17b5472e905c458cb80eb2043d2f5, type: 3}
     weight: 0
@@ -139,7 +160,9 @@ MonoBehaviour:
     level: 12
     sprite: {fileID: 21300000, guid: 62b4d8aa0582d3341ad70c9c7afb4cf1, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "12\uB2E8\uACC4"
+    description: "Lv12\uB294 12\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv12 can adjust weight up to 12
     donutType: 2
     prefab: {fileID: 5226574898272867764, guid: b00525b0835eaa44682cd62f115cb75f, type: 3}
     weight: 0
@@ -150,7 +173,9 @@ MonoBehaviour:
     level: 13
     sprite: {fileID: 21300000, guid: e6845a58f3b5c6b44bd554015547da92, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "13\uB2E8\uACC4"
+    description: "Lv13\uC740 13\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv13 can adjust weight up to 13
     donutType: 2
     prefab: {fileID: 1254055942017508799, guid: 826b6a158f46440488d3f849ac223a6d, type: 3}
     weight: 0
@@ -161,7 +186,9 @@ MonoBehaviour:
     level: 14
     sprite: {fileID: 21300000, guid: 52d59adcc1a944541811e79889905356, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "14\uB2E8\uACC4"
+    description: "Lv14\uB294 14\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv14 can adjust weight up to 14
     donutType: 2
     prefab: {fileID: 2844692311727043404, guid: 3d4b698c0d2cba545a7b43f8783b9ba1, type: 3}
     weight: 0
@@ -172,7 +199,9 @@ MonoBehaviour:
     level: 15
     sprite: {fileID: 21300000, guid: 7b7a330aaf81efd4fa320029a8d50f13, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "15\uB2E8\uACC4"
+    description: "Lv15\uB294 15\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv15 can adjust weight up to 15
     donutType: 2
     prefab: {fileID: 5808206665283012659, guid: 0d74a0416aff67743a1b70c7252b6943, type: 3}
     weight: 0
@@ -183,7 +212,9 @@ MonoBehaviour:
     level: 16
     sprite: {fileID: 21300000, guid: c4376e155ff7b9240ae15a59d914711d, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "16\uB2E8\uACC4"
+    description: "Lv16\uC740 16\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv16 can adjust weight up to 16
     donutType: 2
     prefab: {fileID: 3183983945376797658, guid: b5e251d6e20c10740b41d7b30df0589a, type: 3}
     weight: 0
@@ -194,7 +225,9 @@ MonoBehaviour:
     level: 17
     sprite: {fileID: 21300000, guid: ab822b89f1d4ec949aaa493d6573ff50, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "17\uB2E8\uACC4"
+    description: "Lv17\uC740 17\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv17 can adjust weight up to 17
     donutType: 2
     prefab: {fileID: 5874772647873681843, guid: aff206e81a301434484ee7907978940e, type: 3}
     weight: 0
@@ -205,7 +238,9 @@ MonoBehaviour:
     level: 18
     sprite: {fileID: 21300000, guid: 4f695c4d55dd82945b3b39f8af825746, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "18\uB2E8\uACC4"
+    description: "Lv18\uC740 18\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv18 can adjust weight up to 18
     donutType: 2
     prefab: {fileID: 984029528166404581, guid: a55fc4c018e2aa241a01069b293ac875, type: 3}
     weight: 0
@@ -216,7 +251,9 @@ MonoBehaviour:
     level: 19
     sprite: {fileID: 21300000, guid: f949059dfaaa3f6488f7c3e4e19dea46, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "19\uB2E8\uACC4"
+    description: "Lv19\uB294 19\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv19 can adjust weight up to 19
     donutType: 2
     prefab: {fileID: 1525547102394242445, guid: 2a47303cd5e80db46ac0d1c7e823356a, type: 3}
     weight: 0
@@ -227,7 +264,9 @@ MonoBehaviour:
     level: 20
     sprite: {fileID: 21300000, guid: a8518e6f70ae7fb40b96051c8333a4f6, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "20\uB2E8\uACC4"
+    description: "Lv20\uC740 20\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv20 can adjust weight up to 20
     donutType: 2
     prefab: {fileID: 6758985202696507972, guid: 9e38c131593ac224ea99719ddf45dfc7, type: 3}
     weight: 0
@@ -238,7 +277,9 @@ MonoBehaviour:
     level: 21
     sprite: {fileID: 21300000, guid: 77c937158fa4bc54e967ce2cd2ea26a6, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "21\uB2E8\uACC4"
+    description: "Lv21\uC740 21\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv21 can adjust weight up to 21
     donutType: 2
     prefab: {fileID: 2555593644952316264, guid: 4d2f243d940814e46b02ae5fce4a9f71, type: 3}
     weight: 0
@@ -249,7 +290,9 @@ MonoBehaviour:
     level: 22
     sprite: {fileID: 21300000, guid: a84d11bca788abe4a98885357cbc8883, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "22\uB2E8\uACC4"
+    description: "Lv22\uB294 22\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv22 can adjust weight up to 22
     donutType: 2
     prefab: {fileID: 4345181485142404201, guid: c8b169c98ac8b774488d1b6beffd9f03, type: 3}
     weight: 0
@@ -260,7 +303,9 @@ MonoBehaviour:
     level: 23
     sprite: {fileID: 21300000, guid: 0c28e7a4aba5ada4a9ef931941b71c8a, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "23\uB2E8\uACC4"
+    description: "Lv23\uC740 23\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv23 can adjust weight up to 23
     donutType: 2
     prefab: {fileID: 2806228516680552359, guid: b1ff8de1aa5c15f4ebf09aa56664a4ad, type: 3}
     weight: 0
@@ -271,7 +316,9 @@ MonoBehaviour:
     level: 24
     sprite: {fileID: 21300000, guid: a99c40e498d2ce34491af3cda91d86bb, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "24\uB2E8\uACC4"
+    description: "Lv24\uB294 24\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv24 can adjust weight up to 24
     donutType: 2
     prefab: {fileID: 4703060839428881507, guid: 8b976197be0019249a015c57db15a011, type: 3}
     weight: 0
@@ -282,7 +329,9 @@ MonoBehaviour:
     level: 25
     sprite: {fileID: 21300000, guid: 955fdfcd850c54c48b4f503a3f5edf7f, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "25\uB2E8\uACC4"
+    description: "Lv25\uB294 25\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv25 can adjust weight up to 25
     donutType: 2
     prefab: {fileID: 6358879737967977651, guid: c9b815e3ca87e3947a59e09f80dc556c, type: 3}
     weight: 0
@@ -293,7 +342,9 @@ MonoBehaviour:
     level: 26
     sprite: {fileID: 21300000, guid: e5d8dc391f77eda47bd2b05772e35954, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "26\uB2E8\uACC4"
+    description: "Lv26\uC740 26\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv26 can adjust weight up to 26
     donutType: 2
     prefab: {fileID: 7306477785595393606, guid: 6abdf35caa70d2f40a5066b5eb45d3e6, type: 3}
     weight: 0
@@ -304,7 +355,9 @@ MonoBehaviour:
     level: 27
     sprite: {fileID: 21300000, guid: c0dd284f498681c4b872e900043a2406, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "27\uB2E8"
+    description: "Lv27\uC740 27\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv27 can adjust weight up to 27
     donutType: 2
     prefab: {fileID: 4594861816989188444, guid: 9dbc0d6c3f6cf1249a30bd8efba900aa, type: 3}
     weight: 0
@@ -315,7 +368,9 @@ MonoBehaviour:
     level: 28
     sprite: {fileID: 21300000, guid: d7637659d9c3baa41ba3b7a50fe672c9, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "28\uB2E8\uACC4"
+    description: "Lv28\uC740 28\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv28 can adjust weight up to 28
     donutType: 2
     prefab: {fileID: 8005658098411602893, guid: 8308c98896be8554285c3a80180832be, type: 3}
     weight: 0
@@ -326,7 +381,9 @@ MonoBehaviour:
     level: 29
     sprite: {fileID: 21300000, guid: 56bcdad9ef8f3bd4ea6d861a279eb05f, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "29\uB2E8\uACC4"
+    description: "Lv29\uB294 29\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv29 can adjust weight up to 29
     donutType: 2
     prefab: {fileID: 5260036382833618935, guid: 8d6bd0da2b386c54d9b25ce18556b0f5, type: 3}
     weight: 0
@@ -337,7 +394,9 @@ MonoBehaviour:
     level: 30
     sprite: {fileID: 21300000, guid: bbdb795f9c21e494b97dfbf9d4b5be9f, type: 3}
     displayName: "\uCD09\uCD09"
-    description: "30\uB2E8\uACC4"
+    description: "Lv30\uC740 30\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
+      \uC218 \uC788\uC5B4\uC694"
+    descriptionEnglish: Lv30 can adjust weight up to 30
     donutType: 2
     prefab: {fileID: 7792420087827874815, guid: 25942afa4e863eb4f8c02474c214cf92, type: 3}
     weight: 0
@@ -350,6 +409,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
     displayName: 
     description: 
+    descriptionEnglish: 
     donutType: 0
     prefab: {fileID: 0}
     weight: 0
