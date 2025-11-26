@@ -205,6 +205,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         // 머지 시작
         AnalyticsManager.Instance.MergeAction();
+        if(SoundManager.Instance != null)
+            SoundManager.Instance.moveUnit(transform.position);
         
         EntrySlot fromEntrySlot = null;
         if (originalParent != null)
@@ -377,6 +379,8 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             
             // 머지 성공 애널리틱스
             AnalyticsManager.Instance.MergeSuccess();
+            if(SoundManager.Instance != null)
+                SoundManager.Instance.mergeDonut(transform.position);
 
             BoardManager.Instance.AutoSaveBoardLocal(); //로컬 저장
             return;

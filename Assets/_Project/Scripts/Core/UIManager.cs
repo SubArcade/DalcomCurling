@@ -200,8 +200,7 @@ public class UIManager : MonoBehaviour
         {
             yield return null;
         }
-            onClose?.Invoke();
-
+        onClose?.Invoke();
     }
 
     
