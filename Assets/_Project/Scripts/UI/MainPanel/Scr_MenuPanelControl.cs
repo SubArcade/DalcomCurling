@@ -31,7 +31,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject gameHelpPopUp;
     [SerializeField] private GameObject levelUpRewardPopUp;
     [SerializeField] private GameObject useGiftBoxPopup;
-    
+    [SerializeField] private GameObject guestPopup;
+
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
     [SerializeField] private Button donutCodexButton;
@@ -77,6 +78,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.GameHelpPopup, gameHelpPopUp);
         UIManager.Instance.RegisterPanel(PanelId.LevelUpRewardPopUp, levelUpRewardPopUp);
         UIManager.Instance.RegisterPanel(PanelId.UseGiftBoxPopUp, useGiftBoxPopup);
+        UIManager.Instance.RegisterPanel(PanelId.GuestPopup, guestPopup);
 
         UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
         
