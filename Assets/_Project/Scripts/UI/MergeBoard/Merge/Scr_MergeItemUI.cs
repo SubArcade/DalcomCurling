@@ -133,6 +133,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             }
 
             Destroy(gameObject); // 오브젝트 삭제
+            BoardManager.Instance.AutoSaveBoardLocal();
             return;
 
         }

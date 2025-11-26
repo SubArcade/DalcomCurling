@@ -53,8 +53,6 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private TMP_Text gemText;
     
     public Button testLevelUpButton;
-
-    [SerializeField] private Button gpgsLogin;
     
     void Awake()
     {
@@ -94,8 +92,6 @@ public class Scr_MenuPanelControl : MonoBehaviour
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
         
         testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
-        
-        //gpgsLogin.onClick.AddListener();
     }
 
     //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
