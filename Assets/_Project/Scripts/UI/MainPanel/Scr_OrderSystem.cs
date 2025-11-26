@@ -426,7 +426,7 @@ public class Scr_OrderSystem : MonoBehaviour
             if (!matched)
                 allMatched = false;
         }
-
+        
         return allMatched;
     }
 
@@ -465,7 +465,10 @@ public class Scr_OrderSystem : MonoBehaviour
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;
         DataManager.Instance.GoldChange(newGold);
-
+        
+        // 퀘스트 완료 보상 애널리틱스
+        AnalyticsManager.Instance.QuestRewardComplete();
+        
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)
             StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));

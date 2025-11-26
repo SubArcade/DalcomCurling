@@ -14,7 +14,6 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject giftboxPopup;
     [SerializeField] private GameObject playerLevelInfoPopup;
     [SerializeField] private GameObject askUpgradePopup;
-    [SerializeField] private GameObject failUpgradePopup;
     [SerializeField] private GameObject donutCodexPopup;
     [SerializeField] private GameObject donutUpgradePopup;
     [SerializeField] private GameObject donutCodexClickPopup;

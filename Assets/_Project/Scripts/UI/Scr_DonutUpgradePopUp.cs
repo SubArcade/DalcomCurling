@@ -143,6 +143,7 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             return;
         }
         Data.PlayerData.gold -= cost;
+        Data.GoldChange(Data.PlayerData.gold);
 
         hardLevel++;
         Data.MergeBoardData.generatorLevelHard = hardLevel;
@@ -172,7 +173,8 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             return;
         }
         Data.PlayerData.gold -= cost;
-
+        Data.GoldChange(Data.PlayerData.gold);
+        
         moistLevel++;
         Data.MergeBoardData.generatorLevelMoist = moistLevel;
 
@@ -201,6 +203,7 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             return;
         }
         Data.PlayerData.gold -= cost;
+        Data.GoldChange(Data.PlayerData.gold);
 
         softLevel++;
         Data.MergeBoardData.generatorLevelSoft = softLevel;
@@ -290,25 +293,6 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         return 10000 + ((level - 10) * 5000);
     }
 
-    ////도넛 업그레이드 시 레벨업 & 만렙 도달시 업그레이드 비활성화
-    //void UpgradeDonut(ref int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText, Button upgradeButton, GameObject maxlevelPanel)
-    //{
-    //    if (level >= MaxLevel)
-    //    {
-    //        upgradeButton.interactable = false;
-    //        maxlevelPanel.SetActive(true);
-    //        return;
-    //    }
-    //    level++;
-    //    UpdateDonutText(level,type, createText, optionText);
-
-    //    if (level >= MaxLevel)
-    //    {
-    //        upgradeButton.interactable = false;
-    //        maxlevelPanel.SetActive(true);
-    //    }
-    //}
-
     //도넛 레벨에 따라 텍스트 갱신
     void UpdateDonutText(int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText) 
     {
@@ -340,9 +324,6 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
 
     void updateAllText() 
     {
-        //UpdateDonutText(hardDonutLevel,"단단", HardDonutCreatText, HardDonutOptionText);
-        //UpdateDonutText(moistDonutLevel,"촉촉", MoistDonutCreatText, MoistDonutOptionText);
-        //UpdateDonutText(softDonutLevel,"말랑" ,SoftDonutCreatText, SoftDonutOptionText);
         UpdateDonutText(Data.MergeBoardData.generatorLevelHard, "단단", HardDonutCreatText, HardDonutOptionText);
         UpdateDonutText(Data.MergeBoardData.generatorLevelMoist, "촉촉", MoistDonutCreatText, MoistDonutOptionText);
         UpdateDonutText(Data.MergeBoardData.generatorLevelSoft, "말랑", SoftDonutCreatText, SoftDonutOptionText);
