@@ -5,8 +5,7 @@ using UnityEngine;
 public class Scr_ScreenTimerAnalytics : MonoBehaviour
 {
     private float _enterTime;
-    [SerializeField] private string eventName;
-    [SerializeField] private string categoryName;
+    [SerializeField] private AnalyticsTimerType analyticsTimerType;
 
     private void OnEnable()
     {
@@ -16,9 +15,6 @@ public class Scr_ScreenTimerAnalytics : MonoBehaviour
     private void OnDisable()
     {
         float stayTime = Time.time - _enterTime;
-        FirebaseAnalytics.LogEvent(eventName, 
-            new Parameter("category", categoryName),
-            new Parameter("stay_sec", stayTime)
-        );
+        AnalyticsManager.Instance.LogTimer(analyticsTimerType, stayTime);
     }
 }

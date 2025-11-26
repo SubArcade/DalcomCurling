@@ -13,10 +13,6 @@ public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     [SerializeField] private float moveDistance = 100f; // 위로 이동할 월드 거리
     [SerializeField] private float duration = 1.0f;   // 애니메이션 시간
     [SerializeField] private float dealyTime = 0.5f;   // 애니메이션 시간
-    
-    [Header("Analytics")]
-    [SerializeField] private GameObject appLunch;
-    
 
     private Vector2 startTouchPos;
     private bool isSwiped = false;
@@ -52,8 +48,17 @@ public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
         if (swipeDist > swipeThreshold)
         {
+            // 스와이프
             isSwiped = true;
             StartSwipeUp();
+            AnalyticsManager.Instance.IntroSelect("Swipe");
+        }
+        else
+        {
+            // 일반 터치
+            isSwiped = true;
+            StartSwipeUp();
+            AnalyticsManager.Instance.IntroSelect("Tap");
         }
     }
 
@@ -76,7 +81,8 @@ public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             UIManager.Instance.Open(PanelId.MainPanel);
             
             // 애널리틱 종료
-            appLunch.gameObject.SetActive(false);
+            AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.app_launch, false);
+            AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.main_enter, true);
         });
     }
     

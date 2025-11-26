@@ -286,13 +286,14 @@ public class Scr_OrderSystem : MonoBehaviour
     {
         if (DataManager.Instance.QuestData.refreshCount <= 0)
         {
+            UIManager.Instance.Open(PanelId.OrderRefreshPopUp);
             return;
         }
 
         DataManager.Instance.QuestData.refreshCount--;
         SaveRefreshCount();
         refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
-
+       
         // 해당 주문서의 CompleteObject 비활성화
         if (ClickedButton == refreshBtn1)
         {

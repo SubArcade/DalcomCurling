@@ -110,7 +110,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 return;
             }
 
-            Debug.Log($"{name} 휴지통으로 삭제됨");
+            // Debug.Log($"{name} 휴지통으로 삭제됨");
+            
+            // 휴지통 애널리틱스
+            AnalyticsManager.Instance.TrashUse();
 
             // + 휴지통에 도넛을 넣었을 시에 재생되는 사운드 추가 ---
             if (SoundManager.Instance != null)
@@ -200,6 +203,11 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     private void TryPlaceOrMerge(Cells targetCell)
     {
+        // 머지 시작
+        AnalyticsManager.Instance.MergeAction();
+        if(SoundManager.Instance != null)
+            SoundManager.Instance.moveUnit(transform.position);
+        
         EntrySlot fromEntrySlot = null;
         if (originalParent != null)
             fromEntrySlot = originalParent.GetComponent<EntrySlot>();
@@ -367,7 +375,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             currentCell.ClearItem();
             Destroy(gameObject);
 
-            Debug.Log($"[MERGE] {donutId} → {nextDonut.id} 머지 성공");
+            //Debug.Log($"[MERGE] {donutId} → {nextDonut.id} 머지 성공");
+            
+            // 머지 성공 애널리틱스
+            AnalyticsManager.Instance.MergeSuccess();
+            if(SoundManager.Instance != null)
+                SoundManager.Instance.mergeDonut(transform.position);
 
             BoardManager.Instance.AutoSaveBoardLocal(); //로컬 저장
             return;

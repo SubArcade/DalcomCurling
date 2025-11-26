@@ -190,6 +190,9 @@ public class BoardManager : MonoBehaviour
         Cells target = FindEmptyActiveCell();
         if (target == null)
         {
+            //Debug.Log("빈 칸이 없습니다.");
+            // 가득착 애널리틱스
+            AnalyticsManager.Instance.MergeBoardFull();
             Debug.Log("빈 칸이 없습니다.");
             
             // + 도넛의 포화상태때 생성 시도를 할때 나는 사운드 ---
@@ -205,6 +208,7 @@ public class BoardManager : MonoBehaviour
         if (playerData.energy <= 0)
         {
             Debug.Log("에너지가 부족합니다");
+            UIManager.Instance.Open(PanelId.EnergyRechargePopUp);
             return;
         }
 
