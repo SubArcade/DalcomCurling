@@ -163,6 +163,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         }
 
     }
+
     //사운드 조절 슬라이더와 텍스트 연결 및 저장 불러오기
     private void InitVolumeSettings()
     {
@@ -236,7 +237,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         LocalizationManager.Instance.SetLanguage(selectedLang);
     }
 
-    // 볼륨 끄기 버튼 스크립트
+    // + 볼륨 끄기 버튼 스크립트
     private void SetVolumeSilent(string key, Scrollbar slider, TextMeshProUGUI text, Image gage)
     {
         if (SoundManager.Instance == null) return;
@@ -261,7 +262,7 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // 다시 끄기 전 저장된 값의 볼륨으로 키는 버튼
+    // + 다시 100의 값으로 볼륨으로 키는 버튼
     private void RestoreVolume(string key, Scrollbar slider, TextMeshProUGUI text, Image gage, System.Action<float> setVolumeAction)
     {
         if (SoundManager.Instance == null || setVolumeAction == null) return;
