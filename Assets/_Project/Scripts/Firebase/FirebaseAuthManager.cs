@@ -2,6 +2,7 @@
 using Firebase;
 using Firebase.Auth;
 using Google;
+using UnityEngine;
 
 #if UNITY_ANDROID
 using GooglePlayGames;
