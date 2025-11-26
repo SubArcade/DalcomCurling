@@ -1,7 +1,8 @@
 ﻿using System;
-using Firebase.Firestore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Firebase.Firestore;
 using UnityEngine;
 
 public enum GameMode
@@ -42,6 +43,7 @@ public class UserDataRoot
         soloTier = GameTier.Bronze,
         levelMax = 20,
     };
+    
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData()
     {
         donutEntries = new List<DonutEntry>()
@@ -601,6 +603,26 @@ public class DataManager : MonoBehaviour
         }
         
     }
+
+    /// <summary>
+    /// 게임 매니저로부터 받은 변경된 인벤토리와 점수 데이터를 적용하고 DB에 저장합니다.
+    /// 게임진입시 선반영하는 패널티요소를 위한 동작으로 한번만 수행됨
+    /// </summary>
+    public async Task ApplyPenaltyData(List<DonutEntry> updatedDonutEntries, int newScore)
+    {
+        // 1. 로컬 데이터 업데이트
+        InventoryData.donutEntries = updatedDonutEntries;
+        PlayerData.soloScore = newScore;
+
+        // 2. Firestore에 모든 변경사항 저장
+        await SaveAllUserDataAsync();
+        
+        // 3. 로컬 리스너에게 변경사항 알림
+        OnUserDataChanged?.Invoke(PlayerData);
+        OnUserDataRootChanged?.Invoke(userData);
+        Debug.Log($"페널티 데이터 적용 완료. 현재 점수: {newScore}");
+    }
+
     
     //생성기 레벨 받아오기
     public int GetGeneratorLevel(DonutType type)
@@ -834,4 +856,5 @@ public class DataManager : MonoBehaviour
             return null;
         }
     }
+        
 }

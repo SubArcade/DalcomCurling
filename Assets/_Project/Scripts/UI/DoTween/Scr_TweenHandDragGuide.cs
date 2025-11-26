@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using DG.Tweening;
+using UnityEngine;
 
 public class Scr_TweenHandDragGuide : MonoBehaviour
 {
@@ -68,6 +68,7 @@ public class Scr_TweenHandDragGuide : MonoBehaviour
                   {
                       // 끝나면 원래 자리로 리셋
                       handRect.anchoredPosition = originalPos;
+                      gameObject.SetActive(false);
                   });
     }
 }

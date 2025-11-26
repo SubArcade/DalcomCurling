@@ -1,13 +1,12 @@
-﻿using Firebase.Auth;
-using UnityEngine;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using Firebase;
+using Firebase.Auth;
 using Google;
 
 #if UNITY_ANDROID
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
+using UnityEngine;
 #endif
 
 public class FirebaseAuthManager
@@ -219,7 +218,7 @@ public class FirebaseAuthManager
         });
 #endif
     }
-    
+
     public void ConnectGpgsAccount()
     {
 #if UNITY_ANDROID

@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using DG.Tweening;
 using TMPro;
-using DG.Tweening;
+using UnityEngine;
 
 /// <summary>
 /// 플로팅 텍스트의 동작을 제어하는 스크립트. 활성화 시 애니메이션을 실행하고 자동으로 비활성화됩니다.
@@ -20,6 +20,7 @@ public class FloatingText : MonoBehaviour
     // true일 경우 애니메이션 완료 후 오브젝트를 파괴합니다. false일 경우 비활성화합니다.
     // 인스턴스 프리팹의 경우 true, 오브젝트 풀링의 경우 false로 설정합니다.
     public bool destroyOnComplete = true;
+    public GameObject destroyTargetObject;
 
     void Awake()
     {
@@ -45,7 +46,15 @@ public class FloatingText : MonoBehaviour
         {
             if (destroyOnComplete)
             {
-                Destroy(gameObject);
+                if (destroyTargetObject != null)
+                {
+                    Destroy(destroyTargetObject);
+                }
+                else 
+                { 
+                    Destroy(gameObject);
+                }
+                    
             }
             else
             {
