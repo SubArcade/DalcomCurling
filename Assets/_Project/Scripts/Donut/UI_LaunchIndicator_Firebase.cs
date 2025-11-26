@@ -77,6 +77,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             floatingText.destroyOnComplete = false;
             floatingText.gameObject.SetActive(false);
         }
+        
+        //// + 인게임 BGM 사운드 출력 --- 
+        //SoundManager.Instance.PlayBGMGroup("InGameBGM");
     }
 
     private void HandleProfilesLoaded()
@@ -312,4 +315,6 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         //일단 게임종료후 레벨과 경험치 골드를 받는지만 확인하는 함수,
         //나중에 패배, 탈주, 강종 등  승,패,무 고려해서 두명이 서로 다르게 나오도록 해야함
     }
+
+   
 }

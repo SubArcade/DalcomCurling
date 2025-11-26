@@ -70,15 +70,31 @@ public class SoundManager : MonoBehaviour
                 if (!eventRef.IsNull)
                 {
                     // FMOD 경로에서 이벤트 이름 추출 (예: "event:/SFX/Merge_Donut" -> "Merge_Donut")
-                    string eventName = GetEventName(eventRef.Path);
+                    string path = null;
+                    string eventName;
 
-                    if (soundEventMap.ContainsKey(eventName))
+                    FMOD.Studio.EventDescription eventDescription;
+                    FMOD.RESULT result = FMODUnity.RuntimeManager.StudioSystem.getEventByID(eventRef.Guid, out eventDescription);
+
+                    if (result == FMOD.RESULT.OK && eventDescription.isValid())
                     {
-                        Debug.LogWarning($"[SoundManager] 딕셔너리에 이미 '{eventName}' 키가 존재합니다. 이벤트: {eventRef.Path}");
+                        eventDescription.getPath(out path);
+                    }
+
+                    if (string.IsNullOrEmpty(path))
+                    {
                         continue;
                     }
 
-                    // 모든 개별 사운드(SFX, 단일 BGM, 인텐스 뮤직 등)는 딕셔너리로 관리
+                    eventName = GetEventName(path);
+
+                    if (soundEventMap.ContainsKey(eventName))
+                    {
+                        // path 변수를 사용하여 로그 출력
+                        Debug.LogWarning($"[SoundManager] 딕셔너리에 이미 '{eventName}'키가 존재합니다. 이벤트: {path}");
+                        continue;
+                    }
+
                     soundEventMap.Add(eventName, eventRef);
                 }
             }
@@ -188,7 +204,24 @@ public class SoundManager : MonoBehaviour
 
             if (!currentBGM.IsNull)
             {
-                string bgmName = GetEventName(currentBGM.Path);
+                string path;
+                string bgmName;
+
+                FMOD.Studio.EventDescription eventDescription;
+                FMOD.RESULT result = FMODUnity.RuntimeManager.StudioSystem.getEventByID(currentBGM.Guid, out eventDescription);
+
+                if (result == FMOD.RESULT.OK && eventDescription.isValid())
+                {
+                    eventDescription.getPath(out path);
+                    bgmName = GetEventName(path);
+                }
+                else
+                {
+                    Debug.LogWarning($"[SoundManager] BGM 이벤트 참조가 유효하지 않습니다: (인덱스: {currentBGMIndex})");
+                    currentBGMIndex = (currentBGMIndex + 1) % currentBGMPlaylist.Count;
+                    continue;
+                }
+
                 Debug.Log($"[SoundManager] BGM 재생: {bgmName} (인덱스: {currentBGMIndex + 1}/{currentBGMPlaylist.Count})");
 
                 currentBGMInstance = RuntimeManager.CreateInstance(currentBGM);
@@ -396,7 +429,7 @@ public class SoundManager : MonoBehaviour
     {
         PlaySFX("13_02_Synth_Boing_4", position);
     }
-    
+
     // 도넛 - 도넛 충돌 강하게 사운드
     public void stoneCrashstrong(Vector3 position)
     {
