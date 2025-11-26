@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class Test_MainMenu : MonoBehaviour
 {
-    public Button energyButton;
     public TextMeshProUGUI energyText;
     public GameObject energyTimer_Text;
     public TextMeshProUGUI goldText;
@@ -52,7 +51,6 @@ public class Test_MainMenu : MonoBehaviour
     void Awake()
     {
         //DataManager.Instance.PlayerData.energy = 0;
-        energyButton.onClick.AddListener(()=> testAdd());
         loginButton.onClick.AddListener(TestLogin);
         dropdown.ClearOptions();
         dropdown.AddOptions(new List<string>(idDictionary.Keys));
