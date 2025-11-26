@@ -642,7 +642,8 @@ public class StoneShoot_Firebase : MonoBehaviour
                     {
                         uiLaunch.ShowFloatingText("Failed", _mainCamera.WorldToScreenPoint(_currentStoneRb.transform.position));
                     }
-                    FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, shotData.DonutId);
+                    var stoneController = _currentStoneRb.GetComponent<StoneForceController_Firebase>();
+                    FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, stoneController.DonutId);
                     DisableInput();
                     return;
                 }

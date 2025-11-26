@@ -855,50 +855,5 @@ public class DataManager : MonoBehaviour
             return null;
         }
     }
-
-
-
-    /// <summary>
-    /// 승리 시 획득한 도넛 2개를 머지 보드의 빈 셀에 추가하고 DB에 저장합니다.
-    /// </summary>
-    public async Task AddDonutsToMergeBoard(string donutId1, string donutId2)
-    {
-        var emptyCells = MergeBoardData.cells.Where(c => string.IsNullOrEmpty(c.donutId)).ToList();
-        int addedCount = 0;
-
-        // 첫 번째 도넛 추가 시도
-        if (emptyCells.Count > 0)
-        {
-            emptyCells[0].donutId = donutId1;
-            addedCount++;
-            Debug.Log($"도넛 획득: {donutId1}가 인벤토리에 추가되었습니다.");
-        }
-        else
-        {
-            Debug.LogWarning($"도넛 획득 실패: {donutId1}를 위한 인벤토리(머지 보드) 공간이 부족합니다.");
-        }
-
-        // 두 번째 도넛 추가 시도
-        if (emptyCells.Count > 1)
-        {
-            emptyCells[1].donutId = donutId2;
-            addedCount++;
-            Debug.Log($"도넛 획득: {donutId2}가 인벤토리에 추가되었습니다.");
-        }
-        else if (addedCount == 1) // 첫 번째 도넛은 추가되었으나 두 번째 도넛을 위한 공간이 없을 경우
-        {
-            Debug.LogWarning($"도넛 획득 실패: {donutId2}를 위한 인벤토리(머지 보드) 공간이 부족합니다.");
-        }
-        else // 두 도넛 모두 추가 실패
-        {
-            Debug.LogWarning("도넛 획득 실패: 인벤토리(머지 보드)에 공간이 부족합니다.");
-            return; // 추가할 공간이 없으면 저장할 필요 없음
-        }
-
-        // Firestore에 변경사항 저장
-        await SaveAllUserDataAsync();
-
-        // 로컬 리스너에게 변경사항 알림
-        OnUserDataRootChanged?.Invoke(userData);
-    }
+        
 }

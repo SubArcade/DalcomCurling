@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
         if (scene.name == menuSceneName)
         {
             SetState(GameState.Lobby);
-            ApplyResultRewards();
+            StartCoroutine(ApplyRewardsNextFrame());
         }
     }
 
@@ -116,6 +116,7 @@ public class GameManager : MonoBehaviour
     private int pendingExp;
     private int pendingGold;
     private int pendingPoint;
+    private List<DonutEntry> pendingRewardDonuts = new List<DonutEntry>();
 
     public void SetResultRewards(int level, int gold, int point) //이부분을 호출
     {
@@ -142,11 +143,22 @@ public class GameManager : MonoBehaviour
             {
                 UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
             }
+            
+            // 보류 중인 보상 도넛 지급
+            foreach (var donutEntry in pendingRewardDonuts)
+            {
+                DonutData rewardDonut = DataManager.Instance.GetDonutByID(donutEntry.id);
+                if (rewardDonut != null)
+                {
+                    BoardManager.Instance.AddRewardDonut(rewardDonut);
+                }
+            }
 
             // pending 값 초기화
             pendingExp = 0;
             pendingGold = 0;
             pendingPoint = 0;
+            pendingRewardDonuts.Clear();
         }
     }
     private IEnumerator ApplyRewardsNextFrame()
@@ -175,10 +187,13 @@ public class GameManager : MonoBehaviour
         }
         
     }
-
-    public void ApplyStartGamePenalty(int index1, int index2)
+    private int index1;
+    private int index2;
+    public void ApplyStartGamePenalty(int _index1, int _index2)
     {
         if (DataManager.Instance == null) return;
+        index1 = _index1;
+        index2 = _index2;
 
         // 1. DataManager로부터 현재 데이터 가져오기
         var currentDonuts = DataManager.Instance.InventoryData.donutEntries;
@@ -284,20 +299,15 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // 중복되지 않는 랜덤 인덱스 2개 선택
-        int index1 = UnityEngine.Random.Range(0, availableOpponentDonuts.Count);
-        int index2;
-        do
-        {
-            index2 = UnityEngine.Random.Range(0, availableOpponentDonuts.Count);
-        } while (index1 == index2);
-
         DonutEntry capturedDonut1 = availableOpponentDonuts[index1];
         DonutEntry capturedDonut2 = availableOpponentDonuts[index2];
 
         if (capturedDonut1 != null && capturedDonut2 != null)
         {
-            _ = DataManager.Instance.AddDonutsToMergeBoard(capturedDonut1.id, capturedDonut2.id);
+            // 보상 도넛을 즉시 추가하지 않고, 나중에 안전하게 지급하기 위해 임시 리스트에 추가합니다.
+            pendingRewardDonuts.Add(capturedDonut1);
+            pendingRewardDonuts.Add(capturedDonut2);
+            Debug.Log($"보상 도넛 2개({capturedDonut1.id}, {capturedDonut2.id})를 획득하여 보류 중입니다.");
         }
         else
         {

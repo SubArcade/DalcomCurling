@@ -95,6 +95,7 @@ public class FirebaseGameManager : MonoBehaviour
     private bool roundDataUpdated = false;
     private bool _justTimedOut = false; // 마지막 턴이 타임아웃으로 실패했는지 여부
     private bool penaltyApplied = false; // 게임 시작 시의 페널티가 적용되었는지 확인하는 플래그
+    private DonutEntry _currentTurnDonutEntry; // 현재 턴에 사용하기 위해 선택된 도넛의 정확한 인스턴스
 
     // --- 공유 가능한 게임 변수 ---
     public int aTeamScore { get; private set; } = 0;
@@ -455,6 +456,8 @@ public class FirebaseGameManager : MonoBehaviour
                     Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
                     return;
                 }
+                
+                _currentTurnDonutEntry = selectedDonut; // 턴 시작 시 사용될 도넛 인스턴스를 저장
         
                 Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut);
                 if (donutRigid != null)
@@ -685,48 +688,64 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleGameFinished()
     {
-        //_localState = LocalGameState.InTimeline; // TODO : 로컬 스테이트를 게임종료로 설정하고 현재씬을 종료하고 메인씬으로 넘어가는 처리는 UI버튼에 연결하도록 변경
         _localState = LocalGameState.FinishedGame; // 서버로부터 게임 종료 명령을 받으면 자신의 로컬 상태도 종료 상태로 변경
         Time.fixedDeltaTime = initialFixedDeltaTime;
         //Debug.Log($"FixedDeltaTime = {Time.fixedDeltaTime}");
         Time.timeScale = 1f;
-        
+
         GameOutcome outcome;
 
-        if (aTeamScore > bTeamScore)
+        // 연결 끊김 또는 몰수패로 승자가 결정되었는지 먼저 확인
+        if (!string.IsNullOrEmpty(_currentGame.WinnerId))
         {
-            if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+            if (_currentGame.WinnerId == myUserId)
             {
-                Debug.Log("승리");
+                Debug.Log("상대방의 연결 끊김 또는 몰수패로 승리했습니다.");
                 outcome = GameOutcome.Win;
             }
             else
             {
-                Debug.Log("패배");
+                Debug.Log("연결 문제 또는 몰수패로 패배했습니다.");
                 outcome = GameOutcome.Lose;
             }
         }
-        else if (bTeamScore > aTeamScore)
+        else // WinnerId가 없는 경우, 정상적으로 점수를 비교하여 결과 결정
         {
-            if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+            if (aTeamScore > bTeamScore)
             {
-                Debug.Log("패배");
-                outcome = GameOutcome.Lose;
+                if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+                {
+                    Debug.Log("승리");
+                    outcome = GameOutcome.Win;
+                }
+                else
+                {
+                    Debug.Log("패배");
+                    outcome = GameOutcome.Lose;
+                }
             }
-            else
+            else if (bTeamScore > aTeamScore)
             {
-                Debug.Log("승리");
-                outcome = GameOutcome.Win;
+                if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
+                {
+                    Debug.Log("패배");
+                    outcome = GameOutcome.Lose;
+                }
+                else
+                {
+                    Debug.Log("승리");
+                    outcome = GameOutcome.Win;
+                }
             }
-        }
-        else // 비겼을때 ( 연장전을 이때 시작하거나, 이미 연장전을 해서 이게 없어질 수도 있음 )
-        {
-            Debug.Log("비김");
-            outcome = GameOutcome.Draw;
+            else // 비겼을때
+            {
+                Debug.Log("비김");
+                outcome = GameOutcome.Draw;
+            }
         }
 
         UI_LaunchIndicator_Firebase.FinishedUI(outcome);
-        
+
         // 리스너를 즉시 중지하여 추가 데이터 변경 감지를 막습니다.
         gameListener?.Stop();
         gameListener = null;
@@ -812,22 +831,27 @@ public class FirebaseGameManager : MonoBehaviour
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
 
-        // shotData에 DonutId가 아직 설정되지 않은 경우에만 UI에서 가져옵니다.
-        if (string.IsNullOrEmpty(shotData.DonutId))
+        // 턴 시작 시 저장해둔 DonutEntry 인스턴스를 사용합니다.
+        var donutToUse = _currentTurnDonutEntry;
+
+        // shotData에 ID가 없는 경우 채워줍니다.
+        if (string.IsNullOrEmpty(shotData.DonutId) && donutToUse != null)
         {
-            // 현재 선택된 도넛을 가져옵니다.
-            DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
-        
-            // LastShot 데이터에 도넛 ID를 저장합니다.
-            shotData.DonutId = selectedDonut?.id;
-            
-            // 사용한 도넛을 UI에서 '사용됨'으로 표시하고 다음 도넛을 선택합니다.
-            if (donutSelectionUI != null && selectedDonut != null)
-            {
-                donutSelectionUI.MarkDonutAsUsed(selectedDonut);
-            }
+            shotData.DonutId = donutToUse.id;
         }
-        
+
+        // UI에서 사용된 도넛을 비활성화 처리합니다.
+        if (donutSelectionUI != null && donutToUse != null)
+        {
+            donutSelectionUI.MarkDonutAsUsed(donutToUse);
+        }
+        else
+        {
+            Debug.LogWarning($"SubmitShot: UI에서 비활성화할 도넛을 찾지 못했습니다. Stored Entry: {_currentTurnDonutEntry?.id}, ShotData ID: {shotData.DonutId}");
+        }
+
+        _currentTurnDonutEntry = null; // 사용 후에는 참조를 제거합니다.
+
         int count = stoneManager.myTeam == StoneForceController_Firebase.Team.A
             ? stoneManager.aShotIndex
             : stoneManager.bShotIndex;
@@ -860,6 +884,20 @@ public class FirebaseGameManager : MonoBehaviour
                 { "LastUploaderId", myUserId }
             };
             db.Collection("games").Document(gameId).UpdateAsync(updates);
+        }
+    }
+
+    /// <summary>
+    /// 현재 플레이어가 게임을 포기하고 몰수패 처리됩니다. 상대방은 승리합니다.
+    /// 이 메서드는 항복 버튼에 연결해서 사용합니다.
+    /// </summary>
+    public void SurrenderGame()
+    {
+        if (!string.IsNullOrEmpty(myUserId))
+        {
+            // ForfeitGame 메서드를 호출하여 현재 플레이어를 패배자로, 상대방을 승리자로 처리합니다.
+            ForfeitGame(myUserId, "Player surrendered");
+            Debug.Log("플레이어가 게임을 포기하여 몰수패 처리됩니다.");
         }
     }
 
@@ -1209,6 +1247,8 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void ReplaceCurrentStone(DonutEntry newDonut)
     {
+        _currentTurnDonutEntry = newDonut; // 교체된 도넛 인스턴스로 업데이트
+
         if (stoneManager == null || inputController == null) return;
 
         // 1. 현재 돌 가져오기 및 파괴
