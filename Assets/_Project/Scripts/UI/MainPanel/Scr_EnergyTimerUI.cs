@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using TMPro;
 
@@ -45,21 +45,24 @@ public class Scr_EnergyTimerUI : MonoBehaviour
         if (!notifier) return;
 
         int secToNext = notifier.GetSecondsToNextEnergy();
-
-        if (secToNext == 0)
+        if (DataManager.Instance.PlayerData.energy >= DataManager.Instance.PlayerData.maxEnergy)
         {
             nextEnergyText.text = "가득 참!";
+        }
+        else 
+        {
+            nextEnergyText.text = FormatTime(secToNext);
+
+         if (secToNext == 0)
+         {
+           // nextEnergyText.text = "가득 참!";
             if (DataManager.Instance.PlayerData.energy < DataManager.Instance.PlayerData.maxEnergy)
             {
                 notifier.LazyRegen();
                 DataManager.Instance.EnergyChange(DataManager.Instance.PlayerData.energy);
             }
+         }
         }
-        else
-        {
-            nextEnergyText.text = FormatTime(secToNext);
-        }
-        
     }
 
     private string FormatTime(int totalSeconds)

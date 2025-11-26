@@ -163,8 +163,10 @@ public class GameManager : MonoBehaviour
             DataManager.Instance.PlayerData.exp -= 100;
             
             LevelUpdate.Invoke(DataManager.Instance.PlayerData);
+            UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
             // 레벨업 보상상자
-            BoardManager.Instance.SpawnGiftBox();
+           // BoardManager.Instance.SpawnGiftBox();
+           // 레벨업팝업UI 컴포넌트로 달린 스크립트에보상상자 주는 함수있슴니다
         }
         
     }
