@@ -20,6 +20,7 @@ public class DonutData
     
     [Header("설명, 수치")]
     [Tooltip("설명")] public string description; //설명
+    [Tooltip("영어 설명")] public string descriptionEnglish; //설명
     [Tooltip("도넛 타입")] public DonutType donutType;
     [Tooltip("도넛 프리팹")] public GameObject prefab;
 
