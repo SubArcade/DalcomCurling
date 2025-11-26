@@ -88,7 +88,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         //testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
         startBattle.onClick.AddListener(() => GameManager.Instance.StartGame());
         readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
-        goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
+        //goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp)); //PM요청으로 주석처리
         gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
@@ -106,7 +106,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     public void SetPlayerText(PlayerData playerData)
     {
         levelText.text = $"{playerData.level}";
-        energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        energyText.text = $"{playerData.energy}";
         goldText.text = $"{playerData.gold}";
         gemText.text = $"{playerData.gem}";
     }

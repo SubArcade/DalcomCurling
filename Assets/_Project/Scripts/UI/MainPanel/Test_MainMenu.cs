@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -100,7 +100,7 @@ public class Test_MainMenu : MonoBehaviour
     {
         //DataManager.Instance.PlayerData.energy++;
         //DataManager.Instance.UpdateUserDataAsync(energy: energy);
-        energyText.text = $"{ DataManager.Instance.PlayerData.energy}/{DataManager.Instance.PlayerData.maxEnergy}";
+        energyText.text = $"{ DataManager.Instance.PlayerData.energy}";
     }
 
     // 테스트 계정 로그인

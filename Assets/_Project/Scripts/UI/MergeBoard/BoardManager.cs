@@ -199,6 +199,7 @@ public class BoardManager : MonoBehaviour
         if (playerData.energy <= 0)
         {
             Debug.Log("에너지가 부족합니다");
+            UIManager.Instance.Open(PanelId.EnergyRechargePopUp);
             return;
         }
 
