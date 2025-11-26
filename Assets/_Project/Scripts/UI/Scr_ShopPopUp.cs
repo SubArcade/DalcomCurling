@@ -86,6 +86,7 @@ public class Scr_ShopPopUp : MonoBehaviour
                 goldShopImg.color = defaultImgColor;
             }
         });
+
         //골드상점열기
         goldShopBtn.onValueChanged.AddListener((isOn) =>
         {
@@ -105,6 +106,7 @@ public class Scr_ShopPopUp : MonoBehaviour
 
             }
         });
+
         //로비로 돌아가버리는 버튼
         robbyButton.onClick.AddListener(() =>
         {

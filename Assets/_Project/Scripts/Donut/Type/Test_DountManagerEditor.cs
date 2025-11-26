@@ -22,7 +22,7 @@ public class Test_DonutManagerEditor : Editor
         // 도넛 생성, 업데이트, 개별 업데이트, 제거버튼
         if (GUILayout.Button("도넛 생성", GUILayout.Height(30)))
         {
-            manager.SpawnDonut();
+            manager.SpawnDonut(DonutType.Hard, manager.level);
         }
 
         if (GUILayout.Button("모든 도넛 업데이트", GUILayout.Height(30)))

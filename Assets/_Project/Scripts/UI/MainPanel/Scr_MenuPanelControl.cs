@@ -95,7 +95,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         
         testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
     }
-    
+
     //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
     private void OnEnable()
     {
@@ -110,5 +110,10 @@ public class Scr_MenuPanelControl : MonoBehaviour
         goldText.text = $"{playerData.gold}";
         gemText.text = $"{playerData.gem}";
     }
-    
+
+    private void Start()
+    {
+        SoundManager.Instance.PlayBGMGroup("OutGameBGM");
+    }
+
 }

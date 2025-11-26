@@ -204,7 +204,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -428,7 +429,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -775,7 +777,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -1492,7 +1495,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -1760,9 +1764,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f654d560d5895341bd4b702084a001f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: LSJ_Test
-  matchmakingButton: {fileID: 769367225}
-  matchmakingStatusText: {fileID: 1032070298}
 --- !u!1 &1084156547
 GameObject:
   m_ObjectHideFlags: 0
@@ -2064,14 +2065,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   docId: ZflvQAZZmYj1SKj8mZKZ
-  playerData:
-    <email>k__BackingField: test@test.com
-    <gold>k__BackingField: 250
-    <gem>k__BackingField: 7
-    <energy>k__BackingField: 10
-    <level>k__BackingField: 1
-    <exp>k__BackingField: 0
-    <createdAtUnix>k__BackingField: 0
+  userData:
+    <player>k__BackingField:
+      <email>k__BackingField: test@test.com
+      <nickname>k__BackingField: test
+      <gold>k__BackingField: 250
+      <gem>k__BackingField: 7
+      <energy>k__BackingField: 10
+      <level>k__BackingField: 1
+      <exp>k__BackingField: 0
+      <lastAt>k__BackingField: 0
+      <soloScore>k__BackingField: 0
+      <soloTier>k__BackingField: 0
+    <inventory>k__BackingField:
+      <donutEntries>k__BackingField: []
+    <mergeBoard>k__BackingField:
+      <cells>k__BackingField: []
+      <generatorLevelHard>k__BackingField: 1
+      <generatorLevelSoft>k__BackingField: 1
+      <generatorLevelMoist>k__BackingField: 1
+      cellMax: 49
+      cellWidth: 7
+      cellLength: 7
+    <quest>k__BackingField:
+      <questList1>k__BackingField: []
+      <questList2>k__BackingField: []
+      <questList3>k__BackingField: []
+  Season: 2025
 --- !u!4 &1154803769
 Transform:
   m_ObjectHideFlags: 0
@@ -2290,7 +2310,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2530,7 +2551,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2712,7 +2734,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -3100,7 +3123,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -3598,7 +3622,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: da90cbd488cd9d542a3df059030bb4a2, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -3853,7 +3878,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c8efa17f8729c3b45934fa39053dc255, type: 2}
   m_sharedMaterial: {fileID: 800817055218586376, guid: c8efa17f8729c3b45934fa39053dc255, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 800817055218586376, guid: c8efa17f8729c3b45934fa39053dc255, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
