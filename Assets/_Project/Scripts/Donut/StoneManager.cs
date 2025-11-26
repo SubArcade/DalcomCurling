@@ -398,7 +398,7 @@ public class StoneManager : MonoBehaviour
             {
                 stoneExists = _stoneControllers_A.TryGetValue(stonePos.StoneId, out fc);
             }
-            else
+            else if (stonePos.Team == "B")
             {
                 stoneExists = _stoneControllers_B.TryGetValue(stonePos.StoneId, out fc);
             }
@@ -407,8 +407,8 @@ public class StoneManager : MonoBehaviour
             if (!stoneExists)
             {
                 // 서버가 보내준 위치가 아웃라인 밖인지 확인
-                Vector3 serverPos = new Vector3(stonePos.Position["x"], spawnPosition.position.y, stonePos.Position["z"]);
-                if (CheckDonutPassedOutLine(serverPos.z))
+                //Vector3 serverPos = new Vector3(stonePos.Position["x"], spawnPosition.position.y, stonePos.Position["z"]);
+                if (CheckDonutPassedOutLine(stonePos.Position["z"]))
                 {
                     // 로컬에 없는 돌이 서버에서도 아웃된 위치라면, 이미 클라이언트에서 정상적으로 아웃 처리된 것이므로 건너뛴다.
                     continue;
@@ -464,16 +464,16 @@ public class StoneManager : MonoBehaviour
     // 동기화 과정에서 로컬에 존재하지 않는 돌을 생성하는 도우미 메서드
     private StoneForceController_Firebase SpawnMissingStone(StonePosition stoneInfo)
     {
-        if (string.IsNullOrEmpty(stoneInfo.DonutId))
+        if (string.IsNullOrEmpty(stoneInfo.DonutTypeAndNumber))
         {
             Debug.LogError($"SpawnMissingStone: DonutId가 없어 누락된 돌(ID: {stoneInfo.StoneId})을 생성할 수 없습니다.");
             return null;
         }
 
-        DonutData donutDataToSpawn = DataManager.Instance.GetDonutByID(stoneInfo.DonutId);
+        DonutData donutDataToSpawn = DataManager.Instance.GetDonutByID(stoneInfo.DonutTypeAndNumber);
         if (donutDataToSpawn == null || donutDataToSpawn.prefab == null)
         {
-            Debug.LogError($"SpawnMissingStone: DonutId '{stoneInfo.DonutId}'에 해당하는 프리팹을 찾을 수 없습니다.");
+            Debug.LogError($"SpawnMissingStone: DonutId '{stoneInfo.DonutTypeAndNumber}'에 해당하는 프리팹을 찾을 수 없습니다.");
             return null;
         }
 
@@ -491,7 +491,7 @@ public class StoneManager : MonoBehaviour
 
         // 서버에서 받은 정보로 돌 초기화
         StoneForceController_Firebase.Team team = (stoneInfo.Team == "A") ? StoneForceController_Firebase.Team.A : StoneForceController_Firebase.Team.B;
-        sfc.InitializeDonut(team, type, stoneInfo.StoneId, stoneInfo.DonutId, stoneInfo.Weight, stoneInfo.Resilience, stoneInfo.Friction);
+        sfc.InitializeDonut(team, type, stoneInfo.StoneId, stoneInfo.DonutTypeAndNumber, stoneInfo.Weight, stoneInfo.Resilience, stoneInfo.Friction);
 
         // 올바른 딕셔너리에 추가
         if (team == StoneForceController_Firebase.Team.A)
@@ -537,7 +537,7 @@ public class StoneManager : MonoBehaviour
                 {
                     StoneId = sfc.donutId,
                     Team = sfc.team.ToString(),
-                    DonutId = sfc.DonutId,
+                    DonutTypeAndNumber = sfc.DonutTypeAndNumber,
                     Weight = sfc.DonutWeight,
                     Resilience = sfc.DonutResilience,
                     Friction = sfc.DonutFriction,
@@ -571,7 +571,7 @@ public class StoneManager : MonoBehaviour
                 {
                     StoneId = sfc.donutId,
                     Team = sfc.team.ToString(),
-                    DonutId = sfc.DonutId,
+                    DonutTypeAndNumber = sfc.DonutTypeAndNumber,
                     Weight = sfc.DonutWeight,
                     Resilience = sfc.DonutResilience,
                     Friction = sfc.DonutFriction,

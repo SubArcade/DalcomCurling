@@ -663,7 +663,8 @@ public class StoneShoot_Firebase : MonoBehaviour
                     {
                         uiLaunch.ShowFloatingText("Failed", _mainCamera.WorldToScreenPoint(_currentStoneRb.transform.position));
                     }
-                    FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, shotData.DonutId);
+                    //FirebaseGameManager.Instance.HandleTapFailed(_currentStoneRb, shotData.DonutTypeAndNumber);
+                    FirebaseGameManager.Instance.PlayerLostTimeToShotInTime(_currentStoneRb, "TapFailed");
                     DisableInput();
                     return;
                 }
@@ -692,8 +693,8 @@ public class StoneShoot_Firebase : MonoBehaviour
         {
             Debug.Log("미리 입력된 샷으로 발사를 시작합니다.");
             CurrentState = LaunchState.MovingToHogLine; // 호그 라인 이동 상태로 변경
+            _needToTap = true; // 미리 준비된 샷은 탭 입력이 필요없도록 
             MoveDonutToHogLine(_preparedShotData); // 미리 준비된 샷 데이터로 돌 이동
-            _needToTap = false; // 미리 준비된 샷은 탭 입력이 필요없도록 
             _preparedShotData = null; // 사용한 샷 데이터 초기화
             return true; // 샷 실행됨
         }
