@@ -70,11 +70,13 @@ public class SoundManager : MonoBehaviour
                 if (!eventRef.IsNull)
                 {
                     // FMOD 경로에서 이벤트 이름 추출 (예: "event:/SFX/Merge_Donut" -> "Merge_Donut")
-                    string eventName = GetEventName(eventRef.Path);
+                    string path;
+                    FMODUnity.RuntimeManager.StudioSystem.lookupPath(eventRef.Guid, out path);
+                    string eventName = GetEventName(path);
 
                     if (soundEventMap.ContainsKey(eventName))
                     {
-                        Debug.LogWarning($"[SoundManager] 딕셔너리에 이미 '{eventName}' 키가 존재합니다. 이벤트: {eventRef.Path}");
+                        Debug.LogWarning($"[SoundManager] 딕셔너리에 이미 '{eventName}' 키가 존재합니다. 이벤트: {path}");
                         continue;
                     }
 
@@ -188,7 +190,9 @@ public class SoundManager : MonoBehaviour
 
             if (!currentBGM.IsNull)
             {
-                string bgmName = GetEventName(currentBGM.Path);
+                string path;
+                FMODUnity.RuntimeManager.StudioSystem.lookupPath(currentBGM.Guid, out path);
+                string bgmName = GetEventName(path);
                 Debug.Log($"[SoundManager] BGM 재생: {bgmName} (인덱스: {currentBGMIndex + 1}/{currentBGMPlaylist.Count})");
 
                 currentBGMInstance = RuntimeManager.CreateInstance(currentBGM);
