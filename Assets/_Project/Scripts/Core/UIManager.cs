@@ -34,6 +34,7 @@ public enum PanelId
     GameHelpPopup,
     LevelUpRewardPopUp,
     UseGiftBoxPopup,
+    GuestPopup,
 }
 
 public class UIManager : MonoBehaviour
