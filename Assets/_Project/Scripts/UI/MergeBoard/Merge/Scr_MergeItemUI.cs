@@ -102,9 +102,13 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         // 휴지통
         if (targetObj != null && targetObj.CompareTag("TrashCan"))
         {
-            Debug.Log($"{name} 휴지통으로 삭제됨");
+            if (donutData != null && donutData.donutType == DonutType.Gift)
+            {
+                ResetPosition();
+                return;
+            }
 
-            //TODO: 여기에서 삭제여부 팝업 추가예정
+            Debug.Log($"{name} 휴지통으로 삭제됨");
 
             // 셀 참조 초기화
             if (currentCell != null)
