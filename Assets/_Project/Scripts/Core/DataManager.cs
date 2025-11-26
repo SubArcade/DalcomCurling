@@ -29,7 +29,7 @@ public class UserDataRoot
 {
     [field: SerializeField] [FirestoreProperty] public PlayerData player { get; set; } = new PlayerData(){
         email = "test@test.com",
-        nickname = "test",
+        nickname = "Dalcom",
         gold = 5000,
         gem = 1000,
         energy = 2000,

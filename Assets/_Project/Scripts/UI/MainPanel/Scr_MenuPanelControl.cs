@@ -52,8 +52,9 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private TMP_Text goldText;
     [SerializeField] private TMP_Text gemText;
     
-    public GameObject testLoginPanel;
     public Button testLevelUpButton;
+
+    [SerializeField] private Button gpgsLogin;
     
     void Awake()
     {
@@ -78,8 +79,6 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.LevelUpRewardPopUp, levelUpRewardPopUp);
         UIManager.Instance.RegisterPanel(PanelId.UseGiftBoxPopUp, useGiftBoxPopup);
         UIManager.Instance.RegisterPanel(PanelId.GuestPopup, guestPopup);
-
-        UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
         
         playerLevelInfoButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.PlayerLevelInfoPopup));
         donutCodexButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DonutCodexPopup));
@@ -95,6 +94,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
         
         testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
+        
+        //gpgsLogin.onClick.AddListener();
     }
 
     //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;

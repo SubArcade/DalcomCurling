@@ -125,10 +125,14 @@ public class GameManager : MonoBehaviour
         pendingGold = gold;
         pendingPoint = point;
     }
+    
+    // 게임 종료 후 바로 실행되는 함수
     public void ApplyResultRewards()
     {
         if (State == GameState.Lobby)
         {
+            UIManager.Instance.Open(PanelId.MainPanel);
+            
             int oldLevel = DataManager.Instance.PlayerData.level;
 
             // 실제 데이터 반영
