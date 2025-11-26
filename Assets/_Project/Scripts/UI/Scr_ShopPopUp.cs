@@ -8,10 +8,12 @@ public class Scr_ShopPopUp : MonoBehaviour
 {
     [Header("캐시상점 토글")]
     [SerializeField] private Toggle cashShopBtn;
+    [SerializeField] private Image cashShopImg;
     [SerializeField] private Outline cashShopOutline;
 
     [Header("골드상점 토글")]
     [SerializeField] private Toggle goldShopBtn;
+    [SerializeField] private Image goldShopImg;
     [SerializeField] private Outline goldShopOutline;
 
     [Header("로비로 돌아가기 버튼")]
@@ -47,18 +49,23 @@ public class Scr_ShopPopUp : MonoBehaviour
     private readonly Vector2 inactiveThickness = new Vector2(2f, 2f);
     //상점 토글의 아웃라인 관리용 변수들
 
+    // ✅ 이미지 색상 관리용
+    private readonly Color selectedImgColor = new Color32(0xFE, 0xD3, 0x7E, 0xFF); // 선택시FED37E
+    private readonly Color defaultImgColor = new Color32(0x2B, 0x3F, 0x5D, 0xFF);   // 선택이 아닐시2B3F5D
+
     void Awake()
     {
- 
     }
     void Start()
     {
         bool isCashOn = cashShopBtn.isOn;
 
         cashShopOutline.effectColor = isCashOn ? activeColor : inactiveColor;
+        cashShopImg.color = isCashOn ? selectedImgColor : defaultImgColor;
         cashShopOutline.effectDistance = isCashOn ? activeThickness : inactiveThickness;
 
         goldShopOutline.effectColor = isCashOn ? inactiveColor : activeColor;
+        goldShopImg.color = isCashOn ? defaultImgColor : selectedImgColor;
         goldShopOutline.effectDistance = isCashOn ? inactiveThickness : activeThickness;
 
         //캐시상점 열기
@@ -74,8 +81,12 @@ public class Scr_ShopPopUp : MonoBehaviour
 
                 goldShopOutline.effectColor = inactiveColor;
                 goldShopOutline.effectDistance = inactiveThickness;
+
+                cashShopImg.color = selectedImgColor;
+                goldShopImg.color = defaultImgColor;
             }
         });
+
         //골드상점열기
         goldShopBtn.onValueChanged.AddListener((isOn) =>
         {
@@ -89,8 +100,13 @@ public class Scr_ShopPopUp : MonoBehaviour
 
                 cashShopOutline.effectColor = inactiveColor;
                 cashShopOutline.effectDistance = inactiveThickness;
+
+                goldShopImg.color = selectedImgColor;
+                cashShopImg.color = defaultImgColor;
+
             }
         });
+
         //로비로 돌아가버리는 버튼
         robbyButton.onClick.AddListener(() =>
         {

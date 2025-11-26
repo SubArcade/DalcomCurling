@@ -15,7 +15,13 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
 
     void Start()
     {
-        cancleBtn.onClick.AddListener(() => UIManager.Instance.Close(PanelId.DeleteAccountPopUp));
+        cancleBtn.onClick.AddListener(() => 
+        {
+            UIManager.Instance.Close(PanelId.DeleteAccountPopUp);
+            UIManager.Instance.Open(PanelId.DetailedSettingsPanel);
+            
+        });
+
         confirmBtn.onClick.AddListener(() => OnConfirmBtn());
 
     }

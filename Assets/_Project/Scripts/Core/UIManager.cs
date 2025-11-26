@@ -112,6 +112,36 @@ public class UIManager : MonoBehaviour
             
         }
 
+        // 현재 판넬 업데이트 하기전에 애널리틕스 종료
+        switch (id)
+        {
+            case PanelId.ReadyMenuPanel:
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.ready_open, false);
+                OnReadyPanelOpen?.Invoke();
+                break;
+            case PanelId.DonutCodexPopup:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.donutbook_open, false);
+                break;
+            case PanelId.DonutUpgradePopup:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.upgrade_open, false);
+                break;
+            case PanelId.PlayerLevelInfoPopup:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.profile_open, false);
+                break;
+            case PanelId.EntryPopUp:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.entry_open, false);
+                break;
+            case PanelId.ShopPopUp:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.shop_open, false);
+                break;
+            case PanelId.MatchingPopUp:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.match_search_start, false);
+                break;
+            default:
+                break;
+        }
+        
         switch (id) 
         {
             case PanelId.StartPanel:
@@ -122,10 +152,34 @@ public class UIManager : MonoBehaviour
                 break;
             case PanelId.ReadyMenuPanel:
                 currentPanel[PanelId.MainPanel].SetActive(true);
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.ready_open, true);
                 OnReadyPanelOpen?.Invoke();
                 break;
+            case PanelId.DonutCodexPopup:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.donutbook_open, true);
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                break;
+            case PanelId.DonutUpgradePopup:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.upgrade_open, true);
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                break;
+            case PanelId.PlayerLevelInfoPopup:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.profile_open, true);
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                break;
+            case PanelId.EntryPopUp:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.entry_open, true);
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                break;
+            case PanelId.ShopPopUp:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.shop_open, true);
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                break;
+            case PanelId.MatchingPopUp:
+                AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.match_search_start, true);
+                currentPanel[PanelId.MainPanel].SetActive(true);
+                break;
             default:
-                //Debug.Log("vkvkvkvkvkvkvk");
                 currentPanel[PanelId.MainPanel].SetActive(true);
                 break;
         }
@@ -147,8 +201,7 @@ public class UIManager : MonoBehaviour
         {
             yield return null;
         }
-            onClose?.Invoke();
-
+        onClose?.Invoke();
     }
 
     
