@@ -10,6 +10,12 @@ public class ButtonSound : MonoBehaviour
         {
             button.onClick.AddListener(OnButtonClicked);
         }
+
+        Toggle toggle = GetComponent<Toggle>();
+        if (toggle != null)
+        {
+            toggle.onValueChanged.AddListener(delegate {OnButtonClicked();});
+        }
     }
 
     private void OnButtonClicked()

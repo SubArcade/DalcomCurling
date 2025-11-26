@@ -191,8 +191,16 @@ public class BoardManager : MonoBehaviour
         if (target == null)
         {
             Debug.Log("빈 칸이 없습니다.");
+            
+            // + 도넛의 포화상태때 생성 시도를 할때 나는 사운드 ---
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.saturation(transform.position);
+            }
+           
             return;
         }
+
         PlayerData playerData = DataManager.Instance.PlayerData;
         if (playerData.energy <= 0)
         {
@@ -228,6 +236,11 @@ public class BoardManager : MonoBehaviour
         target.SetItem(item, donutData);
 
 
+        // + 생성기에서 도넛을 생성 했을때 나는 사운드 ---
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.createDonut();
+        }
 
         //Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
         AutoSaveBoardLocal();
@@ -527,7 +540,6 @@ public class BoardManager : MonoBehaviour
 
         Debug.Log("[LoadBoardLocal] 보드 로드 완료");
     }
-
 
     // 임시보관칸에서 보드판에 생성
     public void SpawnFromTempStorage(GiftBoxData giftData)

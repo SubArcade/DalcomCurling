@@ -277,8 +277,5 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         text.text = Mathf.RoundToInt(restoredValue * 100f).ToString();
         gage.fillAmount = restoredValue;
 
-        // 복구된 값으로 저장합니다.
-        PlayerPrefs.SetFloat(key, restoredValue);
-        PlayerPrefs.Save();
     }
 }

@@ -62,6 +62,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         transform.SetParent(canvas.transform, true);
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.8f;
+        
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -73,6 +74,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             out Vector2 pos);
 
         rectTransform.anchoredPosition = pos;
+
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -98,7 +100,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             if (targetCell == null)
                 targetCell = hit.gameObject.GetComponentInParent<Cells>();
         }
-
+        
         // 휴지통
         if (targetObj != null && targetObj.CompareTag("TrashCan"))
         {
@@ -109,6 +111,12 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             }
 
             Debug.Log($"{name} 휴지통으로 삭제됨");
+
+            // + 휴지통에 도넛을 넣었을 시에 재생되는 사운드 추가 ---
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.sellDonut(transform.position);
+            }
 
             // 셀 참조 초기화
             if (currentCell != null)
@@ -123,6 +131,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
             Destroy(gameObject); // 오브젝트 삭제
             return;
+
         }
 
         // 임시보관칸에 드래그 금지

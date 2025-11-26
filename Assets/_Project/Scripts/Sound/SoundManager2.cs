@@ -48,6 +48,13 @@ public class SoundManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        float savedBGM = PlayerPrefs.GetFloat("BGMVolume", 1f);
+        float savedSFX = PlayerPrefs.GetFloat("SFXVolume", 1f);
+
+        SetBGMVolume(savedBGM);
+        SetSFXVolume(savedSFX);
+
     }
 
     /// <summary>
@@ -223,13 +230,12 @@ public class SoundManager : MonoBehaviour
     }
 
 
-    #region SFX 사운드 모음
 
     // SFX 재생 (세분화된 호출)
 
     /// 딕셔너리에 등록된 이벤트 이름으로 SFX를 재생합니다.
     /// 모든 인게임/아웃게임 SFX는 이 메서드를 통해 이름으로 호출됩니다.
-    /// 
+
     /// <param name="eventName">InitializeSoundMap에서 등록된 이벤트의 이름입니다.</param>
     public void PlaySFX(string eventName, Vector3 position = default(Vector3))
     {
@@ -241,13 +247,15 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    #region 아웃게임 SFX 사운드 모음
+
     // 일반 버튼 누를 시
     public void buttonClick(Vector3 position = default(Vector3))
     {
         PlaySFX("01_ui_menu_button_beep_19", position);
     }
 
-    // 컨 선택 시 / 새로운 주문서 등장 시
+    // 칸 선택 시 / 새로운 주문서 등장 시 / 유닛 이동 시(유닛끼리 자리 바뀔 시)
     public void selectSlotScroll(Vector3 position = default(Vector3))
     {
         PlaySFX("02_item_pickup_swipe_01", position);
@@ -305,6 +313,130 @@ public class SoundManager : MonoBehaviour
     public void getGold(Vector3 position)
     {
         PlaySFX("10_coin_bag_ring_gemstone_item_15", position);
+    }
+
+    #endregion
+
+    #region 인게임 SFX 모음
+
+    // 캐릭터/도넛 엔트리 등장 사운드
+    public void appearEntry(Vector3 position)
+    {
+        PlaySFX("01_explosion_small_02", position);
+    }
+
+    // VS 연출 사운드
+    public void appearVS(Vector3 position)
+    {
+        PlaySFX("02_punch_grit_wet_impact_03", position);
+    }
+
+    // Round Start / Turn Start 사운드
+    public void roundturnStart(Vector3 position)
+    {
+        PlaySFX("03_sci-fi_power_up_03", position);
+    }
+
+    // 도넛 선택 사운드
+    public void selectDonut(Vector3 position)
+    {
+        PlaySFX("04_ui_menu_button_beep_11", position);
+    }
+
+    // 파워 드래그 사운드
+    public void powerDrag(Vector3 position)
+    {
+        PlaySFX("05_powerup_whiz_nightvision_goggles_on_01", position);
+    }
+
+    // 스핀 조작 (좌/우 드래그) 사운드
+    public void spinControl(Vector3 position)
+    {
+        PlaySFX("06_whistle_slide_up_06", position);
+    }
+
+    // 10초 타이머 사운드
+    public void tenTimer(Vector3 position)
+    {
+        PlaySFX("07_ui_menu_button_beep_19", position);
+    }
+
+    // TIME OVER 사운드
+    public void timeOver(Vector3 position)
+    {
+        PlaySFX("08_chime_bell_02", position);
+    }
+
+    // 타이밍 퍼펙트 터치 사운드
+    public void timingPerfectTouch(Vector3 position)
+    {
+        PlaySFX("09_ui_menu_button_confirm_01", position);
+    }
+
+    // 타이밍 얼리 터치 사운드
+    public void timingEarlyTouch(Vector3 position)
+    {
+        PlaySFX("10_ui_menu_button_confirm_06", position);
+    }
+
+    // 5배속 프리뷰 시작 사운드
+    public void timerFast(Vector3 position)
+    {
+        PlaySFX("11_cartoon_electronic_computer_code_07", position);
+    }
+
+    // 얼음 위 활주 기본 사운드
+    public void slideSound(Vector3 position)
+    {
+        PlaySFX("12_ice_cracking_melting_02", position);
+    }
+
+    // 도넛 - 도넛 충돌 약하게 사운드
+    public void stoneCrashweak(Vector3 position)
+    {
+        PlaySFX("13_02_Synth_Boing_4", position);
+    }
+    
+    // 도넛 - 도넛 충돌 강하게 사운드
+    public void stoneCrashstrong(Vector3 position)
+    {
+        PlaySFX("14_cartoon_boing_jump_15", position);
+    }
+
+    // OUT 판정 사운드
+    public void outDecide(Vector3 position)
+    {
+        PlaySFX("15_comedy_bite_chew_05", position);
+    }
+
+    // 턴 하이라이트 (가장 가까운 도넛 표시) 사운드
+    public void highlightTurn(Vector3 position)
+    {
+        PlaySFX("16_ui_menu_button_beep_13", position);
+    }
+
+    // 라운드 점수 집계 사운드 
+    public void resultSoundscore(Vector3 position)
+    {
+        PlaySFX("17_ui_menu_popup_message_07", position);
+    }
+
+    // DRAW 사운드 
+    public void drawDecide(Vector3 position)
+    {
+        PlaySFX("18_music_sting_short_groovy_flute_03", position);
+    }
+
+    // YOU WIN 사운드 
+    public void winDecide(Vector3 position)
+    {
+        PlaySFX("19_Positive_07", position);
+    }
+
+    // YOU LOSE 사운드 
+    public void loseDecide(Vector3 position)
+    {
+        PlaySFX("20_Negative_09", position);
     }
 
     #endregion
