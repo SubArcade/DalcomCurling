@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 
 public class UI_LaunchIndicator_Firebase : MonoBehaviour
 {

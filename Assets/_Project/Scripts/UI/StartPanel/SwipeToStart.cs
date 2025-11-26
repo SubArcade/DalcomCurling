@@ -1,6 +1,6 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using DG.Tweening;
 using UnityEngine.UI;
 
 public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandler

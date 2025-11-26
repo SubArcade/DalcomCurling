@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
 using TMPro;
-using DG.Tweening;
+using UnityEngine;
 
 /// <summary>
 /// 플로팅 텍스트의 동작을 제어하는 스크립트. 활성화 시 애니메이션을 실행하고 자동으로 비활성화됩니다.

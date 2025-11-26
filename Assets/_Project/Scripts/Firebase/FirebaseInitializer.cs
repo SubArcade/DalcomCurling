@@ -1,5 +1,5 @@
-﻿using Firebase;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Firebase;
 using UnityEngine;
 
 public class FirebaseInitializer : MonoBehaviour

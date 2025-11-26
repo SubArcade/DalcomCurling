@@ -1,8 +1,8 @@
-﻿using Firebase.Firestore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Firebase.Firestore;
 using UnityEngine;
 
 public enum GameMode
@@ -43,6 +43,7 @@ public class UserDataRoot
         soloTier = GameTier.Bronze,
         levelMax = 20,
     };
+    
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData()
     {
         donutEntries = new List<DonutEntry>()

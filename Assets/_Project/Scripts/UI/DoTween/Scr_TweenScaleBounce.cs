@@ -1,5 +1,5 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
 /// <summary>
 /// UI 요소의 크기를 조절하여 바운스 효과를 주는 컴포넌트입니다.

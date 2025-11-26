@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 using TMPro;
-using System;
+using UnityEngine;
 
 /// <summary>
 /// 게임 시작 시 플레이어 또는 상대방의 닉네임을 TextMeshProUGUI에 표시하는 스크립트입니다.
