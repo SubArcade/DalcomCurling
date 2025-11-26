@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class Scr_DonutUpgradePopUp : MonoBehaviour
 {
     private DataManager Data => DataManager.Instance;
@@ -35,15 +34,14 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     [Header("업그레이드 질문 팝업")]
     [SerializeField] private GameObject AskUpgradePopUp;
     [SerializeField] private GameObject FailUpgradePopUp;
-
     
+    //TODO : 업그레이드 코스트 TextUI 연결
+    //UpgradeCost_Text로 되어있는 금액 텍스트 UpgradeCost 만큼 증가하게
+    //AskUpgradePopup에 있는 텍스트도 출력될때 UpgradeCost 노출
+    //금액소모 시 Data값은 들어감 현재남은 재화 UI를 새로고침 해주는함수 호출해야함
+
     //도넛 업그레이드 레벨 체크용도
-    
     private const int MaxLevel = 20;
-    void Awake()
-    {
-
-    }
 
     void Start()
     {
@@ -86,6 +84,17 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             return;
         }
 
+        int playerLevel = Data.PlayerData.level;
+        if (hardLevel >= playerLevel) return;
+
+        int cost = GetUpgradeCost(hardLevel);
+        if (Data.PlayerData.gold < cost)
+        {
+            FailUpgradePopUp.SetActive(true);
+            return;
+        }
+        Data.PlayerData.gold -= cost;
+
         hardLevel++;
         Data.MergeBoardData.generatorLevelHard = hardLevel;
 
@@ -103,6 +112,17 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             MoistUpgradeMax.SetActive(true);
             return;
         }
+
+        int playerLevel = Data.PlayerData.level;
+        if (moistLevel >= playerLevel) return;
+
+        int cost = GetUpgradeCost(moistLevel);
+        if (Data.PlayerData.gold < cost)
+        {
+            FailUpgradePopUp.SetActive(true);
+            return;
+        }
+        Data.PlayerData.gold -= cost;
 
         moistLevel++;
         Data.MergeBoardData.generatorLevelMoist = moistLevel;
@@ -122,10 +142,32 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             return;
         }
 
+        int playerLevel = Data.PlayerData.level;
+        if (softLevel >= playerLevel) return;
+
+        int cost = GetUpgradeCost(softLevel);
+        if (Data.PlayerData.gold < cost)
+        {
+            FailUpgradePopUp.SetActive(true);
+            return;
+        }
+        Data.PlayerData.gold -= cost;
+
         softLevel++;
         Data.MergeBoardData.generatorLevelSoft = softLevel;
 
         UpdateDonutText(softLevel, "말랑", SoftDonutCreatText, SoftDonutOptionText);
+    }
+
+    //업그레이드 비용
+    private int GetUpgradeCost(int level)
+    {
+        if (level <= 10)
+        {
+            return level * 1000;
+        }
+
+        return 10000 + (level * 5000);
     }
 
     ////도넛 업그레이드 시 레벨업 & 만렙 도달시 업그레이드 비활성화
