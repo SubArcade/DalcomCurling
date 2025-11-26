@@ -1,6 +1,7 @@
-﻿using System;
-using Firebase.Firestore;
+﻿using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -601,6 +602,26 @@ public class DataManager : MonoBehaviour
         }
         
     }
+
+    /// <summary>
+    /// 게임 매니저로부터 받은 변경된 인벤토리와 점수 데이터를 적용하고 DB에 저장합니다.
+    /// 게임진입시 선반영하는 패널티요소를 위한 동작으로 한번만 수행됨
+    /// </summary>
+    public async Task ApplyPenaltyData(List<DonutEntry> updatedDonutEntries, int newScore)
+    {
+        // 1. 로컬 데이터 업데이트
+        InventoryData.donutEntries = updatedDonutEntries;
+        PlayerData.soloScore = newScore;
+
+        // 2. Firestore에 모든 변경사항 저장
+        await SaveAllUserDataAsync();
+        
+        // 3. 로컬 리스너에게 변경사항 알림
+        OnUserDataChanged?.Invoke(PlayerData);
+        OnUserDataRootChanged?.Invoke(userData);
+        Debug.Log($"페널티 데이터 적용 완료. 현재 점수: {newScore}");
+    }
+
     
     //생성기 레벨 받아오기
     public int GetGeneratorLevel(DonutType type)
@@ -833,5 +854,51 @@ public class DataManager : MonoBehaviour
             Debug.LogError($"[FS][READ][ERR] Failed to get user data for {uId}: {e}");
             return null;
         }
+    }
+
+
+
+    /// <summary>
+    /// 승리 시 획득한 도넛 2개를 머지 보드의 빈 셀에 추가하고 DB에 저장합니다.
+    /// </summary>
+    public async Task AddDonutsToMergeBoard(string donutId1, string donutId2)
+    {
+        var emptyCells = MergeBoardData.cells.Where(c => string.IsNullOrEmpty(c.donutId)).ToList();
+        int addedCount = 0;
+
+        // 첫 번째 도넛 추가 시도
+        if (emptyCells.Count > 0)
+        {
+            emptyCells[0].donutId = donutId1;
+            addedCount++;
+            Debug.Log($"도넛 획득: {donutId1}가 인벤토리에 추가되었습니다.");
+        }
+        else
+        {
+            Debug.LogWarning($"도넛 획득 실패: {donutId1}를 위한 인벤토리(머지 보드) 공간이 부족합니다.");
+        }
+
+        // 두 번째 도넛 추가 시도
+        if (emptyCells.Count > 1)
+        {
+            emptyCells[1].donutId = donutId2;
+            addedCount++;
+            Debug.Log($"도넛 획득: {donutId2}가 인벤토리에 추가되었습니다.");
+        }
+        else if (addedCount == 1) // 첫 번째 도넛은 추가되었으나 두 번째 도넛을 위한 공간이 없을 경우
+        {
+            Debug.LogWarning($"도넛 획득 실패: {donutId2}를 위한 인벤토리(머지 보드) 공간이 부족합니다.");
+        }
+        else // 두 도넛 모두 추가 실패
+        {
+            Debug.LogWarning("도넛 획득 실패: 인벤토리(머지 보드)에 공간이 부족합니다.");
+            return; // 추가할 공간이 없으면 저장할 필요 없음
+        }
+
+        // Firestore에 변경사항 저장
+        await SaveAllUserDataAsync();
+
+        // 로컬 리스너에게 변경사항 알림
+        OnUserDataRootChanged?.Invoke(userData);
     }
 }

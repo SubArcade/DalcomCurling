@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public enum GameState
 {
@@ -20,6 +21,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject notifier;
     
     public event Action<PlayerData> LevelUpdate;
+
+    // 페널티로 제거된 도넛 정보를 임시 저장하기 위한 변수
+    private DonutEntry penalizedDonut1;
+    private DonutEntry penalizedDonut2;
+    private int penaltyIndex1 = -1;
+    private int penaltyIndex2 = -1;
     
     private void Awake()
     {
@@ -168,5 +175,133 @@ public class GameManager : MonoBehaviour
         }
         
     }
-    
+
+    public void ApplyStartGamePenalty(int index1, int index2)
+    {
+        if (DataManager.Instance == null) return;
+
+        // 1. DataManager로부터 현재 데이터 가져오기
+        var currentDonuts = DataManager.Instance.InventoryData.donutEntries;
+        var currentScore = DataManager.Instance.PlayerData.soloScore;
+
+        if (currentDonuts == null || currentDonuts.Count < 5)
+        {
+            Debug.LogWarning("페널티를 적용할 수 없습니다: 도넛 인벤토리가 초기화되지 않았습니다.");
+            return;
+        }
+
+        // 1-1. 페널티 적용 전, 복구를 위해 현재 도넛 정보와 인덱스 저장
+        this.penaltyIndex1 = index1;
+        this.penalizedDonut1 = currentDonuts[index1];
+        this.penaltyIndex2 = index2;
+        this.penalizedDonut2 = currentDonuts[index2];
+
+        // 2. 새로운 데이터 상태 계산
+        currentDonuts[index1] = null;
+        currentDonuts[index2] = null;
+
+        int newScore = Mathf.Max(0, currentScore - 10);
+
+        // 3. DataManager에 변경된 데이터 저장을 요청
+        _ = DataManager.Instance.ApplyPenaltyData(currentDonuts, newScore);
+
+        Debug.Log($"게임 시작 페널티 로직 실행. 인덱스 {index1}, {index2}의 도넛이 제거됩니다.");
+    }
+
+    /// <summary>
+    /// 무승부 시, 페널티로 제거된 도넛을 복구하도록 DataManager에 요청합니다.
+    /// </summary>
+    public void ProcessDrawOutcome()
+    {
+        if (DataManager.Instance == null) return;
+        if (penaltyIndex1 == -1 || penaltyIndex2 == -1) // 페널티 정보가 유효하지 않으면 실행 안함
+        {
+            Debug.LogWarning("무승부 도넛 복구 실패: 페널티 정보가 유효하지 않습니다.");
+            return;
+        }
+
+        // DataManager의 SetDonutAt을 직접 호출하여 로컬 인벤토리 복구
+        DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+        DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+
+        // soloscore 10점 복구
+        DataManager.Instance.PlayerData.soloScore += 10;
+        Debug.Log($"무승부: soloscore 10점 복구. 현재 점수: {DataManager.Instance.PlayerData.soloScore}");
+
+        // 로컬 리스너에게 변경 알림 
+        //DataManager.Instance.OnUserDataChanged?.Invoke(DataManager.Instance.PlayerData);
+        //TODO : OnUserDataChanged는 여기서 호출안됨 변경알림때문에 문제 생길경우 수정해줘야함 
+
+        // 복구 요청 후 임시 데이터 초기화
+        penalizedDonut1 = null;
+        penalizedDonut2 = null;
+        penaltyIndex1 = -1;
+        penaltyIndex2 = -1;
+        Debug.Log("무승부: 페널티로 제거되었던 도넛이 로컬에서 복구되었습니다.");
+    }
+
+    /// <summary>
+    /// 승리 시, 페널티로 제거된 도넛을 복구하도록 DataManager에 요청합니다.
+    /// </summary>
+    public void ProcessWinOutcome()
+    {
+        if (DataManager.Instance == null) return;
+        if (penaltyIndex1 == -1 || penaltyIndex2 == -1) // 페널티 정보가 유효하지 않으면 실행 안함
+        {
+            Debug.LogWarning("승리 도넛 복구 실패: 페널티 정보가 유효하지 않습니다.");
+            return;
+        }
+
+        // DataManager의 SetDonutAt을 직접 호출하여 로컬 인벤토리 복구
+        DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+        DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+
+        // 복구 요청 후 임시 데이터 초기화
+        penalizedDonut1 = null;
+        penalizedDonut2 = null;
+        penaltyIndex1 = -1;
+        penaltyIndex2 = -1;
+        Debug.Log("승리: 페널티로 제거되었던 도넛이 로컬에서 복구되었습니다.");
+    }
+
+    /// <summary>
+    /// 승리 시 상대방의 도넛 엔트리에서 랜덤으로 2개를 복사하여 자신의 인벤토리에 추가합니다.
+    /// </summary>
+    /// <param name="opponentDonuts">상대방의 도넛 엔트리 리스트</param>
+    public void ProcessDonutCapture(List<DonutEntry> opponentDonuts)
+    {
+        if (DataManager.Instance == null || opponentDonuts == null || opponentDonuts.Count == 0)
+        {
+            Debug.LogWarning("도넛 획득 실패: 상대방 도넛 정보가 유효하지 않습니다.");
+            return;
+        }
+
+        List<DonutEntry> availableOpponentDonuts = opponentDonuts.Where(d => d != null).ToList();
+
+        if (availableOpponentDonuts.Count < 2)
+        {
+            Debug.LogWarning("도넛 획득 실패: 상대방의 유효한 도넛이 2개 미만입니다.");
+            return;
+        }
+
+        // 중복되지 않는 랜덤 인덱스 2개 선택
+        int index1 = UnityEngine.Random.Range(0, availableOpponentDonuts.Count);
+        int index2;
+        do
+        {
+            index2 = UnityEngine.Random.Range(0, availableOpponentDonuts.Count);
+        } while (index1 == index2);
+
+        DonutEntry capturedDonut1 = availableOpponentDonuts[index1];
+        DonutEntry capturedDonut2 = availableOpponentDonuts[index2];
+
+        if (capturedDonut1 != null && capturedDonut2 != null)
+        {
+            _ = DataManager.Instance.AddDonutsToMergeBoard(capturedDonut1.id, capturedDonut2.id);
+        }
+        else
+        {
+            Debug.LogError("도넛 획득 오류: 선택된 도넛 중 null이 있습니다. 로직을 확인하세요.");
+        }
+    }
 }

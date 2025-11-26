@@ -403,9 +403,17 @@ public class StoneManager : MonoBehaviour
                 stoneExists = _stoneControllers_B.TryGetValue(stonePos.StoneId, out fc);
             }
 
-            // 2. 돌이 없으면 새로 생성
+            // 2. 돌이 없으면 새로 생성 (단, 이미 아웃 처리된 돌은 제외)
             if (!stoneExists)
             {
+                // 서버가 보내준 위치가 아웃라인 밖인지 확인
+                Vector3 serverPos = new Vector3(stonePos.Position["x"], spawnPosition.position.y, stonePos.Position["z"]);
+                if (CheckDonutPassedOutLine(serverPos.z))
+                {
+                    // 로컬에 없는 돌이 서버에서도 아웃된 위치라면, 이미 클라이언트에서 정상적으로 아웃 처리된 것이므로 건너뛴다.
+                    continue;
+                }
+
                 Debug.LogWarning($"로컬에 없는 돌(Team: {stonePos.Team}, ID: {stonePos.StoneId})을 서버 데이터로 새로 생성합니다.");
                 fc = SpawnMissingStone(stonePos);
                 if (fc == null)
@@ -881,13 +889,14 @@ public class StoneManager : MonoBehaviour
     public void DonutOut(StoneForceController_Firebase donut, string message = "Out") //도넛의 아웃 판정
     {
         if (donut == null) return;
-        ShowWorldSpaceFeedback(donut.transform.position, message); //도넛이 아웃판정 받았을때 UI처리
+        
 
         if (donut.team == StoneForceController_Firebase.Team.A)
         {
             if (_stoneControllers_A.ContainsKey(donut.donutId))
             {
                 _stoneControllers_A.Remove(donut.donutId);
+                ShowWorldSpaceFeedback(donut.transform.position, message); //도넛이 아웃판정 받았을때 UI처리
             }
         }
         else
@@ -895,6 +904,7 @@ public class StoneManager : MonoBehaviour
             if (_stoneControllers_B.ContainsKey(donut.donutId))
             {
                 _stoneControllers_B.Remove(donut.donutId);
+                ShowWorldSpaceFeedback(donut.transform.position, message);
             }
         }
 

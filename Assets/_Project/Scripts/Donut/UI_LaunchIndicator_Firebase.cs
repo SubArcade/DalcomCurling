@@ -219,11 +219,11 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     /// </summary>
 
 
-    public void FinishedUI() // 게임종료 - 결과창
+    public void FinishedUI(FirebaseGameManager.GameOutcome outcome) // 게임종료 - 결과창
     {
         AllcloseUI();
         result.SetActive(true);
-        ResultRewardView();
+        ResultRewardView(outcome);
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
@@ -298,19 +298,36 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         }
     }
 
-    public void ResultRewardView() 
+    public void ResultRewardView(FirebaseGameManager.GameOutcome outcome) 
     {
-        int exp = 10;
+        int exp = 0;
+        int rewardGold = 0;
+        int rewardPoint = 0;
 
-
-        // 골드는 100~300 랜덤
-        int rewardGold = Random.Range(100, 150);
-
-        // 포인트는 10~20 랜덤
-        int rewardPoint = Random.Range(10, 20);
+        switch (outcome)
+        {
+            case FirebaseGameManager.GameOutcome.Win:
+                exp = 15;
+                rewardGold = 150;
+                rewardPoint = 20; // 페널티 복구 10점 + 승리 보너스 10점
+                GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
+                GameManager.Instance.ProcessDonutCapture(OpponentProfile.Inventory.donutEntries); // 상대 도넛 획득
+                break;
+            case FirebaseGameManager.GameOutcome.Lose:
+                exp = 8;
+                rewardGold = 50;
+                rewardPoint = 0; // 솔로스코어는 미리 반영되었으므로 0
+                break;
+            case FirebaseGameManager.GameOutcome.Draw:
+                exp = 10;
+                rewardGold = 100;
+                rewardPoint = 0; // 페널티로 잃었던 10점 복구
+                GameManager.Instance.ProcessDrawOutcome(); // 페널티로 제거되었던 도넛 복구
+                break;
+        }
 
         // UI 텍스트 갱신
-        int previewLevel = DataManager.Instance.PlayerData.exp + exp;
+        // int previewLevel = DataManager.Instance.PlayerData.exp + exp; // 이 부분은 이제 필요 없음.
 
         if (expText != null) expText.text = $"+{exp}";
         if (goldText != null) goldText.text = $"+{rewardGold}";
