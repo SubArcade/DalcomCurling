@@ -1,5 +1,5 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
 /// <summary>
 /// RectTransform을 이용하여 UI 요소를 슬라이드 인 효과로 보여주는 컴포넌트입니다.

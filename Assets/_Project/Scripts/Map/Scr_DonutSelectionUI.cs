@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -102,27 +102,33 @@ public class DonutSelectionUI : MonoBehaviour
     }
     
     /// <summary>
-    /// 특정 도넛을 '사용됨'으로 표시하고, 다음 사용 가능한 도넛을 자동으로 선택합니다.
+    /// 현재 선택된 도넛 슬롯의 인덱스를 반환합니다.
     /// </summary>
-    /// <param name="usedEntry">사용된 도넛 엔트리 데이터.</param>
-    public void MarkDonutAsUsed(DonutEntry usedEntry)
+    public int GetSelectedDonutIndex()
     {
-        if (usedEntry == null) return;
+        return _selectedIndex;
+    }
 
-        for (int i = 0; i < donutSlots.Count; i++)
+    /// <summary>
+    /// 특정 인덱스의 도넛을 '사용됨'으로 표시하고, 다음 사용 가능한 도넛을 자동으로 선택합니다.
+    /// </summary>
+    /// <param name="usedIndex">사용된 도넛 슬롯의 인덱스.</param>
+    public void MarkDonutAsUsed(int usedIndex)
+    {
+        if (usedIndex < 0 || usedIndex >= donutSlots.Count) return;
+
+        var slotToMark = donutSlots[usedIndex];
+
+        if (slotToMark.gameObject.activeSelf && !slotToMark.IsUsed())
         {
-            if (donutSlots[i].gameObject.activeSelf && donutSlots[i].GetDonutEntry()?.id == usedEntry.id)
-            {
-                donutSlots[i].SetUsed(true);
-                donutSlots[i].SetSelected(false); // 사용되었으므로 선택 해제
-                //Debug.Log($"DonutSelectionUI: 도넛 {usedEntry.id} 사용됨으로 표시.");
+            slotToMark.SetUsed(true);
+            slotToMark.SetSelected(false);
+            //Debug.Log($"DonutSelectionUI: 도넛 슬롯 {usedIndex} 사용됨으로 표시.");
 
-                // 현재 선택된 도넛이 방금 사용한 도넛이었다면, 다음 도넛을 선택합니다.
-                if (_selectedIndex == i)
-                {
-                    SelectNextAvailableDonut(i);
-                }
-                break;
+            // 현재 선택된 도넛이 방금 사용한 도넛이었다면, 다음 도넛을 선택합니다.
+            if (_selectedIndex == usedIndex)
+            {
+                SelectNextAvailableDonut(usedIndex);
             }
         }
     }

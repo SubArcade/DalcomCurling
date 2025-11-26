@@ -145,10 +145,12 @@ public class UIManager : MonoBehaviour
         switch (id) 
         {
             case PanelId.StartPanel:
-            case PanelId.LoginPanel:
             case PanelId.TestLoginPanel:
                 break;
             case PanelId.MainPanel:
+                break;
+            case PanelId.LoginPanel:
+                currentPanel[PanelId.StartPanel].SetActive(true);
                 break;
             case PanelId.ReadyMenuPanel:
                 currentPanel[PanelId.MainPanel].SetActive(true);

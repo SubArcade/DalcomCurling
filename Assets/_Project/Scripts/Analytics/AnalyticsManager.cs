@@ -85,14 +85,8 @@ public class AnalyticsManager : MonoBehaviour
     public void QuestRewardComplete() => LogCount("questReward_complete", "OutGame");
 
     // 상점 Shop
-    public void ShopPurchaseTry(string productId) =>
-        FirebaseAnalytics.LogEvent("shop_purchase_try",
-            new Parameter("product_id", productId));
-
-    public void ShopPurchaseResult(string productId, bool success) =>
-        FirebaseAnalytics.LogEvent("shop_purchase_result",
-            new Parameter("product_id", productId),
-            new Parameter("result", success ? "Success" : "Fail"));
+    public void ShopPurchaseTry() => LogCount("shop_purchase_try", "Shop");
+    public void ShopPurchaseResult() => LogCount("shop_purchase_result", "Shop");
 
     // 엔트리/레디 Entry/Ready
     public void ReadyEquip(string donutType) => LogCount("ready_equip", "Entry/Ready");
@@ -151,7 +145,7 @@ public class AnalyticsManager : MonoBehaviour
 
             case AnalyticsTimerType.shop_open:
                 eventName = "shop_open";
-                category = "OutGame";
+                category = "Shop";
                 break;
 
             case AnalyticsTimerType.ready_open:
