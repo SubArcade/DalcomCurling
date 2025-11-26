@@ -1,9 +1,9 @@
 ﻿
-using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Firebase.Firestore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -109,7 +109,7 @@ public class LastShot
     [FirestoreProperty] public Dictionary<string, float> Direction { get; set; }
     //[FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
     [FirestoreProperty, ServerTimestamp] public Timestamp Timestamp { get; set; }
-    [FirestoreProperty] public string DonutId { get; set; } // 발사된 도넛의 ID
+    [FirestoreProperty] public string DonutTypeAndNumber { get; set; } // 발사된 도넛의 ID
 }
 
 [FirestoreData]
@@ -133,7 +133,7 @@ public class StonePosition
     [FirestoreProperty]
     public string Team { get; set; }
     [FirestoreProperty]
-    public string DonutId { get; set; } // 발사된 도넛의 종류를 식별하기 위한 ID
+    public string DonutTypeAndNumber { get; set; } // 발사된 도넛의 종류를 식별하기 위한 ID
     [FirestoreProperty]
     public int Weight { get; set; } // 도넛 무게
     [FirestoreProperty]

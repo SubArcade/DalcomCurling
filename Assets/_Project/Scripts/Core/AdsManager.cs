@@ -1,6 +1,6 @@
 using System;
-using UnityEngine;
 using GoogleMobileAds.Api;
+using UnityEngine;
 
 public class AdsRewarded : MonoBehaviour
 {

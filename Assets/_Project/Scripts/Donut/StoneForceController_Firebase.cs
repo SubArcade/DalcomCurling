@@ -8,7 +8,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 {
     public float stoneForce { get; private set; }
     public int donutId; // 발사한 인덱스를 기준으로 인게임에서 도넛을 찾을때 쓰는 ID
-    public string DonutId { get; private set; } // 도넛의 종류를 식별하는 ID (예: "Soft_15")
+    public string DonutTypeAndNumber { get; private set; } // 도넛의 종류를 식별하는 ID (예: "Soft_15")
 
     // 도넛의 물리적 속성
     public int DonutWeight { get; private set; }
@@ -162,7 +162,7 @@ public class StoneForceController_Firebase : MonoBehaviour
         this.team = team;
         this.type = type;
         this.donutId = donutId;
-        this.DonutId = donutTypeId;
+        this.DonutTypeAndNumber = donutTypeId;
         this.DonutWeight = weight;
         this.DonutResilience = resilience;
         this.DonutFriction = friction;

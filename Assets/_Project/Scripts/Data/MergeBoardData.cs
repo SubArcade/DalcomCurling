@@ -1,6 +1,6 @@
-﻿using Firebase.Firestore;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using Firebase.Firestore;
 using UnityEngine;
 
 [System.Serializable, FirestoreData]

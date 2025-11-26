@@ -3,6 +3,8 @@ using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 �
 using System;
 using System.Collections.Generic; // 리스트나 딕셔너리 같은 자료구조를 사용하기 위해 필요합니다.
 using System.Linq; // 리스트에서 데이터를 쉽게 찾거나 걸러낼 때 사용합니다.
+using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
+using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 필요합니다.
 using UnityEngine; // Unity 엔진의 기능을 사용하기 위해 필요합니다.
 using UnityEngine.PlayerLoop;
 
@@ -512,6 +514,7 @@ public class FirebaseGameManager : MonoBehaviour
         if (_currentGame.LastShot == null) return;
         
 
+        Debug.Log($"lastshotId : {_currentGame.LastShot.PlayerId}");
         if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;
@@ -543,14 +546,14 @@ public class FirebaseGameManager : MonoBehaviour
             PlayerProfile opponentProfile = GetPlayerProfile(opponentId);
             DonutEntry opponentDonut = null;
 
-            if (opponentProfile != null && _currentGame.LastShot != null && !string.IsNullOrEmpty(_currentGame.LastShot.DonutId))
+            if (opponentProfile != null && _currentGame.LastShot != null && !string.IsNullOrEmpty(_currentGame.LastShot.DonutTypeAndNumber))
             {
-                opponentDonut = opponentProfile.Inventory.donutEntries.FirstOrDefault(d => d.id == _currentGame.LastShot.DonutId);
+                opponentDonut = opponentProfile.Inventory.donutEntries.FirstOrDefault(d => d.id == _currentGame.LastShot.DonutTypeAndNumber);
             }
 
             if (opponentDonut == null)
             {
-                Debug.LogError($"상대방({opponentId})의 발사된 도넛({_currentGame.LastShot?.DonutId}) 정보를 찾을 수 없습니다. 기본 도넛으로 대체합니다.");
+                Debug.LogError($"상대방({opponentId})의 발사된 도넛({_currentGame.LastShot?.DonutTypeAndNumber}) 정보를 찾을 수 없습니다. 기본 도넛으로 대체합니다.");
                 // TODO: 기본 도넛으로 대체하는 로직 추가 (예: 첫 번째 인벤토리 도넛 또는 기본값)
                 // 현재는 임시로 첫 번째 도넛을 사용하거나, 에러를 발생시킬 수 있습니다.
                 // 여기서는 임시로 상대방의 첫 번째 도넛을 사용하도록 합니다.
@@ -786,31 +789,31 @@ public class FirebaseGameManager : MonoBehaviour
     /// 샷 발사 시 탭 입력을 실패했을 때 호출됩니다.
     /// 턴이 멈추지 않도록 실패한 샷으로 처리하고 턴을 넘깁니다.
     /// </summary>
-    public void HandleTapFailed(Rigidbody donutRigid, string donutId)
-    {
-        Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
-        if (donutRigid != null)
-        {
-            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "Tap Failed");
-        }
-
-        _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
-
-        var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
-        LastShot failedShotData = new LastShot()
-        {
-            Force = -999f, // 실패를 나타내는 특수 값
-            PlayerId = myUserId,
-            Team = stoneManager.myTeam,
-            Spin = -999f,
-            Direction = zeroDict,
-            //ReleasePosition = zeroDict,
-            DonutId = donutId
-        };
-
-        SubmitShot(failedShotData); // MODIFIED: 인덱스가 없으므로 이 오버로드를 호출
-        _localState = LocalGameState.WaitingForPrediction;
-    }
+    // public void HandleTapFailed(Rigidbody donutRigid, string donutTypeAndNumber)
+    // {
+    //     Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
+    //     if (donutRigid != null)
+    //     {
+    //         stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "Tap Failed");
+    //     }
+    //
+    //     _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
+    //
+    //     var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
+    //     LastShot failedShotData = new LastShot()
+    //     {
+    //         Force = -999f, // 실패를 나타내는 특수 값
+    //         PlayerId = myUserId,
+    //         Team = stoneManager.myTeam,
+    //         Spin = -999f,
+    //         Direction = zeroDict,
+    //         //ReleasePosition = zeroDict,
+    //         DonutTypeAndNumber = donutTypeAndNumber
+    //     };
+    //
+    //     SubmitShot(failedShotData);
+    //     _localState = LocalGameState.WaitingForPrediction;
+    // }
 
     /// <summary>
     /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다. (인덱스가 없는 경우의 오버로드)
@@ -851,12 +854,15 @@ public class FirebaseGameManager : MonoBehaviour
 
         shotData.PlayerId = myUserId;
         shotData.Timestamp = Timestamp.GetCurrentTimestamp();
-        
-        // 인덱스를 사용하여 정확한 DonutEntry를 찾고 ID를 설정합니다.
-        if (usedIndex >= 0 && usedIndex < _playerProfiles[myUserId].Inventory.donutEntries.Count)
+
+        // shotData에 DonutId가 아직 설정되지 않은 경우에만 UI에서 가져옵니다.
+        if (string.IsNullOrEmpty(shotData.DonutTypeAndNumber))
         {
-            DonutEntry donutToUse = _playerProfiles[myUserId].Inventory.donutEntries[usedIndex];
-            shotData.DonutId = donutToUse.id;
+            // 현재 선택된 도넛을 가져옵니다.
+            DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+        
+            // LastShot 데이터에 도넛 ID를 저장합니다.
+            shotData.DonutTypeAndNumber = selectedDonut?.id;
             
             // UI에서 사용된 도넛을 비활성화 처리합니다.
             donutSelectionUI?.MarkDonutAsUsed(usedIndex);
@@ -976,15 +982,16 @@ public class FirebaseGameManager : MonoBehaviour
                     };
                     db.Collection("games").Document(gameId).UpdateAsync(updates);
 
-                    if (_justTimedOut)
-                    {
-                        // 이전 턴이 타임아웃으로 실패했다면, 다음 돌을 미리 생성하지 않고 기다립니다.
-                        _localState = LocalGameState.Idle; // 상태를 Idle로 변경하여 실제 턴 시작을 기다림
-                        _justTimedOut = false; // 플래그 초기화
-                        //Debug.Log("타임아웃으로 인한 턴 종료. 다음 돌 미리 생성 건너뛰기.");
-                    }
-                    else
-                    {
+                    // if (_justTimedOut)
+                    // {
+                    //     // 이전 턴이 타임아웃으로 실패했다면, 다음 돌을 미리 생성하지 않고 기다립니다.
+                    //     _localState = LocalGameState.Idle; // 상태를 Idle로 변경하여 실제 턴 시작을 기다림
+                    //     Debug.Log("Idle");
+                    //     _justTimedOut = false; // 플래그 초기화
+                    //     //Debug.Log("타임아웃으로 인한 턴 종료. 다음 돌 미리 생성 건너뛰기.");
+                    // }
+                    // else
+                    // {
                         // 일반적인 상대 턴 종료 후, 내 샷을 미리 준비합니다.
                         //Debug.Log("상대 턴 시뮬레이션 완료. 내 샷을 미리 준비합니다.");
                         if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
@@ -1012,7 +1019,7 @@ public class FirebaseGameManager : MonoBehaviour
                             {
                                 //Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
                             }
-                        }
+                        //}
                     }
                 }
                 else if (_localState == LocalGameState.SimulatingMyShot)
@@ -1160,26 +1167,35 @@ public class FirebaseGameManager : MonoBehaviour
         // });
         
     }
-
-    private void PlayerLostTimeToShotInTime(Rigidbody donutRigid)
+    /// <summary>
+    /// 샷 발사 시 탭 입력을 실패했을 때 호출됩니다.
+    /// 턴이 멈추지 않도록 실패한 샷으로 처리하고 턴을 넘깁니다.
+    /// </summary>
+    public void PlayerLostTimeToShotInTime(Rigidbody donutRigid, string message)
     {
+        string donutTypeAndNumber = null;
+        if (donutRigid != null)
+        {
+            StoneForceController_Firebase sfc = donutRigid.transform.GetComponent<StoneForceController_Firebase>();
+            donutTypeAndNumber = sfc.DonutTypeAndNumber;
+            //stoneManager.DonutOut(sfc, "Timeout");
+            stoneManager.DonutOut(sfc, message);
+        }
         _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
-        StoneForceController_Firebase sfc = donutRigid.transform.GetComponent<StoneForceController_Firebase>();
-        stoneManager.DonutOut(sfc, "Timeout");
         var zeroDict = new Dictionary<string, float>
         {
             { "x", 0 },
             { "y", 0 },
             { "z", 0 }
         };
-        LastShot shotData = new LastShot()
+        LastShot failedShotData = new LastShot()
         {
-            Force = -999f, // 최종 힘
-            PlayerId = stoneManager.myUserId,
+            Force = -999f, // 실패를 나타내는 특수 값
+            PlayerId = myUserId,
             Team = stoneManager.myTeam, // 발사하는 팀
             Spin = -999f, // 최종 스핀 값
             Direction = zeroDict, // 발사 방향
-            DonutId = sfc.DonutId // 시간 초과된 도넛의 ID를 명시적으로 전달
+            DonutTypeAndNumber = donutTypeAndNumber// 시간 초과된 도넛의 ID를 명시적으로 전달
         };
         SubmitShot(shotData, -1); // 인덱스를 모르므로 -1 전달
         _localState = LocalGameState.WaitingForPrediction;
@@ -1255,9 +1271,16 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
         private void OnDonutChanged(DonutEntry newDonut)
         {
+            if (_justTimedOut)
+            {
+                _justTimedOut = false;
+                //Debug.Log("얘가 자꾸 도넛 발사 실패하면 호출되서 막아버림");
+                return;
+            }
             // 입력대기 상태면 도넛을 교체 할 수 있게
             if (_localState == LocalGameState.WaitingForInput)
             {
+                
                 //Debug.Log($"선택한 도넛이 {newDonut.id}(으)로 변경되어 교체합니다.");
                 ReplaceCurrentStone(newDonut);
             }
@@ -1386,7 +1409,7 @@ public class FirebaseGameManager : MonoBehaviour
                 Debug.Log("입력 시간 초과. 턴을 넘깁니다.");
 
                 inputController?.DisableInput();
-                PlayerLostTimeToShotInTime(_currentTurnDonutRigid);
+                PlayerLostTimeToShotInTime(_currentTurnDonutRigid, "TimeOut");
             });
     }
 
