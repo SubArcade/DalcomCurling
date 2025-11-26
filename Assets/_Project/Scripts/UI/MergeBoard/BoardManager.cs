@@ -190,7 +190,9 @@ public class BoardManager : MonoBehaviour
         Cells target = FindEmptyActiveCell();
         if (target == null)
         {
-            Debug.Log("빈 칸이 없습니다.");
+            //Debug.Log("빈 칸이 없습니다.");
+            // 가득착 애널리틱스
+            AnalyticsManager.Instance.MergeBoardFull();
             return;
         }
         PlayerData playerData = DataManager.Instance.PlayerData;

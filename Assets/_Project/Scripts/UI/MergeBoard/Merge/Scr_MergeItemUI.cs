@@ -108,7 +108,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 return;
             }
 
-            Debug.Log($"{name} 휴지통으로 삭제됨");
+            // Debug.Log($"{name} 휴지통으로 삭제됨");
+            
+            // 휴지통 애널리틱스
+            AnalyticsManager.Instance.TrashUse();
 
             // 셀 참조 초기화
             if (currentCell != null)
@@ -191,6 +194,9 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     private void TryPlaceOrMerge(Cells targetCell)
     {
+        // 머지 시작
+        AnalyticsManager.Instance.MergeAction();
+        
         EntrySlot fromEntrySlot = null;
         if (originalParent != null)
             fromEntrySlot = originalParent.GetComponent<EntrySlot>();
@@ -358,7 +364,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             currentCell.ClearItem();
             Destroy(gameObject);
 
-            Debug.Log($"[MERGE] {donutId} → {nextDonut.id} 머지 성공");
+            //Debug.Log($"[MERGE] {donutId} → {nextDonut.id} 머지 성공");
+            
+            // 머지 성공 애널리틱스
+            AnalyticsManager.Instance.MergeSuccess();
 
             BoardManager.Instance.AutoSaveBoardLocal(); //로컬 저장
             return;

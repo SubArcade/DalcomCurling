@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         
         FirebaseAuthManager.Instance.Init();
 
-        //StartCoroutine(Delay(2f));
+        StartCoroutine(Delay(2f));
     }
     
     
@@ -87,6 +87,15 @@ public class GameManager : MonoBehaviour
             Debug.Log("뒤로가기 눌림!");
             // 팝업 띄우기
         }
+    }
+
+    // 게임 시작
+    public void StartGame()
+    {
+        SetState(GameState.Playing);
+        UIManager.Instance.Open(PanelId.MatchingPopUp);
+        FirebaseMatchmakingManager.Instance.StartMatchmaking();
+        DataManager.Instance.SaveAllUserDataAsync();
     }
     
     public void EndGame()

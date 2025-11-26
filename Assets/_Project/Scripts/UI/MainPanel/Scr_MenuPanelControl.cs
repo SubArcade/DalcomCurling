@@ -34,14 +34,14 @@ public class Scr_MenuPanelControl : MonoBehaviour
     
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
-    [SerializeField] private Button donutCodexButton;
-    [SerializeField] private Button donutUpgradeButton;
-    [SerializeField] private Button EntryPopUpButton;
+    [SerializeField] private Button donutCodexButton;   // 도감
+    [SerializeField] private Button donutUpgradeButton; // 업그레이드
+    [SerializeField] private Button entryPopUpButton;   // 엔트리 팝업
     [SerializeField] private Button detailedSettingsButton;
-    [SerializeField] private Button readyButton;
-    [SerializeField] private Button testBattle;
-    [SerializeField] private Button goldShopButton;
-    [SerializeField] private Button gemShopButton;
+    [SerializeField] private Button readyButton;    // 레디
+    [SerializeField] private Button startBattle;    // 매칭 시작
+    [SerializeField] private Button goldShopButton; // 상점
+    [SerializeField] private Button gemShopButton;  // 상점
     [SerializeField] private Button energyRechargeButton;
     [SerializeField] private Button orderRefreshButton;
     
@@ -81,11 +81,12 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
         
         playerLevelInfoButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.PlayerLevelInfoPopup));
-        donutCodexButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.DonutCodexPopup));
+        donutCodexButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DonutCodexPopup));
         donutUpgradeButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.DonutUpgradePopup));
-        EntryPopUpButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EntryPopUp));
+        entryPopUpButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EntryPopUp));
         detailedSettingsButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DetailedSettingsPanel));
-        testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
+        //testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
+        startBattle.onClick.AddListener(() => GameManager.Instance.StartGame());
         readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
         goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
