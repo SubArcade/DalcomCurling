@@ -45,9 +45,11 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     private GeneratorType pendingUpgradeType;
     [SerializeField] private TextMeshProUGUI popupDescText;
 
-    //TODO : 업그레이드 코스트 TextUI 연결
-    //UpgradeCost_Text로 되어있는 금액 텍스트 UpgradeCost 만큼 증가하게
-    //AskUpgradePopup에 있는 텍스트도 출력될때 UpgradeCost 노출
+    [Header("cost 갱신 텍스트")]
+    [SerializeField] private TextMeshProUGUI HardCostText;
+    [SerializeField] private TextMeshProUGUI MoistCostText;
+    [SerializeField] private TextMeshProUGUI SoftCostText;
+    [SerializeField] private TextMeshProUGUI popupCostText; // 팝업에 표시될 비용 텍스트
 
     //도넛 업그레이드 레벨 체크용도
     private const int MaxLevel = 20;
@@ -83,15 +85,15 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         LocalizationManager.Instance.OnLanguageChanged -= updateAllText;
     }
 
+    // 팝업 열기, 텍스트 연동
     private void OpenAskUpgradePopup(GeneratorType type)
     {
         pendingUpgradeType = type;
 
-        // 현재 레벨 가져오기
         int currentLevel = GetCurrentGeneratorLevel(type);
         int nextLevel = currentLevel + 1;
+        int cost = GetUpgradeCost(currentLevel);
 
-        // 타입 한글 이름
         string typeName = type switch
         {
             GeneratorType.Hard => "단단 도넛",
@@ -106,7 +108,8 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
             $"({currentLevel}단계 → {nextLevel}단계 업그레이드)\n" +
             $"도넛 생성 확률이 증가합니다.";
 
-        // 팝업 열기
+        popupCostText.text = $"{cost}";
+
         AskUpgradePopUp.SetActive(true);
     }
 
@@ -293,6 +296,19 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         return 10000 + ((level - 10) * 5000);
     }
 
+    // 버튼 비용 텍스트 갱신
+    private void UpdateUpgradeCostTexts()
+    {
+        int hardLevel = Data.MergeBoardData.generatorLevelHard;
+        int moistLevel = Data.MergeBoardData.generatorLevelMoist;
+        int softLevel = Data.MergeBoardData.generatorLevelSoft;
+
+        HardCostText.text = GetUpgradeCost(hardLevel).ToString();
+        MoistCostText.text = GetUpgradeCost(moistLevel).ToString();
+        SoftCostText.text = GetUpgradeCost(softLevel).ToString();
+    }
+
+
     //도넛 레벨에 따라 텍스트 갱신
     void UpdateDonutText(int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText) 
     {
@@ -328,6 +344,7 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         UpdateDonutText(Data.MergeBoardData.generatorLevelMoist, "촉촉", MoistDonutCreatText, MoistDonutOptionText);
         UpdateDonutText(Data.MergeBoardData.generatorLevelSoft, "말랑", SoftDonutCreatText, SoftDonutOptionText);
 
+        UpdateUpgradeCostTexts();
         UpdateUpgradeButtonState();
     }
     void OnClickClosePopUp() 
