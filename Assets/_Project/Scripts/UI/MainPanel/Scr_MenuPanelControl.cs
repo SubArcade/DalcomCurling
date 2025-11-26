@@ -14,7 +14,6 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject giftboxPopup;
     [SerializeField] private GameObject playerLevelInfoPopup;
     [SerializeField] private GameObject askUpgradePopup;
-    [SerializeField] private GameObject failUpgradePopup;
     [SerializeField] private GameObject donutCodexPopup;
     [SerializeField] private GameObject donutUpgradePopup;
     [SerializeField] private GameObject donutCodexClickPopup;
@@ -31,7 +30,8 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject gameHelpPopUp;
     [SerializeField] private GameObject levelUpRewardPopUp;
     [SerializeField] private GameObject useGiftBoxPopup;
-    
+    [SerializeField] private GameObject guestPopup;
+
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
     [SerializeField] private Button donutCodexButton;   // 도감
@@ -52,7 +52,6 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private TMP_Text goldText;
     [SerializeField] private TMP_Text gemText;
     
-    public GameObject testLoginPanel;
     public Button testLevelUpButton;
     
     void Awake()
@@ -77,8 +76,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.GameHelpPopup, gameHelpPopUp);
         UIManager.Instance.RegisterPanel(PanelId.LevelUpRewardPopUp, levelUpRewardPopUp);
         UIManager.Instance.RegisterPanel(PanelId.UseGiftBoxPopUp, useGiftBoxPopup);
-
-        UIManager.Instance.RegisterPanel(PanelId.TestLoginPanel, testLoginPanel);
+        UIManager.Instance.RegisterPanel(PanelId.GuestPopup, guestPopup);
         
         playerLevelInfoButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.PlayerLevelInfoPopup));
         donutCodexButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DonutCodexPopup));

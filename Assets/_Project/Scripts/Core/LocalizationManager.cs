@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using UnityEngine;
 
 
 // 로컬라이제이션 josn에서 파싱할 키값

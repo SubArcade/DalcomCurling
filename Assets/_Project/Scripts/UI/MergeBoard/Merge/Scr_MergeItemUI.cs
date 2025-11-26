@@ -133,6 +133,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             }
 
             Destroy(gameObject); // 오브젝트 삭제
+            BoardManager.Instance.AutoSaveBoardLocal();
             return;
 
         }
@@ -261,6 +262,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             if (entrySlot != null && targetItem != null)
             {
                 SwapEntryAndCell(entrySlot, targetCell, this, targetItem);
+                BoardManager.Instance.AutoSaveBoardLocal();
             }
             else
             {
@@ -297,6 +299,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             if (!canMerge)
             {
                 SwapEntryAndCell(fromEntrySlot, targetCell, this, targetItem);
+                BoardManager.Instance.AutoSaveBoardLocal();
                 return;
             }
         }
@@ -408,6 +411,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         rectTransform.localScale = Vector3.one;
 
         UpdateOriginalParent(target.transform);
+        BoardManager.Instance.AutoSaveBoardLocal();
     }
 
     public void ResetPosition()
@@ -506,6 +510,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         other.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
         this.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
+        BoardManager.Instance.AutoSaveBoardLocal();
         Debug.Log($"[SWAP] {cellA.gridX},{cellA.gridY} <-> {cellB.gridX},{cellB.gridY}");
     }
 

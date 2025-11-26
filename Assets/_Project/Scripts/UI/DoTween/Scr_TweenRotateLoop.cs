@@ -1,5 +1,5 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
 /// <summary>
 /// UI 요소를 계속해서 회전시키는 컴포넌트입니다.

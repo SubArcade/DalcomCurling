@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System;
-using System.Collections.Generic; // List를 사용하기 위해 추가
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI; // List를 사용하기 위해 추가
 
 /// <summary>
 /// 인벤토리의 개별 도넛 슬롯 UI를 제어하는 스크립트입니다.

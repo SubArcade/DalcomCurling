@@ -1,4 +1,4 @@
-using Firebase.Analytics;
+﻿using Firebase.Analytics;
 using UnityEngine;
 
 // 화면 체류 시간 측정

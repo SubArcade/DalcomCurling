@@ -1,13 +1,12 @@
-﻿using Firebase.Auth;
-using UnityEngine;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using Firebase;
+using Firebase.Auth;
 using Google;
 
 #if UNITY_ANDROID
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
+using UnityEngine;
 #endif
 
 public class FirebaseAuthManager
@@ -172,6 +171,51 @@ public class FirebaseAuthManager
         PlayGamesPlatform.Activate();
 
         _gpgsActivated = true;
+#endif
+    }
+
+    public void GooglePlayLoginFirst()
+    {
+#if UNITY_ANDROID
+        EnsureGpgsActivated();
+
+        PlayGamesPlatform.Instance.ManuallyAuthenticate(async status =>
+        {
+            if (status != SignInStatus.Success)
+            {
+                Debug.LogError($"[GPGS] 로그인 실패 또는 취소: {status}");
+                return;
+            }
+
+            PlayGamesPlatform.Instance.RequestServerSideAccess(true, async authCode =>
+            {
+                if (string.IsNullOrEmpty(authCode))
+                {
+                    Debug.LogError("[GPGS] authCode 비어있음");
+                    return;
+                }
+
+                var cred = PlayGamesAuthProvider.GetCredential(authCode);
+
+                try
+                {
+                    var gUser = await auth.SignInWithCredentialAsync(cred);
+
+                    await DataManager.Instance.EnsureUserDocAsync(
+                        gUser.UserId,
+                        gUser.Email ?? "gpgs",
+                        authProviderType: AuthProviderType.GooglePlay
+                    );
+
+                    LoginState?.Invoke(true);
+                    UIManager.Instance.Open(PanelId.StartPanel);
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("[GPGS] Firebase 로그인 중 오류: " + e);
+                }
+            });
+        });
 #endif
     }
 

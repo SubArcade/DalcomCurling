@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using UnityEngine;
+using System.Collections;
 using TMPro;
+using UnityEngine;
 
 public class Scr_EnergyTimerUI : MonoBehaviour
 {
