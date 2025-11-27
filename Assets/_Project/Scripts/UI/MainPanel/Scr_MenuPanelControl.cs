@@ -31,6 +31,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject levelUpRewardPopUp;
     [SerializeField] private GameObject useGiftBoxPopup;
     [SerializeField] private GameObject guestPopup;
+    [SerializeField] private GameObject exitPopup;
 
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
@@ -44,6 +45,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private Button gemShopButton;  // 상점
     [SerializeField] private Button energyRechargeButton;
     [SerializeField] private Button orderRefreshButton;
+    [SerializeField] private Button exitButton; //종료버튼
     
     
     [Header("플레이어 데이터 값")]
@@ -77,6 +79,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.LevelUpRewardPopUp, levelUpRewardPopUp);
         UIManager.Instance.RegisterPanel(PanelId.UseGiftBoxPopUp, useGiftBoxPopup);
         UIManager.Instance.RegisterPanel(PanelId.GuestPopup, guestPopup);
+        UIManager.Instance.RegisterPanel(PanelId.ExitPopup, exitPopup);
         
         playerLevelInfoButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.PlayerLevelInfoPopup));
         donutCodexButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DonutCodexPopup));

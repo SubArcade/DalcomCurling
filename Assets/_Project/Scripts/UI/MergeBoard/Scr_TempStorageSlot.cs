@@ -133,7 +133,15 @@ public class TempStorageSlot : MonoBehaviour
         {
             tempButton.gameObject.SetActive(false);
             tempTextBox.gameObject.SetActive(false);
+            tempIcon.sprite = null;
+            countText.text = "";
+            return;
         }
+
+        tempButton.gameObject.SetActive(true);
+        var first = storage.Peek();
+        tempIcon.sprite = first.sprite;
+
         if (storage.Count == 1)
         {
             tempButton.gameObject.SetActive(true);
