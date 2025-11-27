@@ -789,31 +789,31 @@ public class FirebaseGameManager : MonoBehaviour
     /// 샷 발사 시 탭 입력을 실패했을 때 호출됩니다.
     /// 턴이 멈추지 않도록 실패한 샷으로 처리하고 턴을 넘깁니다.
     /// </summary>
-    // public void HandleTapFailed(Rigidbody donutRigid, string donutTypeAndNumber)
-    // {
-    //     Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
-    //     if (donutRigid != null)
-    //     {
-    //         stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "Tap Failed");
-    //     }
-    //
-    //     _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
-    //
-    //     var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
-    //     LastShot failedShotData = new LastShot()
-    //     {
-    //         Force = -999f, // 실패를 나타내는 특수 값
-    //         PlayerId = myUserId,
-    //         Team = stoneManager.myTeam,
-    //         Spin = -999f,
-    //         Direction = zeroDict,
-    //         //ReleasePosition = zeroDict,
-    //         DonutTypeAndNumber = donutTypeAndNumber
-    //     };
-    //
-    //     SubmitShot(failedShotData);
-    //     _localState = LocalGameState.WaitingForPrediction;
-    // }
+    public void HandleTapFailed(Rigidbody donutRigid, string donutTypeAndNumber)
+    {
+        Debug.Log("탭 입력 실패. 턴을 넘깁니다.");
+        if (donutRigid != null)
+        {
+            stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "Tap Failed");
+        }
+    
+        _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
+    
+        var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
+        LastShot failedShotData = new LastShot()
+        {
+            Force = -999f, // 실패를 나타내는 특수 값
+            PlayerId = myUserId,
+            Team = stoneManager.myTeam,
+            Spin = -999f,
+            Direction = zeroDict,
+            //ReleasePosition = zeroDict,
+            DonutTypeAndNumber = donutTypeAndNumber
+        };
+    
+        SubmitShot(failedShotData);
+        _localState = LocalGameState.WaitingForPrediction;
+    }
 
     /// <summary>
     /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다. (인덱스가 없는 경우의 오버로드)
@@ -1174,8 +1174,14 @@ public class FirebaseGameManager : MonoBehaviour
     public void PlayerLostTimeToShotInTime(Rigidbody donutRigid, string message)
     {
         string donutTypeAndNumber = null;
+        StoneShoot_Firebase stoneShoot = transform.GetComponent<StoneShoot_Firebase>();
         if (donutRigid != null)
         {
+            if (stoneShoot.IsFinalDirectionAvailable()) // 이미 방향이라도 설정한게 있으면
+            {
+                stoneShoot.ReleaseShot(); // 그냥 자동으로 발사한다
+                return;
+            }
             StoneForceController_Firebase sfc = donutRigid.transform.GetComponent<StoneForceController_Firebase>();
             donutTypeAndNumber = sfc.DonutTypeAndNumber;
             //stoneManager.DonutOut(sfc, "Timeout");
