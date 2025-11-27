@@ -245,50 +245,75 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         //매칭버튼을 누르면 버튼 비활성화
         //if (matchmakingButton != null) { matchmakingButton.interactable = false; }
         //if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
-
-        string userId = FirebaseAuthManager.Instance.UserId;
-        if (string.IsNullOrEmpty(userId))
+        try
         {
-            Debug.LogError("로그인하지 않은 상태에서는 매치메이킹을 시작할 수 없습니다.");
-            return;
-        }
+            if (db == null)
+            {
+                Debug.LogError("[매치메이킹] Firestore db가 null입니다.");
+                return;
+            }
+            await Task.Yield();
+            await Task.Yield();
+            await Task.Yield();
+            await Task.Yield();
+            await Task.Yield();
+            
+            string userId = FirebaseAuthManager.Instance.UserId;
+            //Debug.Log($"[매치메이킹] userId: {userId}");
+            if (string.IsNullOrEmpty(userId))
+            {
+                Debug.LogError("로그인하지 않은 상태에서는 매치메이킹을 시작할 수 없습니다.");
+                return;
+            }
 
-        // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
-        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync();
-        if (!userDoc.Exists)
+            //Debug.Log("[매치메이킹] Firestore GetSnapshotAsync 호출 직전");
+            // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
+            DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync();
+            //Debug.Log("[매치메이킹] Firestore GetSnapshotAsync 호출 끝");
+            
+            if (!userDoc.Exists)
+            {
+                Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
+                return;
+            }
+
+            //Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 직전");
+            // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
+            PlayerData playerData = userDoc.ConvertTo<PlayerData>();
+            //Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 끝");
+            int playerSoloScore = playerData.soloScore;
+            string playerScoreBracket = GetScoreBracket(playerSoloScore);
+            Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
+
+            // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
+            Query waitingRoomsQuery = db.Collection(RoomsCollection)
+                .WhereEqualTo("Status", "waiting")
+                .WhereLessThan("PlayerCount", 2)
+                .WhereEqualTo("ScoreBracket", playerScoreBracket)
+                .Limit(1);
+
+            QuerySnapshot snapshot = await waitingRoomsQuery.GetSnapshotAsync();
+
+            if (snapshot.Count > 0)
+            {
+                // 참여할 룸을 찾았습니다.
+                DocumentSnapshot roomDoc = snapshot.Documents.First();
+                Debug.Log($"참여할 룸을 찾았습니다: {roomDoc.Id}");
+                await JoinRoomAsync(roomDoc.Reference);
+            }
+            else
+            {
+                // 참여할 룸이 없으므로 새 룸을 생성합니다.
+                Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
+                await CreateRoomAsync(playerScoreBracket); // 점수 구간을 전달
+            }
+
+        }
+        catch(Exception e)
         {
-            Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
-            return;
+            Debug.LogError($"[매치메이킹] 예외 발생: {e}");
         }
-
-        // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
-        PlayerData playerData = userDoc.ConvertTo<PlayerData>();
-        int playerSoloScore = playerData.soloScore;
-        string playerScoreBracket = GetScoreBracket(playerSoloScore);
-        Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
-
-        // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
-        Query waitingRoomsQuery = db.Collection(RoomsCollection)
-            .WhereEqualTo("Status", "waiting")
-            .WhereLessThan("PlayerCount", 2)
-            .WhereEqualTo("ScoreBracket", playerScoreBracket)
-            .Limit(1);
-
-        QuerySnapshot snapshot = await waitingRoomsQuery.GetSnapshotAsync();
-
-        if (snapshot.Count > 0)
-        {
-            // 참여할 룸을 찾았습니다.
-            DocumentSnapshot roomDoc = snapshot.Documents.First();
-            Debug.Log($"참여할 룸을 찾았습니다: {roomDoc.Id}");
-            await JoinRoomAsync(roomDoc.Reference);
-        }
-        else
-        {
-            // 참여할 룸이 없으므로 새 룸을 생성합니다.
-            Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
-            await CreateRoomAsync(playerScoreBracket); // 점수 구간을 전달
-        }
+        
     }
 
     private async System.Threading.Tasks.Task JoinRoomAsync(DocumentReference roomRef)
