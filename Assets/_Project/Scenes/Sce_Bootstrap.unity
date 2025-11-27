@@ -695,6 +695,7 @@ MonoBehaviour:
   gameSceneName: LSJ_Test
   menuSceneName: Sce_MainMenu
   notifier: {fileID: 2559032892304817238}
+  matchmakingObj: {fileID: 1179012149}
 --- !u!1 &644544085
 GameObject:
   m_ObjectHideFlags: 0
@@ -1020,7 +1021,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1179012150
 Transform:
   m_ObjectHideFlags: 0

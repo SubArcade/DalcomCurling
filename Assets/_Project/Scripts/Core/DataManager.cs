@@ -591,10 +591,10 @@ public class DataManager : MonoBehaviour
         else
         {
             //Debug.Log("도넛데이터 들어옴");
-            Debug.Log(donutData.id);
-            Debug.Log(donutData.donutType);
-            Debug.Log(donutData.weight);
-            Debug.Log(donutData.friction);
+            // Debug.Log(donutData.id);
+            // Debug.Log(donutData.donutType);
+            // Debug.Log(donutData.weight);
+            // Debug.Log(donutData.friction);
             InventoryData.donutEntries[index].id = donutData.id;
             InventoryData.donutEntries[index].type = donutData.donutType;
             InventoryData.donutEntries[index].weight = donutData.weight;
