@@ -233,7 +233,35 @@ public class SoundManager : MonoBehaviour
         Debug.Log("[SoundManager] BGM 정지됨.");
     }
 
+    /// <summary>
+    /// 현재 재생 중인 BGM 인스턴스의 FMOD 파라미터 값을 설정합니다.
+    /// UI_LaunchIndicator_Firebase.cs와 같은 외부 스크립트에서 호출됩니다.
+    /// </summary>
+    /// <param name="parameterName">FMOD Studio에서 설정한 파라미터 이름입니다 (예: "MusicState").</param>
+    /// <param name="value">파라미터에 설정할 값입니다 (0f 또는 1f).</param>
+    public void SetBGMParameter(string parameterName, float value)
+    {
+        // 1. 현재 BGM 인스턴스가 유효한지 확인합니다.
+        if (currentBGMInstance.isValid())
+        {
+            // 2. FMOD Studio API를 사용하여 파라미터 값을 설정합니다.
+            FMOD.RESULT result = currentBGMInstance.setParameterByName(parameterName, value);
 
+            if (result == FMOD.RESULT.OK)
+            {
+                Debug.Log($"[SoundManager] BGM 파라미터 '{parameterName}'가 {value}로 설정되었습니다.");
+            }
+            else
+            {
+                Debug.LogWarning($"[SoundManager] 파라미터 설정 오류 ({parameterName}:{value}). FMOD Result: {result}");
+            }
+        }
+        else
+        {
+            // BGM이 재생되고 있지 않을 경우 경고 메시지 출력
+            Debug.LogWarning($"[SoundManager] BGM 인스턴스가 유효하지 않아 파라미터 '{parameterName}'를 설정할 수 없습니다.");
+        }
+    }
 
     // SFX 재생 (세분화된 호출)
 

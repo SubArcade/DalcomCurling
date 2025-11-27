@@ -43,6 +43,12 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [Header("플로팅 텍스트")]
     [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
 
+    // 사운드 관련 내용 추가 ---
+    [Header("BGM 전환 설정")]
+    [SerializeField] private int bgmTransitionRound = 1; // BGM이 전환될 라운드 번호 (예: 3)
+    private bool isSpecialMusicPlaying = false; // BGM이 이미 전환되었는지 확인하는 플래그
+    private const string BGM_STATE_PARAMETER = "MusicState"; // FMOD에서 설정한 파라미터 이름
+
     //내부변수
     private int displayTurn = 0;
 
@@ -79,9 +85,14 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             floatingText.destroyOnComplete = false;
             floatingText.gameObject.SetActive(false);
         }
-        
-        //// + 인게임 BGM 사운드 출력 --- 
-        //SoundManager.Instance.PlayBGMGroup("InGameBGM");
+
+        // 인게임 BGM 사운드 재생 ---
+        // 로비 BGM을 명시적으로 정지
+        SoundManager.Instance.StopBGM();
+
+        // 인게임 BGM을 재생 (Element 0으로 시작)
+        SoundManager.Instance.PlayBGMGroup("InGameBGM");
+        SoundManager.Instance.SetBGMParameter(BGM_STATE_PARAMETER, 0f);
     }
 
     private void HandleProfilesLoaded()
@@ -162,6 +173,20 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         bScoreText.text = $"{bScore}";
         roundText.text = $"Round : {round}";
         roundChangeText.text = $"Round {round} Start!";
+
+        // BGM 전환 로직 추가 ---
+
+        // 현재 라운드가 전환 라운드 이상이고, 아직 Element 1 음악이 재생되지 않았다면
+        if (round >= bgmTransitionRound && !isSpecialMusicPlaying)
+        {
+            // 1. SoundManager에게 BGM 파라미터 값을 1.0f로 설정하라고 명령
+            SoundManager.Instance.SetBGMParameter(BGM_STATE_PARAMETER, 1f);
+
+            // 2. 중복 전환 방지를 위해 플래그 설정
+            isSpecialMusicPlaying = true;
+
+            Debug.Log($"BGM 전환: 라운드 {round} 도달! Element 1 음악으로 전환 명령");
+        }
     }
 
     /// <summary>
