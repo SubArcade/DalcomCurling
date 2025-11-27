@@ -12,6 +12,7 @@ public class LoginSystem : MonoBehaviour
     [Header("게스트로그인 팝업")]
     [SerializeField] private GameObject guestPopup;
     [SerializeField] private Button guestPopupButton;
+    [SerializeField] private Button guestPoupCancleBtn;
     
     void Start()
     {
@@ -19,7 +20,7 @@ public class LoginSystem : MonoBehaviour
         guestButtontest.onClick.AddListener(AnonymousLogin);
 
         guestPopupButton.onClick.AddListener(() => guestPopup.SetActive(true)); //게스트 확인 팝업
-        
+        guestPoupCancleBtn.onClick.AddListener(() => UIManager.Instance.Close(PanelId.GuestPopup));
         //FirebaseAuthManager.Instance.Init();
     }
     public void LogOut()
