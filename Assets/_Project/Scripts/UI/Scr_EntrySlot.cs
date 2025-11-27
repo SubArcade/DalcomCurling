@@ -114,7 +114,6 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
-
         //Debug.Log($"[MoveIn] {currentItem.donutData.id} 슬롯에 도넛 들어감");
         // Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
         // Debug.Log($"currentItem: {currentItem?.name}");
@@ -163,8 +162,6 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
-
-        //Debug.Log($"[SwapWithCell] 보드 셀 {fromCell.name} ↔ {toSlot.name} 교체 완료");
     }
 
     // 엔트리 <> 엔트리 스왑

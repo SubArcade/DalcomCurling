@@ -16,50 +16,68 @@ MonoBehaviour:
   levels:
   - id: Gift_1
     level: 1
-    sprite: {fileID: 21300000, guid: 4030dc16f1d65b34ab9d762abef1c6b2, type: 3}
+    sprite: {fileID: 21300000, guid: 745968601164d69448e779174c98b307, type: 3}
     donutType: 3
     prefab: {fileID: 0}
-    rewardGold: 0
-    rewardEnergy: 0
-    rewardGem: 0
+    minGold: 100
+    maxGold: 199
+    minEnergy: 10
+    maxEnergy: 19
+    minGem: 0
+    maxGem: 0
   - id: Gift_2
     level: 2
     sprite: {fileID: 21300000, guid: 39d39624f1eae6242865a94efd368a59, type: 3}
     donutType: 3
     prefab: {fileID: 0}
-    rewardGold: 0
-    rewardEnergy: 0
-    rewardGem: 0
+    minGold: 200
+    maxGold: 299
+    minEnergy: 20
+    maxEnergy: 29
+    minGem: 0
+    maxGem: 0
   - id: Gift_3
     level: 3
     sprite: {fileID: 21300000, guid: f9b8c699c1e03864f98761d15dd4fe8b, type: 3}
     donutType: 3
     prefab: {fileID: 0}
-    rewardGold: 0
-    rewardEnergy: 0
-    rewardGem: 0
+    minGold: 300
+    maxGold: 399
+    minEnergy: 30
+    maxEnergy: 39
+    minGem: 10
+    maxGem: 20
   - id: Gift_4
     level: 4
     sprite: {fileID: 21300000, guid: c102c19216ae8e147a8b3f6ac1feecc3, type: 3}
     donutType: 3
     prefab: {fileID: 0}
-    rewardGold: 0
-    rewardEnergy: 0
-    rewardGem: 0
+    minGold: 400
+    maxGold: 499
+    minEnergy: 40
+    maxEnergy: 49
+    minGem: 20
+    maxGem: 30
   - id: Gift_5
     level: 5
     sprite: {fileID: 21300000, guid: f0697d8debcce7b49828c602bd126e2e, type: 3}
     donutType: 3
     prefab: {fileID: 0}
-    rewardGold: 0
-    rewardEnergy: 0
-    rewardGem: 0
+    minGold: 500
+    maxGold: 599
+    minEnergy: 50
+    maxEnergy: 59
+    minGem: 30
+    maxGem: 40
   giftBoxData:
     id: 
     level: 0
     sprite: {fileID: 0}
     donutType: 0
     prefab: {fileID: 0}
-    rewardGold: 0
-    rewardEnergy: 0
-    rewardGem: 0
+    minGold: 0
+    maxGold: 0
+    minEnergy: 0
+    maxEnergy: 0
+    minGem: 0
+    maxGem: 0
