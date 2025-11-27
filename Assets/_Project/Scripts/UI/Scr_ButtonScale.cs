@@ -7,6 +7,9 @@ using UnityEngine.UI;
 
 public class Scr_ButtonScale : MonoBehaviour
 {
+    [Header("ReadyMenu UI")]
+    [SerializeField] private GameObject ReadyMenuUI;
+
     [Header("상점버튼 연결")]
     [SerializeField] private Button marketBtn;
 
@@ -43,6 +46,10 @@ public class Scr_ButtonScale : MonoBehaviour
         OnMouseCodexButton();
         OnMouseEntryButton();
         OnMouseUpgradeButton();
+
+        //레디메뉴가 꺼지면 이벤트 호출
+        var readyMenuBehaviour = ReadyMenuUI.AddComponent<ReadyMenuWatcher>();
+        readyMenuBehaviour.onDisabled += ResetButtonScales;
     }
 
     private Vector3 trashOriginalScale;
@@ -102,5 +109,27 @@ public class Scr_ButtonScale : MonoBehaviour
         var entry = new EventTrigger.Entry { eventID = type };
         entry.callback.AddListener((_) => action());
         trigger.triggers.Add(entry);
+    }
+
+    //버튼 크기 초기화
+    private void ResetButtonScales()
+    {
+        TrashCanTransform.localScale = trashOriginalScale;
+        StartButtonTransform.localScale = startOriginalScale;
+        CodexButtonTransform.localScale = CodexOriginalScale;
+        EntryTransform.localScale = EntryOriginalScale;
+        UpgradeTransform.localScale = UpgradeOriginalScale;
+    }
+
+}
+
+//레디메뉴가 켜져있나 꺼져있나 판단하는 보조 클래스
+public class ReadyMenuWatcher : MonoBehaviour
+{
+    public System.Action onDisabled; //외부에서 구독할수있는 콜백
+
+    void OnDisable()
+    {
+        onDisabled?.Invoke(); //비활성화되면 호출
     }
 }
