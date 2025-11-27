@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public string gameSceneName;
     public string menuSceneName;
     [SerializeField] private GameObject notifier;
+    [SerializeField] private GameObject matchmakingObj;
     
     public event Action<PlayerData> LevelUpdate;
 
@@ -66,6 +67,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         
         notifier.SetActive(true);
+        matchmakingObj.SetActive(true);
     }
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
