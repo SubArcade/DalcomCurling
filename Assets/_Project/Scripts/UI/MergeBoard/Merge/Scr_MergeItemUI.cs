@@ -109,8 +109,6 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 ResetPosition();
                 return;
             }
-
-            // Debug.Log($"{name} 휴지통으로 삭제됨");
             
             // 휴지통 애널리틱스
             AnalyticsManager.Instance.TrashUse();
@@ -119,6 +117,16 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             if (SoundManager.Instance != null)
             {
                 SoundManager.Instance.sellDonut(transform.position);
+            }
+
+            if (donutId != null) //도넛 재화 반환
+            {
+                int donutLv = donutData.level;
+                int value = DonutReturnCoin(donutLv); // 반환계산
+                Debug.Log($"반환 값 : {value}");
+                int returnCoin = DataManager.Instance.PlayerData.gold + value;
+                DataManager.Instance.GoldChange(returnCoin);
+                Debug.Log($"현재 금액 : {returnCoin}");
             }
 
             // 셀 참조 초기화
@@ -523,6 +531,20 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         if (icon != null) icon.sprite = data.sprite;
     }
 
+    public int DonutReturnCoin(int level) //도넛반환 계산
+    {
+        if (level <= 10)
+        {
+            return level * 50;
+        }
+        if (level <= 20)
+        {
+            return 500 + ((level - 10) * 100);
+        }
+
+        return 1500 + ((level - 20) * 250);
+    }
+
     // 나중에 이펙트 추가할거
     /*
     private IEnumerator MergeEffect(Vector3 pos)
@@ -538,7 +560,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         yield return null;
     }
     */
-   public int ParseGiftLevel(string id) //유틸 함수
+    public int ParseGiftLevel(string id) //유틸 함수
     {
         if (string.IsNullOrEmpty(id)) return -1;
         var parts = id.Split('_');

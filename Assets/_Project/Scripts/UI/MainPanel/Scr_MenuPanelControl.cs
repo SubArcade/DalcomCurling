@@ -51,9 +51,9 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private TMP_Text energyText;
     [SerializeField] private TMP_Text goldText;
     [SerializeField] private TMP_Text gemText;
-    
+  
     public Button testLevelUpButton;
-    
+  
     void Awake()
     {
         UIManager.Instance.RegisterPanel(PanelId.StartPanel,startPanel);    
@@ -100,7 +100,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         DataManager.Instance.OnUserDataChanged += SetPlayerText;
         GameManager.Instance.LevelUpdate += SetPlayerText;
     }
-    
+ 
     public void SetPlayerText(PlayerData playerData)
     {
         levelText.text = $"{playerData.level}";
