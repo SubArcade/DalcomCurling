@@ -43,9 +43,10 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private Button startBattle;    // 매칭 시작
     [SerializeField] private Button goldShopButton; // 상점
     [SerializeField] private Button gemShopButton;  // 상점
-    [SerializeField] private Button energyRechargeButton;
-    [SerializeField] private Button orderRefreshButton;
+    [SerializeField] private Button energyRechargeButton; //에너지 충전 버튼
+    [SerializeField] private Button orderRefreshButton; //새로고침 버튼
     [SerializeField] private Button exitButton; //종료버튼
+    [SerializeField] private Button exitcancleBtn;
     
     
     [Header("플레이어 데이터 값")]
@@ -93,8 +94,22 @@ public class Scr_MenuPanelControl : MonoBehaviour
         gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
-        
         testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
+        
+
+        exitcancleBtn.onClick.AddListener(() => UIManager.Instance.Close(PanelId.ExitPopup));
+        exitButton.onClick.AddListener(() => 
+        {
+            Application.Quit(); 
+            Debug.Log("게임종료성공");
+        }); //게임종료 버튼
+    }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            UIManager.Instance.Open(PanelId.ExitPopup);    
+        }
     }
 
     //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
