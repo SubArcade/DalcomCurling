@@ -10,6 +10,26 @@ public enum DonutDexViewState
     Reward    // 보상 슬롯
 }
 
+public enum EffectType
+{
+    None,
+    a,
+    b,
+    c,
+    d,
+    e,
+}
+
+public enum CharacterType
+{
+    None,
+    a,
+    b,
+    c,
+    d,
+    e,
+}
+
 [System.Serializable, FirestoreData]
 public class DonutEntry
 {
@@ -36,8 +56,10 @@ public class DonutCodexData
 public class InventoryData
 {
     [field: SerializeField, Tooltip("도넛 앤트리")][FirestoreProperty] public List<DonutEntry> donutEntries { get; set; } = new();
-    // 캐릭터
-    // 이팩트
+    [field: SerializeField, Tooltip("이펙트")][FirestoreProperty] public List<EffectType> effectList { get; set; } = new();
+    [field: SerializeField, Tooltip("캐릭터")][FirestoreProperty] public List<CharacterType> characterList { get; set; } = new();
+    [field: SerializeField, Tooltip("캐릭터")][FirestoreProperty] public EffectType curEffectType { get; set; }
+    [field: SerializeField, Tooltip("캐릭터")][FirestoreProperty] public CharacterType curCharacterType { get; set; }
     
     // 도감 데이터
     [field: SerializeField, Tooltip("단단도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> hardDonutCodexDataList { get; set; } = new();

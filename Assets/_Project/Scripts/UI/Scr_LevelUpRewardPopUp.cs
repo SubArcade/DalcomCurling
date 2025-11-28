@@ -16,7 +16,7 @@ public class Scr_LevelUpRewardPopUp : MonoBehaviour
     private void OnClickGetBtn()
     {
         GiveGiftBox();
-        GiveGiftBox();
+        //GiveGiftBox();
         UIManager.Instance.Close(PanelId.LevelUpRewardPopUp);
     }
 

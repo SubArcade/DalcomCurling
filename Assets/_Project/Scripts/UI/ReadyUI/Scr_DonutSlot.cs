@@ -2,11 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Scr_DonutSlot : MonoBehaviour,
-    IPointerClickHandler,
-    IBeginDragHandler,
-    IDragHandler,
-    IEndDragHandler
+public class Scr_DonutSlot : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private Image donutImage;        // Slot 안의 DonutImage
     [SerializeField] private GameObject outlineImage; // 꼭지점 테두리 이미지 (GameObject)
@@ -57,6 +53,7 @@ public class Scr_DonutSlot : MonoBehaviour,
     // 클릭 → 단순 선택만
     public void OnPointerClick(PointerEventData eventData)
     {
+        //Debug.Log($"OnPointerClick : {slotIndex}");
         if (owner != null)
             owner.OnClickSlot(slotIndex);
     }
@@ -64,7 +61,7 @@ public class Scr_DonutSlot : MonoBehaviour,
     // ============================
     // 드래그 시작
     // ============================
-    public void OnBeginDrag(PointerEventData eventData)
+    /*public void OnBeginDrag(PointerEventData eventData)
     {
         if (donutImage.sprite == null || owner == null)
             return;
@@ -127,5 +124,5 @@ public class Scr_DonutSlot : MonoBehaviour,
         }
 
         owner.EndDrag(dropSlot.slotIndex);
-    }
+    }*/
 }

@@ -347,7 +347,13 @@ MonoBehaviour:
       <perSecEnergy>k__BackingField: 10
       <levelMax>k__BackingField: 20
     <inventory>k__BackingField:
-      <donutEntries>k__BackingField: []
+      <donutEntries>k__BackingField:
+      - <id>k__BackingField: 
+        <type>k__BackingField: 0
+        <weight>k__BackingField: 0
+        <resilience>k__BackingField: 0
+        <friction>k__BackingField: 0
+        <level>k__BackingField: 0
       <hardDonutCodexDataList>k__BackingField: []
       <softDonutCodexDataList>k__BackingField: []
       <moistDnutCodexDataList>k__BackingField: []
