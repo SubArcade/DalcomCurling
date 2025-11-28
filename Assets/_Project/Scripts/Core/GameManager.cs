@@ -23,6 +23,10 @@ public class GameManager : MonoBehaviour
     
     public event Action<PlayerData> LevelUpdate;
 
+    // 결과 화면에 표시할 상대방의 선택된 도넛
+    public DonutEntry OpponentSelectedDonut1 { get; private set; }
+    public DonutEntry OpponentSelectedDonut2 { get; private set; }
+
     // 페널티로 제거된 도넛 정보를 임시 저장하기 위한 변수
     private DonutEntry penalizedDonut1;
     private DonutEntry penalizedDonut2;
@@ -101,6 +105,10 @@ public class GameManager : MonoBehaviour
     // 게임 시작
     public void StartGame()
     {
+        // 이전 게임의 결과 표시용 데이터 초기화
+        OpponentSelectedDonut1 = null;
+        OpponentSelectedDonut2 = null;
+
         SetState(GameState.Playing);
         UIManager.Instance.Open(PanelId.MatchingPopUp);
         FirebaseMatchmakingManager.Instance.StartMatchmaking();
@@ -333,5 +341,40 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("도넛 획득 오류: 선택된 도넛 중 null이 있습니다. 로직을 확인하세요.");
         }
+    }
+
+
+    /// <summary>
+    /// 결과 화면에 표시할 상대방의 도넛을 설정합니다.
+    /// 매치메이킹이 완료되고 상대방의 데이터가 정해졌을 때 호출해야 합니다.
+    /// </summary>
+    /// <param name="opponentDonuts">상대방의 도넛 리스트</param>
+    /// <param name="idx1">표시할 첫 번째 도넛의 인덱스</param>
+    /// <param name="idx2">표시할 두 번째 도넛의 인덱스</param>
+    public void SetOpponentDonutsForDisplay(List<DonutEntry> opponentDonuts, int idx1, int idx2)
+    {
+        if (opponentDonuts == null) {
+            OpponentSelectedDonut1 = null;
+            OpponentSelectedDonut2 = null;
+            return;
+        }
+
+        var availableDonuts = new List<DonutEntry>();
+
+        foreach (var d in opponentDonuts)
+        {
+            if (d != null)
+            {
+                availableDonuts.Add(d);
+            }
+        }
+
+        OpponentSelectedDonut1 = (idx1 >= 0 && idx1 < availableDonuts.Count) ? availableDonuts[idx1] : null;
+        OpponentSelectedDonut2 = (idx2 >= 0 && idx2 < availableDonuts.Count) ? availableDonuts[idx2] : null;
+
+        if (OpponentSelectedDonut1 == null)
+            Debug.LogWarning($"SetOpponentDonutsForDisplay: idx1({idx1})에 해당하는 도넛을 찾을 수 없습니다.");
+        if (OpponentSelectedDonut2 == null)
+            Debug.LogWarning($"SetOpponentDonutsForDisplay: idx2({idx2})에 해당하는 도넛을 찾을 수 없습니다.");
     }
 }
