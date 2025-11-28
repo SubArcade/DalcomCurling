@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -28,9 +29,9 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
 
     private void OnConfirmBtn() 
     {
-        string Text = input.text.Trim();
+        string text = input.text.Trim();
 
-        if (Text == "DALCOM")
+        if (text.Equals("DALCOM", StringComparison.OrdinalIgnoreCase))
         {
             Debug.Log("계정삭제 완료!!");
             UIManager.Instance.Close(PanelId.DeleteAccountPopUp);
