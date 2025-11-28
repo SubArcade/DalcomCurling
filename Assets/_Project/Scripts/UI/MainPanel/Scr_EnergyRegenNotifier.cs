@@ -25,49 +25,51 @@ public class EnergyRegenNotifier : MonoBehaviour
     // 프로젝트의 싱글톤/데이터 접근은 여기에 맞춰주세요
     private PlayerData playerData => DataManager.Instance.PlayerData;
 
-    // playerData 가정:
-    // int    energy;        // 현재 에너지
-    // long   lastAt;        // 마지막 회복 '틱' 기준 시간(UTC seconds)
-    // ※ lastAt가 0이면 초기화가 필요합니다. (아래에서 처리)
-
     private void Awake()
     {
 #if UNITY_ANDROID
         EnsureChannel();
 #endif
     }
+    
+    void OnEnable()  => DataManager.Instance.PauseChanged += OnPauseChanged;
+    void OnDisable() => DataManager.Instance.PauseChanged -= OnPauseChanged;
 
-    private void Start()
+    private void OnPauseChanged(bool isPaused)
     {
-        // 앱 진입 시 한 번 정산 + 예약
-        ApplyLazyRegenAndReschedule();
+        if (isPaused)
+        {
+            // 앱이 백그라운드로 감 → 종료 흐름
+            ApplyLazyRegenAndReschedule();
+        }
+        else
+        {
+            // 앱 복귀 → 오프라인 누적 정산만
+            ApplyLazyRegenOnly();
+        }
     }
-
-    void OnEnable()  => DataManager.Instance.PauseChanged += ApplyLazyRegenAndReschedule;
-    void OnDisable() => DataManager.Instance.PauseChanged -= ApplyLazyRegenAndReschedule;
-
-    // 외부에서 에너지를 소비했을 때 호출하면 즉시 재예약
-    public void OnEnergySpent(int amount)
+    
+    public void ApplyLazyRegenOnly()
     {
-        if (amount <= 0) return;
-        playerData.energy = Mathf.Max(0, playerData.energy - amount);
-
-        // 소비한 시점이 새로운 기준이 되도록 lastAt도 조정(이전 잔여 누적은 유지됨)
-        if (playerData.energy < playerData.maxEnergy && playerData.lastAt <= 0)
-            playerData.lastAt = NowUtcSeconds();
-
-        // 소비 즉시 가득 알림 다시 예약
-        RescheduleNotification();
+        if (!DataManager.Instance.isLogin) return;
+        LazyRegen();
     }
-
+    
     public void ApplyLazyRegenAndReschedule()
     {
+        
+        if (!DataManager.Instance.isLogin)
+        {
+            CancelAllEnergyNotifications();
+            return;
+        }
+        
         LazyRegen();            // 누적 시간만큼 회복
         RescheduleNotification(); // 가득 차는 시점에 알림 재예약
     }
 
     // 경과 시간만큼 회복(5분=300초당 +1), 잔여초 보존
-    private void LazyRegen()
+    public void LazyRegen()
     {
         if (playerData.energy >= playerData.maxEnergy)
         {
@@ -175,4 +177,40 @@ public class EnergyRegenNotifier : MonoBehaviour
 
     private long NowUtcSeconds() => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     private DateTime FromUnixSeconds(long s) => DateTimeOffset.FromUnixTimeSeconds(s).UtcDateTime;
+    
+    public void CancelAllEnergyNotifications()
+    {
+#if UNITY_ANDROID
+        if (_lastScheduledId.HasValue)
+        {
+            AndroidNotificationCenter.CancelScheduledNotification(_lastScheduledId.Value);
+            AndroidNotificationCenter.CancelDisplayedNotification(_lastScheduledId.Value);
+            _lastScheduledId = null;
+        }
+#endif
+    }
+    
+    /// <summary>
+    /// 다음 에너지 +1 까지 남은 초 (가득 차 있으면 0)
+    /// </summary>
+    public int GetSecondsToNextEnergy()
+    {
+        if (playerData == null) return 0;
+        if (playerData.energy >= playerData.maxEnergy) return 0;
+
+        long now = NowUtcSeconds();
+        if (playerData.lastAt <= 0 || playerData.lastAt > now)
+            playerData.lastAt = now;
+
+        long elapsed = now - playerData.lastAt;
+        long cycle = playerData.perSecEnergy;   // 1칸 차는 데 걸리는 초
+
+        if (cycle <= 0) return 0;
+
+        long remainInCycle = cycle - (elapsed % cycle);
+        if (remainInCycle == cycle) remainInCycle = 0; // 막 갱신된 직후
+
+        return (int)remainInCycle;
+    }
+    
 }

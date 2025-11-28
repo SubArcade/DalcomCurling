@@ -1,5 +1,5 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
 /// <summary>
 /// CanvasGroup의 알파 값을 조절하여 페이드 인/아웃 효과를 주는 컴포넌트입니다.

@@ -1,12 +1,15 @@
-﻿using DG.Tweening;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Scr_ButtonScale : MonoBehaviour
 {
+    [Header("상점버튼 연결")]
+    [SerializeField] private Button marketBtn;
+
     [Header("휴지통 관련")]
     [SerializeField] private GameObject TrashCan;
     [SerializeField] private Transform TrashCanTransform;
@@ -32,31 +35,9 @@ public class Scr_ButtonScale : MonoBehaviour
     [SerializeField] private Transform UpgradeTransform;
     [SerializeField] private Image UpgradeImage;
 
-
-    IEnumerator Start()
+    void Start()
     {
-        yield return new WaitForSeconds(0.2f); // 혹시라도 로딩 지연 대비
-
-        TrashCan = transform.Find("Bottom/ButtonGroup/basket_Button")?.gameObject;
-        TrashCanTransform = TrashCan.transform;
-        TrashCanImage = TrashCan.GetComponent<Image>();
-
-        StartPopUp = transform.Find("Bottom/Battle_Button")?.gameObject;
-        StartButtonTransform = StartPopUp.transform;
-        startImage = StartPopUp.GetComponent<Image>();
-        
-        Codex = transform.Find("Bottom/ButtonGroup/Codex_Button")?.gameObject;
-        CodexButtonTransform = Codex.transform;
-        CodexImage = Codex.GetComponent<Image>();
-
-        Entry = transform.Find("Bottom/ButtonGroup/Entry_Button")?.gameObject;
-        EntryTransform = Entry.transform;
-        EntryImage = Entry.GetComponent<Image>();
-
-        Upgrade = transform.Find("Bottom/ButtonGroup/Upgrade_Button")?.gameObject;
-        UpgradeTransform = Upgrade.transform;
-        UpgradeImage = Upgrade.GetComponent<Image>();
-
+        marketBtn.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         OnMouseTrashCan();
         OnMouseStartButton();
         OnMouseCodexButton();

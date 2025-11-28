@@ -1,9 +1,9 @@
 ﻿
-using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Firebase.Firestore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -32,6 +32,10 @@ public class Room
 
     [FirestoreProperty]
     public string ScoreBracket { get; set; } // 룸 생성자의 점수 구간
+
+    // 새로 추가할 필드: 각 플레이어의 프로필 정보를 저장합니다.
+    [FirestoreProperty]
+    public Dictionary<string, PlayerProfile> PlayerProfiles { get; set; }
 }
 
 // Firestore의 'games' 문서 구조를 나타내는 클래스입니다.
@@ -43,7 +47,7 @@ public class Game
 
     [FirestoreProperty]
     public string CurrentTurnPlayerId { get; set; }
-    
+
     [FirestoreProperty]
     public string RoundStartingPlayerId { get; set; }
 
@@ -55,16 +59,16 @@ public class Game
 
     [FirestoreProperty]
     public int TurnNumber { get; set; } // 현재 턴 번호 (1~8)
-    
+
     [FirestoreProperty]
     public int RoundNumber { get; set; } // 현재 라운드 정보 ( 1 ~ 3 )
-    
+
     [FirestoreProperty]
     public int ATeamScore { get; set; } //A 팀의 현재 점수
-    
+
     [FirestoreProperty]
     public int BTeamScore { get; set; } //B 팀의 현재 점수
-    
+
 
     [FirestoreProperty]
     public Dictionary<string, int> DonutsIndex { get; set; } // 플레이어별 사용한 돌 개수
@@ -83,6 +87,13 @@ public class Game
 
     [FirestoreProperty]
     public string FinishReason { get; set; } // 게임 종료 사유를 저장하는 속성
+    
+    [FirestoreProperty]
+    public string LastUploaderId { get; set; }
+    
+    [FirestoreProperty]
+    public ScoredDonuts ScoredDonuts { get; set; }
+    
 }
 
 [FirestoreData]
@@ -96,8 +107,9 @@ public class LastShot
     public float Force { get; set; }
     [FirestoreProperty] public float Spin { get; set; }
     [FirestoreProperty] public Dictionary<string, float> Direction { get; set; }
-    [FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
+    //[FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
     [FirestoreProperty, ServerTimestamp] public Timestamp Timestamp { get; set; }
+    [FirestoreProperty] public string DonutTypeAndNumber { get; set; } // 발사된 도넛의 ID
 }
 
 [FirestoreData]
@@ -121,7 +133,25 @@ public class StonePosition
     [FirestoreProperty]
     public string Team { get; set; }
     [FirestoreProperty]
+    public string DonutTypeAndNumber { get; set; } // 발사된 도넛의 종류를 식별하기 위한 ID
+    [FirestoreProperty]
+    public int Weight { get; set; } // 도넛 무게
+    [FirestoreProperty]
+    public int Resilience { get; set; } // 도넛 탄성
+    [FirestoreProperty]
+    public int Friction { get; set; } // 도넛 마찰
+    [FirestoreProperty]
     public Dictionary<string, float> Position { get; set; } // Vector3 저장용
+}
+
+[FirestoreData]
+public class ScoredDonuts
+{
+    [FirestoreProperty]
+    public List<int> StoneId { get; set; }
+    
+    [FirestoreProperty]
+    public string Team { get; set; }
 }
 
 
@@ -144,7 +174,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
 
     private Coroutine matchmakingTimeoutCoroutine; // 매치메이킹 타임아웃 코루틴
     private string waitingRoomId; // 현재 대기 중인 룸의 ID
-    
+
     // 점수 구간 정의
     private const string ScoreBracket_0_199 = "0-199";
     private const string ScoreBracket_200_499 = "200-499";
@@ -164,10 +194,16 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    void Start()
+    
+    async void Start()
     {
         // Firestore 인스턴스를 초기화합니다.
+        
+        while (!FirebaseInitializer.IsInitialized)
+        {
+            await System.Threading.Tasks.Task.Yield();
+        }
+        
         db = FirebaseFirestore.DefaultInstance;
         //matchmakingButton.onClick.AddListener(()=>StartMatchmaking());
     }
@@ -205,11 +241,11 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     public async Task StartMatchmaking()
     {
         Debug.Log("매치메이킹을 시작합니다...");
-        
+
         //매칭버튼을 누르면 버튼 비활성화
         //if (matchmakingButton != null) { matchmakingButton.interactable = false; }
         //if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
-        
+
         string userId = FirebaseAuthManager.Instance.UserId;
         if (string.IsNullOrEmpty(userId))
         {
@@ -218,7 +254,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
 
         // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
-        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync(); 
+        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync();
         if (!userDoc.Exists)
         {
             Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
@@ -228,7 +264,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
         PlayerData playerData = userDoc.ConvertTo<PlayerData>();
         int playerSoloScore = playerData.soloScore;
-        string playerScoreBracket = GetScoreBracket(playerSoloScore);        
+        string playerScoreBracket = GetScoreBracket(playerSoloScore);
         Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
 
         // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
@@ -259,6 +295,38 @@ public class FirebaseMatchmakingManager : MonoBehaviour
     {
         string userId = FirebaseAuthManager.Instance.UserId;
 
+        // 데이터베이스에서 다시 가져오는 대신, 현재 DataManager의 인스턴스 값을 사용합니다.
+        var joiningPlayer = DataManager.Instance.PlayerData;
+        var joiningInventory = DataManager.Instance.InventoryData;
+        if (joiningPlayer == null || joiningInventory == null)
+        {
+            Debug.LogError($"참가 플레이어({userId})의 데이터를 DataManager에서 불러오지 못했습니다.");
+            return;
+        }
+
+        // [테스트용 임시 코드] 인벤토리가 비어있으면 더미 데이터를 주입합니다.
+        if (joiningInventory.donutEntries == null || joiningInventory.donutEntries.Count == 0)
+        {
+            Debug.LogWarning($"참가 플레이어({userId})의 인벤토리가 비어있어 테스트용 더미 데이터를 주입합니다.");
+            joiningInventory.donutEntries = new List<DonutEntry>
+            {
+                new DonutEntry { id = "Soft_15", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
+                new DonutEntry { id = "Hard_22", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
+                new DonutEntry { id = "Moist_13", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
+                new DonutEntry { id = "Soft_14", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
+                new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
+            };
+        }
+
+        // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
+        string displayNickname = string.IsNullOrEmpty(joiningPlayer.nickname) ? "플레이어2" : joiningPlayer.nickname;
+
+        PlayerProfile joiningProfile = new PlayerProfile
+        {
+            Nickname = displayNickname,
+            Email = joiningPlayer.email,
+            Inventory = joiningInventory
+        };
         await db.RunTransactionAsync(async transaction =>
         {
             DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(roomRef);
@@ -281,7 +349,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             {
                 { "PlayerIds", FieldValue.ArrayUnion(userId) },
                 { "PlayerCount", room.PlayerCount + 1 },
-                { "Status", "playing" }
+                { "Status", "playing" },
+                { $"PlayerProfiles.{userId}", joiningProfile } // 참가 플레이어 프로필 추가
             };
 
             transaction.Update(roomRef, updates);
@@ -296,6 +365,38 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         string userId = FirebaseAuthManager.Instance.UserId;
         DocumentReference newRoomRef = db.Collection(RoomsCollection).Document();
 
+        // 데이터베이스에서 다시 가져오는 대신, 현재 DataManager의 인스턴스 값을 사용합니다.
+        var hostPlayer = DataManager.Instance.PlayerData;
+        var hostInventory = DataManager.Instance.InventoryData;
+        if (hostPlayer == null || hostInventory == null)
+        {
+            Debug.LogError($"호스트 플레이어({userId})의 데이터를 DataManager에서 불러오지 못했습니다.");
+            return;
+        }
+
+        // [테스트용 임시 코드] 인벤토리가 비어있으면 더미 데이터를 주입합니다.
+        if (hostInventory.donutEntries == null || hostInventory.donutEntries.Count == 0)
+        {
+            Debug.LogWarning($"호스트 플레이어({userId})의 인벤토리가 비어있어 테스트용 더미 데이터를 주입합니다.");
+            hostInventory.donutEntries = new List<DonutEntry>
+            {
+                new DonutEntry { id = "Soft_10", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
+                new DonutEntry { id = "Hard_5", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
+                new DonutEntry { id = "Moist_20", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
+                new DonutEntry { id = "Soft_22", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
+                new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
+            };
+        }
+
+        // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
+        string displayNickname = string.IsNullOrEmpty(hostPlayer.nickname) ? "플레이어1" : hostPlayer.nickname;
+
+        PlayerProfile hostProfile = new PlayerProfile
+        {
+            Nickname = displayNickname,
+            Email = hostPlayer.email,
+            Inventory = hostInventory
+        };
         var room = new Room
         {
             RoomId = newRoomRef.Id,
@@ -304,7 +405,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             PlayerCount = 1, // 플레이어 수 초기화
             CreatedAt = Timestamp.GetCurrentTimestamp(),
             GameId = null, // 초기에는 GameId가 없습니다.
-            ScoreBracket = playerScoreBracket // 룸 생성 시 점수 구간 설정
+            ScoreBracket = playerScoreBracket, // 룸 생성 시 점수 구간 설정
+            PlayerProfiles = new Dictionary<string, PlayerProfile> { { userId, hostProfile } } // 호스트 프로필 추가
         };
 
         await newRoomRef.SetAsync(room);
@@ -398,7 +500,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                 { room.PlayerIds[1], 0 }
             },
             LastShot = null,
-            PredictedResult = null
+            PredictedResult = null,
+            ScoredDonuts = null
         };
 
         // "games" 컬렉션에 새 게임 문서를 추가합니다.
@@ -421,7 +524,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
     }
 
-    private async void CancelMatchmaking()
+    public async void CancelMatchmaking()
     {
         Debug.Log("매치메이킹 시간 초과 또는 취소. 매칭을 중단합니다.");
         UIManager.Instance.Close(PanelId.MatchingPopUp); //매칭팝업창 닫기
@@ -434,7 +537,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
 
         // 타임아웃 코루틴 중지
         if (matchmakingTimeoutCoroutine != null)
-        { 
+        {
             StopCoroutine(matchmakingTimeoutCoroutine);
             matchmakingTimeoutCoroutine = null;
         }

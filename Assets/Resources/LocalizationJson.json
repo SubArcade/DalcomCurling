@@ -1,14 +1,46 @@
-{
+﻿{
   "ko": {
     "Btn_Start": "시작하기",
     "Btn_Exit": "종료",
     "Title_Main": "메인 메뉴",
-    "Label_Gold": "골드"
+    "Label_Gold": "골드",
+    "Label_Setting": "환경설정",
+    "Label_Account": "계정",
+    "Label_DeleteAccount": "계정삭제",
+    "Label_AccountLink": "Google Play 계정연동",
+    "Label_GameSetting": "게임 설정",
+    "Label_AlarmSetting": "알림 설정",
+    "Label_AlarmText": "알림을 받으시려면 기기 설정에서 알림이 켜져있는지 확인해주세요!",
+    "Label_AlarmEnergy": "에너지 모두 재충전",
+    "Label_EventAlarm": "이벤트 수신 알림",
+    "Label_Midnight": "야간 알림(22:00~08:00)",
+    "Label_Service": "서비스 이용 약관",
+    "Label_Protect": "개인 정보 보호",
+    "Label_ContactEMail": "문의메일 : donut@soft.com",
+    "Language_Select": "언어선택",
+    "Label_ReincarnateText": "[주의] 환생을 하면 모든 게임 정보가 초기화 되고 처음부터 다시 시작합니다.\n\n▼ 아래 조건 만족 시 환생 가능\n플레이어 LV.20 & 모든 속성 도넛(단단/촉촉/말랑) 30단계 해금\n\n유지되는 항목 : 젬, 이펙트, 스킨, 캐릭터\n\n환생을 하면 칭호를 획득할 수 있습니다."
+
   },
   "en": {
     "Btn_Start": "Start",
     "Btn_Exit": "Exit",
     "Title_Main": "Main Menu",
-    "Label_Gold": "Gold"
+    "Label_Gold": "Gold",
+    "Label_Setting": "Setting",
+    "Label_Account": "Account",
+    "Label_DeleteAccount": "Delete Account",
+    "Label_AccountLink": "Google Play Link Account",
+    "Label_GameSetting": "Game Setting",
+    "Label_AlarmSetting": "Alarm Setting",
+    "Label_AlarmText": "Please check your device settings to ensure notifications are turned on",
+    "Label_AlarmEnergy": "Energy Fully Recharged",
+    "Label_EventAlarm": "Event Notifications",
+    "Label_Midnight": "Nighttime Notifications (10:00 PM – 8:00 AM)",
+    "Label_Service": "Terms of Service",
+    "Label_Protect": "Privacy Protection",
+    "Label_ContactEMail": "Contact Email : donut@soft.com",
+    "Language_Select": "Language",
+    "Label_ReincarnateText": "[Notice] Reincarnation resets all game data and restarts the game from the beginning.\n\n▼ Requirements for Reincarnation\nPlayer LV.20 & All Donut Attributes (Hard/Soft/Moist) unlocked to Level 30\n\nItems retained: Gems, Effects, Skins, Characters\n\nYou can obtain a special title upon Reincarnation."
+
   }
 }

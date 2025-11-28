@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Cinemachine;
+﻿using Cinemachine;
+using UnityEngine;
 using UnityEngine.Playables;
 
 /// <summary>
@@ -13,6 +13,7 @@ public class Src_GameCamControl : MonoBehaviour
 
     [Header("게임 시작 타임라인")]
     [SerializeField] private PlayableDirector startTimeline;
+    [SerializeField] private PlayableDirector RoundTimeline;
 
     private const int ACTIVE_PRIORITY = 15;
     private const int INACTIVE_PRIORITY = 10;
@@ -35,6 +36,18 @@ public class Src_GameCamControl : MonoBehaviour
         else
         {
             Debug.LogWarning("시작 타임라인이 할당되지 않았습니다.");
+        }
+    }
+
+    public void PlayRoundTimeline()
+    {
+        if (RoundTimeline != null)
+        {
+            RoundTimeline.Play();
+        }
+        else
+        {
+            Debug.LogWarning("라운드 변경 타임라인이 할당되지 않았습니다.");
         }
     }
 

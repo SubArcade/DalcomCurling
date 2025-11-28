@@ -4,10 +4,10 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(DonutManager))]
-public class DonutManagerEditor : Editor
+public class Test_DonutManagerEditor : Editor
 {
-    private DonutParticleSystem.AuraType particleTestType = DonutParticleSystem.AuraType.Fire;
-    private DonutParticleSystem.TrailType trailTestType = DonutParticleSystem.TrailType.FireTail;
+    private Scr_DonutParticleSystem.AuraType particleTestType = Scr_DonutParticleSystem.AuraType.Fire;
+    private Scr_DonutParticleSystem.TrailType trailTestType = Scr_DonutParticleSystem.TrailType.FireTail;
 
     public override void OnInspectorGUI()
     {
@@ -22,7 +22,7 @@ public class DonutManagerEditor : Editor
         // 도넛 생성, 업데이트, 개별 업데이트, 제거버튼
         if (GUILayout.Button("도넛 생성", GUILayout.Height(30)))
         {
-            manager.SpawnDonut();
+            manager.SpawnDonut(DonutType.Hard, manager.level);
         }
 
         if (GUILayout.Button("모든 도넛 업데이트", GUILayout.Height(30)))
@@ -43,7 +43,7 @@ public class DonutManagerEditor : Editor
         GUILayout.Space(10);
         GUILayout.Label("파티클 테스트", EditorStyles.boldLabel);
 
-        particleTestType = (DonutParticleSystem.AuraType)EditorGUILayout.EnumPopup("파티클 타입", particleTestType);
+        particleTestType = (Scr_DonutParticleSystem.AuraType)EditorGUILayout.EnumPopup("파티클 타입", particleTestType);
 
         if (GUILayout.Button("선택 도넛에 파티클 적용", GUILayout.Height(30))) 
         {
@@ -56,7 +56,7 @@ public class DonutManagerEditor : Editor
         }
 
         // 꼬리 파티클만 추가
-        trailTestType = (DonutParticleSystem.TrailType)EditorGUILayout.EnumPopup("꼬리 파티클 타입", trailTestType);
+        trailTestType = (Scr_DonutParticleSystem.TrailType)EditorGUILayout.EnumPopup("꼬리 파티클 타입", trailTestType);
 
         if (GUILayout.Button("선택 도넛에 꼬리파티클 적용", GUILayout.Height(30)))
         {
@@ -70,16 +70,16 @@ public class DonutManagerEditor : Editor
     }
 
     // 파티클 적용 메서드
-    private void ApplyParticleToSelectedDonut(DonutManager manager, DonutParticleSystem.AuraType auraType, bool enabled)
+    private void ApplyParticleToSelectedDonut(DonutManager manager, Scr_DonutParticleSystem.AuraType auraType, bool enabled)
     {
         if (manager.GetSpawnedDonutCount() > manager.selectDonutIndex)
         {
             GameObject selectedDonut = manager.GetSpawnedDonuts()[manager.selectDonutIndex];
-            var particleSystem = selectedDonut.GetComponent<DonutParticleSystem>();
+            var particleSystem = selectedDonut.GetComponent<Scr_DonutParticleSystem>();
 
             if (particleSystem != null)
             {
-                if (auraType != DonutParticleSystem.AuraType.None)
+                if (auraType != Scr_DonutParticleSystem.AuraType.None)
                 {
                     particleSystem.ChangeAuraType(auraType);
                 }
@@ -95,16 +95,16 @@ public class DonutManagerEditor : Editor
     }
 
     // 꼬리 파티클 적용 메서드
-    private void ApplyTrailToSelectedDonut(DonutManager manager, DonutParticleSystem.TrailType trailType, bool enabled)
+    private void ApplyTrailToSelectedDonut(DonutManager manager, Scr_DonutParticleSystem.TrailType trailType, bool enabled)
     {
         if (manager.GetSpawnedDonutCount() > manager.selectDonutIndex)
         {
             GameObject selectedDonut = manager.GetSpawnedDonuts()[manager.selectDonutIndex];
-            var particleSystem = selectedDonut.GetComponent<DonutParticleSystem>();
+            var particleSystem = selectedDonut.GetComponent<Scr_DonutParticleSystem>();
 
             if (particleSystem != null)
             {
-                if (trailType != DonutParticleSystem.TrailType.None)
+                if (trailType != Scr_DonutParticleSystem.TrailType.None)
                 {
                     particleSystem.ChangeTrailType(trailType);
                 }
