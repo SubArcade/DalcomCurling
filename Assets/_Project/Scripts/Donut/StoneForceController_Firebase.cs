@@ -25,7 +25,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     private float spinAmountFactor = 600f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
     private float sidewaysForceFactor = 4f; // 회전값을 통해 얼마나 옆으로 휘게 할지 적용하는 변수 ( 높을수록 많이 휨 ) , 기본값 5, 0.07(기존로직)
     //private float sidewaysForceSpeedLimit = 0f; // 속도가 몇%가 될때까지 옆으로 휘는 힘을 가할건지 ( 낮을수록 오래 휨 ), 기본값 0.4
-    private int sidewaysForceAddLimit = 1000; // 동일한 횟수만큼만 옆으로 밀리는 힘을 주어서 각 환경에서 싱크가 일치하도록 도움
+    private int sidewaysForceAddLimit = 1200; // 동일한 횟수만큼만 옆으로 밀리는 힘을 주어서 각 환경에서 싱크가 일치하도록 도움
     private int sidewaysForceAddCount = 0; // 현재까지 옆으로 밀리는 힘을 준 횟수
     //private float sweepSidewaysForceFactor = 0.3f; // 스위핑으로 양옆으로 얼마나 휘게 만들지 ( 높을수록 많이 휨 ) , 기본값 0.3
     private Rigidbody rigid;
@@ -74,46 +74,15 @@ public class StoneForceController_Firebase : MonoBehaviour
         {
             sidewaysForceAddCount++;
             
-            // velocityCalc =
-            //     1f - (stoneForce - rigid.velocity.magnitude) / stoneForce; // 발사 파워와 현재 속도를 통해, 현재 속도의 비율을 0~1로 고정
-            //
-            // rigid.angularVelocity = Vector3.up * spinForce * spinAmountFactor * velocityCalc; // 물체의 물리적 회전속도를 직접 조정
             
-    
-    
-            //현재 이동 속도가 발사속도의 설정한 퍼센트 이상일때까지만 옆으로 밀리는 힘을 추가함( 이후에는 남아있는 힘으로 인해 자연스럽게 휨 )
-            // float forceAmount = spinForce * sidewaysForceFactor * (velocityCalc > sidewaysForceSpeedLimit ? velocityCalc * 0.5f : 0);
-            //float forceAmount = spinForce * sidewaysForceFactor * velocityCalc * 0.5f;
-            
-            
-            //////////
-            // float forceAmount = spinForce * sidewaysForceFactor;
-            // rigid.AddForce(
-            //     Vector3.right * forceAmount * Time.fixedDeltaTime * 0.01f,
-            //     ForceMode.VelocityChange); // ForceMode를 VelocityChange로 변경
-            //float forceAmount = spinForce * sidewaysForceFactor;
-            if (sidewaysForceAddCount % 2 == 0)
+            if (sidewaysForceAddCount % 2 == 0 && sidewaysForceAddCount > 200)
             {
                 rigid.AddForce(
                     Vector3.right * spinForce * sidewaysForceFactor * 0.01f,
                     ForceMode.VelocityChange); // ForceMode를 VelocityChange로 변경 
                 ///////////
             }
-    
-            // 스위핑으로 인한 꺾임 계산
-            //rigid.AddForce(
-            //    Vector3.right * velocityCalc * 0.5f * sweepSidewaysForce * sweepSidewaysForceFactor, ForceMode.Acceleration);
         }
-        // else if ((isShooted && attackMoveFinished == false && rigid.isKinematic == false 
-        //          && sidewaysForceAddLimit <= sidewaysForceAddCount)
-        //          || isShooted && attackMoveFinished == false && rigid.isKinematic == false
-        //          && isCollided) // 좌우로 가해지는 힘 횟수가 끝났거나 다른 도넛과 충돌했으면
-        // {
-        //     velocityCalc =
-        //         1f - (stoneForce - rigid.velocity.magnitude) / stoneForce; // 발사 파워와 현재 속도를 통해, 현재 속도의 비율을 0~1로 고정
-        //
-        //     rigid.angularVelocity = Vector3.up * spinForce * spinAmountFactor * velocityCalc; // 물체의 물리적 회전속도를 직접 조정
-        // }
     }
 
     IEnumerator DonutSpinVisualizationCoroutine()
@@ -144,16 +113,10 @@ public class StoneForceController_Firebase : MonoBehaviour
         stoneForce = force;
 
         spinForce = spin * 0.01f; // fixedDaltaTime 삭제로 인한 계수 추가
-        //rigid.AddForce(launchDestination, ForceMode.VelocityChange);
         rigid.velocity = launchDestination;
-        //rigid.AddForce(Vector3.right * spinForce * sidewaysForceFactor * 4f, ForceMode.VelocityChange);
-        // DOVirtual.DelayedCall(0.2f, () =>
-        // {
-        //     isShooted = true;
-        // });
+       
         isShooted = true;
         spinVisualCoroutine = StartCoroutine(DonutSpinVisualizationCoroutine());
-        //Debug.Log($"[StoneForceController_Firebase] Force: {force}, Spin: {spin}");
     }
 
     // StoneShoot.Team 대신 직접 정의한 Team enum 사용
@@ -290,51 +253,17 @@ public class StoneForceController_Firebase : MonoBehaviour
         {
             isCollided = true;
         }
+        else if (other.gameObject.CompareTag("SideWall"))
+        {
+            Vector3 collisionNormal = other.contacts[0].normal;  // 충돌지점 수직 방향 벡터 계산
+        
+            // 현재 속도의 반대 방향으로 튕겨나가는 속도 벡터 계산
+            Vector3 newVelocity = Vector3.Reflect(rigid.velocity, collisionNormal);
+
+            rigid.velocity = newVelocity * 1.0f; // 여기 계수 바꾸면 튕기는 정도도 바뀜
+            isCollided = true;
+        }
     }
 
-    // SweepState enum도 StoneShoot에서 가져오거나 직접 정의해야 합니다.
-    public void SweepValueChanged(SweepState sweepState, float value)
-    {
-        if (physicMaterial == null) return; // null 체크 추가
-
-        if (sweepState == SweepState.FrontSweep)
-        {
-            sweepFrictionValue = value;
-            physicMaterial.dynamicFriction = initialFrictionValue - (value * 0.1f);
-            sweepSidewaysForce = 0;
-        }
-        else if (sweepState == SweepState.LeftSweep)
-        {
-            sweepFrictionValue = 0;
-            sweepSidewaysForce = -value;
-        }
-        else if (sweepState == SweepState.RightSweep)
-        {
-            sweepFrictionValue = 0;
-            sweepSidewaysForce = value;
-        }
-        else if (sweepState == SweepState.None)
-        {
-            if (sweepSidewaysForce != 0)
-            {
-                sweepSidewaysForce = value;
-            }
-            else if (sweepFrictionValue != 0)
-            {
-                sweepFrictionValue = value;
-                sweepSidewaysForce = 0;
-            }
-        }
-
-        physicMaterial.dynamicFriction = initialFrictionValue - (sweepFrictionValue * 0.6f * 0.1f);
-    }
-
-    // SweepState enum 정의 (StoneShoot에서 가져옴)
-    public enum SweepState
-    {
-        FrontSweep,
-        LeftSweep,
-        RightSweep,
-        None
-    }
+    
 }
