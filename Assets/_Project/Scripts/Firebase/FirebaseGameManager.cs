@@ -757,11 +757,7 @@ public class FirebaseGameManager : MonoBehaviour
         {
             CleanupGameDocuments();
         }
-
-        DOVirtual.DelayedCall(5f, () =>
-        {
-            SceneLoader.Instance.LoadLocal(GameManager.Instance.menuSceneName); // 메뉴씬으로 이동
-        });
+               
     }
 
     /// <summary>
@@ -1425,7 +1421,7 @@ public class FirebaseGameManager : MonoBehaviour
         countDownTween = null;
         ControlCountdown(false);
     }
-
+     
     public void Change_SuccessfullyShotInTime_To_True()
     {
         SuccessfullyShotInTime = true;

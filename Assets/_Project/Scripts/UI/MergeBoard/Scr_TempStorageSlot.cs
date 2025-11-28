@@ -20,7 +20,7 @@ public class TempStorageSlot : MonoBehaviour
     {
         tempButton = GetComponent<Button>();
         if (tempButton != null) tempButton.onClick.AddListener(OnClick);
-        tempButton.gameObject.SetActive(false);
+        //tempButton.gameObject.SetActive(false);
 
         DataManager.Instance.OnBoardDataLoaded += HandleBoardLoaded;
     }
@@ -163,4 +163,11 @@ public class TempStorageSlot : MonoBehaviour
 
         BoardManager.Instance.SpawnFromTempStorage(data);
     }
+
+    private void OnDisable()
+    {
+        if (DataManager.Instance != null)
+            DataManager.Instance.OnBoardDataLoaded -= HandleBoardLoaded;
+    }
+
 }

@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public GameState State { get; private set; } = GameState.Lobby;
     public string gameSceneName;
     public string menuSceneName;
+    private bool isAppStarted = true;
     [SerializeField] private GameObject notifier;
     [SerializeField] private GameObject matchmakingObj;
     
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     // 상대방으로부터 획득한 도넛 (승리 시 결과 화면 표시용)
     public DonutEntry CapturedDonut1 { get; private set; }
     public DonutEntry CapturedDonut2 { get; private set; }
+    public FirebaseGameManager.GameOutcome LastGameOutcome { get; private set; } //게임 승패 저장
 
     // 페널티로 제거된 도넛 정보를 임시 저장하기 위한 변수
     private DonutEntry penalizedDonut1;
@@ -63,8 +65,9 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name != menuSceneName)
             SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive);
         
-        FirebaseAuthManager.Instance.Init();
-
+        // 앱 최초 실행 시에만 isAppStarted가 true인 상태로 Init 호출
+        FirebaseAuthManager.Instance.Init(isAppStarted);
+        
         StartCoroutine(Delay(2f));
     }
     
@@ -79,9 +82,22 @@ public class GameManager : MonoBehaviour
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 씬 이름이 menuSceneName일 때만 보상 반영
+        // 씬 이름이 menuSceneName일 때만 보상 반영 및 초기화
         if (scene.name == menuSceneName)
         {
+            // isAppStarted가 true이면, 앱 최초 실행 후 메뉴 씬이 처음 로드된 것.
+            if (isAppStarted)
+            {
+                // Start()에서 Init(true)가 이미 호출되었으므로, 플래그만 false로 변경.
+                isAppStarted = false;
+            }
+            else
+            {
+                // isAppStarted가 false이면, 게임이 끝나고 메뉴 씬으로 돌아온 것.
+                // Init(false)를 호출하여 MainPanel이 열리도록 함.
+                FirebaseAuthManager.Instance.Init(isAppStarted);
+            }
+            
             SetState(GameState.Lobby);
             StartCoroutine(ApplyRewardsNextFrame());
         }
@@ -113,6 +129,7 @@ public class GameManager : MonoBehaviour
         PlayerPenalizedDonut2 = null;
         CapturedDonut1 = null;
         CapturedDonut2 = null;
+        LastGameOutcome = FirebaseGameManager.GameOutcome.Draw; // 기본값으로 초기화
 
         SetState(GameState.Playing);
         UIManager.Instance.Open(PanelId.MatchingPopUp);
@@ -134,6 +151,14 @@ public class GameManager : MonoBehaviour
         State = state;
         // HUD나 시스템에 이벤트로 알려주고, 상태별 로직 실행
 
+    }
+
+    /// <summary>
+    /// 게임 결과를 GameManager에 저장합니다.
+    /// </summary>
+    public void SetGameOutcome(FirebaseGameManager.GameOutcome outcome)
+    {
+        LastGameOutcome = outcome;
     }
 
     //게임종료시의 UI로부터 받아올 보상 값들을 담을 변수

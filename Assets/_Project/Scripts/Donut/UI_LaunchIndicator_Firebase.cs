@@ -226,8 +226,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public void FinishedUI(FirebaseGameManager.GameOutcome outcome) // 게임종료 - 결과창
     {
         AllcloseUI();
-        result.SetActive(true);
-        ResultRewardView(outcome);
+        ResultRewardView(outcome); //게임결과 설정
+        result.SetActive(true); // 결과창 on
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
@@ -281,7 +281,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         for (int i = 0; i < slots.Count; i++)
         {
-            if (i < entries.Count)
+            // 항목이 존재하고, null이 아닌지 확인
+            if (i < entries.Count && entries[i] != null)
             {
                 slots[i].gameObject.SetActive(true);
                 // 표시 전용 슬롯은 클릭 기능이 필요 없으므로 onClickAction에 null 전달
@@ -289,7 +290,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             }
             else
             {
-                slots[i].gameObject.SetActive(false); // 남는 슬롯은 비활성화
+                slots[i].gameObject.SetActive(false); // 남는 슬롯 또는 null인 슬롯은 비활성화
             }
         }
     }
@@ -340,6 +341,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         if (resultText != null) resultText.text = $"{result}";
         if (getDonutText != null) getDonutText.text = $"{getDonut}";
 
+        GameManager.Instance.SetGameOutcome(outcome); // 게임 결과 저장
         GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
 
     }

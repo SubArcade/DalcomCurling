@@ -32,6 +32,15 @@ public class DonutEntryUI : MonoBehaviour
         _onClickAction = onClickAction;
         _isUsed = false; // 새로 설정될 때는 항상 사용되지 않은 상태로 초기화
 
+        // --- FIX: DataManager.Instance가 초기화되었는지 확인 ---
+        if (DataManager.Instance == null)
+        {
+            Debug.LogError($"DonutEntryUI.Setup: DataManager.Instance가 null입니다. ID: {data?.id}. 스크립트 실행 순서(Script Execution Order) 문제일 수 있습니다.");
+            if (donutImage != null) donutImage.sprite = null;
+            return; // NullReferenceException을 방지하기 위해 여기서 중단
+        }
+        // --- End of FIX ---
+
         // DataManager를 통해 도넛의 원본 데이터를 가져옵니다.
         // DonutData는 DonutTypeSO.cs에 정의되어 있습니다.
         DonutData originalDonutData = DataManager.Instance.GetDonutByID(data.id);
