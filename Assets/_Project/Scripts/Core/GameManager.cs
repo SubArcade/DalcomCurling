@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public string gameSceneName;
     public string menuSceneName;
     [SerializeField] private GameObject notifier;
+    [SerializeField] private GameObject matchmakingObj;
     
     public event Action<PlayerData> LevelUpdate;
 
@@ -66,6 +67,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         
         notifier.SetActive(true);
+        matchmakingObj.SetActive(true);
     }
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -201,6 +203,7 @@ public class GameManager : MonoBehaviour
             // 레벨업 보상상자
            // BoardManager.Instance.SpawnGiftBox();
            // 레벨업팝업UI 컴포넌트로 달린 스크립트에보상상자 주는 함수있슴니다
+           BoardManager.Instance.RefreshBoardUnlock();
         }
         
     }

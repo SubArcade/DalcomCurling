@@ -30,9 +30,11 @@ public class EntrySlot : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         var dragged = eventData.pointerDrag?.GetComponent<MergeItemUI>();
+        // Debug.Log($"{dragged.currentCell.gridX}");
+        // Debug.Log($"{dragged.currentCell.gridY}");
         if (dragged == null) return;
 
-        dragged.DetachFromCurrentCell();  // 보드에서온거 셀 해제
+        //dragged.DetachFromCurrentCell();  // 보드에서온거 셀 해제
         //dragged.isFromEntry = true;
       
         // 같은 슬롯이면 취소
@@ -48,7 +50,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
             return;
         }
 
-        //Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
+        Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
 
         EntrySlot fromSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
 
@@ -75,12 +77,13 @@ public class EntrySlot : MonoBehaviour, IDropHandler
             SwapItems(fromSlot, toSlot, dragged);
             return;
         }
-
+        //Debug.Log($"{dragged.currentCell.gridX}");
         MoveIn(dragged);
     }
 
     private void MoveIn(MergeItemUI dragged)
     {
+        //Debug.Log($"{dragged.currentCell.gridX}");
         // Gift 타입은 차단
         if (dragged.donutData != null && dragged.donutData.donutType == DonutType.Gift)
         {
@@ -105,10 +108,12 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         CheckMarkOff(dragged);
 
         SaveToInventory(); //도넛 값 넣기
+        
+        dragged.currentCell.ClearItem();
+        BoardManager.Instance.AutoSaveBoardLocal();
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
-
         //Debug.Log($"[MoveIn] {currentItem.donutData.id} 슬롯에 도넛 들어감");
         // Debug.Log($"[MoveIn] {name} 슬롯에 도넛 들어감");
         // Debug.Log($"currentItem: {currentItem?.name}");
@@ -157,8 +162,6 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
-
-        //Debug.Log($"[SwapWithCell] 보드 셀 {fromCell.name} ↔ {toSlot.name} 교체 완료");
     }
 
     // 엔트리 <> 엔트리 스왑
