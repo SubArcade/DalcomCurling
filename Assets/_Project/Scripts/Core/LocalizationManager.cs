@@ -82,6 +82,50 @@ public enum LocalizationKey
     Up_generatorUP, //확를증가
 
     Order_Level, //주문서 n단계 도넛텍스트
+    Label_askExit, //게임종료
+
+    Btn_cancle, //취소
+    Btn_guestLogin, //게스트 로그인
+    Label_guestDescr, //게스트 안내
+    Btn_confirm, //확인
+    
+    Label_accountExit, //계정삭제
+    Label_accountDeleteWarning, //계정삭제 안내
+    Label_accountDeleteConfirm, //계정삭제 확인텍스트
+    Label_accountDeleteInsert, //계정삭제 입력
+
+    Label_getreward, //보상획득
+    Label_Touch, //계속하려면 터치
+
+    Label_levelUPreward, //레벨업보상
+    Label_getText, //획득하기
+    Label_adsDouble, //광고보기
+    
+    Label_gameHelp, //게임 도움말 이하 스텝5까지
+    Label_step1,
+    Label_step2,
+    Label_step3,
+    Label_step4,
+    Label_step5,
+
+    Label_orderLabel, //주문서
+    Label_askRefresh,
+    Label_disRefresh,
+    Label_reFreshCharge,
+
+    Label_energyCharge, //에너지충전
+    Label_donutEnergy,
+    Label_energyTime,
+
+    Label_Dalcom, //달콤컬링
+
+    Label_rankingTier, //티어
+    Label_bronze,
+    Label_silver,
+    Label_gold,
+    Label_platinum,
+    Label_diamond,
+    Label_challenger,
 }
 
 public class LocalizationManager : MonoBehaviour

@@ -73,8 +73,55 @@
 
     "Up_generator": "도넛생성기",
     "Up_generatorUP" :  "도넛생성확률 증가",
-  
-      "Order_Level" :  "단계"
+
+    "Order_Level": "단계",
+
+    "Label_askExit": "게임을 종료하시겠습니까?",
+
+    "Btn_cancle": "취소",
+    "Btn_guestLogin": "게스트 로그인",
+    "Label_guestDescr": "게스트로 로그인 할 경우, 디바이스를 초기화 하거나 앱 재설치 시 데이터가 삭제됩니다",
+
+    "Btn_confirm": "확인",
+
+    "Label_accountExit": "계정삭제",
+    "Label_acoountDeleteWarning": "계정을 삭제할 경우 연결된 데이터도 삭제됩니다.",
+    "Label_accountDeleteConfirm": "입력후에 확인을 터치하면 계정삭제가 진행됩니다.",
+    "Label_accountDeleteInsert" :  "아래 입력창에 DALCOM을 입력하세요",
+
+    "Label_getreward": "보상 획득",
+    "Label_Touch": "계속하려면 터치하세요",
+
+    "Label_levelUPreward": "레벨업 보상!",
+    "Label_getText": "획득하기",
+    "Label_adsDouble": "광고보고X2",
+
+    "Label_gameHelp": "게임 도움말",
+    "Label_step1": "생성기를 터치해서 도넛 만들기",
+    "Label_step2": "같은 도넛 두개를 합쳐서 상위단계 도넛 만들기",
+    "Label_step3": "주문서를 완료하고 골드 획득하기",
+    "Label_step4": "생성기 업그레이드로 더 높은 단계의 도넛 만들기",
+    "Label_step5": "엔트리를 설정하고 달콤컬링 플레이!",
+
+    "Label_orderLabel": "주문서 새로고침",
+    "Label_askRefresh": "광고를 보고 새로고침 횟수를 충전할까요?",
+    "Label_disRefresh": "매일 초기화되며 광고 한번당 5회가 충전됩니다.",
+    "Label_reFreshCharge": "충전하기",
+
+    "Label_energyCharge": "에너지 충전",
+    "Label_donutEnergy": "도넛을 생성하려면 에너지가 필요합니다",
+    "Label_energyTime": "2분30초마다 에너지 1개씩 회복가능",
+
+    "Label_Dalcom": "달콤 컬링!",
+
+    "Label_rankingTier": "랭킹 티어 정보",
+    "Label_bronze": "브론즈",
+    "Label_silver": "실버",
+    "Label_gold": "골드",
+    "Label_platinum": "플래티넘",
+    "Label_diamond": "다이아몬드",
+      "Label_challenger" :"챌런저",
+
   },
   "en": {
     "Btn_Start": "Start",
@@ -147,9 +194,56 @@
 
     "Label_Matching": "Matching",
     "Btn_CancleMatch": "Cancle",
-
+    "ㄴ": null,
     "Up_generator": "DonutGenerator",
     "Up_generatorUP": "Donut chance Up",
-    "Order_Level": "Level"
+    "Order_Level": "Level",
+
+    "Label_askExit": "Do you want to quit the game?",
+
+    "Btn_cancle": "Cancle",
+    "Btn_guestLogin": "Guest Login",
+    "Label_guestDescr": "Guest login data will be lost if the device is reset or the app is reinstalled.",
+
+    "Btn_confirm": "Confirm",
+
+    "Label_accountExit": "Delete Account",
+    "Label_accountDeleteWarning": "Deleting your account will also delete all linked data.",
+    "Label_accountDeleteConfirm": "Enter the text and tap confirm to proceed with account deletion.",
+    "Label_accountDeleteInsert": "Please type DALCOM in the input field below.",
+
+    "Label_getreward": "Claim Reward",
+    "Label_Touch": "Tap to continue",
+
+    "Label_levelUPreward": "Level Up Reward!",
+    "Label_getText": "Claim",
+    "Label_adsDouble": "Watch Ad x2",
+
+    "Label_gameHelp": "Game Help",
+    "Label_step1": "Tap generator to make donuts",
+    "Label_step2": "Merge two donuts for higher tier",
+    "Label_step3": "Complete orders to earn gold",
+    "Label_step4": "Upgrade generator for better donuts",
+    "Label_step5": "Set entry and play Sweet Curling!",
+
+    "Label_orderLabel": "Order Refresh",
+    "Label_askRefresh": "Watch an ad to recharge refresh attempts?",
+    "Label_disRefresh": "Resets daily, each ad gives 5 refreshes.",
+    "Label_reFreshCharge": "Recharge",
+
+    "Label_energyCharge": "Energy Charge",
+    "Label_donutEnergy": "Energy is needed to make donuts",
+    "Label_energyTime": "Recover 1 energy every 2m30s",
+
+    "Label_Dalcom": "Dalcom Curling!",
+
+    "Label_rankingTier": "Ranking Tier Info",
+    "Label_bronze": "Bronze",
+    "Label_silver": "Silver",
+    "Label_gold": "Gold",
+    "Label_platinum": "Platinum",
+    "Label_diamond": "Diamond",
+    "Label_challenger": "Challenger"
+
   }
 }
