@@ -39,8 +39,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private TextMeshProUGUI expText; 
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI pointText;
-    [SerializeField] private TextMeshProUGUI resultText; // 승리 / 패배등 쓰여질 공간
-    [SerializeField] private TextMeshProUGUI getDonutText;
+    [SerializeField] private TextMeshProUGUI resultText; // 승리,패배 결과 텍스트
+    [SerializeField] private TextMeshProUGUI getDonutText; // 승리,패배에 따라 획득/잃은 도넛 텍스트
+
    
     [Header("플로팅 텍스트")]
     [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
@@ -311,7 +312,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 getDonut = "획득 도넛";
                 
                 GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
-                GameManager.Instance.ProcessDonutCapture(OpponentProfile.Inventory.donutEntries); // 상대 도넛 획득
+                GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
                 break;
             case FirebaseGameManager.GameOutcome.Lose:
                 exp = 8;
@@ -331,7 +332,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         }
 
         // UI 텍스트 갱신
-        // int previewLevel = DataManager.Instance.PlayerData.exp + exp; // 이 부분은 이제 필요 없음.
+        //int previewLevel = DataManager.Instance.PlayerData.exp + exp; 
 
         if (expText != null) expText.text = $"+{exp}";
         if (goldText != null) goldText.text = $"+{rewardGold}";

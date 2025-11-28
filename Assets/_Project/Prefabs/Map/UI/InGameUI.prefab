@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 7278216513054901765}
   - component: {fileID: 373493022350791785}
   m_Layer: 5
-  m_Name: Next_Button (1)
+  m_Name: confirm_Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -879,7 +879,7 @@ GameObject:
   - component: {fileID: 8845263066392250570}
   - component: {fileID: 4241509467884766837}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: GetDonut_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1798,7 +1798,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6720859120361174269
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2832,7 +2832,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3524807991411965418}
   m_Layer: 5
-  m_Name: Victory&Defeat Panel
+  m_Name: First Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3170,7 +3170,7 @@ GameObject:
   - component: {fileID: 6900276324617086297}
   - component: {fileID: 1371495721902729332}
   m_Layer: 5
-  m_Name: BluePanel
+  m_Name: PointPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5568,6 +5568,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1675312238225134240}
   - component: {fileID: 2912215606312965281}
+  - component: {fileID: 5761070790532886412}
   m_Layer: 5
   m_Name: Result
   m_TagString: Untagged
@@ -5608,6 +5609,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7705582652383999536}
   m_CullTransparentMesh: 1
+--- !u!114 &5761070790532886412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7705582652383999536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d719be289072f84da1f2becf9049468, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  secondPanel: {fileID: 0}
+  next_Button: {fileID: 779378662287227172}
+  confirm_Button: {fileID: 373493022350791785}
+  opponentDonutImage1: {fileID: 0}
+  opponentDonutImage2: {fileID: 0}
+  opponentDonutPanel1: {fileID: 0}
+  opponentDonutPanel2: {fileID: 0}
+  touchDonutList: []
+  loseDonut_a: {fileID: 6072665082218622501}
+  loseDonut_b: {fileID: 8245883896458847120}
+  getDonut_a: {fileID: 5708328298225652060}
+  getDonut_b: {fileID: 6767340017945811907}
 --- !u!1 &7707825853747445572
 GameObject:
   m_ObjectHideFlags: 0
@@ -5618,12 +5643,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4136958428998148701}
   m_Layer: 5
-  m_Name: Result Panel
+  m_Name: Second Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4136958428998148701
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6177,7 +6202,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 40, y: 20}
-  m_SizeDelta: {x: 180, y: 170}
+  m_SizeDelta: {x: 170, y: 170}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &2895689125684441764
 CanvasRenderer:

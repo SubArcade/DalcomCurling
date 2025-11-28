@@ -19,14 +19,15 @@ public class Scr_ResultControl : MonoBehaviour
     [Header("가져올 도넛 선택창")]
     [SerializeField] private List<Button> touchDonutList; // 도넛 선택 오브젝트
     private List<Button> selectedObjects = new List<Button>();
-    private Image loseDonut_a;
-    private Image loseDonut_b;
-    private Image getDonut_a;
-    private Image getDonut_b;
     private int count = 0;
 
-    //상대 도넛 . 내 읽은 도넛 이미지 받아오기.
+    [Header("내 잃은 도넛")]
+    [SerializeField] private Image loseDonut_a;
+    [SerializeField] private Image loseDonut_b;
 
+    [Header("획득한 도넛")]
+    [SerializeField] private Image getDonut_a;
+    [SerializeField] private Image getDonut_b;
 
     void Start() 
     {
@@ -40,28 +41,24 @@ public class Scr_ResultControl : MonoBehaviour
             Button btn = Button.GetComponent<Button>();
             if (btn != null)
             {
-                //btn.onClick.AddListener(() => OnObjectClicked(img));
+                btn.onClick.AddListener(() => OnObjectClicked());
             }
         }
+        DisplayGameResultDonuts(); // 게임 결과 도넛 정보 표시
+
     }
     void Update()
     {
         
     }
 
-    private void OnObjectClicked(Image img)
+    private void OnObjectClicked()
     {
         if (count > 2) return;
         count++;
 
 
-
     }
-
-
-
-
-
 
 
 
@@ -77,64 +74,54 @@ public class Scr_ResultControl : MonoBehaviour
         });
     }
 
-
     /// <summary>
-    /// GameManager로부터 상대방 도넛 정보를 가져와 UI에 표시합니다.
+    /// GameManager로부터 게임 결과 도넛 정보를 가져와 UI에 표시합니다.
+    /// (내 잃은 도넛, 획득한 도넛, 상대방 선택 도넛)
     /// </summary>
-    private void DisplayOpponentDonuts()
+    private void DisplayGameResultDonuts()
     {
         if (GameManager.Instance == null || DataManager.Instance == null)
         {
             Debug.LogError("GameManager 또는 DataManager 인스턴스를 찾을 수 없습니다.");
+
             opponentDonutPanel1?.SetActive(false);
             opponentDonutPanel2?.SetActive(false);
             return;
         }
 
-        // 첫 번째 도넛 표시
-        DonutEntry donut1 = GameManager.Instance.OpponentSelectedDonut1;
-        if (opponentDonutPanel1 != null)
-        {
-            if (donut1 != null)
-            {
-                DonutData donutData1 = DataManager.Instance.GetDonutByID(donut1.id);
-                if (donutData1 != null && opponentDonutImage1 != null)
-                {
-                    opponentDonutImage1.sprite = donutData1.sprite; 
-                    opponentDonutPanel1.SetActive(true);
-                }
-                else
-                {
-                    opponentDonutPanel1.SetActive(false);
-                }
-            }
-            else
-            {
-                opponentDonutPanel1.SetActive(false);
-            }
-        }
+        // --- 내 잃은 도넛 표시 ---
+        DisplayDonut(GameManager.Instance.PlayerPenalizedDonut1, loseDonut_a);
+        DisplayDonut(GameManager.Instance.PlayerPenalizedDonut2, loseDonut_b);
 
-        // 두 번째 도넛 표시
-        DonutEntry donut2 = GameManager.Instance.OpponentSelectedDonut2;
-        if (opponentDonutPanel2 != null)
+        // --- 획득한 도넛 표시 (승리 시) ---
+        DisplayDonut(GameManager.Instance.CapturedDonut1, getDonut_a);
+        DisplayDonut(GameManager.Instance.CapturedDonut2, getDonut_b);
+        
+    }
+
+    /// <summary>
+    /// 단일 도넛 정보를 UI에 표시하는 메서드
+    /// </summary>
+    /// <param name="donutEntry">표시할 DonutEntry 정보</param>
+    /// <param name="targetImage">스프라이트를 설정할 Image 컴포넌트</param>
+    /// <param name="targetPanel">도넛이 없을 경우 비활성화할 GameObject 패널</param>
+    /// <param name="debugName">디버그 메시지용 이름</param>
+    private void DisplayDonut(DonutEntry donutEntry, Image targetImage)
+    {
+        if (donutEntry != null)
         {
-            if (donut2 != null)
+            DonutData donutData = DataManager.Instance.GetDonutByID(donutEntry.id);
+            if (donutData != null && targetImage != null)
             {
-                DonutData donutData2 = DataManager.Instance.GetDonutByID(donut2.id);
-                if (donutData2 != null && opponentDonutImage2 != null)
-                {
-                    opponentDonutImage2.sprite = donutData2.sprite;
-                    opponentDonutPanel2.SetActive(true);
-                }
-                else
-                {
-                    opponentDonutPanel2.SetActive(false);
-                }
+                targetImage.sprite = donutData.sprite; // DonutData의 'sprite' 필드 사용
+                
             }
             else
             {
-                opponentDonutPanel2.SetActive(false);
+               
             }
         }
+        
     }
+    
 }

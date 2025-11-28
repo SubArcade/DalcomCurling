@@ -23,9 +23,12 @@ public class GameManager : MonoBehaviour
     
     public event Action<PlayerData> LevelUpdate;
 
-    // 결과 화면에 표시할 상대방의 선택된 도넛
-    public DonutEntry OpponentSelectedDonut1 { get; private set; }
-    public DonutEntry OpponentSelectedDonut2 { get; private set; }
+    // 플레이어가 페널티로 잃은 도넛 (결과 화면 표시용)
+    public DonutEntry PlayerPenalizedDonut1 { get; private set; }
+    public DonutEntry PlayerPenalizedDonut2 { get; private set; }
+    // 상대방으로부터 획득한 도넛 (승리 시 결과 화면 표시용)
+    public DonutEntry CapturedDonut1 { get; private set; }
+    public DonutEntry CapturedDonut2 { get; private set; }
 
     // 페널티로 제거된 도넛 정보를 임시 저장하기 위한 변수
     private DonutEntry penalizedDonut1;
@@ -106,8 +109,10 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         // 이전 게임의 결과 표시용 데이터 초기화
-        OpponentSelectedDonut1 = null;
-        OpponentSelectedDonut2 = null;
+        PlayerPenalizedDonut1 = null;
+        PlayerPenalizedDonut2 = null;
+        CapturedDonut1 = null;
+        CapturedDonut2 = null;
 
         SetState(GameState.Playing);
         UIManager.Instance.Open(PanelId.MatchingPopUp);
@@ -217,7 +222,7 @@ public class GameManager : MonoBehaviour
     }
     private int index1;
     private int index2;
-    public void ApplyStartGamePenalty(int _index1, int _index2)
+    public void ApplyStartGamePenalty(int _index1, int _index2, List<DonutEntry> opponentDonuts)
     {
         if (DataManager.Instance == null) return;
         index1 = _index1;
@@ -236,8 +241,26 @@ public class GameManager : MonoBehaviour
         // 1-1. 페널티 적용 전, 복구를 위해 현재 도넛 정보와 인덱스 저장
         this.penaltyIndex1 = index1;
         this.penalizedDonut1 = currentDonuts[index1];
+        this.PlayerPenalizedDonut1 = currentDonuts[index1]; // 결과 화면 표시용으로 저장
         this.penaltyIndex2 = index2;
         this.penalizedDonut2 = currentDonuts[index2];
+        this.PlayerPenalizedDonut2 = currentDonuts[index2]; // 결과 화면 표시용으로 저장
+
+        // 1-2. (승리 시) 획득할 상대방 도넛을 미리 저장
+        if (opponentDonuts != null)
+        {
+            List<DonutEntry> availableOpponentDonuts = opponentDonuts.Where(d => d != null).ToList();
+            if (availableOpponentDonuts.Count >= 2 && index1 < availableOpponentDonuts.Count && index2 < availableOpponentDonuts.Count && index1 != index2)
+            {
+                CapturedDonut1 = availableOpponentDonuts[index1];
+                CapturedDonut2 = availableOpponentDonuts[index2];
+                Debug.Log($"결과 화면에 표시할 획득 예정 도넛으로 저장: {CapturedDonut1.id}, {CapturedDonut2.id}");
+            }
+            else
+            {
+                Debug.LogWarning("상대방 도넛 정보가 충분하지 않아 획득 예정 도넛을 저장할 수 없습니다.");
+            }
+        }
 
         // 2. 새로운 데이터 상태 계산
         currentDonuts[index1] = null;
@@ -308,73 +331,21 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 승리 시 상대방의 도넛 엔트리에서 랜덤으로 2개를 복사하여 자신의 인벤토리에 추가합니다.
+    /// 승리 시, 미리 저장해둔 상대방 도넛을 보상으로 지급 대기열에 추가합니다.
     /// </summary>
-    /// <param name="opponentDonuts">상대방의 도넛 엔트리 리스트</param>
-    public void ProcessDonutCapture(List<DonutEntry> opponentDonuts)
+    public void ProcessDonutCapture()
     {
-        if (DataManager.Instance == null || opponentDonuts == null || opponentDonuts.Count == 0)
-        {
-            Debug.LogWarning("도넛 획득 실패: 상대방 도넛 정보가 유효하지 않습니다.");
-            return;
-        }
-
-        List<DonutEntry> availableOpponentDonuts = opponentDonuts.Where(d => d != null).ToList();
-
-        if (availableOpponentDonuts.Count < 2)
-        {
-            Debug.LogWarning("도넛 획득 실패: 상대방의 유효한 도넛이 2개 미만입니다.");
-            return;
-        }
-
-        DonutEntry capturedDonut1 = availableOpponentDonuts[index1];
-        DonutEntry capturedDonut2 = availableOpponentDonuts[index2];
-
-        if (capturedDonut1 != null && capturedDonut2 != null)
+        if (CapturedDonut1 != null && CapturedDonut2 != null)
         {
             // 보상 도넛을 즉시 추가하지 않고, 나중에 안전하게 지급하기 위해 임시 리스트에 추가합니다.
-            pendingRewardDonuts.Add(capturedDonut1);
-            pendingRewardDonuts.Add(capturedDonut2);
-            Debug.Log($"보상 도넛 2개({capturedDonut1.id}, {capturedDonut2.id})를 획득하여 보류 중입니다.");
+            pendingRewardDonuts.Add(CapturedDonut1);
+            pendingRewardDonuts.Add(CapturedDonut2);
+            Debug.Log($"보상 도넛 2개({CapturedDonut1.id}, {CapturedDonut2.id})를 획득하여 보류 중입니다.");
         }
         else
         {
-            Debug.LogError("도넛 획득 오류: 선택된 도넛 중 null이 있습니다. 로직을 확인하세요.");
+            Debug.LogWarning("도넛 획득 실패: 캡처할 도넛 정보가 미리 설정되지 않았습니다.");
         }
     }
 
-
-    /// <summary>
-    /// 결과 화면에 표시할 상대방의 도넛을 설정합니다.
-    /// 매치메이킹이 완료되고 상대방의 데이터가 정해졌을 때 호출해야 합니다.
-    /// </summary>
-    /// <param name="opponentDonuts">상대방의 도넛 리스트</param>
-    /// <param name="idx1">표시할 첫 번째 도넛의 인덱스</param>
-    /// <param name="idx2">표시할 두 번째 도넛의 인덱스</param>
-    public void SetOpponentDonutsForDisplay(List<DonutEntry> opponentDonuts, int idx1, int idx2)
-    {
-        if (opponentDonuts == null) {
-            OpponentSelectedDonut1 = null;
-            OpponentSelectedDonut2 = null;
-            return;
-        }
-
-        var availableDonuts = new List<DonutEntry>();
-
-        foreach (var d in opponentDonuts)
-        {
-            if (d != null)
-            {
-                availableDonuts.Add(d);
-            }
-        }
-
-        OpponentSelectedDonut1 = (idx1 >= 0 && idx1 < availableDonuts.Count) ? availableDonuts[idx1] : null;
-        OpponentSelectedDonut2 = (idx2 >= 0 && idx2 < availableDonuts.Count) ? availableDonuts[idx2] : null;
-
-        if (OpponentSelectedDonut1 == null)
-            Debug.LogWarning($"SetOpponentDonutsForDisplay: idx1({idx1})에 해당하는 도넛을 찾을 수 없습니다.");
-        if (OpponentSelectedDonut2 == null)
-            Debug.LogWarning($"SetOpponentDonutsForDisplay: idx2({idx2})에 해당하는 도넛을 찾을 수 없습니다.");
-    }
 }

@@ -1446,7 +1446,9 @@ public class FirebaseGameManager : MonoBehaviour
             index2 = UnityEngine.Random.Range(0, 5);
         } while (index1 == index2);
 
-        GameManager.Instance.ApplyStartGamePenalty(index1, index2);
+        PlayerProfile opponentProfile = GetPlayerProfile(GetOpponentId());
+        List<DonutEntry> opponentDonuts = opponentProfile?.Inventory?.donutEntries;
+        GameManager.Instance.ApplyStartGamePenalty(index1, index2, opponentDonuts);
         penaltyApplied = true;
         Debug.Log($"게임 시작 페널티 로직 실행. 인덱스 {index1}, {index2}의 도넛이 제거됩니다.");
     }
