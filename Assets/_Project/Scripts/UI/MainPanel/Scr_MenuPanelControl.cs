@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -103,7 +101,12 @@ public class Scr_MenuPanelControl : MonoBehaviour
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
         testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
         
-        checkEntryButton.onClick.AddListener(() => checkEntryPopup.SetActive(false));
+        checkEntryButton.onClick.AddListener(() =>
+        {
+            checkEntryPopup.SetActive(false);
+            // 앤트리 팝업 열기
+            UIManager.Instance.Open(PanelId.EntryPopUp);
+        });
         checkGiftBoxButton.onClick.AddListener(() => checkGiftBoxPopup.SetActive(false));
         
 
@@ -146,10 +149,18 @@ public class Scr_MenuPanelControl : MonoBehaviour
     private void CheckReadyPanel()
     {
         int stack = 0;
+        Debug.Log(DataManager.Instance.InventoryData.donutEntries);
         foreach (var entry in DataManager.Instance.InventoryData.donutEntries)
         {
-            if (entry.id == null)
+            if (entry == null)
+            {
                 stack++;
+                continue;
+            }
+            
+            if (string.IsNullOrEmpty(entry.id))
+                stack++;
+            
         }
         
         if (stack == 0)

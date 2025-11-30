@@ -60,6 +60,7 @@ public class Scr_TestRewardButton : MonoBehaviour
             case AdType.GIFTBOX:
                 GiveGiftBox();
                 GiveGiftBox();
+                UIManager.Instance.Open(PanelId.MainPanel);
                 break;
         }
         Debug.Log($"보상 획득: +{amount} {type}");

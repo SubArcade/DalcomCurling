@@ -18,6 +18,7 @@ public enum EffectType
     c,
     d,
     e,
+    f,
 }
 
 public enum CharacterType
@@ -28,6 +29,7 @@ public enum CharacterType
     c,
     d,
     e,
+    f,
 }
 
 [System.Serializable, FirestoreData]
