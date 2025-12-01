@@ -45,4 +45,10 @@ public class PlayerData
     [field: SerializeField, Tooltip("최대 에너지")] public int maxEnergy { get; set; }
     [field: SerializeField, Tooltip("충전 시간(초)")] public int perSecEnergy { get; set; }
     [field: SerializeField, Tooltip("플레이어 만랩")] public int levelMax { get; set; }
+    
+    // 환경설정 데이터
+    [field: SerializeField, Tooltip("에너지 모두 재충전")] [FirestoreProperty] public int energyFullRecharged { get; set; }
+    [field: SerializeField, Tooltip("이벤트 수신 알림")] [FirestoreProperty] public int eventReceivedNotif { get; set; }
+    [field: SerializeField, Tooltip("야간 알림")] [FirestoreProperty] public int nightNotif { get; set; }
+    
 }

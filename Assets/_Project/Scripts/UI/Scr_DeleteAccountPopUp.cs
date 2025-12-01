@@ -27,14 +27,16 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
 
     }
 
-    private void OnConfirmBtn() 
+    private async void OnConfirmBtn() 
     {
         string text = input.text.Trim();
 
         if (text.Equals("DALCOM", StringComparison.OrdinalIgnoreCase))
         {
             Debug.Log("계정삭제 완료!!");
+            await FirebaseAuthManager.Instance.DeleteAccountAsync();
             UIManager.Instance.Close(PanelId.DeleteAccountPopUp);
+            UIManager.Instance.Open(PanelId.LoginPanel);
         }
         else 
         {

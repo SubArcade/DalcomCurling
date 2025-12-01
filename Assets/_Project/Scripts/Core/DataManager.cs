@@ -28,49 +28,10 @@ public enum GameTier
 [System.Serializable, FirestoreData]
 public class UserDataRoot
 {
-    [field: SerializeField] [FirestoreProperty] public PlayerData player { get; set; } = new PlayerData(){
-        email = "test@test.com",
-        nickname = "Dalcom",
-        gold = 5000,
-        gem = 1000,
-        energy = 2000,
-        level = 1,
-        exp = 0,
-        lastAt = 0,
-        maxEnergy = 50,
-        perSecEnergy = 10,
-        soloScore = 0,
-        soloTier = GameTier.Bronze,
-        levelMax = 20,
-    };
-    
-    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData()
-    {
-        donutEntries = new List<DonutEntry>()
-        {
-            null,
-            null,
-            null,
-            null,
-            null
-        }
-    };
-
-    [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
-    {
-        generatorLevelHard = 1,
-        generatorLevelMoist = 1,
-        generatorLevelSoft = 1,
-        cellMax = 49,
-        cellWidth = 7,
-        cellLength = 7,
-    };
-    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData()
-    {   
-        maxCount = 5,
-        refreshCount =5,
-        baseGold = 0,
-    };
+    [field: SerializeField] [FirestoreProperty] public PlayerData player { get; set; } = new PlayerData();
+    [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
+    [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData();
+    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData();
 }
 
 public class DataManager : MonoBehaviour
@@ -110,6 +71,54 @@ public class DataManager : MonoBehaviour
 
     // 백그라운드 이벤트
     public event Action<bool> PauseChanged;
+    
+    // 처음 셋팅 데이터
+    [SerializeField] private PlayerData firstPlayerData = new PlayerData()
+    {
+        email = "",
+        nickname = "Dalcom",
+        gold = 5000,
+        gem = 1000,
+        energy = 2000,
+        level = 1,
+        exp = 0,
+        lastAt = 0,
+        maxEnergy = 50,
+        perSecEnergy = 10,
+        soloScore = 0,
+        soloTier = GameTier.Bronze,
+        levelMax = 20,
+        gainNamePlateType =
+        {
+            NamePlateType.NONE
+        }
+    };
+    [SerializeField] private InventoryData firstInventoryData = new InventoryData()
+    {
+        donutEntries = new List<DonutEntry>()
+        {
+            null,
+            null,
+            null,
+            null,
+            null
+        }
+    };
+    [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
+    {
+        generatorLevelHard = 1,
+        generatorLevelMoist = 1,
+        generatorLevelSoft = 1,
+        cellMax = 49,
+        cellWidth = 7,
+        cellLength = 7,
+    };
+    [SerializeField] private QuestData firstQuestData = new QuestData()
+    {
+        maxCount = 5,
+        refreshCount =5,
+        baseGold = 0,
+    };
 
     // 바뀐 데이터 이벤트 함수 실행용 함수
     // 텍스트를 바꿔줄꺼다
@@ -168,17 +177,17 @@ public class DataManager : MonoBehaviour
     {
         docId = uId;
         
-        int maxEnergy = userData.player.maxEnergy;
-        int secEnergy = userData.player.perSecEnergy;
-        int maxLevel = userData.player.levelMax;
+        int maxEnergy = firstPlayerData.maxEnergy;
+        int secEnergy = firstPlayerData.perSecEnergy;
+        int maxLevel = firstPlayerData.levelMax;
         
-        int cellMax = MergeBoardData.cellMax;
-        int cellWidth = MergeBoardData.cellWidth;
-        int cellLength = MergeBoardData.cellLength;
+        int cellMax = firstMergeBoardData.cellMax;
+        int cellWidth = firstMergeBoardData.cellWidth;
+        int cellLength = firstMergeBoardData.cellLength;
         
-        int baseGold = QuestData.baseGold;
-        int RefreshCount = QuestData.refreshCount;
-        int maxCount = QuestData.maxCount;
+        int baseGold = firstQuestData.baseGold;
+        int RefreshCount = firstQuestData.refreshCount;
+        int maxCount = firstQuestData.maxCount;
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
@@ -243,13 +252,10 @@ public class DataManager : MonoBehaviour
         PlayerData.levelMax = maxLevel;
     }
 
+    // 값이 바뀌는 처음 셋팅 데이터
     private void FirstBasePlayerData()
     {
-        PlayerData.gainNamePlateType.Add(NamePlateType.NONE);
-        
-        // 임시용
-        PlayerData.gem = 1000;
-        PlayerData.energy = 2000;
+        userData.player = firstPlayerData;
     }
     
     // 기본 인벤토리 데이터
@@ -290,7 +296,8 @@ public class DataManager : MonoBehaviour
 
     private void FirstBaseInventoryData()
     {
-        EnsureDonutSlots();
+        //EnsureDonutSlots();
+        userData.inventory = firstInventoryData;
     }
     
     
@@ -415,6 +422,7 @@ public class DataManager : MonoBehaviour
             Debug.LogError($"[FS][SAVE-ALL][ERR] {e}");
         }
     }
+    
     // Rank 디비 관련 함수들
 
     // 디비에 들어가는 컬랙션과 문서 설정
@@ -430,6 +438,13 @@ public class DataManager : MonoBehaviour
         return ModeDoc(targetMode).Collection("leaders");
     }
 
+    // 계정 삭제
+    public async Task DeleteUserDataAsync()
+    {
+        var docRef = db.Collection("user").Document(docId);
+        await docRef.DeleteAsync();
+        Debug.Log("[DataManager] Firestore 유저 데이터 삭제 완료");
+    }
     
     // 도넛 SO 데이터 불러오기
     

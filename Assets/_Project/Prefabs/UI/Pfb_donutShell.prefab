@@ -342,6 +342,10 @@ MonoBehaviour:
   rewardRoot: {fileID: 2350003369635996587}
   donutImage: {fileID: 6538613924151784124}
   rewardText: {fileID: 4864790175923816903}
+  donutType: 0
+  level: 0
+  baseSprite: {fileID: 21300000, guid: da3d79559c0a02140b86cd06b2c8c7c1, type: 3}
+  activeSprite: {fileID: 21300000, guid: 4b051db428a93d04e960d760abf0c332, type: 3}
 --- !u!1 &5213169026846149969
 GameObject:
   m_ObjectHideFlags: 0
@@ -779,7 +783,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3674540306851544728, guid: 0cff65138bff78042a075b0c18da9184, type: 3}
       propertyPath: m_text
-      value: "\uC82C 1\uAC1C \uD68D"
+      value: "\uC82C 1\uAC1C \uD68D\uB4DD\n"
       objectReference: {fileID: 0}
     - target: {fileID: 3674540306851544728, guid: 0cff65138bff78042a075b0c18da9184, type: 3}
       propertyPath: m_fontSize

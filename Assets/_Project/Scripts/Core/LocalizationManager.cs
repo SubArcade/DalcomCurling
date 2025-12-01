@@ -147,6 +147,9 @@ public enum LocalizationKey
     Label_ads3Text,
     Label_gemFree,
     Label_lookAds,
+    Label_ServicePolicy,
+    Label_ServicePolicyDetail,
+    Label_PrivacyNotice
     //----------인게임 UI 로컬
     ingame_waitingThrow, //도넛 던지기 기다리는중
     ingame_checkConnect, //연결ㄹ확인중
