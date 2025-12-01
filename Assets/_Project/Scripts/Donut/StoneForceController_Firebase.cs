@@ -32,6 +32,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 
     private PhysicMaterial physicMaterial;
     private Coroutine spinVisualCoroutine = null;
+    private Scr_DonutParticleSystem donutParticleSystem;
 
     // private StoneShoot shoot; // 더 이상 StoneShoot을 직접 참조하지 않습니다.
     private float initialFrictionValue;
@@ -64,6 +65,7 @@ public class StoneForceController_Firebase : MonoBehaviour
         }
         physicMaterial = capsuleCollider.material;
         initialFrictionValue = physicMaterial.dynamicFriction;
+        donutParticleSystem = transform.GetComponent<Scr_DonutParticleSystem>();
     }
 
 
@@ -252,6 +254,7 @@ public class StoneForceController_Firebase : MonoBehaviour
         if (other.gameObject.CompareTag("InGameDonut"))
         {
             isCollided = true;
+            donutParticleSystem.PlayCollisionParticle(other);
         }
         else if (other.gameObject.CompareTag("SideWall"))
         {
@@ -263,6 +266,7 @@ public class StoneForceController_Firebase : MonoBehaviour
             rigid.velocity = newVelocity * 1.0f; // 여기 계수 바꾸면 튕기는 정도도 바뀜
             isCollided = true;
         }
+        
     }
 
     

@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using UnityEngine;
 
 public class Scr_DonutParticleSystem : MonoBehaviour
@@ -33,6 +34,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     [SerializeField] private string targetLayerName = "Donut";
     [SerializeField] private float minCrashForce = 1.0f; // 충돌에 필요한 최소값
 
+    private GameObject currentCollisionParticle;
     private GameObject currentAuraParticle;
     private GameObject currentTrailParticle;
     private Rigidbody donutRigidbody;
@@ -47,51 +49,76 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     public bool IsTrailEnabled => trailEnabled;
     public TrailType CurrentTrailType => selectedTrail;
 
-    private void Start()
+    private void Awake()
     {
         donutRigidbody = GetComponent<Rigidbody>();
-
-        targetLayer = LayerMask.NameToLayer(targetLayerName);
-        if (targetLayer == -1)
-        {
-            Debug.LogWarning($"Layer'{targetLayerName}'를 찾을 수 없습니다");
-        }
-        
+        trailRenderer = GetComponent<TrailRenderer>();
     }
-    
-    // private void Update()
+    // private void Start()
     // {
-    //     UpdateTrailBasedOnSpeed();
-    //     UpdateTrailDirection();
+    //     donutRigidbody = GetComponent<Rigidbody>();
+    //
+    //     targetLayer = LayerMask.NameToLayer(targetLayerName);
+    //     if (targetLayer == -1)
+    //     {
+    //         Debug.LogWarning($"Layer'{targetLayerName}'를 찾을 수 없습니다");
+    //     }
+    //     
     // }
+    
+     private void Update()
+     {
+         UpdateTrailBasedOnSpeed();
+         UpdateTrailDirection();
+     }
 
-    public void InitializeDonutParticles(StoneForceController_Firebase.Team team)
+    public void InitializeDonutParticles(StoneForceController_Firebase.Team team) // StoneManager에서 도넛이 생성될때 미리 파티클들을 설정하는 함수
     {
         if (team == StoneForceController_Firebase.Team.A)
         {
             selectedAura = AuraType.Fire;
+            selectedTrail = TrailType.FireTail;
+            trailEnabled = true;
         }
         else if (team == StoneForceController_Firebase.Team.B)
         {
             selectedAura = AuraType.Ice;
+            selectedTrail = TrailType.IceTail;
+            trailEnabled = true;
         }
-        ApplyAuraSettings();
+        ApplyAuraSettings(); //오라 설정
+        CreateCollisionParticleToChildren(); // 충돌 파티클 미리 만들어놓기
     }
 
     // 충돌 파티클에 관한 부분 스크립트 작성구간
-    private void OnCollisionEnter(Collision collision)
+    // private void OnCollisionEnter(Collision collision)
+    // {
+    //     // 지정된 레이어만 충돌하게 만들기
+    //     if (targetLayer != -1 && collision.gameObject.layer != targetLayer) return;
+    //
+    //     // 충돌에 필요한 최소 힘 설정하기
+    //     float collisionForce = collision.relativeVelocity.magnitude;
+    //     if (collisionForce < minCrashForce) return;
+    //
+    //     // 충돌 지점에 파티클 생성하기 (2)
+    //     CreateCollisionParticle(collision);
+    //
+    //     Debug.Log($"도넛이 {collision.gameObject.name}이랑 {collisionForce}의 힘으로 충돌했습니다");
+    // }
+
+    private void CreateCollisionParticleToChildren() // 이 게임에 쓰일 충돌 파티클을 미리 생성해둠
     {
-        // 지정된 레이어만 충돌하게 만들기
-        if (targetLayer != -1 && collision.gameObject.layer != targetLayer) return;
+        currentCollisionParticle = Instantiate(CrashParticlePrefab, transform, true);
+    }
 
-        // 충돌에 필요한 최소 힘 설정하기
-        float collisionForce = collision.relativeVelocity.magnitude;
-        if (collisionForce < minCrashForce) return;
-
-        // 충돌 지점에 파티클 생성하기 (2)
-        CreateCollisionParticle(collision);
-
-        Debug.Log($"도넛이 {collision.gameObject.name}이랑 {collisionForce}의 힘으로 충돌했습니다");
+    public void PlayCollisionParticle(Collision collision) // 충돌시 StoneForceController_Firebase에서 호출할 함수. 파티클을 재생시킴
+    {
+        ContactPoint contact = collision.contacts[0];
+        Vector3 collisionPoint = contact.point;
+        Quaternion collisionRotation = Quaternion.LookRotation(contact.normal);
+        currentCollisionParticle.transform.position = collisionPoint;
+        currentCollisionParticle.transform.rotation = collisionRotation;
+        currentCollisionParticle.GetComponent<ParticleSystem>().Play();
     }
 
     private void CreateCollisionParticle(Collision collision)
