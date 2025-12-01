@@ -390,6 +390,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             
             // 머지 성공 애널리틱스
             AnalyticsManager.Instance.MergeSuccess();
+            DataManager.Instance.AddCodexEntry(nextDonut.donutType, nextDonut.id, nextDonut.level);
             if(SoundManager.Instance != null)
                 SoundManager.Instance.mergeDonut(transform.position);
 

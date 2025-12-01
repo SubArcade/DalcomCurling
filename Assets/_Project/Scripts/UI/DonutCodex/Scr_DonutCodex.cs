@@ -143,7 +143,7 @@ public class Scr_DonutCodex : MonoBehaviour
     {
         RefreshType(DonutType.Soft, softShells);
         OnPanel(DonutType.Soft);
-        image.sprite = baseHardSprite;
+        image.sprite = baseSoftSprite;
         if (LocalizationManager.Instance.CurrentLanguage == "ko")
         {
             titleText.text = "말랑 도넛";
@@ -170,7 +170,7 @@ public class Scr_DonutCodex : MonoBehaviour
     {
         RefreshType(DonutType.Moist, moistShells);
         OnPanel(DonutType.Moist);
-        image.sprite = baseHardSprite;
+        image.sprite = baseMoistSprite;
         if (LocalizationManager.Instance.CurrentLanguage == "ko")
         {
             titleText.text = "촉촉 도넛";

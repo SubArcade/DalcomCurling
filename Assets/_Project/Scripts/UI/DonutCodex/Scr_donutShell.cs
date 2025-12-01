@@ -22,7 +22,7 @@ public class Scr_donutShell : MonoBehaviour
 
     [Header("Reward 상태용")]
     [SerializeField] private TMP_Text rewardText;
-    private int gem;
+    private int gem = 1;
     public DonutType donutType;
     public int level;
     
@@ -73,7 +73,7 @@ public class Scr_donutShell : MonoBehaviour
                 break;
             case DonutDexViewState.Reward:
                 gem = reward;
-                if (LocalizationManager.Instance.CurrentLanguage == "ko")
+                if(LocalizationManager.Instance.CurrentLanguage == "ko")
                     rewardText.text = $"젬 {reward}개 획득";
                 else
                     rewardText.text = $"{reward} Gem";

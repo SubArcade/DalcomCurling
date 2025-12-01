@@ -95,6 +95,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("뒤로가기 눌림!");
             // 팝업 띄우기
+            UIManager.Instance.Open(PanelId.ExitPopup);
         }
     }
 
