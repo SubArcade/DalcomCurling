@@ -60,6 +60,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     private CapsuleCollider capsuleCollider;
     private Vector3 originalScale;
     private Vector3 newScale;
+    private bool particleTrailFinished = false;
     
     //fixedUpdate 내부에서 변수 생성을 하지 않도록 미리 생성한 변수
     private Vector3 velocity;
@@ -68,6 +69,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     private Quaternion targetRotation;
     private float scaleValue_Y;
     private GameObject particleSystemParent;
+    private ParticleSystem.MainModule mainModule;
 
     // 파티클 시스템의 로컬 X축 회전 보정을 위한 상수 (90도 회전 필요)
     private readonly Quaternion rotationOffset = Quaternion.Euler(0f, 0f, 0f);
@@ -107,7 +109,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
      
      void Update()
      {
-         if (initialized)
+         if (initialized && !particleTrailFinished)
          {
              // 1. 현재 속도 벡터를 가져옵니다.
              velocity = donutRigidbody.velocity;
@@ -149,7 +151,9 @@ public class Scr_DonutParticleSystem : MonoBehaviour
                  if (selectedTrail == TrailType.LightTail || selectedTrail == TrailType.MagicTail)
                  {
                      trailParticleSystem.transform.localScale = new Vector3(originalScale.x,
-                         originalScale.y, originalScale.z + sqrVelocity * 0.05f);
+                         originalScale.y, originalScale.z + sqrVelocity * 0.02f);
+                     mainModule = trailParticleSystem.main;
+                     mainModule.simulationSpeed  = 1f + sqrVelocity * 0.02f;
                  }
                  else
                  {
@@ -161,6 +165,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
              {
                  //trailParticleSystem.transform.localScale = new Vector3(0, 0, 0);
                  trailParticleSystem.Stop();
+                 particleTrailFinished = true;
              }
              
              //trailParticleSystem.transform.position = capsuleCollider.bounds.center + direction * colliderRadius;
