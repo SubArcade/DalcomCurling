@@ -136,7 +136,12 @@ public class DataManager : MonoBehaviour
         PlayerData.level = level;
         OnUserDataChanged?.Invoke(PlayerData);
     }
-    
+    public void NicknameChange(string Name)
+    {
+        PlayerData.nickname = Name;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
     void Awake()
     {
         Instance = this;

@@ -361,7 +361,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     // 닉네임 변경 (무료)
     private void FreeChangeNickname()
     {
-        DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+        //DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+        DataManager.Instance.NicknameChange(changeNicknameInputField.text);
         DataManager.Instance.PlayerData.changeNicknameCount++;
         nickNameAnswerPopup.SetActive(false);
         nickNameChangePopup.SetActive(false);
@@ -382,7 +383,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         else
         {
             // 닉네임 변경
-            DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+            //DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+            DataManager.Instance.NicknameChange(changeNicknameInputField.text);
             DataManager.Instance.PlayerData.changeNicknameCount++;
             DataManager.Instance.PlayerData.gem -= int.Parse(gemText);
             DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem);

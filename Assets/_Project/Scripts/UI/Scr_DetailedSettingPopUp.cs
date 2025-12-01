@@ -53,7 +53,12 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     {
         accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
         accountExit.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DeleteAccountPopUp));
-        gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));          
+        gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));
+        accountIdText.text = $"User ID : {DataManager.Instance.PlayerData.nickname}";
+    }
+    void OnEnable()
+    {
+        accountIdText.text = $"User ID : {DataManager.Instance.PlayerData.nickname}";
     }
     void Start()
     {
