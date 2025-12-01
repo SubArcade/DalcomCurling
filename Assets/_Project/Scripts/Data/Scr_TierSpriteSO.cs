@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
+public class TierSpritePair
+{
+    public GameTier tier;     // enum 값
+    public Sprite sprite;     // 매칭되는 이미지
+}
+
 [CreateAssetMenu(fileName = "TierSpriteSO", menuName = "SO/TierSpriteSO")]
 public class Scr_TierSpriteSO : ScriptableObject
 {
-    [Serializable]
-    public class TierSpritePair
-    {
-        public GameTier tier;     // enum 값
-        public Sprite sprite;     // 매칭되는 이미지
-    }
-
     [SerializeField] private List<TierSpritePair> tierSprites = new List<TierSpritePair>();
 
     private Dictionary<GameTier, Sprite> tierSpriteDict;

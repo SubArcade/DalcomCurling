@@ -22,4 +22,9 @@ public class NamePlate
 public class NamePlaateSO : ScriptableObject
 {
     public List<NamePlate> namePlateList;
+    
+    public NamePlate GetByType(NamePlateType type)
+    {
+        return namePlateList.Find(p => p.plateType == type);
+    }
 }
