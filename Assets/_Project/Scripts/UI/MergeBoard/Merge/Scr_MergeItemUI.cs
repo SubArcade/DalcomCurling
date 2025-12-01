@@ -391,8 +391,17 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             // 머지 성공 애널리틱스
             AnalyticsManager.Instance.MergeSuccess();
             DataManager.Instance.AddCodexEntry(nextDonut.donutType, nextDonut.id, nextDonut.level);
-            if(SoundManager.Instance != null)
-                SoundManager.Instance.mergeDonut();
+            Debug.Log($"{nextDonut.donutType}111111111111111111111111111111111");
+            if (nextDonut.donutType == DonutType.Gift)
+            {
+                if(SoundManager.Instance != null)
+                    SoundManager.Instance.mergeGiftBox();  
+            }
+            else
+            {
+                if(SoundManager.Instance != null)
+                    SoundManager.Instance.mergeDonut();   
+            }
 
             BoardManager.Instance.AutoSaveBoardLocal(); //로컬 저장
             return;
