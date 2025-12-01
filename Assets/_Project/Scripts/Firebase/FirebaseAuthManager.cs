@@ -39,7 +39,7 @@ public class FirebaseAuthManager
     //await FirebaseAuth.DefaultInstance.CurrentUser.UpdatePasswordAsync(newPassword);
 
 
-    public async void Init()
+    public async void Init(bool isfirst = false)
     {
         // FirebaseInitializer가 완료될 때까지 기다립니다.
         while (!FirebaseInitializer.IsInitialized)
@@ -58,7 +58,9 @@ public class FirebaseAuthManager
         if (auth.CurrentUser != null)
         {
             Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
-            UIManager.Instance.Open(PanelId.StartPanel);
+            if (isfirst) UIManager.Instance.Open(PanelId.StartPanel);
+            else UIManager.Instance.Open(PanelId.MainPanel);
+
             await DataManager.Instance.EnsureUserDocAsync(auth.CurrentUser.UserId, isAutoLogin: true);
         }
         else

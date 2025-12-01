@@ -11,10 +11,19 @@ public class Scr_TweenHandDragGuide : MonoBehaviour
     private RectTransform handRect;
     private Sequence currentSeq;
     private Vector3 originalScale;
-    private void Awake()
+    private bool isInitialized = false;
+
+    private void Initialize()
     {
+        if (isInitialized) return;
         handRect = GetComponent<RectTransform>();
         originalScale = transform.localScale;
+        isInitialized = true;
+    }
+    
+    private void Awake()
+    {
+        Initialize();
     }
 
     private void OnDisable()
@@ -27,6 +36,7 @@ public class Scr_TweenHandDragGuide : MonoBehaviour
     /// </summary>
     public void PlayVerticalDrag()
     {
+        Initialize();
         PlayDragAnimation(direction: Vector2.down);
     }
 
@@ -35,6 +45,7 @@ public class Scr_TweenHandDragGuide : MonoBehaviour
     /// </summary>
     public void PlayHorizontalDrag()
     {
+        Initialize();
         PlayDragAnimation(direction: Vector2.right);
     }
 
@@ -43,6 +54,7 @@ public class Scr_TweenHandDragGuide : MonoBehaviour
     /// </summary>
     public void PlayTouchMove()
     {
+        Initialize();
         transform.localScale = originalScale;
         Sequence sequence = DOTween.Sequence();
         sequence.AppendInterval(dragTime);

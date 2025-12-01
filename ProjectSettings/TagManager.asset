@@ -8,6 +8,8 @@ TagManager:
   - MainCanvas
   - EntrySlot
   - TrashCan
+  - GameManager
+  - SideWall
   layers:
   - Default
   - TransparentFX

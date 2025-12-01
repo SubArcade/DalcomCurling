@@ -142,7 +142,24 @@
     "Label_ads3Text": "오늘부터 180일동안 광고가 등장하지않아요!",
     "Label_gemFree": "하루 한번 무료",
 
-    "Label_loockAds" :  "광고보기",
+    "Label_loockAds": "광고보기",
+
+    "ingame_waitingThrow": "상대방이 도넛을 던지는중...",
+
+    "ingame_checkConnect": "연결 확인중...",
+
+    "ingame_resultLevel": "플레이어 레벨",
+    "ingame_resultRank": "랭킹 등급",
+    "ingame_resultGetdonut": "획득 도넛",
+
+    "ingame_victoryText": "승리!",
+    "ingame_defeatText": "패배!",
+    "ingame_DonutSteal": "뺏어올 도넛을 선택하세요!",
+    "ingame_NextText": "다음",
+    "ingame_streak": "연승",
+
+    "ingame_surrenderText" :  "항복하시겠습니까?\n패배처리가 되며, 메인화면으로 돌아갑니다.",
+
     "Label_ServicePolicy" : "서비스 이용약관 요약",
     "Label_ServicePolicyDetail" : "• 본 게임의 서비스 이용 조건 및 제공 범위는 약관에 따라 운영됩니다.\n\n- 게임 콘텐츠, 계정 기능, 이용 가능한 환경(OS/기기) 등은 약관에 따라 제공됩니다.\n\n- 서비스는 업데이트나 점검 등으로 변경될 수 있으며, 필요 시 일부 기능이 제한될 수 있습니다.\n\n• 인앱결제(IAP)는 스토어 정책에 따라 처리됩니다.\n\n- 상품 구매·취소·환불은 Google Play 또는 App Store의 기준을 따릅니다.\n\n- 소비성 상품은 이미 사용된 경우 환불이 제한될 수 있습니다.\n\n• 이용자는 정당한 방법으로 서비스에 접근해야 하며, 금지 행위를 준수해야 합니다.\n\n- 불법 프로그램, 버그 악용, 계정 공유·거래 등은 금지됩니다.\n\n- 위반 시 계정 정지·기록 초기화 등 제재가 적용될 수 있습니다.\n\n• 게임 내부에서 제공되는 광고는 서비스 운영을 위한 요소입니다.\n\n- 광고 시청 보상 등 일부 기능은 운영 정책에 따라 제공되거나 변경될 수 있습니다.\n\n- 광고 노출 방식은 회사의 운영 정책 또는 제휴사 정책에 의해 달라질 수 있습니다.\n\n• 회사는 안정적인 서비스를 위해 최선을 다하지만, 외부 환경(네트워크/스토어 오류)은 책임 범위에 포함되지 않을 수 있습니다.\n\n- 스토어 결제 오류, 네트워크 장애 등은 해당 사업자의 정책이 우선합니다.\n\n- 예측 불가능한 기술적 문제 발생 시, 서비스가 일시 중단될 수 있습니다.\n\n• 자세한 내용은 전체 약관에서 확인할 수 있습니다.\n\n- 약관에는 서비스 이용 범위, 제한, 책임 범위, 이용자 권리 의무 등이 포함됩니다.\n\n- 약관은 서비스 안정화 및 법령 준수를 위해 변경될 수 있습니다.",
     "Label_PrivacyNotice" : "개인정보 보호 안내"
@@ -292,6 +309,22 @@
     "Label_loockAds": "Look Ads",
     "Label_ServicePolicy" : "Service Policy",
     "Label_ServicePolicyDetail" : "• The game is provided according to the Terms of Service, which define usage conditions and service scope.\\n\\n- Access requirements such as device compatibility, operating systems, and account functions follow the Terms of Service.\\n\\n- Some features may change or become limited due to updates, maintenance, or operational needs.\\n\\n• In-app purchases (IAP) are handled in accordance with each store’s policy.\\n\\n- Purchases, cancellations, and refunds follow Google Play or App Store rules.\\n\\n- Consumable items may not be refundable once they have been used.\\n\\n• Users must access the service through legitimate means and comply with prohibited actions.\\n\\n- Use of unauthorized programs, bug exploitation, and account sharing or trading are strictly prohibited.\\n\\n- Violations may result in penalties such as account suspension, data reset, or access restrictions without prior notice.\\n\\n• Advertisements within the game are part of the service operation.\\n\\n- Rewarded ads and ad placements may change depending on operational policy.\\n\\n- The type and frequency of ads may vary based on platform or partner requirements.\\n\\n• The company strives to provide stable service but cannot guarantee issues caused by external factors.\\n\\n- Store payment errors, network instability, and third-party service issues may fall outside our responsibility.\\n\\n- Unpredictable technical issues may result in temporary suspension or limited functionality.\\n\\n• Refer to the full Terms of Service for details.\\n\\n- The document includes usage limits, responsibilities, and user obligations.\\n\\n- Policies may be updated to improve service quality or comply with legal requirements.\"\n}",
-    "Label_PrivacyNotice" : "Privacy Notice"
+    "Label_PrivacyNotice" : "Privacy Notice",
+
+    "ingame_waitingThrow": "Opponent is throwing a donut...",
+
+    "ingame_checkConnect": "Checking connection...",
+
+    "ingame_resultLevel": "Player Level",
+    "ingame_resultRank": "Ranking Tier",
+    "ingame_resultGetdonut": "Donuts Earned",
+
+    "ingame_victoryText": "Victory!",
+    "ingame_defeatText": "Defeat!",
+    "ingame_DonutSteal": "Choose a donut to steal!",
+    "ingame_NextText": "Next",
+    "ingame_streak": "streak",
+
+    "ingame_surrenderText": "Do you want to surrender?\nIt will count as a defeat and return to the main screen."
   }
 }

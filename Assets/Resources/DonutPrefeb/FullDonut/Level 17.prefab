@@ -236,7 +236,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48652f4fd1e77824588bfc782d1efbe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stoneForce: 0
   donutId: 0
   spinForce: 0
   sweepSidewaysForce: 0
@@ -254,7 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   auraEnabled: 1
-  selectedAura: 1
+  selectedAura: 0
   auraFirePrefab: {fileID: 7823327091382468809, guid: 1fccb73a80225da4da53bc2e2c0ff010, type: 3}
   auraLightPrefab: {fileID: 6331275906715107345, guid: e382dc261e0ed114eb7bfab07a7ac3fc, type: 3}
   auraMagicPrefab: {fileID: 8846737274113074935, guid: e25f35359464b9842bcb70e5cf33d845, type: 3}
@@ -264,15 +263,16 @@ MonoBehaviour:
   selectedTrail: 1
   trailRenderer: {fileID: 0}
   minSpeedForTrail: 1
-  trailFirePrefab: {fileID: 7823327091382468809, guid: f26debc113eb71a47baa7039beb1bb9b, type: 3}
-  trailLightPrefab: {fileID: 0}
-  trailMagicPrefab: {fileID: 0}
-  trailIcePrefab: {fileID: 0}
+  trailFirePrefab: {fileID: 1649497727076839573, guid: 0a8e92515c6c9a1448a18db8b8697e8b, type: 3}
+  trailLightPrefab: {fileID: 8300941046603710838, guid: 9d90df4e1cea7384b964dd674b450f51, type: 3}
+  trailMagicPrefab: {fileID: 8105017068113891617, guid: 8d3dc79f433e0d14f89a8d3a2ed4c8b0, type: 3}
+  trailIcePrefab: {fileID: 8828913270134644546, guid: 3014a308a9169ce48b1e812fa107dbaf, type: 3}
   trailElectricPrefab: {fileID: 0}
   CrashParticlePrefab: {fileID: 3223031359271505891, guid: 62d5298ce92ee8a4c87039604bc35cea, type: 3}
   CrashParticleDuation: 2
   targetLayerName: Donut
   minCrashForce: 1
+  trailParticleSystem: {fileID: 0}
 --- !u!4 &867657085177072059 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
