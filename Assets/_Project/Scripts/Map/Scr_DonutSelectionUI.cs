@@ -46,6 +46,8 @@ public class DonutSelectionUI : MonoBehaviour
     /// <param name="clickedDonut">클릭된 도넛의 데이터.</param>
     private void OnDonutClicked(DonutEntry clickedDonut)
     {
+        // 도넛 선택 사운드 ---
+        SoundManager.Instance.selectDonut();
         for (int i = 0; i < donutSlots.Count; i++)
         {
             // 도넛 선택 사운드 ---
