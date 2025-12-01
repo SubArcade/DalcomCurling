@@ -202,7 +202,7 @@ public class DataManager : MonoBehaviour
             //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold, RefreshCount, maxCount);
 
-            await docRef.SetAsync(userData, SetOptions.MergeAll);
+            //await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"자동 로그인: /{userCollection}/{uId}");
         }
         

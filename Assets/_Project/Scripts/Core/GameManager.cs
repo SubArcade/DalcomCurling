@@ -45,6 +45,8 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
+            if (DataManager.Instance != null)
+                DataManager.Instance.OnBoardDataLoaded += HandleDataLoadedForRewards;
         }
         else
         {
@@ -99,14 +101,26 @@ public class GameManager : MonoBehaviour
             }
             
             SetState(GameState.Lobby);
-            StartCoroutine(ApplyRewardsNextFrame());
         }
     }
 
     private void OnDestroy()
     {
         if (Instance == this)
+        {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            if (DataManager.Instance != null)
+                DataManager.Instance.OnBoardDataLoaded -= HandleDataLoadedForRewards;
+        }
+    }
+
+    private void HandleDataLoadedForRewards()
+    {
+        // 로비 씬으로 돌아왔을 때(게임이 끝난 직후), 그리고 앱 최초 실행이 아닐 때만 보상 로직 실행
+        if (State == GameState.Lobby && !isAppStarted)
+        {
+            ApplyResultRewards();
+        }
     }
 
 
@@ -179,13 +193,34 @@ public class GameManager : MonoBehaviour
     {
         if (State == GameState.Lobby)
         {
+            // 1. 페널티 복구 로직 (DB에서 데이터를 다시 로드한 후 실행)
+            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Draw)
+            {
+                if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
+                {
+                    DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+                    DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+                    DataManager.Instance.PlayerData.soloScore += 10; // 점수 복구
+                    Debug.Log("무승부: 페널티로 제거되었던 도넛과 점수가 복구됩니다.");
+                }
+            }
+            else if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+            {
+                if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
+                {
+                    DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+                    DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+                    Debug.Log("승리: 페널티로 제거되었던 도넛이 복구됩니다.");
+                }
+            }
+            
             UIManager.Instance.Open(PanelId.MainPanel);
             
             int oldLevel = DataManager.Instance.PlayerData.level;
             UIManager.Instance.Open(PanelId.MainPanel);
             
             Debug.Log(">>>>>> 게임보상을 반영합니다.");
-            // 실제 데이터 반영
+            // 2. 실제 데이터 반영 (경험치, 골드, 포인트)
             
             LevelUp(pendingExp);
             DataManager.Instance.PlayerData.gold += pendingGold;
@@ -200,6 +235,13 @@ public class GameManager : MonoBehaviour
                 UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
             }
             
+            // 3. 승리 시 상대 도넛 보상 지급
+            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+            {
+                if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
+                if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
+            }
+            
             // 보류 중인 보상 도넛 지급
             foreach (var donutEntry in pendingRewardDonuts)
             {
@@ -210,11 +252,14 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            // pending 값 초기화
+            // 4. pending 값 초기화
             pendingExp = 0;
             pendingGold = 0;
             pendingPoint = 0;
             pendingRewardDonuts.Clear();
+            
+            // 5. 모든 결과 및 보상이 적용된 최종 데이터를 Firestore에 저장
+            _ = DataManager.Instance.SaveAllUserDataAsync();
         }
     }
     private IEnumerator ApplyRewardsNextFrame()

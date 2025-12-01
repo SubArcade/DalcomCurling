@@ -540,7 +540,7 @@ public class FirebaseGameManager : MonoBehaviour
         if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;
-            DOTween.Kill("WatingThrowUI");
+            DOTween.Kill("WatingThrowUI"); //트윈킬 처리안해주면 시뮬레이션중에 튀어나옴
             UI_LaunchIndicator_Firebase.IdleUI(); // 상대방 샷 데이터가 도착하면 패널을 끔
 
             // 만약 샷 정보에 발사 시간을 놓쳤음을 나타내는 정보가 있을경우
@@ -1064,13 +1064,12 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void OnRoundEnd() //이번 라운드가 끝났을때.
     {
-        // 라운드 변경 시 턴 UI를 초기화합니다.
-        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
+        // 라운드 변경 시 턴 UI를 강제 동기화하여 점수 계산시 턴 정보 일치화.
+        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(7);
         
         // 카메라 움직임 필요
         stoneManager?.SyncPositions(_currentGame.PredictedResult.FinalStonePositions);
-        //
-        
+                
         gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
         roundDataUpdated = true;
 
@@ -1175,7 +1174,6 @@ public class FirebaseGameManager : MonoBehaviour
         stoneManager?.RoundCountUp();
         roundDataUpdated = true;
         db.Collection("games").Document(gameId).UpdateAsync(updates);
-        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
 
         //db.Collection("games").Document(gameId).UpdateAsync("PredictedResult", result);
 
