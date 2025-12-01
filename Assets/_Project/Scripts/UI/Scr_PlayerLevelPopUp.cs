@@ -342,6 +342,10 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     // 닉네임 변경 확정창 띄우기
     private void OnAnswerPopup()
     {
+        if (changeNicknameInputField.text.Length < 2)
+        {
+            return;
+        }
         nickNameAnswerPopup.SetActive(true);
         string hexColor = ColorUtility.ToHtmlStringRGB(nicknameColor);
         nameAnswerText.text = $"<color=#{hexColor}>‘{changeNicknameInputField.text}’</color>로\n 변경하시겠습니까?";

@@ -147,6 +147,9 @@ public enum LocalizationKey
     Label_ads3Text,
     Label_gemFree,
     Label_lookAds,
+    Label_ServicePolicy,
+    Label_ServicePolicyDetail,
+    Label_PrivacyNotice
 }
 
 public class LocalizationManager : MonoBehaviour

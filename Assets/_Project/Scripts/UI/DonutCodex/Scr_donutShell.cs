@@ -14,7 +14,7 @@ public class Scr_donutShell : MonoBehaviour
 
     [Header("상태별 루트 오브젝트")]
     [SerializeField] private GameObject questionRoot; // 물음표 화면
-    [SerializeField] private GameObject donutRoot;    // 도넛 화면
+    [SerializeField] public GameObject donutRoot;    // 도넛 화면
     [SerializeField] private GameObject rewardRoot;   // 보상 화면
 
     [Header("Donut 상태용")]
@@ -26,7 +26,25 @@ public class Scr_donutShell : MonoBehaviour
     public DonutType donutType;
     public int level;
     
+    [Header("도넛 배경")]
+    [SerializeField] public Sprite baseSprite;
+    [SerializeField] public Sprite activeSprite;
+    
     public event System.Action<Scr_donutShell> OnDonutClicked;
+    
+    void OnEnable()
+    {
+        if (LocalizationManager.Instance != null)
+        {
+            LocalizationManager.Instance.OnLanguageChanged += () =>
+            {
+                if (LocalizationManager.Instance.CurrentLanguage == "ko")
+                    rewardText.text = $"젬 {gem}개 획득";
+                else
+                    rewardText.text = $"{gem} Gem";
+            };
+        }
+    }
     
     private void Awake()
     {
@@ -55,7 +73,11 @@ public class Scr_donutShell : MonoBehaviour
                 break;
             case DonutDexViewState.Reward:
                 gem = reward;
-                rewardText.text = $"젬 {reward}개 획득";
+                if (LocalizationManager.Instance.CurrentLanguage == "ko")
+                    rewardText.text = $"젬 {reward}개 획득";
+                else
+                    rewardText.text = $"{reward} Gem";
+
                 break;
             default:
                 break;

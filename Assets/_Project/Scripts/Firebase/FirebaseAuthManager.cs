@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
 using Google;
@@ -282,6 +283,67 @@ public class FirebaseAuthManager
 #else
         Debug.LogWarning("Google Play Games 연동은 안드로이드에서만 지원됩니다.");
 #endif
+    }
+    
+    public async Task DeleteAccountAsync()
+    {
+        var user = auth.CurrentUser;
+
+        if (user == null)
+        {
+            Debug.LogWarning("[AccountDelete] 현재 로그인된 유저가 없습니다.");
+            return;
+        }
+
+        string uid = user.UserId;
+        Debug.Log($"[AccountDelete] 삭제 대상 UID: {uid}");
+
+        // Firebase Auth 계정 삭제
+        try
+        {
+            await user.DeleteAsync();
+            Debug.Log("[AccountDelete] Firebase Auth 계정 삭제 완료.");
+        }
+        catch (FirebaseException fe)
+        {
+            var authError = (AuthError)fe.ErrorCode;
+            Debug.LogError($"[AccountDelete] 계정 삭제 실패: {authError} / {fe.Message}");
+
+            if (authError == AuthError.RequiresRecentLogin)
+            {
+                // ★ 중요: 최근 로그인 필요
+                // - 게스트: 다시 게스트 로그인 후 삭제 시도
+                // - GPGS 연동 계정: GPGS 다시 로그인 → credential로 재인증 → Delete 다시 수행
+                Debug.LogError("[AccountDelete] 최근 로그인 필요. 다시 로그인 후 계정 삭제를 재시도하세요.");
+            }
+
+            return;
+        }
+
+        // Firestore / 기타 유저 데이터 삭제
+        try
+        {
+            // 예시: user 컬렉션 사용 중일 때
+            await DataManager.Instance.DeleteUserDataAsync();
+            await user.DeleteAsync();
+            Debug.Log("[AccountDelete] Firestore user doc 삭제 완료.");
+            // 랭크 데이터 삭제 필요
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[AccountDelete] Firestore 삭제 중 오류 (무시 가능): {e}");
+        }
+        
+        // 로컬 데이터 정리
+        try
+        {
+            auth.SignOut();
+            Debug.Log("[AccountDelete] 로컬 데이터 초기화 및 로그아웃 완료.");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[AccountDelete] 로컬 정리 중 오류: {e}");
+        }
     }
 
 }

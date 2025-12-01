@@ -266,8 +266,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4622608299959774168, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622608299959774168, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622608299959774168, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622608299959774168, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3532485644915481291, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
@@ -325,7 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a29ad266754a1d84e84341581bd29798, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  docId: ZflvQAZZmYj1SKj8mZKZ
+  docId: 
   isLogin: 0
   userData:
     <player>k__BackingField:
@@ -346,6 +363,9 @@ MonoBehaviour:
       <maxEnergy>k__BackingField: 50
       <perSecEnergy>k__BackingField: 10
       <levelMax>k__BackingField: 20
+      <energyFullRecharged>k__BackingField: 0
+      <eventReceivedNotif>k__BackingField: 0
+      <nightNotif>k__BackingField: 0
     <inventory>k__BackingField:
       <donutEntries>k__BackingField:
       - <id>k__BackingField: 
@@ -354,6 +374,10 @@ MonoBehaviour:
         <resilience>k__BackingField: 0
         <friction>k__BackingField: 0
         <level>k__BackingField: 0
+      <effectList>k__BackingField: 
+      <characterList>k__BackingField: 
+      <curEffectType>k__BackingField: 0
+      <curCharacterType>k__BackingField: 0
       <hardDonutCodexDataList>k__BackingField: []
       <softDonutCodexDataList>k__BackingField: []
       <moistDnutCodexDataList>k__BackingField: []
@@ -377,6 +401,80 @@ MonoBehaviour:
     <score>k__BackingField: 0
     <tier>k__BackingField: 0
     <uid>k__BackingField: 
+  firstPlayerData:
+    <email>k__BackingField: 
+    <nickname>k__BackingField: Dalcom
+    <gold>k__BackingField: 5000
+    <gem>k__BackingField: 1000
+    <energy>k__BackingField: 2000
+    <level>k__BackingField: 1
+    <exp>k__BackingField: 0
+    <lastAt>k__BackingField: 0
+    <authProviderType>k__BackingField: 0
+    <curNamePlateType>k__BackingField: 0
+    <gainNamePlateType>k__BackingField: 00000000
+    <changeNicknameCount>k__BackingField: 0
+    <soloScore>k__BackingField: 0
+    <soloTier>k__BackingField: 0
+    <maxEnergy>k__BackingField: 50
+    <perSecEnergy>k__BackingField: 10
+    <levelMax>k__BackingField: 20
+    <energyFullRecharged>k__BackingField: 0
+    <eventReceivedNotif>k__BackingField: 0
+    <nightNotif>k__BackingField: 0
+  firstInventoryData:
+    <donutEntries>k__BackingField:
+    - <id>k__BackingField: 
+      <type>k__BackingField: 0
+      <weight>k__BackingField: 0
+      <resilience>k__BackingField: 0
+      <friction>k__BackingField: 0
+      <level>k__BackingField: 0
+    - <id>k__BackingField: 
+      <type>k__BackingField: 0
+      <weight>k__BackingField: 0
+      <resilience>k__BackingField: 0
+      <friction>k__BackingField: 0
+      <level>k__BackingField: 0
+    - <id>k__BackingField: 
+      <type>k__BackingField: 0
+      <weight>k__BackingField: 0
+      <resilience>k__BackingField: 0
+      <friction>k__BackingField: 0
+      <level>k__BackingField: 0
+    - <id>k__BackingField: 
+      <type>k__BackingField: 0
+      <weight>k__BackingField: 0
+      <resilience>k__BackingField: 0
+      <friction>k__BackingField: 0
+      <level>k__BackingField: 0
+    - <id>k__BackingField: 
+      <type>k__BackingField: 0
+      <weight>k__BackingField: 0
+      <resilience>k__BackingField: 0
+      <friction>k__BackingField: 0
+      <level>k__BackingField: 0
+    <effectList>k__BackingField: 
+    <characterList>k__BackingField: 
+    <curEffectType>k__BackingField: 0
+    <curCharacterType>k__BackingField: 0
+    <hardDonutCodexDataList>k__BackingField: []
+    <softDonutCodexDataList>k__BackingField: []
+    <moistDnutCodexDataList>k__BackingField: []
+  firstMergeBoardData:
+    <cells>k__BackingField: []
+    <tempGiftIds>k__BackingField: []
+    <generatorLevelHard>k__BackingField: 1
+    <generatorLevelSoft>k__BackingField: 1
+    <generatorLevelMoist>k__BackingField: 1
+    cellMax: 49
+    cellWidth: 7
+    cellLength: 7
+  firstQuestData:
+    <questList1>k__BackingField: []
+    <questList2>k__BackingField: []
+    <questList3>k__BackingField: []
+    <refreshCount>k__BackingField: 5
 --- !u!1 &364261897
 GameObject:
   m_ObjectHideFlags: 0
@@ -986,7 +1084,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1137162047}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
