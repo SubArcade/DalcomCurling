@@ -189,9 +189,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
       insertIndex: -1
       addedObject: {fileID: 892656090373698066}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7708305529952544291}
   m_SourcePrefab: {fileID: 100100000, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
 --- !u!1 &2799952467545548971 stripped
 GameObject:
@@ -385,7 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   auraEnabled: 1
-  selectedAura: 1
+  selectedAura: 0
   auraFirePrefab: {fileID: 7823327091382468809, guid: 1fccb73a80225da4da53bc2e2c0ff010, type: 3}
   auraLightPrefab: {fileID: 6331275906715107345, guid: e382dc261e0ed114eb7bfab07a7ac3fc, type: 3}
   auraMagicPrefab: {fileID: 8846737274113074935, guid: e25f35359464b9842bcb70e5cf33d845, type: 3}
@@ -395,119 +392,16 @@ MonoBehaviour:
   selectedTrail: 1
   trailRenderer: {fileID: 0}
   minSpeedForTrail: 1
-  trailFirePrefab: {fileID: 7823327091382468809, guid: 11fc4e4ded3f4dc4a801a6f169142926, type: 3}
-  trailLightPrefab: {fileID: 6532625474870085665, guid: 42ae47f7db5b2f4478cc38727b2b191b, type: 3}
-  trailMagicPrefab: {fileID: 8846737274113074935, guid: 142cab9a09298724595c35609c03a547, type: 3}
-  trailIcePrefab: {fileID: 4823518202205099639, guid: a72a6b92124f5fd469e271dbaad3c0e9, type: 3}
+  trailFirePrefab: {fileID: 1649497727076839573, guid: 0a8e92515c6c9a1448a18db8b8697e8b, type: 3}
+  trailLightPrefab: {fileID: 8300941046603710838, guid: 9d90df4e1cea7384b964dd674b450f51, type: 3}
+  trailMagicPrefab: {fileID: 8105017068113891617, guid: 8d3dc79f433e0d14f89a8d3a2ed4c8b0, type: 3}
+  trailIcePrefab: {fileID: 8828913270134644546, guid: 3014a308a9169ce48b1e812fa107dbaf, type: 3}
   trailElectricPrefab: {fileID: 0}
   CrashParticlePrefab: {fileID: 3223031359271505891, guid: 62d5298ce92ee8a4c87039604bc35cea, type: 3}
   CrashParticleDuation: 2
   targetLayerName: Donut
   minCrashForce: 1
---- !u!96 &7708305529952544291
-TrailRenderer:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2799952467545548971}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 0
-  m_LightProbeUsage: 0
-  m_ReflectionProbeUsage: 0
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Time: 5
-  m_PreviewTimeScale: 1
-  m_Parameters:
-    serializedVersion: 3
-    widthMultiplier: 1
-    widthCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    colorGradient:
-      serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 1}
-      key2: {r: 0, g: 0, b: 0, a: 0}
-      key3: {r: 0, g: 0, b: 0, a: 0}
-      key4: {r: 0, g: 0, b: 0, a: 0}
-      key5: {r: 0, g: 0, b: 0, a: 0}
-      key6: {r: 0, g: 0, b: 0, a: 0}
-      key7: {r: 0, g: 0, b: 0, a: 0}
-      ctime0: 0
-      ctime1: 65535
-      ctime2: 0
-      ctime3: 0
-      ctime4: 0
-      ctime5: 0
-      ctime6: 0
-      ctime7: 0
-      atime0: 0
-      atime1: 65535
-      atime2: 0
-      atime3: 0
-      atime4: 0
-      atime5: 0
-      atime6: 0
-      atime7: 0
-      m_Mode: 0
-      m_ColorSpace: -1
-      m_NumColorKeys: 2
-      m_NumAlphaKeys: 2
-    numCornerVertices: 0
-    numCapVertices: 0
-    alignment: 0
-    textureMode: 0
-    textureScale: {x: 1, y: 1}
-    shadowBias: 0.5
-    generateLightingData: 0
-  m_MinVertexDistance: 0.1
-  m_MaskInteraction: 0
-  m_Autodestruct: 0
-  m_Emitting: 1
-  m_ApplyActiveColorSpace: 1
+  trailParticleSystem: {fileID: 0}
 --- !u!4 &3283332226543497745 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3617f4c846f974741ae5398df1d57175, type: 3}
