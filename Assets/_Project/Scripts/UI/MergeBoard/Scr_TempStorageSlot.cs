@@ -163,4 +163,11 @@ public class TempStorageSlot : MonoBehaviour
 
         BoardManager.Instance.SpawnFromTempStorage(data);
     }
+
+    private void OnDisable()
+    {
+        if (DataManager.Instance != null)
+            DataManager.Instance.OnBoardDataLoaded -= HandleBoardLoaded;
+    }
+
 }
