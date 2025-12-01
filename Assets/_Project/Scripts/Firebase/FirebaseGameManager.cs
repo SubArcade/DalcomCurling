@@ -540,6 +540,7 @@ public class FirebaseGameManager : MonoBehaviour
         if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;
+            DOTween.Kill("WatingThrowUI");
             UI_LaunchIndicator_Firebase.IdleUI(); // 상대방 샷 데이터가 도착하면 패널을 끔
 
             // 만약 샷 정보에 발사 시간을 놓쳤음을 나타내는 정보가 있을경우

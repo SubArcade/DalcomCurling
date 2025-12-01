@@ -249,8 +249,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public void IdleUI() //기본 상단 UI만 출력되는 상태
     {
         AllcloseUI();
-        roundPanel.SetActive(true);
         WaitThrowPopUp.SetActive(false);
+        roundPanel.SetActive(true);
     }
     public void WatingThrowUI() 
     {
