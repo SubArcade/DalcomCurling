@@ -72,7 +72,7 @@
     "Btn_CancleMatch": "매칭 취소",
 
     "Up_generator": "도넛생성기",
-    "Up_generatorUP" :  "도넛생성확률 증가",
+    "Up_generatorUP": "도넛생성확률 증가",
 
     "Order_Level": "단계",
 
@@ -87,7 +87,7 @@
     "Label_accountExit": "계정삭제",
     "Label_acoountDeleteWarning": "계정을 삭제할 경우 연결된 데이터도 삭제됩니다.",
     "Label_accountDeleteConfirm": "입력후에 확인을 터치하면 계정삭제가 진행됩니다.",
-    "Label_accountDeleteInsert" :  "아래 입력창에 DALCOM을 입력하세요",
+    "Label_accountDeleteInsert": "아래 입력창에 DALCOM을 입력하세요",
 
     "Label_getreward": "보상 획득",
     "Label_Touch": "계속하려면 터치하세요",
@@ -120,8 +120,29 @@
     "Label_gold": "골드",
     "Label_platinum": "플래티넘",
     "Label_diamond": "다이아몬드",
-      "Label_challenger" :"챌런저",
+    "Label_challenger": "챌런저",
 
+    "Label_shopEffect1": "불방구",
+    "Label_shopEffect1Text": "전날 불닭을 먹었나봐요ㅠㅜ",
+    "Label_shopEffect2": "무지개 뿅뿅",
+    "Label_shopEffect2Text": "세상에서 가장 아름다운 개는? 무지개 하하하",
+    "Label_shopEffect3": "별빛 스파클링",
+    "Label_shopEffect3Text": "이 도넛은 스타가 될 도넛이다.",
+
+    "Label_shopCharacter1": "북치기박치기",
+    "Label_shopCharacter1Text": "박치기공룡 파키케팔로사우루스",
+    "Label_shopCharacter2": "큐티큐티 고먐미",
+    "Label_shopCharacter2Text": "냥냥",
+
+    "Label_ads1": "광고제거 7일권",
+    "Label_ads1Text": "오늘부터 7일동안 광고가 등장하지않아요!",
+    "Label_ads2": "광고제거 30일권",
+    "Label_ads2Text": "오늘부터 30일동안 광고가 등장하지않아요!",
+    "Label_ads3": "광고제거 180일권",
+    "Label_ads3Text": "오늘부터 180일동안 광고가 등장하지않아요!",
+    "Label_gemFree": "하루 한번 무료",
+
+    "Label_loockAds" :  "광고보기",
   },
   "en": {
     "Btn_Start": "Start",
@@ -243,7 +264,28 @@
     "Label_gold": "Gold",
     "Label_platinum": "Platinum",
     "Label_diamond": "Diamond",
-    "Label_challenger": "Challenger"
+    "Label_challenger": "Challenger",
 
+    "Label_shopEffect1": "Fireball",
+    "Label_shopEffect1Text": "Looks like you had spicy chicken yesterday…",
+    "Label_shopEffect2": "Rainbow Boom",
+    "Label_shopEffect2Text": "The most beautiful dog? Rainbow haha",
+    "Label_shopEffect3": "Starlight Sparkling",
+    "Label_shopEffect3Text": "This donut is destined to be a star.",
+
+    "Label_shopCharacter1": "Headbutt Dino",
+    "Label_shopCharacter1Text": "Pachycephalosaurus, the headbutt dinosaur",
+    "Label_shopCharacter2": "Cutie Kitty",
+    "Label_shopCharacter2Text": "Meow",
+
+    "Label_ads1": "Ad Removal 7 Days",
+    "Label_ads1Text": "No ads will appear for 7 days starting today!",
+    "Label_ads2": "Ad Removal 30 Days",
+    "Label_ads2Text": "No ads will appear for 30 days starting today!",
+    "Label_ads3": "Ad Removal 180 Days",
+    "Label_ads3Text": "No ads will appear for 180 days starting today!",
+    "Label_gemFree": "Free Once a Day",
+
+    "Label_loockAds": "Look Ads"
   }
 }
