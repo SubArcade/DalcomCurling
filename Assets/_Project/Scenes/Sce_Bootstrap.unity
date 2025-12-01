@@ -178,6 +178,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pfb_SettingPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 185612191006068220, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1808373852987003326, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -257,6 +261,10 @@ PrefabInstance:
     - target: {fileID: 1808373852987003326, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3532485644915481291, guid: f9d1b596cb718ae40adcc8b6d559e71a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -339,7 +347,13 @@ MonoBehaviour:
       <perSecEnergy>k__BackingField: 10
       <levelMax>k__BackingField: 20
     <inventory>k__BackingField:
-      <donutEntries>k__BackingField: []
+      <donutEntries>k__BackingField:
+      - <id>k__BackingField: 
+        <type>k__BackingField: 0
+        <weight>k__BackingField: 0
+        <resilience>k__BackingField: 0
+        <friction>k__BackingField: 0
+        <level>k__BackingField: 0
       <hardDonutCodexDataList>k__BackingField: []
       <softDonutCodexDataList>k__BackingField: []
       <moistDnutCodexDataList>k__BackingField: []
@@ -544,6 +558,10 @@ PrefabInstance:
     - target: {fileID: 7620856112004861834, guid: 3640404686a10af4792063ab7dc6e4f7, type: 3}
       propertyPath: m_Name
       value: Pfb_LoadingPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 7620856112004861834, guid: 3640404686a10af4792063ab7dc6e4f7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1516,7 +1534,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &4698161357013453726
 GameObject:
   m_ObjectHideFlags: 0

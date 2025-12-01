@@ -316,91 +316,87 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 새로고침시 이미지, 이름.레벨,보상골드 갱신
     public void RefreshOrderDonut(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
     {
-        idList.Clear(); //id 초기화
+        idList.Clear(); // id 초기화
 
-        int count = Mathf.Min(orderImages.Count, textInfos.Count, 3); //도넛을 최대 3개까지만 새로고침
-        int totalReward = 0;
-        var questList = new List<QuestList>();
-        HashSet<string> usedDonuts = new(); //타입+레벨 검사해서 중복 방지
+        // 이번에 갱신할 도넛 개수를 랜덤으로 결정 (1~3)
+        int refreshCount = Random.Range(1, 4);
+
+        int totalReward = 0; //보상골드 초기화
+        var questList = new List<QuestList>(); //도넛들의 퀘스트 정보를 저장할 리스트
+        HashSet<string> usedDonuts = new(); //중복방지를 위한 도넛조합을 저장할 집합
 
         // 플레이어 레벨 기반 도넛 레벨 범위 계산
         int playerLevel = DataManager.Instance.PlayerData.level;
-        var (minLevel, maxLevel) = DonutLevelRange(playerLevel);
-        for (int i = 0; i < count; i++)
+        var (minLevel, maxLevel) = DonutLevelRange(playerLevel); 
+
+        // 먼저 모든 슬롯 비활성화
+        for (int i = 0; i < orderImages.Count; i++)
         {
-            DonutData donut = null; //도넛을 찾기 위한 변수와 무한루프 방지
-            int safety = 100;
-            while (safety-- > 0) //100에서 점점 1회씩 빼가며 중복되지않는 도넛 탐샘
+            orderImages[i].gameObject.SetActive(false);
+            if (i < textInfos.Count)
             {
-                DonutType randomType;
+                textInfos[i].levelText.text = "";
+                textInfos[i].typeText.text = "";
+            }
+        }
 
-                DonutType[] types = { DonutType.Hard, DonutType.Soft, DonutType.Moist };
-                randomType = types[Random.Range(0, types.Length)];
-                int randomLevel = Random.Range(minLevel, maxLevel + 1); //도넛의 타입과 레벨 무작위 선택
-                string comboKey = $"{randomType}_{randomLevel}"; //타입+레벨 조합한 키 생성
+        // refreshCount 만큼만 채워 넣기
+        for (int i = 0; i < refreshCount; i++)
+        {
+            DonutData donut = null; //도넛데이터를 찾기위해 변수 초기화
+            int safety = 100; //무한루프 방지용 100회 제한
+            while (safety-- > 0)
+            {
+                DonutType[] types = { DonutType.Hard, DonutType.Soft, DonutType.Moist };//타입랜덤으로 선택
+                DonutType randomType = types[Random.Range(0, types.Length)]; 
+                int randomLevel = Random.Range(minLevel, maxLevel + 1);//레벨을 랜덤으로 선택
+                string comboKey = $"{randomType}_{randomLevel}"; //타입과 레벨을 조합키로 문자열 생성
 
-                if (usedDonuts.Contains(comboKey)) continue; //이미 생성된 조합이면 다시 시도
+                if (usedDonuts.Contains(comboKey)) continue; //중복이면 다시 시도
 
-                var candidate = DataManager.Instance.GetDonutData(randomType, randomLevel); //해당 도넛 데이터 가져옴
-                if (candidate != null) //도넛이 존재하면
+                //위의 랜덤 타입과 레벨을 통해 데이터매니저에서 도넛을 찾음
+                var candidate = DataManager.Instance.GetDonutData(randomType, randomLevel);
+                if (candidate != null)
                 {
-                    donut = candidate; //도넛을 선택하고 
-                    usedDonuts.Add(comboKey); //조합을 추가해서 넣은뒤
+                    donut = candidate; //변수에 저장
+                    usedDonuts.Add(comboKey); //위의 조합키 문자열을 중복방지용 리스트에 저장
                     break;
                 }
             }
 
-            if (donut == null) continue; //도넛을 못 찾아도 계속 진행
+            if (donut == null) continue; //도넛이 없으면 건너뜀
 
-
-            //이미지, 타입, 단계 설명표시
+            // 슬롯 활성화
+            orderImages[i].gameObject.SetActive(true);
             orderImages[i].sprite = donut.sprite;
 
-            //저장
             idList.Add(donut.id);
 
             int reward = GetRewardByDonutLevel(donut.level);
             totalReward += reward;
 
-            // 퀘스트 정보 저장
             questList.Add(new QuestList
             {
                 donutId = donut.id,
                 rewardGold = reward
             });
 
+            // 텍스트 갱신
+            if (i < textInfos.Count)
+            {
+                textInfos[i].levelText.text = $"{donut.level}단계";
+                textInfos[i].typeText.text = donut.donutType.ToString();
+            }
         }
-        SetDonutTexts(textInfos, idList);
+
         costText.text = $"{totalReward}";
 
-        // 어떤 주문서인지에 따라 해당 퀘스트 저장
-        if (orderImages == orderDonuts1)
-        {
-            DataManager.Instance.QuestData.questList1 = questList;
-        }
-        else if (orderImages == orderDonuts2)
-        {
-            DataManager.Instance.QuestData.questList2 = questList;
-        }
-        else if (orderImages == orderDonuts3)
-        {
-            DataManager.Instance.QuestData.questList3 = questList;
-        }
-
         // 주문서별 보상 저장
-        if (orderImages == orderDonuts1)
-        {
-            rewardGold1 = totalReward; 
-        }
-        else if (orderImages == orderDonuts2)
-        {
-            rewardGold2 = totalReward;
-        }
-        else if (orderImages == orderDonuts3)
-        {
-            rewardGold3 = totalReward;
-        }
+        if (orderImages == orderDonuts1) rewardGold1 = totalReward;
+        else if (orderImages == orderDonuts2) rewardGold2 = totalReward;
+        else if (orderImages == orderDonuts3) rewardGold3 = totalReward;
     }
+
 
     //머지보드판에서 도넛 검색후 주문서 클리어 여부 결정
     public bool IsOrderCompleted(List<string> orderDonutIDs, List<DonutVisualInfo> visuals)

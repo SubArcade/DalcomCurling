@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,7 +29,15 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private GameObject levelUpRewardPopUp;
     [SerializeField] private GameObject useGiftBoxPopup;
     [SerializeField] private GameObject guestPopup;
-
+    [SerializeField] private GameObject exitPopup;
+    
+    [Header("메인화면 예외처리 팝업")]
+    [SerializeField] private GameObject checkEntryPopup;
+    [SerializeField] private GameObject checkGiftBoxPopup;
+    [SerializeField] private Button checkEntryButton;
+    [SerializeField] private Button checkGiftBoxButton;
+    
+    
     [Header("화면 전환 버튼")]
     [SerializeField] private Button playerLevelInfoButton;
     [SerializeField] private Button donutCodexButton;   // 도감
@@ -42,8 +48,10 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private Button startBattle;    // 매칭 시작
     [SerializeField] private Button goldShopButton; // 상점
     [SerializeField] private Button gemShopButton;  // 상점
-    [SerializeField] private Button energyRechargeButton;
-    [SerializeField] private Button orderRefreshButton;
+    [SerializeField] private Button energyRechargeButton; //에너지 충전 버튼
+    [SerializeField] private Button orderRefreshButton; //새로고침 버튼
+    [SerializeField] private Button exitButton; //종료버튼
+    [SerializeField] private Button exitcancleBtn;
     
     
     [Header("플레이어 데이터 값")]
@@ -51,9 +59,9 @@ public class Scr_MenuPanelControl : MonoBehaviour
     [SerializeField] private TMP_Text energyText;
     [SerializeField] private TMP_Text goldText;
     [SerializeField] private TMP_Text gemText;
-    
+  
     public Button testLevelUpButton;
-    
+  
     void Awake()
     {
         UIManager.Instance.RegisterPanel(PanelId.StartPanel,startPanel);    
@@ -77,6 +85,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         UIManager.Instance.RegisterPanel(PanelId.LevelUpRewardPopUp, levelUpRewardPopUp);
         UIManager.Instance.RegisterPanel(PanelId.UseGiftBoxPopUp, useGiftBoxPopup);
         UIManager.Instance.RegisterPanel(PanelId.GuestPopup, guestPopup);
+        UIManager.Instance.RegisterPanel(PanelId.ExitPopup, exitPopup);
         
         playerLevelInfoButton.onClick.AddListener(()=>UIManager.Instance.Open(PanelId.PlayerLevelInfoPopup));
         donutCodexButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DonutCodexPopup));
@@ -85,13 +94,35 @@ public class Scr_MenuPanelControl : MonoBehaviour
         detailedSettingsButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DetailedSettingsPanel));
         //testBattle.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MatchingPopUp));
         startBattle.onClick.AddListener(() => GameManager.Instance.StartGame());
-        readyButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ReadyMenuPanel));
+        readyButton.onClick.AddListener(CheckReadyPanel);
         //goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp)); //PM요청으로 주석처리
         gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
-        
         testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
+        
+        checkEntryButton.onClick.AddListener(() =>
+        {
+            checkEntryPopup.SetActive(false);
+            // 앤트리 팝업 열기
+            UIManager.Instance.Open(PanelId.EntryPopUp);
+        });
+        checkGiftBoxButton.onClick.AddListener(() => checkGiftBoxPopup.SetActive(false));
+        
+
+        exitcancleBtn.onClick.AddListener(() => UIManager.Instance.Close(PanelId.ExitPopup));
+        exitButton.onClick.AddListener(() => 
+        {
+            Application.Quit(); 
+            Debug.Log("게임종료성공");
+        }); //게임종료 버튼
+    }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            UIManager.Instance.Open(PanelId.ExitPopup);    
+        }
     }
 
     //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
@@ -100,7 +131,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         DataManager.Instance.OnUserDataChanged += SetPlayerText;
         GameManager.Instance.LevelUpdate += SetPlayerText;
     }
-    
+ 
     public void SetPlayerText(PlayerData playerData)
     {
         levelText.text = $"{playerData.level}";
@@ -115,4 +146,45 @@ public class Scr_MenuPanelControl : MonoBehaviour
         SoundManager.Instance.PlayBGMGroup("OutGameBGM");
     }
 
+    // 준비화면 검사
+    private void CheckReadyPanel()
+    {
+        int stack = 0;
+        Debug.Log(DataManager.Instance.InventoryData.donutEntries);
+        foreach (var entry in DataManager.Instance.InventoryData.donutEntries)
+        {
+            if (entry == null)
+            {
+                stack++;
+                continue;
+            }
+            
+            if (string.IsNullOrEmpty(entry.id))
+                stack++;
+            
+        }
+        
+        if (stack == 0)
+        {
+            if (DataManager.Instance.MergeBoardData.tempGiftIds.Count == 0)
+            {
+                // 준비화면으로 이동 
+                UIManager.Instance.Open(PanelId.ReadyMenuPanel);
+            }
+            else
+            {
+                // 기프트 박스 확인 팝업창
+                checkGiftBoxPopup.SetActive(true);
+            }
+
+        }
+        else
+        {
+            if(UIManager.Instance.CurrentPanelId == PanelId.EntryPopUp)
+                UIManager.Instance.Open(PanelId.MainPanel);
+            // 앤트리 확인 팝업창
+            checkEntryPopup.SetActive(true);
+        }
+    }
+    
 }

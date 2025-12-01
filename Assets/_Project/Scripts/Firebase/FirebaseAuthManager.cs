@@ -54,10 +54,6 @@ public class FirebaseAuthManager
 
         await FirebaseApp.CheckAndFixDependenciesAsync();
 
-        // GPGS 초기화
-        // PlayGamesPlatform.DebugLogEnabled = true;
-        // PlayGamesPlatform.Activate();
-
         if (auth.CurrentUser != null)
         {
             Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");

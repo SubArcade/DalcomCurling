@@ -45,7 +45,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
     // 사운드 관련 내용 추가 ---
     [Header("BGM 전환 설정")]
-    [SerializeField] private int bgmTransitionRound = 1; // BGM이 전환될 라운드 번호 (예: 3)
+    [SerializeField] private int bgmTransitionRound = 2; // BGM이 전환될 라운드 번호 (예: 3)
     private bool isSpecialMusicPlaying = false; // BGM이 이미 전환되었는지 확인하는 플래그
     private const string BGM_STATE_PARAMETER = "MusicState"; // FMOD에서 설정한 파라미터 이름
 

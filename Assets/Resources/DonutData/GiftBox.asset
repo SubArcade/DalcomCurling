@@ -16,9 +16,10 @@ MonoBehaviour:
   levels:
   - id: Gift_1
     level: 1
-    sprite: {fileID: 21300000, guid: 4030dc16f1d65b34ab9d762abef1c6b2, type: 3}
+    sprite: {fileID: 21300000, guid: 745968601164d69448e779174c98b307, type: 3}
     displayName: "Lv1 \uC120\uBB3C\uC0C1\uC790"
     description: "Lv1 \uC120\uBB3C\uC0C1\uC790\uC785\uB2C8\uB2E4."
+    descriptionEnglish: 
     donutType: 3
     prefab: {fileID: 0}
     weight: 0
@@ -30,6 +31,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 39d39624f1eae6242865a94efd368a59, type: 3}
     displayName: "Lv2 \uC120\uBB3C\uC0C1\uC790"
     description: "Lv2 \uC120\uBB3C\uC0C1\uC790\uC785\uB2C8\uB2E4"
+    descriptionEnglish: 
     donutType: 3
     prefab: {fileID: 0}
     weight: 0
@@ -41,6 +43,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: f9b8c699c1e03864f98761d15dd4fe8b, type: 3}
     displayName: "Lv3 \uC120\uBB3C\uC0C1\uC790"
     description: "Lv3 \uC120\uBB3C\uC0C1\uC790\uC785\uB2C8\uB2E4."
+    descriptionEnglish: 
     donutType: 3
     prefab: {fileID: 0}
     weight: 0
@@ -52,6 +55,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: c102c19216ae8e147a8b3f6ac1feecc3, type: 3}
     displayName: "Lv4 \uC120\uBB3C\uC0C1\uC790"
     description: "Lv4 \uC120\uBB3C\uC0C1\uC790\uC785\uB2C8\uB2E4."
+    descriptionEnglish: 
     donutType: 3
     prefab: {fileID: 0}
     weight: 0
@@ -63,6 +67,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: f0697d8debcce7b49828c602bd126e2e, type: 3}
     displayName: "Lv5 \uC120\uBB3C\uC0C1\uC790"
     description: "Lv5 \uC120\uBB3C\uC0C1\uC790\uC785\uB2C8\uB2E4."
+    descriptionEnglish: 
     donutType: 3
     prefab: {fileID: 0}
     weight: 0
@@ -75,6 +80,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
     displayName: 
     description: 
+    descriptionEnglish: 
     donutType: 0
     prefab: {fileID: 0}
     weight: 0

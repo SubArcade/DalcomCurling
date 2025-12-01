@@ -69,6 +69,12 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("설명 팝업")] private GameObject ReincarnationInfoPopup;
     [SerializeField, Tooltip("설명 닫기 버튼")] private Button ReincarnationInfoCloseButton;
     
+    [Header("랭크 티어")]
+    [SerializeField, Tooltip("팝업")] private GameObject rankTierPopUp;
+    [SerializeField, Tooltip("닫기 버튼")] private Button rankTierCloseButton;
+    [SerializeField, Tooltip("열기 버튼")] private Button rankTierOpenButton;
+    
+    
     private void OnEnable()
     {
         TextSetUp();
@@ -160,6 +166,10 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         ReincarnationInfoCloseButton.onClick.AddListener(() => ReincarnationInfoPopup.SetActive(false));
         ReincarnationConfirmButton.onClick.AddListener(ReincarnationButton);
         explanationButton.onClick.AddListener(() => ReincarnationInfoPopup.SetActive(true));
+        
+        // 랭크 티어 팝업
+        rankTierCloseButton.onClick.AddListener(() => rankTierPopUp.SetActive(false));
+        rankTierOpenButton.onClick.AddListener(() => rankTierPopUp.SetActive(true));
     }
 
     // 기본판넬 토글 on/off

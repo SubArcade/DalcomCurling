@@ -61,7 +61,8 @@ public class Scr_OrderRefresh : MonoBehaviour
     private void UpdateUI()
     {
         countText.text = $"{orderSystem.GetRefreshCount()}/{orderSystem.GetMaxRefreshCount()}";
-        adsText.text = $"충전하기 ({maxChargeCount - currentChargeCount}/{maxChargeCount})";
+        string chargeLabel = LocalizationManager.Instance.GetText(LocalizationKey.Label_reFreshCharge);
+        adsText.text = $"{chargeLabel} ({maxChargeCount - currentChargeCount}/{maxChargeCount})";
     }
 
 }
