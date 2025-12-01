@@ -186,7 +186,8 @@ public class GameManager : MonoBehaviour
             
             Debug.Log(">>>>>> 게임보상을 반영합니다.");
             // 실제 데이터 반영
-            DataManager.Instance.PlayerData.exp += pendingExp;
+            
+            LevelUp(pendingExp);
             DataManager.Instance.PlayerData.gold += pendingGold;
             DataManager.Instance.PlayerData.soloScore += pendingPoint;
 
@@ -223,12 +224,12 @@ public class GameManager : MonoBehaviour
     }
 
     // 레벨업 로직
-    public void LevelUp()
+    public void LevelUp(int getExp)
     {
         if(DataManager.Instance.PlayerData.level >= 20)
             return;
         
-        DataManager.Instance.PlayerData.exp += 20;
+        DataManager.Instance.PlayerData.exp += getExp;
     
         // 100 이 넘으면 레벨업
         if (DataManager.Instance.PlayerData.exp >= 100)

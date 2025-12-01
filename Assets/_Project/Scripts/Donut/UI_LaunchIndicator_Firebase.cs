@@ -30,6 +30,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject result;
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject WaitThrowPopUp;
+    
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
@@ -226,12 +228,16 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public void FinishedUI(FirebaseGameManager.GameOutcome outcome) // 게임종료 - 결과창
     {
         AllcloseUI();
+        WaitThrowPopUp.SetActive(false);
+        DOTween.Kill("WatingThrowUI");
         ResultRewardView(outcome); //게임결과 설정
         result.SetActive(true); // 결과창 on
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
         AllcloseUI();
+        DOTween.Kill("WatingThrowUI");
+        WaitThrowPopUp.SetActive(false);
         roundPanel.SetActive(true);
         donutEntry.SetActive(true);
         minimap.SetActive(true);
@@ -244,6 +250,12 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     {
         AllcloseUI();
         roundPanel.SetActive(true);
+        WaitThrowPopUp.SetActive(false);
+    }
+    public void WatingThrowUI() 
+    {
+        AllcloseUI();
+        WaitThrowPopUp.SetActive(true);
     }
     public void AllcloseUI() // 모든 UI를 닫음
     {
@@ -251,7 +263,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
-        settingsPanel.SetActive(false);
+        settingsPanel.SetActive(false);        
     }
     public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)

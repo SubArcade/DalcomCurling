@@ -94,7 +94,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
         
-        testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
+        //testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
     }
 
     //private void OnEnable() =>  DataManager.Instance.OnUserDataChanged += SetPlayerText;
