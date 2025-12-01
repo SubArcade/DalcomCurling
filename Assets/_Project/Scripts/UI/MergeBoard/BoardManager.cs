@@ -200,7 +200,7 @@ public class BoardManager : MonoBehaviour
             // + 도넛의 포화상태때 생성 시도를 할때 나는 사운드 ---
             if (SoundManager.Instance != null)
             {
-                SoundManager.Instance.saturation(transform.position);
+                SoundManager.Instance.saturation();
             }
            
             return;

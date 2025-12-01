@@ -140,6 +140,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         gemText.text = $"{playerData.gem}";
     }
 
+    // + 아웃게임 BGM 사운드 출력 --- 
     private void Start()
     {
         SoundManager.Instance.PlayBGMGroup("OutGameBGM");
