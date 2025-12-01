@@ -147,6 +147,21 @@ public enum LocalizationKey
     Label_ads3Text,
     Label_gemFree,
     Label_lookAds,
+    //----------인게임 UI 로컬
+    ingame_waitingThrow, //도넛 던지기 기다리는중
+    ingame_checkConnect, //연결ㄹ확인중
+
+    ingame_resultLevel, //결과창
+    ingame_resultRank,
+    ingame_resultGetdonut,
+
+    ingame_victoryText, //보상결과창
+    ingame_defeatText,
+    ingame_DonutSteal,
+    ingame_NextText,
+    ingame_streak,
+
+    ingame_surrenderText, //항복
 }
 
 public class LocalizationManager : MonoBehaviour

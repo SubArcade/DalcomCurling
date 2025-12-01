@@ -312,7 +312,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 exp = 15;
                 rewardGold = 150;
                 rewardPoint = 20; // 페널티 복구 10점 + 승리 보너스 10점
-                result = "VICTORY!";
+                result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_victoryText)}";
                 GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
                 GameManager.Instance.ProcessDonutCapture(OpponentProfile.Inventory.donutEntries); // 상대 도넛 획득
                 break;
@@ -320,7 +320,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 exp = 8;
                 rewardGold = 50;
                 rewardPoint = 0; // 솔로스코어는 미리 반영되었으므로 0
-                result = "DEFEAT!";
+                result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_defeatText)}";
                 break;
             case FirebaseGameManager.GameOutcome.Draw:
                 exp = 10;

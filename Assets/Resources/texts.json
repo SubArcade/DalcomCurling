@@ -142,7 +142,25 @@
     "Label_ads3Text": "오늘부터 180일동안 광고가 등장하지않아요!",
     "Label_gemFree": "하루 한번 무료",
 
-    "Label_loockAds" :  "광고보기",
+    "Label_loockAds": "광고보기",
+
+    "ingame_waitingThrow": "상대방이 도넛을 던지는중...",
+
+    "ingame_checkConnect": "연결 확인중...",
+
+    "ingame_resultLevel": "플레이어 레벨",
+    "ingame_resultRank": "랭킹 등급",
+    "ingame_resultGetdonut": "획득 도넛",
+
+    "ingame_victoryText": "승리!",
+    "ingame_defeatText": "패배!",
+    "ingame_DonutSteal": "뺏어올 도넛을 선택하세요!",
+    "ingame_NextText": "다음",
+    "ingame_streak": "연승",
+
+    "ingame_surrenderText" :  "항복하시겠습니까?\n패배처리가 되며, 메인화면으로 돌아갑니다."
+
+     
   },
   "en": {
     "Btn_Start": "Start",
@@ -286,6 +304,22 @@
     "Label_ads3Text": "No ads will appear for 180 days starting today!",
     "Label_gemFree": "Free Once a Day",
 
-    "Label_loockAds": "Look Ads"
+    "Label_loockAds": "Look Ads",
+
+    "ingame_waitingThrow": "Opponent is throwing a donut...",
+
+    "ingame_checkConnect": "Checking connection...",
+
+    "ingame_resultLevel": "Player Level",
+    "ingame_resultRank": "Ranking Tier",
+    "ingame_resultGetdonut": "Donuts Earned",
+
+    "ingame_victoryText": "Victory!",
+    "ingame_defeatText": "Defeat!",
+    "ingame_DonutSteal": "Choose a donut to steal!",
+    "ingame_NextText": "Next",
+    "ingame_streak": "streak",
+
+    "ingame_surrenderText": "Do you want to surrender?\nIt will count as a defeat and return to the main screen."
   }
 }
