@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using GoogleMobileAds.Api;
 using UnityEngine;
@@ -15,16 +15,17 @@ public enum AdType
 public class AdsRewarded : MonoBehaviour
 {
     public static AdsRewarded Instance { get; private set; }
-    
+
     // 보상형 광고단위 ID
     // ca-app-pub-4548432662417935/3098948422 안드로이드 배포용
     // ca-app-pub-3940256099942544/5224354917 안드로이드 테스트용
-#if UNITY_ANDROID
     private const string TestAD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"; // 안드로이드 테스트
     // 배포용
     private const string EnergyAD_UNIT_ID = "ca-app-pub-4548432662417935/3098948422"; // 에너지
     private const string RefreshAD_UNIT_ID = "ca-app-pub-4548432662417935/3823474752"; // 퀘스트 새로고침
     private const string GiftBoxAD_UNIT_ID = "ca-app-pub-4548432662417935/3098948422"; // 기프트박스
+#if UNITY_ANDROID
+
 #elif UNITY_IOS
     private const string AD_UNIT_ID = "apple"; // 아이폰
 #else

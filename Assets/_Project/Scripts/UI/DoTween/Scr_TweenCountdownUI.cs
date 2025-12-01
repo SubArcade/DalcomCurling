@@ -40,6 +40,7 @@ public class Scr_TweenCountdownUI : MonoBehaviour
         {
             int num = i; // 캡처 변수
             countdownSequence.AppendCallback(() => ShowNumber(num));
+            countdownSequence.AppendCallback(() => SoundManager.Instance.tenTimer());
             countdownSequence.AppendInterval(interval);
         }
 

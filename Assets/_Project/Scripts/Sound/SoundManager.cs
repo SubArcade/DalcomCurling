@@ -33,6 +33,7 @@ public class SoundManager : MonoBehaviour
     private List<EventReference> currentBGMPlaylist;
     private int currentBGMIndex = 0;
     private Coroutine bgmCoroutine;
+    public const string BGM_STATE_PARAMETER = "MusicState";
 
     #region 초기화 및 딕셔너리 구성
 
@@ -182,6 +183,36 @@ public class SoundManager : MonoBehaviour
     {
         Debug.Log($"[SoundManager] {playlistName} BGM 플레이리스트 시작 (총 {currentBGMPlaylist.Count}곡)");
 
+        // InGameBGM은 단일 적응형 BGM으로 간주하고 별도 처리
+        bool isAdaptiveBGM = playlistName == "InGameBGM";
+
+        if (isAdaptiveBGM)
+        {
+            if (currentBGMPlaylist.Count == 0 || currentBGMPlaylist[0].IsNull)
+            {
+                Debug.LogWarning($"[SoundManager] InGameBGM 이벤트가 할당되지 않았습니다.");
+                yield break;
+            }
+
+            EventReference adaptiveBGM = currentBGMPlaylist[0];
+
+            StopBGMInternal();
+
+            // 인스턴스 생성 및 재생
+            currentBGMInstance = RuntimeManager.CreateInstance(adaptiveBGM);
+
+            // ⭐ 핵심 수정: 파라미터 초기화 (0번 곡으로 시작)
+            currentBGMInstance.setParameterByName(BGM_STATE_PARAMETER, 0f);
+
+            currentBGMInstance.start();
+
+            Debug.Log("[SoundManager] InGameBGM (적응형) 재생 시작. 코루틴 즉시 종료하여 파라미터 전환 대기.");
+
+            // ⭐ 핵심 수정: 무한 루프 BGM이므로 씬 멈춤 방지를 위해 즉시 코루틴 종료
+            yield break;
+        }
+
+        // 일반 BGM 플레이리스트 루프 로직
         while (true)
         {
             if (currentBGMPlaylist.Count == 0) yield break;
@@ -263,88 +294,90 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    // ... (클래스 정의 및 기타 필드/메소드 생략) ...
+
     // SFX 재생 (세분화된 호출)
 
     /// 딕셔너리에 등록된 이벤트 이름으로 SFX를 재생합니다.
     /// 모든 인게임/아웃게임 SFX는 이 메서드를 통해 이름으로 호출됩니다.
-
     /// <param name="eventName">InitializeSoundMap에서 등록된 이벤트의 이름입니다.</param>
-    public void PlaySFX(string eventName, Vector3 position = default(Vector3))
+    public void PlaySFX(string eventName)
     {
         EventReference sfxRef = GetEventReference(eventName);
 
         if (!sfxRef.IsNull)
         {
-            RuntimeManager.PlayOneShot(sfxRef, position);
+            // 2D Playback: RuntimeManager.PlayOneShot(EventReference)만 사용
+            FMODUnity.RuntimeManager.PlayOneShot(sfxRef);
         }
     }
 
     #region 아웃게임 SFX 사운드 모음
 
     // 일반 버튼 누를 시
-    public void buttonClick(Vector3 position = default(Vector3))
+    public void buttonClick()
     {
-        PlaySFX("01_ui_menu_button_beep_19", position);
+        PlaySFX("01_ui_menu_button_beep_19");
     }
 
     // 칸 선택 시 / 새로운 주문서 등장 시 / 유닛 이동 시(유닛끼리 자리 바뀔 시)
-    public void selectSlotScroll(Vector3 position = default(Vector3))
+    public void selectSlotScroll()
     {
-        PlaySFX("02_item_pickup_swipe_01", position);
+        PlaySFX("02_item_pickup_swipe_01");
     }
 
     // 도넛 생성 시
-    public void createDonut(Vector3 position = default(Vector3))
+    public void createDonut()
     {
-        PlaySFX("03_collect_item_13", position);
+        PlaySFX("03_collect_item_13");
     }
 
     // 도넛 머지 시 
-    public void mergeDonut(Vector3 position = default(Vector3))
+    public void mergeDonut()
     {
-        PlaySFX("04_happy_collect_item_01", position);
+        PlaySFX("04_happy_collect_item_01");
     }
 
     // 기프트박스 머지 시
-    public void mergeGiftBox(Vector3 position = default(Vector3))
+    public void mergeGiftBox()
     {
-        PlaySFX("05_collect_item_11", position);
+        PlaySFX("05_collect_item_11");
     }
 
     // 포화상태 시 더 생성하려고 시도할 때
-    public void saturation(Vector3 position)
+    public void saturation()
     {
-        PlaySFX("06_jingle_chime_16_negative", position);
+        PlaySFX("06_jingle_chime_16_negative");
     }
 
     // 유닛 이동 시 (유닛끼리 자리 바뀔 시)
-    public void moveUnit(Vector3 position)
+    public void moveUnit()
     {
-        PlaySFX("02_item_pickup_swipe_01", position);
+        PlaySFX("02_item_pickup_swipe_01");
     }
 
     // 도넛 판매 시
-    public void sellDonut(Vector3 position)
+    public void sellDonut()
     {
-        PlaySFX("07_ui_menu_button_beep_23", position);
+        PlaySFX("07_ui_menu_button_beep_23");
     }
 
     // 보상 수령 창 노출 시
-    public void receiptReward(Vector3 position)
+    public void receiptReward()
     {
-        PlaySFX("08_collectable_item_bonus_03", position);
+        PlaySFX("08_collectable_item_bonus_03");
     }
 
     // 주문서 complete 버튼 터치 시
-    public void completeScroll(Vector3 position)
+    public void completeScroll()
     {
-        PlaySFX("09_collect_item_15", position);
+        PlaySFX("09_collect_item_15");
     }
 
     // complete 버튼 터치 후 골드 획득 시
-    public void getGold(Vector3 position)
+    public void getGold()
     {
-        PlaySFX("10_coin_bag_ring_gemstone_item_15", position);
+        PlaySFX("10_coin_bag_ring_gemstone_item_15");
     }
 
     #endregion
@@ -352,126 +385,130 @@ public class SoundManager : MonoBehaviour
     #region 인게임 SFX 모음
 
     // 캐릭터/도넛 엔트리 등장 사운드
-    public void appearEntry(Vector3 position)
+    public void appearEntry()
     {
-        PlaySFX("01_explosion_small_02", position);
+        PlaySFX("01_explosion_small_02");
     }
 
     // VS 연출 사운드
-    public void appearVS(Vector3 position)
+    public void appearVS()
     {
-        PlaySFX("02_punch_grit_wet_impact_03", position);
+        PlaySFX("02_punch_grit_wet_impact_03");
     }
 
     // Round Start / Turn Start 사운드
-    public void roundturnStart(Vector3 position)
+    public void roundturnStart()
     {
-        PlaySFX("03_sci-fi_power_up_03", position);
+        PlaySFX("03_sci-fi_power_up_03");
     }
 
     // 도넛 선택 사운드
-    public void selectDonut(Vector3 position)
+    public void selectDonut()
     {
-        PlaySFX("04_ui_menu_button_beep_11", position);
+        PlaySFX("04_ui_menu_button_beep_19");
     }
 
     // 파워 드래그 사운드
-    public void powerDrag(Vector3 position)
+    public void powerDrag()
     {
-        PlaySFX("05_powerup_whiz_nightvision_goggles_on_01", position);
+        PlaySFX("05_powerup_whiz_nightvision_goggles_on_01");
     }
 
     // 스핀 조작 (좌/우 드래그) 사운드
-    public void spinControl(Vector3 position)
+    public void spinControl()
     {
-        PlaySFX("06_whistle_slide_up_06", position);
+        PlaySFX("06_whistle_slide_up_06");
     }
 
     // 10초 타이머 사운드
-    public void tenTimer(Vector3 position)
+    public void tenTimer()
     {
-        PlaySFX("07_ui_menu_button_beep_19", position);
+        
+        PlaySFX("07_ui_menu_button_beep_11");
     }
 
     // TIME OVER 사운드
-    public void timeOver(Vector3 position)
+    public void timeOver()
     {
-        PlaySFX("08_chime_bell_02", position);
+        PlaySFX("08_chime_bell_02");
     }
 
     // 타이밍 퍼펙트 터치 사운드
-    public void timingPerfectTouch(Vector3 position)
+    public void timingPerfectTouch()
     {
-        PlaySFX("09_ui_menu_button_confirm_01", position);
+        PlaySFX("09_ui_menu_button_confirm_01");
     }
 
     // 타이밍 얼리 터치 사운드
-    public void timingEarlyTouch(Vector3 position)
+    public void timingEarlyTouch()
     {
-        PlaySFX("10_ui_menu_button_confirm_06", position);
+        PlaySFX("10_ui_menu_button_confirm_06");
     }
 
     // 5배속 프리뷰 시작 사운드
-    public void timerFast(Vector3 position)
+    public void timerFast()
     {
-        PlaySFX("11_cartoon_electronic_computer_code_07", position);
+        PlaySFX("11_cartoon_electronic_computer_code_07");
     }
 
     // 얼음 위 활주 기본 사운드
-    public void slideSound(Vector3 position)
+    public void slideSound()
     {
-        PlaySFX("12_ice_cracking_melting_02", position);
+        PlaySFX("12_ice_cracking_melting_02");
     }
 
     // 도넛 - 도넛 충돌 약하게 사운드
-    public void stoneCrashweak(Vector3 position)
+    public void stoneCrashweak()
     {
-        PlaySFX("13_02_Synth_Boing_4", position);
+        PlaySFX("13_02_Synth_Boing_4");
     }
-    
+
+
     // 도넛 - 도넛 충돌 강하게 사운드
-    public void stoneCrashstrong(Vector3 position)
+    public void stoneCrashstrong()
     {
-        PlaySFX("14_cartoon_boing_jump_15", position);
+        PlaySFX("14_cartoon_boing_jump_15");
     }
 
     // OUT 판정 사운드
-    public void outDecide(Vector3 position)
+    public void outDecide()
     {
-        PlaySFX("15_comedy_bite_chew_05", position);
+        PlaySFX("15_comedy_bite_chew_05");
     }
 
     // 턴 하이라이트 (가장 가까운 도넛 표시) 사운드
-    public void highlightTurn(Vector3 position)
+    public void highlightTurn()
     {
-        PlaySFX("16_ui_menu_button_beep_13", position);
+        PlaySFX("16_ui_menu_button_beep_13");
     }
 
     // 라운드 점수 집계 사운드 
-    public void resultSoundscore(Vector3 position)
+    public void resultSoundscore()
     {
-        PlaySFX("17_ui_menu_popup_message_07", position);
+        PlaySFX("17_ui_menu_popup_message_07");
     }
 
     // DRAW 사운드 
-    public void drawDecide(Vector3 position)
+    public void drawDecide()
     {
-        PlaySFX("18_music_sting_short_groovy_flute_03", position);
+        PlaySFX("18_music_sting_short_groovy_flute_03");
     }
 
     // YOU WIN 사운드 
-    public void winDecide(Vector3 position)
+    public void winDecide()
     {
-        PlaySFX("19_Positive_07", position);
+        PlaySFX("19_Positive_07");
     }
 
     // YOU LOSE 사운드 
-    public void loseDecide(Vector3 position)
+    public void loseDecide()
     {
-        PlaySFX("20_Negative_09", position);
+        PlaySFX("20_Negative_09");
     }
 
     #endregion
+
+    // ... (볼륨 조절 등 기타 메소드 생략) ...
 
     #region 사운드 볼륨 조절
 

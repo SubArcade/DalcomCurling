@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -48,6 +48,8 @@ public class DonutSelectionUI : MonoBehaviour
     {
         for (int i = 0; i < donutSlots.Count; i++)
         {
+            // 도넛 선택 사운드 ---
+            SoundManager.Instance.selectDonut();
             // 활성화되어 있고, 사용되지 않았으며, 데이터가 일치하는 슬롯을 찾습니다.
             if (donutSlots[i].gameObject.activeSelf && !donutSlots[i].IsUsed() && donutSlots[i].GetDonutEntry() == clickedDonut)
             {
