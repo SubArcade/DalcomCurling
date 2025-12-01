@@ -26,8 +26,8 @@ public class Scr_DonutCodex : MonoBehaviour
     
     [Header("버튼 이미지")]
     [SerializeField, Tooltip("단단")] private Image hardImage;
-    [SerializeField, Tooltip("단단")] private Image softImage;
-    [SerializeField, Tooltip("단단")] private Image moistImage;
+    [SerializeField, Tooltip("촉촉")] private Image softImage;
+    [SerializeField, Tooltip("말랑")] private Image moistImage;
     
     [Header("닫기 버튼")]
     [SerializeField, Tooltip("닫기")] private Button closeButton;
@@ -38,6 +38,14 @@ public class Scr_DonutCodex : MonoBehaviour
     [SerializeField, Tooltip("레벨")] private TMP_Text levelText;
     [SerializeField, Tooltip("도넛 종류")] private TMP_Text titleText;
     
+    [Header("기본 이미지")]
+    [SerializeField, Tooltip("단단")] private Sprite baseHardSprite;
+    [SerializeField, Tooltip("촉촉")] private Sprite baseSoftSprite;
+    [SerializeField, Tooltip("말랑")] private Sprite baseMoistSprite;
+    
+    public Scr_donutShell curDonutShell;
+    
+    
 
     private void OnEnable()
     {
@@ -45,6 +53,7 @@ public class Scr_DonutCodex : MonoBehaviour
         SubscribeList(hardShells);
         SubscribeList(softShells);
         SubscribeList(moistShells);
+        RefreshHard();
     }
 
     private void OnDisable()
@@ -54,6 +63,7 @@ public class Scr_DonutCodex : MonoBehaviour
         UnsubscribeList(moistShells);
     }
 
+    // 도넛 클릭시 설명창 업데이트
     private void SubscribeList(List<Scr_donutShell> list)
     {
         if (list == null) return;
@@ -104,7 +114,28 @@ public class Scr_DonutCodex : MonoBehaviour
     {
         RefreshType(DonutType.Hard, hardShells);
         OnPanel(DonutType.Hard);
-        titleText.text = "단단 도넛";
+        
+        image.sprite = baseHardSprite;
+        if (LocalizationManager.Instance.CurrentLanguage == "ko")
+        {
+            titleText.text = "단단 도넛";
+            levelText.text = "1단계";
+            infotext.text = "단단 도넛에 대한 설명이에요 ( + 값 관련 설명)\n단단 도넛에 대한 설명이에요 ( + 값 관련 설명)";
+        }
+        else
+        {
+            titleText.text = "Hard";
+            levelText.text = "Level 1";
+            infotext.text = "This is a description of the Hard Donut (+ value details)";
+        }
+        
+        // 전에 클릭된 도넛 배경 비활성화
+        if (curDonutShell != null)
+        {
+            curDonutShell.donutRoot.GetComponent<Image>().sprite = curDonutShell.baseSprite;
+            curDonutShell = null;
+        }
+
     }
 
     // 촉촉 버튼
@@ -112,16 +143,53 @@ public class Scr_DonutCodex : MonoBehaviour
     {
         RefreshType(DonutType.Soft, softShells);
         OnPanel(DonutType.Soft);
-        titleText.text = "말랑 도넛";
+        image.sprite = baseHardSprite;
+        if (LocalizationManager.Instance.CurrentLanguage == "ko")
+        {
+            titleText.text = "말랑 도넛";
+            levelText.text = "1단계";
+            infotext.text = "말랑 도넛에 대한 설명이에요 ( + 값 관련 설명)\n말랑 도넛에 대한 설명이에요 ( + 값 관련 설명)";
+        }
+        else
+        {
+            titleText.text = "Soft";
+            levelText.text = "Level 1";
+            infotext.text = "This is a description of the Soft Donut (+ value details)";
+        }
+        
+        // 전에 클릭된 도넛 배경 비활성화
+        if (curDonutShell != null)
+        {
+            curDonutShell.donutRoot.GetComponent<Image>().sprite = curDonutShell.baseSprite;
+            curDonutShell = null;
+        }
     }
-
     
     // 말랑 버튼
     private void RefreshMoist()
     {
         RefreshType(DonutType.Moist, moistShells);
         OnPanel(DonutType.Moist);
-        titleText.text = "촉촉 도넛";
+        image.sprite = baseHardSprite;
+        if (LocalizationManager.Instance.CurrentLanguage == "ko")
+        {
+            titleText.text = "촉촉 도넛";
+            levelText.text = "1단계";
+            infotext.text = "촉촉 도넛에 대한 설명이에요 ( + 값 관련 설명)\n촉촉 도넛에 대한 설명이에요 ( + 값 관련 설명)";
+        }
+        else
+        {
+            titleText.text = "Moist";
+            levelText.text = "Level 1";
+            infotext.text = "This is a description of the Moist Donut (+ value details)";
+        }
+        
+        // 전에 클릭된 도넛 배경 비활성화
+        if (curDonutShell != null)
+        {
+            curDonutShell.donutRoot.GetComponent<Image>().sprite = curDonutShell.baseSprite;
+            curDonutShell = null;
+        }
     }
     
     private void OnPanel(DonutType donutType)
@@ -190,9 +258,26 @@ public class Scr_DonutCodex : MonoBehaviour
     {  
         DonutData donutData = DataManager.Instance.GetDonutData(shell.donutType, shell.level);
         image.sprite = donutData.sprite;
-        infotext.text = donutData.description;
+        shell.donutRoot.GetComponent<Image>().sprite = shell.activeSprite;
         // 나중에 영어 버전 처리 필요
-        levelText.text = $"{donutData.level} 단계";
+        if (LocalizationManager.Instance.CurrentLanguage == "ko")
+        {
+            infotext.text = donutData.description;
+            levelText.text = $"{donutData.level} 단계";
+        }
+        else
+        {
+            infotext.text = donutData.descriptionEnglish;
+            levelText.text = $"Level {donutData.level}";
+        }
+        
+        // 전에 클릭된 도넛 배경 비활성화
+        if (curDonutShell != null)
+        {
+            curDonutShell.donutRoot.GetComponent<Image>().sprite = curDonutShell.baseSprite;
+        }
+        curDonutShell = shell;
+        
     }
     
 #if UNITY_EDITOR

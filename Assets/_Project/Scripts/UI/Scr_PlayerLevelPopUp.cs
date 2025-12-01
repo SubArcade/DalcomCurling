@@ -342,6 +342,10 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     // 닉네임 변경 확정창 띄우기
     private void OnAnswerPopup()
     {
+        if (changeNicknameInputField.text.Length < 2)
+        {
+            return;
+        }
         nickNameAnswerPopup.SetActive(true);
         string hexColor = ColorUtility.ToHtmlStringRGB(nicknameColor);
         nameAnswerText.text = $"<color=#{hexColor}>‘{changeNicknameInputField.text}’</color>로\n 변경하시겠습니까?";
@@ -361,7 +365,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     // 닉네임 변경 (무료)
     private void FreeChangeNickname()
     {
-        DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+        //DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+        DataManager.Instance.NicknameChange(changeNicknameInputField.text);
         DataManager.Instance.PlayerData.changeNicknameCount++;
         nickNameAnswerPopup.SetActive(false);
         nickNameChangePopup.SetActive(false);
@@ -382,7 +387,8 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         else
         {
             // 닉네임 변경
-            DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+            //DataManager.Instance.PlayerData.nickname = changeNicknameInputField.text;
+            DataManager.Instance.NicknameChange(changeNicknameInputField.text);
             DataManager.Instance.PlayerData.changeNicknameCount++;
             DataManager.Instance.PlayerData.gem -= int.Parse(gemText);
             DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem);

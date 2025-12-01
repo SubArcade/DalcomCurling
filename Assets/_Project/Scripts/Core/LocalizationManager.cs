@@ -126,6 +126,30 @@ public enum LocalizationKey
     Label_platinum,
     Label_diamond,
     Label_challenger,
+
+    Label_shopEffect1, //젬 상점 이펙트
+    Label_shopEffect1Text,
+    Label_shopEffect2,
+    Label_shopEffect2Text,
+    Label_shopEffect3,
+    Label_shopEffect3Text,
+
+    Label_shopCharacter1, //젬 상점 캐릭터
+    Label_shopCharacter1Text,
+    Label_shopCharacter2,
+    Label_shopCharacter2Text,
+
+    Label_ads1,  //캐시상점 광고제거 및 일일무료
+    Label_ads1Text,
+    Label_ads2,
+    Label_ads2Text,
+    Label_ads3,
+    Label_ads3Text,
+    Label_gemFree,
+    Label_lookAds,
+    Label_ServicePolicy,
+    Label_ServicePolicyDetail,
+    Label_PrivacyNotice
 }
 
 public class LocalizationManager : MonoBehaviour
