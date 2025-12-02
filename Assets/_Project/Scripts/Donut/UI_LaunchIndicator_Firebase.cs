@@ -44,7 +44,19 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private TextMeshProUGUI resultText; // 승리,패배 결과 텍스트
     [SerializeField] private TextMeshProUGUI getDonutText; // 승리,패배에 따라 획득/잃은 도넛 텍스트
 
-   
+
+    [Header("칭호를 적용할 자신과 상대의 텍스트와 이미지")]
+    [SerializeField] private TextMeshProUGUI EpitheText1; //ingameUI의 EpitheText들입니다
+    [SerializeField] private TextMeshProUGUI EpitheText2; //ingameUI의 epitheText들입니다
+    [SerializeField] private TextMeshProUGUI timeLineEpitheText1; //timelineUI의 epitheText들입니다.
+    [SerializeField] private TextMeshProUGUI timeLineEpitheText2;
+    [SerializeField] private Image EpitheImage1; //ingameUI의 텍스트부모이미지입니다
+    [SerializeField] private Image EpitheImage2;
+    [SerializeField] private Image timeLineEpitheImage1;//timelineUI의 부모이미지입니다
+    [SerializeField] private Image timeLineEpitheImage2;
+    [SerializeField] private NamePlaateSO namePlateSO; //so넣어주시면됩니다.
+
+
     [Header("플로팅 텍스트")]
     [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
 
@@ -136,6 +148,20 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
             // 상대방 인벤토리 UI 채우기 (오프닝 타임라인) 
             PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
+            // 인게임UI의 칭호 텍스트 반영
+            if (EpitheText1 != null)
+                EpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, EpitheImage1);
+
+            if (EpitheText2 != null)
+                EpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, EpitheImage2);
+            //타임라인UI의 칭호 텍스트 반영
+            if (timeLineEpitheText1 != null)
+                timeLineEpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, timeLineEpitheImage1);
+
+            if (timeLineEpitheText2 != null)
+                timeLineEpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, timeLineEpitheImage2);
+
+
         }
         else
         {
@@ -410,4 +436,40 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         // ❌ 참고: bgmTransitionTurn 변수는 사용하지 않으므로 제거해야 합니다.
     }
 
+    // enum → 문자열 변환 함수
+    private string GetEpitheText(NamePlateType type, Image targetImage = null)
+    {
+        // SO에서 매핑된 NamePlate 가져오기
+        NamePlate plate = namePlateSO != null ? namePlateSO.GetByType(type) : null;
+
+        // 이미지 반영
+        if (targetImage != null)
+        {
+            if (plate != null && plate.plateSprite != null)
+            {
+                targetImage.sprite = plate.plateSprite;
+                targetImage.enabled = true;
+            }
+            else
+            {
+                targetImage.enabled = false;
+            }
+        }
+
+        // 텍스트 반환 (한글 이름 우선)
+        if (plate != null && !string.IsNullOrEmpty(plate.koNamePlate))
+            return plate.koNamePlate;
+
+        // 기본 fallback
+        switch (type)
+        {
+            case NamePlateType.NONE: return "";
+            case NamePlateType.DoughNewbie: return "초보 조물러";
+            case NamePlateType.SoftTouch: return "말랑 조작자";
+            case NamePlateType.DoughHandler: return "반죽 핸들러";
+            case NamePlateType.DonutPilot: return "도넛 파일럿";
+            case NamePlateType.DonutMaster: return "도넛 마스터";
+            default: return type.ToString();
+        }
+    }
 }
