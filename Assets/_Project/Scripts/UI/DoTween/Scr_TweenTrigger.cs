@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
@@ -19,6 +19,7 @@ public class TweenTrigger : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
 
     [Tooltip("이벤트를 발생시킬 트리거 타입")]
     public TriggerType triggerType = TriggerType.OnClick;
+    
 
     [Tooltip("호출할 UnityEvent")]
     public UnityEvent onTrigger;

@@ -40,7 +40,12 @@ public class Scr_ButtonScale : MonoBehaviour
 
     void Start()
     {
-        marketBtn.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
+        marketBtn.onClick.AddListener(() => 
+        {
+            UIManager.Instance.Open(PanelId.ShopPopUp);
+            SoundManager.Instance.buttonClick();
+        });
+
         OnMouseTrashCan();
         OnMouseStartButton();
         OnMouseCodexButton();
