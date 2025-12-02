@@ -380,6 +380,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 rewardGold = 50;
                 rewardPoint = 0; // 솔로스코어는 미리 반영되었으므로 0
                 result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_defeatText)}";
+                
+                getDonut = "잃은 도넛";
+
                 break;
             case FirebaseGameManager.GameOutcome.Draw:
                 exp = 10;

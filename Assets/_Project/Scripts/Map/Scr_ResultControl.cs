@@ -51,18 +51,20 @@ public class Scr_ResultControl : MonoBehaviour
         SetupUIForGameOutcome();
 
         // 결과창이 뜨면 20초 후에 자동 종료
-        DOVirtual.DelayedCall(20f, () =>
-        {
-            if (SceneLoader.Instance != null)
-            {
-                GameManager.Instance.EndGame();
-            }
-            else
-            {
-                Debug.LogError("SceneLoader.Instance를 찾을 수 없습니다.");
-            }
-        }).SetId("endgame");
+        //DOVirtual.DelayedCall(20f, () =>
+        //{
+        //    if (SceneLoader.Instance != null)
+        //    {
+        //        GameManager.Instance.EndGame();
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError("SceneLoader.Instance를 찾을 수 없습니다.");
+        //    }
+        //}).SetId("endgame");
     }
+
+   
 
     void Start()
     {
@@ -303,9 +305,9 @@ public class Scr_ResultControl : MonoBehaviour
         //레벨업을 했다면 레벨업 텍스트를 띄우고 아니라면 setactive(false)
     }
 
-    private void SetwitePanel2(int getPoint) 
+    private void SetwitePanel2(int getPoint)
     {
-        var player =DataManager.Instance.PlayerData;
+        var player = DataManager.Instance.PlayerData;
         GameTier oldTier = player.soloTier;
         int oldScore = player.soloScore;
 
@@ -314,14 +316,14 @@ public class Scr_ResultControl : MonoBehaviour
 
         //티어 계산해서 저장
         GameTier newTier = DataManager.Instance.CalculateTier(newScore);
-      
+
 
         //티어별로 포인트 설정
         int maxPoint = 0;
-        switch (newTier) 
+        switch (newTier)
         {
-            case GameTier.Bronze: 
-                { 
+            case GameTier.Bronze:
+                {
                     maxPoint = 1000;
                     break;
                 }
@@ -332,17 +334,17 @@ public class Scr_ResultControl : MonoBehaviour
                 }
             case GameTier.Gold:
                 {
-                    maxPoint = 3000; 
-                    break; 
+                    maxPoint = 3000;
+                    break;
                 }
-            case GameTier.Platinum: 
+            case GameTier.Platinum:
                 {
-                    maxPoint = 4000; 
-                    break; 
+                    maxPoint = 4000;
+                    break;
                 }
-            case GameTier.Diamond: 
-                { 
-                    maxPoint = 5000; 
+            case GameTier.Diamond:
+                {
+                    maxPoint = 5000;
                     break;
                 }
             default: maxPoint = 5000; break;
@@ -370,6 +372,7 @@ public class Scr_ResultControl : MonoBehaviour
         player.soloTier = newTier;
         DataManager.Instance.ScoreChange(player.soloScore);
         DataManager.Instance.PlayerData.soloTier = player.soloTier;
+    }
     private void OnDestroy()
     {
         DOTween.Kill("endgame");
