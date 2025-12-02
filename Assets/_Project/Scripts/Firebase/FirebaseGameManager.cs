@@ -1092,7 +1092,7 @@ public class FirebaseGameManager : MonoBehaviour
     public void OnRoundEnd() //이번 라운드가 끝났을때.
     {
         // 라운드 변경 시 턴 UI를 강제 동기화하여 점수 계산시 턴 정보 일치화.
-        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(99);
+        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(7);
         
         // 카메라 움직임 필요
         stoneManager?.SyncPositions(_currentGame.PredictedResult.FinalStonePositions);

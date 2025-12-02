@@ -31,14 +31,14 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject WaitThrowPopUp;
-    
+
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
     [Header("결과창 보상 갱신을 위한 변수")]
-    [SerializeField] private TextMeshProUGUI expText; 
+    [SerializeField] private TextMeshProUGUI expText;
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI pointText;
     [SerializeField] private TextMeshProUGUI resultText; // 승리,패배 결과 텍스트
@@ -151,21 +151,21 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
             // 상대방 인벤토리 UI 채우기 (오프닝 타임라인) 
             PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
-  
+
             // 인게임UI의 칭호 텍스트 반영
             if (EpitheText1 != null)
                 EpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, EpitheImage1);
 
             if (EpitheText2 != null)
                 EpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, EpitheImage2);
- 
+
             //타임라인UI의 칭호 텍스트 반영
             if (timeLineEpitheText1 != null)
                 timeLineEpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, timeLineEpitheImage1);
 
             if (timeLineEpitheText2 != null)
                 timeLineEpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, timeLineEpitheImage2);
-    
+
             // ⭐ 타임라인 UI 캐릭터 이미지 반영
             if (timeLinePlayerCharacter1 != null)
             {
@@ -232,15 +232,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     {
         if (turnText != null)
         {
-            if (turn == 99)
-            {
-                turnText.text = "";
-            }
-            else
-            {
-                displayTurn = (turn / 2) + 1; // 내부 턴 번호를 컬링 규칙에 맞게 가공
-                turnText.text = $"Turn : {displayTurn}";
-            }
+            displayTurn = (turn / 2) + 1; // 내부 턴 번호를 컬링 규칙에 맞게 가공
+            turnText.text = $"Turn : {displayTurn}";
         }
     }
 
@@ -275,7 +268,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         // 1. 위치 설정
         floatingText.transform.position = screenPosition;
-        
+
         // 2. 텍스트 설정
         floatingText.SetText(message);
 
@@ -317,7 +310,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         WaitThrowPopUp.SetActive(false);
         roundPanel.SetActive(true);
     }
-    public void WatingThrowUI() 
+    public void WatingThrowUI()
     {
         AllcloseUI();
         WaitThrowPopUp.SetActive(true);
@@ -328,7 +321,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
-        settingsPanel.SetActive(false);        
+        settingsPanel.SetActive(false);
     }
     public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
@@ -387,9 +380,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 rewardGold = 150;
                 rewardPoint = 20; // 페널티 복구 10점 + 승리 보너스 10점
                 result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_victoryText)}";
-                
+
                 getDonut = "획득 도넛";
-                
+
                 //GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
                 GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
                 break;
@@ -398,7 +391,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 rewardGold = 50;
                 rewardPoint = 0; // 솔로스코어는 미리 반영되었으므로 0
                 result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_defeatText)}";
-                
+
                 getDonut = "잃은 도넛";
 
                 break;
@@ -407,7 +400,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 rewardGold = 100;
                 rewardPoint = 0; // 페널티로 잃었던 10점 복구
                 result = "DRAW!";
-                getDonut = "획득 도넛";
+                getDonut = "변동 없음";
                 GameManager.Instance.ProcessDrawOutcome(); // 페널티로 제거되었던 도넛 복구
                 break;
         }
@@ -425,7 +418,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
 
     }
-    
+
     /// <summary>
     /// 현재 턴 번호를 UI에 업데이트하고 BGM 전환 로직을 처리합니다.
     /// </summary>
