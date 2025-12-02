@@ -128,7 +128,7 @@ public class Scr_DonutStateEditor : MonoBehaviour
             ? entryList[listIndex]
             : null;
     
-        Debug.Log(entry.id);    
+        //Debug.Log(entry.id);    
         // 도넛 amount가 0일경우 처음 앤트리에 넣은값
         if (entry.donutAmount == 0)
         {

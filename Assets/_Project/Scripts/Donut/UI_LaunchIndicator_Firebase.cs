@@ -112,7 +112,6 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         // 인게임 BGM을 재생 (Element 0으로 시작)
         SoundManager.Instance.PlayBGMGroup("InGameBGM");
-        SoundManager.Instance.SetBGMParameter(BGM_STATE_PARAMETER, 0f);
     }
 
     private void HandleProfilesLoaded()
@@ -417,37 +416,6 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         GameManager.Instance.SetGameOutcome(outcome); // 게임 결과 저장
         GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
 
-    }
-
-    /// <summary>
-    /// 현재 턴 번호를 UI에 업데이트하고 BGM 전환 로직을 처리합니다.
-    /// </summary>
-    /// <param name="turn">현재 턴 번호.</param>
-    public void turnBGM(int turn)
-    {
-        // ⭐ 1. turnText가 유효한지 먼저 확인합니다.
-        if (turnText != null)
-        {
-            // 내부 턴 번호를 컬링 규칙에 맞게 가공 (1, 2, 3, 4, ...)
-            // (이 코드가 먼저 실행되어야 displayTurn 값이 갱신됩니다.)
-            displayTurn = (turn / 2) + 1;
-            turnText.text = $"Turn : {displayTurn}";
-
-            // ----------------------------------------------------
-            // ⭐ 2. BGM 전환 로직은 displayTurn 계산 후 별도의 if 문으로 체크합니다.
-
-            // 현재 displayTurn이 4 이상이고, 아직 BGM이 전환되지 않았다면
-            if (displayTurn >= 4 && !isSpecialMusicPlaying)
-            {
-                // 1. SoundManager에게 BGM 파라미터 값을 1.0f로 설정하라고 명령
-                SoundManager.Instance.SetBGMParameter(BGM_STATE_PARAMETER, 1f);
-                isSpecialMusicPlaying = true;
-
-                Debug.Log($"BGM 전환: 턴 {displayTurn} 도달! Element 1 음악으로 전환 명령");
-            }
-            // ----------------------------------------------------
-        }
-        // ❌ 참고: bgmTransitionTurn 변수는 사용하지 않으므로 제거해야 합니다.
     }
 
     // enum → 문자열 변환 함수

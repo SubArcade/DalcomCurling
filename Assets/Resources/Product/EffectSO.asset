@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: EffectSO
   m_EditorClassIdentifier: 
   effectSoList:
+  - effectType: 0
+    auraEffect: {fileID: 0}
+    collisionEffect: {fileID: 0}
+    trailEffect: {fileID: 0}
   - effectType: 2
     auraEffect: {fileID: 4823518202205099639, guid: 21d5a35a5e6529f409af66b05f3a786d, type: 3}
     collisionEffect: {fileID: 3223031359271505891, guid: 62d5298ce92ee8a4c87039604bc35cea, type: 3}
