@@ -322,7 +322,7 @@ public class FirebaseGameManager : MonoBehaviour
                             //SoundManager.Instance.selectDonut();
                         });
 
-                        DOVirtual.DelayedCall(7.5f, () => {
+                        DOVirtual.DelayedCall(7.7f, () => {
                             SoundManager.Instance.appearVS();
                         });
                         // 8.5초의 연출 대기시간을 기다림

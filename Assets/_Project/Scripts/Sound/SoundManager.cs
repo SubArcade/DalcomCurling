@@ -182,31 +182,6 @@ public class SoundManager : MonoBehaviour
     {
         Debug.Log($"[SoundManager] {playlistName} BGM 플레이리스트 시작 (총 {currentBGMPlaylist.Count}곡)");
 
-        // InGameBGM은 단일 적응형 BGM으로 간주하고 별도 처리
-        bool isAdaptiveBGM = playlistName == "InGameBGM";
-
-        if (isAdaptiveBGM)
-        {
-            if (currentBGMPlaylist.Count == 0 || currentBGMPlaylist[0].IsNull)
-            {
-                Debug.LogWarning($"[SoundManager] InGameBGM 이벤트가 할당되지 않았습니다.");
-                yield break;
-            }
-
-            EventReference adaptiveBGM = currentBGMPlaylist[0];
-
-            StopBGMInternal();
-
-            // 인스턴스 생성 및 재생
-            currentBGMInstance = RuntimeManager.CreateInstance(adaptiveBGM);
-            currentBGMInstance.start();
-
-            Debug.Log("[SoundManager] InGameBGM (적응형/일반 BGM) 재생 시작. 코루틴 즉시 종료.");
-
-            // 씬 멈춤 방지를 위해 즉시 코루틴 종료 (⭐핵심⭐)
-            yield break;
-        }
-
         // 일반 BGM 플레이리스트 루프 로직
         while (true)
         {
