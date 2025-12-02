@@ -188,8 +188,15 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     {
         if (turnText != null)
         {
-            displayTurn = (turn / 2) + 1; // 내부 턴 번호를 컬링 규칙에 맞게 가공
-            turnText.text = $"Turn : {displayTurn}";
+            if (turn == 99)
+            {
+                turnText.text = "";
+            }
+            else
+            {
+                displayTurn = (turn / 2) + 1; // 내부 턴 번호를 컬링 규칙에 맞게 가공
+                turnText.text = $"Turn : {displayTurn}";
+            }
         }
     }
 
