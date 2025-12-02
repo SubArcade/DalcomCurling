@@ -86,7 +86,12 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private float disconnectionThreshold = 25f; // 연결 끊김으로 판단하는 임계 시간 (초)
     
     // --- SO 연결 ---\
-    public  EffectSO effectSo { get; private set; }
+    [SerializeField] private EffectSO effectSo;
+
+    public EffectSO EffectSoObject
+    {
+        get { return effectSo; }
+    }
 
     // --- 게임 내부 변수 ---
     private float initialFixedDeltaTime;
