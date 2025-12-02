@@ -62,7 +62,14 @@ public class FirebaseAuthManager
             // else UIManager.Instance.Open(PanelId.MainPanel);
 
             await DataManager.Instance.EnsureUserDocAsync(auth.CurrentUser.UserId, isAutoLogin: true);
-            UIManager.Instance.Open(PanelId.StartPanel);
+            if (GameManager.Instance.State != GameState.Lobby)
+            {
+                UIManager.Instance.Open(PanelId.MainPanel);
+            }
+            else
+            {
+                UIManager.Instance.Open(PanelId.StartPanel);
+            }
         }
         else
         {

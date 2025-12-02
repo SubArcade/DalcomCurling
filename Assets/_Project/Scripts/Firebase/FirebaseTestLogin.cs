@@ -1,3 +1,4 @@
+/*
 using System;
 using TMPro;
 using UnityEngine;
@@ -91,3 +92,4 @@ public class FirebaseTestLogin : MonoBehaviour
         FirebaseAuthManager.Instance.Logout();
     }
 }
+*/

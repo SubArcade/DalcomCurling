@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -99,7 +100,7 @@ public class GameManager : MonoBehaviour
             {
                 // isAppStarted가 false이면, 게임이 끝나고 메뉴 씬으로 돌아온 것.
                 // Init(false)를 호출하여 MainPanel이 열리도록 함.
-                FirebaseAuthManager.Instance.Init(isAppStarted);
+               // FirebaseAuthManager.Instance.Init(isAppStarted);
             }
             
             SetState(GameState.Lobby);
@@ -155,10 +156,21 @@ public class GameManager : MonoBehaviour
     }
     
     // 게임 끝 -> 메인화면으로 다시 전환
-    public void EndGame()
+    public async void EndGame()
     {
         Debug.Log("EndGame 실행");
         SceneLoader.Instance.LoadLocal(menuSceneName);
+        
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        
         UIManager.Instance.Open(PanelId.MainPanel);
         SetState(GameState.Lobby);
     }
