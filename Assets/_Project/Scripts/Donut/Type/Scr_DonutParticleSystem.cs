@@ -25,10 +25,13 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     [SerializeField] private GameObject trailLightPrefab;
     [SerializeField] private GameObject trailMagicPrefab;
     [SerializeField] private GameObject trailIcePrefab;
-    [SerializeField] private GameObject trailElectricPrefab;
+    //[SerializeField] private GameObject trailElectricPrefab;
 
     [Header("충돌 파티클")]
-    [SerializeField] private GameObject CrashParticlePrefab;
+    [SerializeField] private GameObject collosionRed;
+    [SerializeField] private GameObject collosionBlue;
+    [SerializeField] private GameObject collosionMagic;
+    [SerializeField] private GameObject collosionStar;
     [SerializeField] private float CrashParticleDuation = 2.0f; // 충돌 파티클 지속시간 -> 필요없을시 삭제하기
                                                                 // 어차피 파티클 Looping 끈상태라서 필요없을것 같음
     [SerializeField] private string targetLayerName = "Donut";
@@ -60,6 +63,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     private CapsuleCollider capsuleCollider;
     private Vector3 originalScale;
     private Vector3 newScale;
+    private bool particleTrailFinished = false;
     
     //fixedUpdate 내부에서 변수 생성을 하지 않도록 미리 생성한 변수
     private Vector3 velocity;
@@ -68,6 +72,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     private Quaternion targetRotation;
     private float scaleValue_Y;
     private GameObject particleSystemParent;
+    private ParticleSystem.MainModule mainModule;
 
     // 파티클 시스템의 로컬 X축 회전 보정을 위한 상수 (90도 회전 필요)
     private readonly Quaternion rotationOffset = Quaternion.Euler(0f, 0f, 0f);
@@ -79,35 +84,12 @@ public class Scr_DonutParticleSystem : MonoBehaviour
         //trailRenderer.enabled = false;
         capsuleCollider = transform.GetComponent<CapsuleCollider>();
         colliderRadius = capsuleCollider.radius * transform.localScale.x;
-        
-
-
-        //InitializeDonutParticles(StoneForceController_Firebase.Team.A);
     }
-    // private void Start()
-    // {
-    //     donutRigidbody = GetComponent<Rigidbody>();
-    //
-    //     targetLayer = LayerMask.NameToLayer(targetLayerName);
-    //     if (targetLayer == -1)
-    //     {
-    //         Debug.LogWarning($"Layer'{targetLayerName}'를 찾을 수 없습니다");
-    //     }
-    //     
-    // }
     
-     // private void Update()
-     // {
-     //     if (initialized && !attackFinished)
-     //     {
-     //         UpdateTrailBasedOnSpeed();
-     //         UpdateTrailDirection();
-     //     }
-     // }
      
      void Update()
      {
-         if (initialized)
+         if (initialized && !particleTrailFinished)
          {
              // 1. 현재 속도 벡터를 가져옵니다.
              velocity = donutRigidbody.velocity;
@@ -149,7 +131,9 @@ public class Scr_DonutParticleSystem : MonoBehaviour
                  if (selectedTrail == TrailType.LightTail || selectedTrail == TrailType.MagicTail)
                  {
                      trailParticleSystem.transform.localScale = new Vector3(originalScale.x,
-                         originalScale.y, originalScale.z + sqrVelocity * 0.05f);
+                         originalScale.y, originalScale.z + sqrVelocity * 0.02f);
+                     mainModule = trailParticleSystem.main;
+                     mainModule.simulationSpeed  = 1f + sqrVelocity * 0.02f;
                  }
                  else
                  {
@@ -161,6 +145,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
              {
                  //trailParticleSystem.transform.localScale = new Vector3(0, 0, 0);
                  trailParticleSystem.Stop();
+                 particleTrailFinished = true;
              }
              
              //trailParticleSystem.transform.position = capsuleCollider.bounds.center + direction * colliderRadius;
@@ -231,7 +216,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
 
     private void CreateCollisionParticleToChildren() // 이 게임에 쓰일 충돌 파티클을 미리 생성해둠
     {
-        currentCollisionParticle = Instantiate(CrashParticlePrefab, transform, true);
+        currentCollisionParticle = Instantiate(collosionBlue, transform, true);
     }
 
     public void PlayCollisionParticle(Collision collision) // 충돌시 StoneForceController_Firebase에서 호출할 함수. 파티클을 재생시킴
@@ -246,7 +231,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
 
     private void CreateCollisionParticle(Collision collision)
     {
-        if (CrashParticlePrefab == null)
+        if (collosionBlue == null)
         {
             Debug.LogWarning("충돌 파티클이 설정되어있지않습니다"); 
             return;
@@ -258,7 +243,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
         Quaternion collisionRotation = Quaternion.LookRotation(contact.normal);
 
         GameObject collisionParticle = Instantiate(
-            CrashParticlePrefab,
+            collosionBlue,
             collisionPoint,
             collisionRotation
             );
@@ -270,16 +255,16 @@ public class Scr_DonutParticleSystem : MonoBehaviour
 
     public void SetCollisionParticlePrefab(GameObject newPrefab)
     {
-        CrashParticlePrefab = newPrefab;
+        collosionBlue = newPrefab;
     }
 
     // 충돌 파티클 생성하기 테스트용으로 임시로 생성함 테스트후에 삭제하기
     public void TestCreateCollisionParticle(Vector3 position)
     {
-        if (CrashParticlePrefab != null)
+        if (collosionBlue != null)
         {
             GameObject testParticle = Instantiate(
-                CrashParticlePrefab,
+                collosionBlue,
                 position,
                 Quaternion.identity
                 );
@@ -417,7 +402,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
             case TrailType.LightTail: return trailLightPrefab;
             case TrailType.MagicTail: return trailMagicPrefab;
             case TrailType.IceTail: return trailIcePrefab;
-            case TrailType.ElectricTail: return trailElectricPrefab;
+            //case TrailType.ElectricTail: return trailElectricPrefab;
             default: return null;
         }
     }

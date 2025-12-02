@@ -728,8 +728,9 @@ public class StoneShoot_Firebase : MonoBehaviour
             // 미리 준비된 샷에서는 어떤 도넛을 사용했는지 정보가 없으므로, 현재 선택된 도넛의 인덱스를 가져옵니다.
             int selectedIndex = uiLaunch.donutSelectionUI.GetSelectedDonutIndex();
             //MoveDonutToHogLine(_preparedShotData, selectedIndex);
-            MoveDonutToHogLine(selectedIndex);
             _needToTap = true;
+            _inputEnabled = true;
+            MoveDonutToHogLine(selectedIndex);
             //_needToTap = false; // 미리 준비된 샷은 탭 입력이 필요없도록 
             //_preparedShotData = null; // 사용한 샷 데이터 초기화
             return true; // 샷 실행됨
