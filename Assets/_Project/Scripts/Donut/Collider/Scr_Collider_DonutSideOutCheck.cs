@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,6 +18,7 @@ public class Scr_Collider_DonutSideOutCheck : MonoBehaviour
             StoneForceController_Firebase sfc = other.transform.GetComponent<StoneForceController_Firebase>();
             stoneManager.DonutOut(sfc);
             Debug.Log("옆쪽 벽과 충돌함");
+
         }
     }
 }

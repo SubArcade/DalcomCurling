@@ -202,7 +202,7 @@ public class DataManager : MonoBehaviour
             //BaseMergeBoardData(cellMax, cellWidth, cellLength);
             BaseQuestData(baseGold, RefreshCount, maxCount);
 
-            //await docRef.SetAsync(userData, SetOptions.MergeAll);
+            await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"자동 로그인: /{userCollection}/{uId}");
         }
         
@@ -215,8 +215,8 @@ public class DataManager : MonoBehaviour
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             FirstBasePlayerData();
-            BaseInventoryData();
             FirstBaseInventoryData();
+            BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             FirstBaseMergeBoardData();
             BaseQuestData(baseGold, RefreshCount, maxCount);
@@ -444,6 +444,45 @@ public class DataManager : MonoBehaviour
         var docRef = db.Collection("user").Document(docId);
         await docRef.DeleteAsync();
         Debug.Log("[DataManager] Firestore 유저 데이터 삭제 완료");
+    }
+    
+    // 도넛 생성기 OR 머지 후 도감 등록
+    public void AddCodexEntry(DonutType donutType, string donutId, int level)
+    {
+        level = level - 1;
+        switch (donutType)
+        {
+            case DonutType.Hard:
+                if (InventoryData.hardDonutCodexDataList[level].donutDexViewState == DonutDexViewState.Question)
+                {
+                    InventoryData.hardDonutCodexDataList[level] = new DonutCodexData()
+                    {
+                        id = donutId,
+                        donutDexViewState = DonutDexViewState.Reward
+                    };   
+                }
+                break;
+            case DonutType.Soft:
+                if (InventoryData.softDonutCodexDataList[level].donutDexViewState == DonutDexViewState.Question)
+                {
+                    InventoryData.softDonutCodexDataList[level] = new DonutCodexData()
+                    {
+                        id = donutId,
+                        donutDexViewState = DonutDexViewState.Reward
+                    };   
+                }
+                break;
+            case DonutType.Moist:
+                if (InventoryData.moistDnutCodexDataList[level].donutDexViewState == DonutDexViewState.Question)
+                {
+                    InventoryData.moistDnutCodexDataList[level] = new DonutCodexData()
+                    {
+                        id = donutId,
+                        donutDexViewState = DonutDexViewState.Reward
+                    };   
+                }
+                break;
+        }
     }
     
     // 도넛 SO 데이터 불러오기
@@ -818,6 +857,7 @@ public class DataManager : MonoBehaviour
     //     {
     //         _ = SaveAllUserDataAsync();
     //     }
+    //     PauseChanged?.Invoke(hasFocus);
     // }
     
     // Util

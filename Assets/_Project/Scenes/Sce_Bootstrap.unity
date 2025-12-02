@@ -1004,6 +1004,46 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[3].Path
+      value: event:/04_ui_menu_button_beep_19
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[6].Path
+      value: event:/07_ui_menu_button_beep_11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[3].Guid.Data1
+      value: 341625300
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[3].Guid.Data2
+      value: 1268170450
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[3].Guid.Data3
+      value: 334973591
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[3].Guid.Data4
+      value: 86178138
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[6].Guid.Data1
+      value: 786693447
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[6].Guid.Data2
+      value: 1123323472
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[6].Guid.Data3
+      value: -552786515
+      objectReference: {fileID: 0}
+    - target: {fileID: 7792650670720805081, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
+      propertyPath: allSoundGroups.Array.data[3].Events.Array.data[6].Guid.Data4
+      value: 1321876739
+      objectReference: {fileID: 0}
     - target: {fileID: 8385077181069695210, guid: 7219b3ce69df1624188d305810d0c958, type: 3}
       propertyPath: m_Name
       value: SoundManager

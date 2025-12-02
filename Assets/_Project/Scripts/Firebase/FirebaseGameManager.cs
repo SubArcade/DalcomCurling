@@ -1,6 +1,7 @@
 ﻿using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
 using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 필요합니다.
 using System;
+using System.Collections;
 using System.Collections.Generic; // 리스트나 딕셔너리 같은 자료구조를 사용하기 위해 필요합니다.
 using System.Linq; // 리스트에서 데이터를 쉽게 찾거나 걸러낼 때 사용합니다.
 using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
@@ -314,7 +315,16 @@ public class FirebaseGameManager : MonoBehaviour
                         isFirstTurn = false;
                         roundDataUpdated = false;
                         gameCamControl?.PlayStartTimeline(); // 긴 타임라인 재생
+                        SoundManager.Instance.appearEntry();
 
+                        // 사운드 출력 테스트용 +++
+                        DOVirtual.DelayedCall(2f, () => {
+                            //SoundManager.Instance.selectDonut();
+                        });
+
+                        DOVirtual.DelayedCall(7.5f, () => {
+                            SoundManager.Instance.appearVS();
+                        });
                         // 8.5초의 연출 대기시간을 기다림
                         DOVirtual.DelayedCall(8.5f, () => {
                             
@@ -345,6 +355,7 @@ public class FirebaseGameManager : MonoBehaviour
                                 UI_LaunchIndicator_Firebase.WatingThrowUI();
                             }).SetId("WatingThrowUI");
                         }
+                        SoundManager.Instance.roundturnStart();
                     }
                 }
 
@@ -543,6 +554,7 @@ public class FirebaseGameManager : MonoBehaviour
             DOTween.Kill("WatingThrowUI"); //트윈킬 처리안해주면 시뮬레이션중에 튀어나옴
             UI_LaunchIndicator_Firebase.IdleUI(); // 상대방 샷 데이터가 도착하면 패널을 끔
 
+            SoundManager.Instance.timerFast();
             // 만약 샷 정보에 발사 시간을 놓쳤음을 나타내는 정보가 있을경우
             if ((_currentGame.LastShot.Force == -999f)
                 && (_currentGame.LastShot.Spin == -999f) && (_currentGame.LastShot.Direction["x"] == 0)
@@ -718,7 +730,7 @@ public class FirebaseGameManager : MonoBehaviour
         Time.timeScale = 1f;
 
         GameOutcome outcome;
-
+        // win,draw,lose 사운드 추가 +++
         // 연결 끊김 또는 몰수패로 승자가 결정되었는지 먼저 확인
         if (!string.IsNullOrEmpty(_currentGame.WinnerId))
         {
@@ -726,11 +738,13 @@ public class FirebaseGameManager : MonoBehaviour
             {
                 Debug.Log("상대방의 연결 끊김 또는 몰수패로 승리했습니다.");
                 outcome = GameOutcome.Win;
+                SoundManager.Instance.winDecide();
             }
             else
             {
                 Debug.Log("연결 문제 또는 몰수패로 패배했습니다.");
                 outcome = GameOutcome.Lose;
+                SoundManager.Instance.loseDecide();
             }
         }
         else // WinnerId가 없는 경우, 정상적으로 점수를 비교하여 결과 결정
@@ -741,11 +755,13 @@ public class FirebaseGameManager : MonoBehaviour
                 {
                     Debug.Log("승리");
                     outcome = GameOutcome.Win;
+                    SoundManager.Instance.winDecide();
                 }
                 else
                 {
                     Debug.Log("패배");
                     outcome = GameOutcome.Lose;
+                    SoundManager.Instance.loseDecide();
                 }
             }
             else if (bTeamScore > aTeamScore)
@@ -754,17 +770,20 @@ public class FirebaseGameManager : MonoBehaviour
                 {
                     Debug.Log("패배");
                     outcome = GameOutcome.Lose;
+                    SoundManager.Instance.loseDecide();
                 }
                 else
                 {
                     Debug.Log("승리");
                     outcome = GameOutcome.Win;
+                    SoundManager.Instance.winDecide();
                 }
             }
             else // 비겼을때
             {
                 Debug.Log("비김");
                 outcome = GameOutcome.Draw;
+                SoundManager.Instance.drawDecide();
             }
         }
 
@@ -1433,6 +1452,7 @@ public class FirebaseGameManager : MonoBehaviour
 
                 inputController?.DisableInput();
                 PlayerLostTimeToShotInTime(_currentTurnDonutRigid, "TimeOut");
+                SoundManager.Instance.timeOver();
             });
     }
 

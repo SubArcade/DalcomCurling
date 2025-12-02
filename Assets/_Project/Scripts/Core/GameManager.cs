@@ -132,6 +132,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("뒤로가기 눌림!");
             // 팝업 띄우기
+            UIManager.Instance.Open(PanelId.ExitPopup);
         }
     }
 
@@ -151,12 +152,13 @@ public class GameManager : MonoBehaviour
         DataManager.Instance.SaveAllUserDataAsync();
     }
     
+    // 게임 끝 -> 메인화면으로 다시 전환
     public void EndGame()
     {
-        SetState(GameState.Result);
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-        
+        Debug.Log("EndGame 실행");
+        SceneLoader.Instance.LoadLocal(menuSceneName);
+        UIManager.Instance.Open(PanelId.MainPanel);
+        SetState(GameState.Lobby);
     }
     
 

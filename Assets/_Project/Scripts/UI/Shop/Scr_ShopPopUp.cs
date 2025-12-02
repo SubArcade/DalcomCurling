@@ -55,10 +55,7 @@ public class Scr_ShopPopUp : MonoBehaviour
     // ✅ 이미지 색상 관리용
     private readonly Color selectedImgColor = new Color32(0xFE, 0xD3, 0x7E, 0xFF); // 선택시FED37E
     private readonly Color defaultImgColor = new Color32(0x2B, 0x3F, 0x5D, 0xFF);   // 선택이 아닐시2B3F5D
-
-    void Awake()
-    {
-    }
+    
     void Start()
     {
         bool isCashOn = cashShopBtn.isOn;

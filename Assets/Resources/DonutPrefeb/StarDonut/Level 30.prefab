@@ -461,6 +461,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Star_Choco_1 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8105293432586930888, guid: 489b1f00ea6440d46bb83a481bc1c40a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

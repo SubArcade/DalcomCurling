@@ -9,7 +9,8 @@ public enum AdType
     TEST,
     ENERGY,
     REFRESH,
-    GIFTBOX
+    GIFTBOX,
+    Gem
 }
 
 public class AdsRewarded : MonoBehaviour

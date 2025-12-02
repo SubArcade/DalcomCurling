@@ -116,7 +116,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             // + 휴지통에 도넛을 넣었을 시에 재생되는 사운드 추가 ---
             if (SoundManager.Instance != null)
             {
-                SoundManager.Instance.sellDonut(transform.position);
+                SoundManager.Instance.sellDonut();
             }
 
             if (donutId != null) //도넛 재화 반환
@@ -215,7 +215,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         // 머지 시작
         AnalyticsManager.Instance.MergeAction();
         if(SoundManager.Instance != null)
-            SoundManager.Instance.moveUnit(transform.position);
+            SoundManager.Instance.moveUnit();
         
         EntrySlot fromEntrySlot = null;
         if (originalParent != null)
@@ -390,8 +390,18 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             
             // 머지 성공 애널리틱스
             AnalyticsManager.Instance.MergeSuccess();
-            if(SoundManager.Instance != null)
-                SoundManager.Instance.mergeDonut(transform.position);
+            DataManager.Instance.AddCodexEntry(nextDonut.donutType, nextDonut.id, nextDonut.level);
+            Debug.Log($"{nextDonut.donutType}111111111111111111111111111111111");
+            if (nextDonut.donutType == DonutType.Gift)
+            {
+                if(SoundManager.Instance != null)
+                    SoundManager.Instance.mergeGiftBox();  
+            }
+            else
+            {
+                if(SoundManager.Instance != null)
+                    SoundManager.Instance.mergeDonut();   
+            }
 
             BoardManager.Instance.AutoSaveBoardLocal(); //로컬 저장
             return;

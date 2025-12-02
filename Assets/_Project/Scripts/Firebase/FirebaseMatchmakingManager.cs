@@ -345,6 +345,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         {
             Nickname = displayNickname,
             Email = joiningPlayer.email,
+            curNamePlateType = joiningPlayer.curNamePlateType,
             Inventory = joiningInventory
         };
         await db.RunTransactionAsync(async transaction =>
@@ -415,6 +416,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         {
             Nickname = displayNickname,
             Email = hostPlayer.email,
+            curNamePlateType = hostPlayer.curNamePlateType,
             Inventory = hostInventory
         };
         var room = new Room

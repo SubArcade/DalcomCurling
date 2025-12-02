@@ -693,7 +693,9 @@ public class StoneManager : MonoBehaviour
             StartCoroutine(HighlightScoredDonuts(sortedDonutList, 0, true));
             team = StoneForceController_Firebase.Team.None;
             score = -99;
+            SoundManager.Instance.highlightTurn();
             return;
+
         }
         team = sortedDonutList[0].team; // out으로 보낼 승리팀
         scoredIds.Add(sortedDonutList[0].donutId);
@@ -794,11 +796,13 @@ public class StoneManager : MonoBehaviour
             if (sortedDonutList[i].transform.TryGetComponent<Outlinable>(out var outline))
             {
                 outline.enabled = true;
+                SoundManager.Instance.highlightTurn();
                 ShowWorldSpaceFeedback(sortedDonutList[i].transform.position, "+1");
             }
             //sortedDonutList[i].transform.GetComponent<Outlinable>().enabled = true;
         }
-      
+        yield return wait;
+        SoundManager.Instance.resultSoundscore();
     }
 
     public void ClearOldDonutsInNewRound(Game newGame, int round = -99) // 새 라운드가 시작하기 전에, 기존에 생성되었던 모든 도넛들을 지움
@@ -889,6 +893,7 @@ public class StoneManager : MonoBehaviour
     public void DonutOut(StoneForceController_Firebase donut, string message = "Out") //도넛의 아웃 판정
     {
         if (donut == null) return;
+
         
 
         if (donut.team == StoneForceController_Firebase.Team.A)
@@ -908,7 +913,7 @@ public class StoneManager : MonoBehaviour
             }
         }
 
-
+        SoundManager.Instance.outDecide();
         Destroy(donut.gameObject);
         
     }

@@ -130,6 +130,8 @@ public class BoardManager : MonoBehaviour
         selectionHighlight.gameObject.SetActive(true);
         selectionHighlight.transform.SetParent(cell.transform, false);
         selectionHighlight.rectTransform.anchoredPosition = Vector2.zero;
+        // 칸 선택 사운드
+        SoundManager.Instance.selectSlotScroll();
     }
 
     void GenerateBoard()
@@ -198,7 +200,7 @@ public class BoardManager : MonoBehaviour
             // + 도넛의 포화상태때 생성 시도를 할때 나는 사운드 ---
             if (SoundManager.Instance != null)
             {
-                SoundManager.Instance.saturation(transform.position);
+                SoundManager.Instance.saturation();
             }
            
             return;
@@ -544,6 +546,7 @@ public class BoardManager : MonoBehaviour
 
         Debug.Log("[LoadBoardLocal] 보드 로드 완료");
     }
+    
 
     // 임시보관칸에서 보드판에 생성
     public void SpawnFromTempStorage(GiftBoxData giftData)

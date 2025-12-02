@@ -302,6 +302,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 if (inputArea != null && RectTransformUtility.RectangleContainsScreenPoint(inputArea, touchPosition, null))
                 {
                     StartDrag(touchPosition, DragType.PowerDirection);
+                    SoundManager.Instance.powerDrag();
                     uiLaunch.FireShotReadyTwoUI(); // 조작이 시작되면 도넛 선택 못하도록 UI꺼주기
                 }
             }
@@ -381,6 +382,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 if (inputArea != null && RectTransformUtility.RectangleContainsScreenPoint(inputArea, touchPosition, null))
                 {
                     StartDrag(touchPosition, DragType.Rotation);
+                    SoundManager.Instance.spinControl();
                 }
             }
             else if (isTouchMoved && IsDragging && CurrentDragType == DragType.Rotation)
@@ -406,6 +408,7 @@ public class StoneShoot_Firebase : MonoBehaviour
         if (Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
         {
             TapBeforeHogLine();
+            
         }
     }
     #endregion
@@ -776,12 +779,14 @@ public class StoneShoot_Firebase : MonoBehaviour
             weights = perfectZoneRandomWeights; // 퍼펙트존 가중치 사용
             Debug.Log("퍼펙트존");
             uiLaunch.ShowFloatingText("Perfect", Input.mousePosition);
+            SoundManager.Instance.timingPerfectTouch();
         }
         else if (zPos >= earlyZoneLine.position.z && zPos < perfectZoneLine.position.z)
         {
             weights = earlyZoneRandomWeights; // 얼리존 가중치 사용
             Debug.Log("얼리존");
             uiLaunch.ShowFloatingText("Early", Input.mousePosition);
+            SoundManager.Instance.timingEarlyTouch();
         }
 
         if (weights != null) // 가중치 리스트가 유효하면
