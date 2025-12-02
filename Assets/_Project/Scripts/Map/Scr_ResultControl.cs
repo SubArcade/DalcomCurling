@@ -90,17 +90,20 @@ public class Scr_ResultControl : MonoBehaviour
                 SetupForWin();
                 SetwitePanel1(exp);
                 SetwitePanel2(point);
+                SetCharacterImage();
                 break;
             case FirebaseGameManager.GameOutcome.Lose:
                 SetupForLose();
                 SetwitePanel1(exp);
                 SetwitePanel2(point);
+                SetCharacterImage();
                 break;
             case FirebaseGameManager.GameOutcome.Draw:
             default:
                 SetupForDraw();
                 SetwitePanel1(exp);
                 SetwitePanel2(point);
+                SetCharacterImage();
                 break;
         }
     }
@@ -373,6 +376,23 @@ public class Scr_ResultControl : MonoBehaviour
         DataManager.Instance.ScoreChange(player.soloScore);
         DataManager.Instance.PlayerData.soloTier = player.soloTier;
     }
+
+    private void SetCharacterImage()
+    {
+        var currentType = DataManager.Instance.InventoryData.curCharacterType;
+        Sprite sprite = characterSO.GetCharacterSprite(currentType);
+
+        if (sprite != null)
+        {
+            characterImg.sprite = sprite;
+            characterImg.enabled = true;
+        }
+        else
+        {
+            characterImg.enabled = false;
+        }
+    }
+
     private void OnDestroy()
     {
         DOTween.Kill("endgame");
