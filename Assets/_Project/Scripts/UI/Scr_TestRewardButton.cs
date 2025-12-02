@@ -56,6 +56,7 @@ public class Scr_TestRewardButton : MonoBehaviour
                 break;
             case AdType.REFRESH:
                 DataManager.Instance.QuestData.refreshCount += reward;
+                Debug.Log(DataManager.Instance.QuestData.refreshCount);
                 break;
             case AdType.GIFTBOX:
                 GiveGiftBox();

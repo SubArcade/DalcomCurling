@@ -19,6 +19,8 @@ public class QuestData
 
     // 로컬 퀘스트 데이터 (디비에 들어가지 않는 변수)
     [field: SerializeField, Tooltip("새로고침 횟수")][FirestoreProperty] public int refreshCount { get; set; }
+    [field: SerializeField, Tooltip("새로고침 채우기 횟수")][FirestoreProperty] public int maxChargeCount { get; set; }
+    [field: SerializeField, Tooltip("새로고침 채우기 횟수")][FirestoreProperty] public int currentChargeCount { get; set; }
 
     public int maxCount { get; set; }
     public int baseGold { get; set; }

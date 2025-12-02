@@ -104,6 +104,15 @@ public class DataManager : MonoBehaviour
             null,
             null
         },
+        dailyFreeGemClaimed = false,
+        effectList = new List<EffectType>()
+        {
+            EffectType.None,
+        },
+        characterList = new List<CharacterType>()
+        {
+            CharacterType.None
+        }
     };
     [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
     {
@@ -118,6 +127,8 @@ public class DataManager : MonoBehaviour
     {
         maxCount = 5,
         refreshCount = 5,
+        maxChargeCount = 3,
+        currentChargeCount = 0,
         baseGold = 0,
     };
 
@@ -221,6 +232,7 @@ public class DataManager : MonoBehaviour
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             FirstBaseMergeBoardData();
             BaseQuestData(baseGold, RefreshCount, maxCount);
+            FirstBaseQuestData();
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
@@ -331,6 +343,11 @@ public class DataManager : MonoBehaviour
                 MergeBoardData.cells.Add(cellData);
             }
         }
+
+        MergeBoardData.generatorLevelHard = 1;
+        MergeBoardData.generatorLevelSoft = 1;
+        MergeBoardData.generatorLevelMoist = 1;
+        
     }
 
     // 기본 퀘스트 데이터
@@ -340,6 +357,13 @@ public class DataManager : MonoBehaviour
         QuestData.refreshCount = RefreshCount;
         QuestData.maxCount = MaxCount;
     }
+
+    private void FirstBaseQuestData()
+    {
+        QuestData.currentChargeCount = firstQuestData.currentChargeCount;
+        QuestData.maxChargeCount = firstQuestData.maxChargeCount;
+    }
+    
     // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
     public async Task UpdateUserDataAsync(

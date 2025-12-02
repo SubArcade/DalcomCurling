@@ -16,10 +16,7 @@ public class EnergyRegenNotifier : MonoBehaviour
     [SerializeField] private string messageTitle = "에너지 가득!";
     [SerializeField] private string messageText = $"에너지가 회복되었어요.";
     
-    [SerializeField, Tooltip("알림 on/off")] private bool notificationsEnabled = true;
-    
     [Header("야간 알림 차단 시간")]
-    [SerializeField] private bool useQuietHours = true;
     [SerializeField] private int quietStartHour = 22;
     [SerializeField] private int quietEndHour = 8;
 
@@ -44,8 +41,8 @@ public class EnergyRegenNotifier : MonoBehaviour
 
     public void IsNotificationsEnabled(bool value)
     {
-        notificationsEnabled = value;
-        Debug.Log(notificationsEnabled);
+        DataManager.Instance.PlayerData.energyFullRecharged = value;
+        Debug.Log(DataManager.Instance.PlayerData.energyFullRecharged);
         
         if (!value)
             CancelAllEnergyNotifications();
@@ -55,8 +52,8 @@ public class EnergyRegenNotifier : MonoBehaviour
     
     public void IsUseQuietHours(bool value)
     {
-        useQuietHours = value;
-        Debug.Log(useQuietHours);
+        DataManager.Instance.PlayerData.nightNotif = value;
+        Debug.Log(DataManager.Instance.PlayerData.nightNotif);
     }
     
     private void OnPauseChanged(bool isPaused)
@@ -91,7 +88,7 @@ public class EnergyRegenNotifier : MonoBehaviour
         LazyRegen();            // 누적 시간만큼 회복
         //RescheduleNotification(); // 가득 차는 시점에 알림 재예약
         
-        if (notificationsEnabled)
+        if (DataManager.Instance.PlayerData.energyFullRecharged)
             RescheduleNotification();
         else
             CancelAllEnergyNotifications();
@@ -138,7 +135,7 @@ public class EnergyRegenNotifier : MonoBehaviour
     {
 #if UNITY_ANDROID
         // 알림 끄기
-        if (!notificationsEnabled)
+        if (!DataManager.Instance.PlayerData.energyFullRecharged)
         {
             Debug.Log("[EnergyRegen] Notifications disabled, skip scheduling.");
             return;
@@ -162,7 +159,7 @@ public class EnergyRegenNotifier : MonoBehaviour
         var fireLocal = fullUtc.Value.ToLocalTime();
         
         // 야간 시간
-        if (useQuietHours)
+        if (DataManager.Instance.PlayerData.nightNotif)
         {
             fireLocal = AdjustToAllowedTime(fireLocal);
         }

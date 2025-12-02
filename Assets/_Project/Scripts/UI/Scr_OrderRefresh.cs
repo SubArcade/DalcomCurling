@@ -16,8 +16,8 @@ public class Scr_OrderRefresh : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countText;
 
 
-    private int maxChargeCount = 3;  // 최대 충전 가능 횟수
-    private int currentChargeCount = 0; // 현재까지 충전한 횟수
+    //private int maxChargeCount = 3;  // 최대 충전 가능 횟수
+    //private int currentChargeCount = 0; // 현재까지 충전한 횟수
     private Scr_OrderSystem orderSystem; //새로고침 참조를 위한 변수
 
     void Awake()
@@ -45,15 +45,19 @@ public class Scr_OrderRefresh : MonoBehaviour
     //누르면 횟수 아무조건없이 차도록 해놨어요 광고보면 차는걸로 하시면될거같아용
     private void OnClickChargeRefresh()
     {
-        if (currentChargeCount >= maxChargeCount) return;
+        if (DataManager.Instance.QuestData.currentChargeCount >= DataManager.Instance.QuestData.maxChargeCount)
+        {
+            Debug.Log("가득참");
+            return;
+        }
 
         // 1번 주문서 기준으로 5회 충전
-        orderSystem.AddRefreshCount(5);
+        //orderSystem.AddRefreshCount(5);
 
-        currentChargeCount++;
+        DataManager.Instance.QuestData.currentChargeCount++;
         UpdateUI();
 
-        if (currentChargeCount >= maxChargeCount)
+        if (DataManager.Instance.QuestData.currentChargeCount >= DataManager.Instance.QuestData.maxChargeCount)
             Btn.interactable = false;
     }
 
@@ -62,7 +66,7 @@ public class Scr_OrderRefresh : MonoBehaviour
     {
         countText.text = $"{orderSystem.GetRefreshCount()}/{orderSystem.GetMaxRefreshCount()}";
         string chargeLabel = LocalizationManager.Instance.GetText(LocalizationKey.Label_reFreshCharge);
-        adsText.text = $"{chargeLabel} ({maxChargeCount - currentChargeCount}/{maxChargeCount})";
+        adsText.text = $"{chargeLabel} ({DataManager.Instance.QuestData.maxChargeCount - DataManager.Instance.QuestData.currentChargeCount}/{DataManager.Instance.QuestData.maxChargeCount})";
     }
 
 }

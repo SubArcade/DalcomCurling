@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
     private bool isAppStarted = true;
     [SerializeField] private GameObject notifier;
     [SerializeField] private GameObject matchmakingObj;
-    
+    public long lastDailyReset;
+    public event Action DailyReset;
     public event Action<PlayerData> LevelUpdate;
 
     // 플레이어가 페널티로 잃은 도넛 (결과 화면 표시용)
@@ -80,6 +81,7 @@ public class GameManager : MonoBehaviour
         
         notifier.SetActive(true);
         matchmakingObj.SetActive(true);
+        CheckDailyReset();
     }
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -421,4 +423,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 하루 리셋
+    public void CheckDailyReset()
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    
+        // 오늘 00:00 UTC 기준 (혹은 KST 00:00)
+        DateTimeOffset today = DateTimeOffset.UtcNow.Date; 
+        long todayStart = today.ToUnixTimeSeconds();
+
+        if (lastDailyReset < todayStart)
+        {
+            DailyReset?.Invoke();
+            DataManager.Instance.QuestData.currentChargeCount = 0;
+            DataManager.Instance.InventoryData.dailyFreeGemClaimed = true;
+            Debug.Log("[Daily] 오늘자 리셋 완료");
+        }
+        else
+        {
+            Debug.Log("[Daily] 이미 오늘 리셋 완료 상태");
+        }
+    }
 }

@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: EffectSO
   m_EditorClassIdentifier: 
   effectSoList:
+  - effectType: 0
+    effectPrefab: {fileID: 0}
   - effectType: 1
     effectPrefab: {fileID: 0}
   - effectType: 2

@@ -363,9 +363,9 @@ MonoBehaviour:
       <maxEnergy>k__BackingField: 50
       <perSecEnergy>k__BackingField: 10
       <levelMax>k__BackingField: 20
-      <energyFullRecharged>k__BackingField: 0
-      <eventReceivedNotif>k__BackingField: 0
-      <nightNotif>k__BackingField: 0
+      <energyFullRecharged>k__BackingField: 1
+      <eventReceivedNotif>k__BackingField: 1
+      <nightNotif>k__BackingField: 1
     <inventory>k__BackingField:
       <donutEntries>k__BackingField:
       - <id>k__BackingField: 
@@ -404,9 +404,9 @@ MonoBehaviour:
   firstPlayerData:
     <email>k__BackingField: 
     <nickname>k__BackingField: Dalcom
-    <gold>k__BackingField: 5000
-    <gem>k__BackingField: 1000
-    <energy>k__BackingField: 2000
+    <gold>k__BackingField: 0
+    <gem>k__BackingField: 0
+    <energy>k__BackingField: 50
     <level>k__BackingField: 1
     <exp>k__BackingField: 0
     <lastAt>k__BackingField: 0
@@ -419,9 +419,9 @@ MonoBehaviour:
     <maxEnergy>k__BackingField: 50
     <perSecEnergy>k__BackingField: 10
     <levelMax>k__BackingField: 20
-    <energyFullRecharged>k__BackingField: 0
-    <eventReceivedNotif>k__BackingField: 0
-    <nightNotif>k__BackingField: 0
+    <energyFullRecharged>k__BackingField: 1
+    <eventReceivedNotif>k__BackingField: 1
+    <nightNotif>k__BackingField: 1
   firstInventoryData:
     <donutEntries>k__BackingField:
     - <id>k__BackingField: 
@@ -1388,6 +1388,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   messageTitle: "\uC5D0\uB108\uC9C0 \uAC00\uB4DD!"
   messageText: "\uC5D0\uB108\uC9C0"
+  quietStartHour: 22
+  quietEndHour: 8
 --- !u!1 &1455456535
 GameObject:
   m_ObjectHideFlags: 0
@@ -1551,7 +1553,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1700842877
 Transform:
   m_ObjectHideFlags: 0
@@ -1703,6 +1705,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   messageTitle: "\uC5D0\uB108\uC9C0 \uAC00\uB4DD!"
   messageText: "\uC5D0\uB108\uC9C0\uAC00 \uD68C\uBCF5\uB418\uC5C8\uC5B4\uC694."
+  quietStartHour: 22
+  quietEndHour: 8
 --- !u!1 &6634671133720460848
 GameObject:
   m_ObjectHideFlags: 0
