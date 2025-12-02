@@ -16,6 +16,7 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public MergeItemUI occupant { get; set; }
     public int gridX, gridY;
     public string donutId;
+    public bool isTempOccupied = false; // 임시점유 확인용
 
     private Sprite lockSprite;
 

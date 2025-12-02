@@ -190,7 +190,14 @@ public class EntrySlot : MonoBehaviour, IDropHandler
             targetItem.isFromEntry = true;
         }
 
-        SaveToInventory(); //도넛 값 넣기
+        // === 2. InventoryData 스왑 (두 칸 모두 저장해야 함) ===
+        // toSlot(=dragged가 들어간 자리)
+        if (toSlot.currentItem != null)
+            toSlot.SaveToInventory();
+
+        // fromSlot(=targetItem이 들어간 자리)
+        if (fromSlot.currentItem != null)
+            fromSlot.SaveToInventory();
 
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
