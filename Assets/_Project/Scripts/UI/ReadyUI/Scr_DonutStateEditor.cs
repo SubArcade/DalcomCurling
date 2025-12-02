@@ -23,6 +23,16 @@ public class Scr_DonutStateEditor : MonoBehaviour
     {
         // UIManager.Instance.OnReadyPanelOpen += () => Open(true);
         Open(true);
+        for (int i = 0; i < slotUIs.Count; i++)
+        {
+            int slotIndex = i + 1; // 1~5
+            slotUIs[i].Init(this, slotIndex);
+            RefreshSlot(slotIndex);
+            slotUIs[i].SetSelected(false);
+        }
+
+        // 기본 선택: 1번
+        SelectSlot(1);
     }
 
     private void OnDisable()
@@ -47,10 +57,10 @@ public class Scr_DonutStateEditor : MonoBehaviour
     private void Start()
     {
         // 최소 5칸 보장 + 기본값 세팅 (이미 함수 있음)
-        DataManager.Instance.EnsureDonutSlots();
+        //DataManager.Instance.EnsureDonutSlots();
 
         // 슬롯 초기 이미지 로드
-        for (int i = 0; i < slotUIs.Count; i++)
+        /*for (int i = 0; i < slotUIs.Count; i++)
         {
             int slotIndex = i + 1; // 1~5
             slotUIs[i].Init(this, slotIndex);
@@ -59,7 +69,7 @@ public class Scr_DonutStateEditor : MonoBehaviour
         }
 
         // 기본 선택: 1번
-        SelectSlot(1);
+        SelectSlot(1);*/
     }
 
     /// <summary>

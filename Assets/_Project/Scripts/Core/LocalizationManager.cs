@@ -82,6 +82,89 @@ public enum LocalizationKey
     Up_generatorUP, //확를증가
 
     Order_Level, //주문서 n단계 도넛텍스트
+    Label_askExit, //게임종료
+
+    Btn_cancle, //취소
+    Btn_guestLogin, //게스트 로그인
+    Label_guestDescr, //게스트 안내
+    Btn_confirm, //확인
+    
+    Label_accountExit, //계정삭제
+    Label_accountDeleteWarning, //계정삭제 안내
+    Label_accountDeleteConfirm, //계정삭제 확인텍스트
+    Label_accountDeleteInsert, //계정삭제 입력
+
+    Label_getreward, //보상획득
+    Label_Touch, //계속하려면 터치
+
+    Label_levelUPreward, //레벨업보상
+    Label_getText, //획득하기
+    Label_adsDouble, //광고보기
+    
+    Label_gameHelp, //게임 도움말 이하 스텝5까지
+    Label_step1,
+    Label_step2,
+    Label_step3,
+    Label_step4,
+    Label_step5,
+
+    Label_orderLabel, //주문서
+    Label_askRefresh,
+    Label_disRefresh,
+    Label_reFreshCharge,
+
+    Label_energyCharge, //에너지충전
+    Label_donutEnergy,
+    Label_energyTime,
+
+    Label_Dalcom, //달콤컬링
+
+    Label_rankingTier, //티어
+    Label_bronze,
+    Label_silver,
+    Label_gold,
+    Label_platinum,
+    Label_diamond,
+    Label_challenger,
+
+    Label_shopEffect1, //젬 상점 이펙트
+    Label_shopEffect1Text,
+    Label_shopEffect2,
+    Label_shopEffect2Text,
+    Label_shopEffect3,
+    Label_shopEffect3Text,
+
+    Label_shopCharacter1, //젬 상점 캐릭터
+    Label_shopCharacter1Text,
+    Label_shopCharacter2,
+    Label_shopCharacter2Text,
+
+    Label_ads1,  //캐시상점 광고제거 및 일일무료
+    Label_ads1Text,
+    Label_ads2,
+    Label_ads2Text,
+    Label_ads3,
+    Label_ads3Text,
+    Label_gemFree,
+    Label_lookAds,
+    Label_ServicePolicy,
+    Label_ServicePolicyDetail,
+    Label_PrivacyNotice,
+    //----------인게임 UI 로컬
+    ingame_waitingThrow, //도넛 던지기 기다리는중
+    ingame_checkConnect, //연결ㄹ확인중
+
+    ingame_resultLevel, //결과창
+    ingame_resultRank,
+    ingame_resultGetdonut,
+
+    ingame_victoryText, //보상결과창
+    ingame_defeatText,
+    ingame_DonutSteal,
+    ingame_NextText,
+    ingame_streak,
+
+    ingame_surrenderText, //항복
 }
 
 public class LocalizationManager : MonoBehaviour

@@ -18,10 +18,19 @@ public class GameManager : MonoBehaviour
     public GameState State { get; private set; } = GameState.Lobby;
     public string gameSceneName;
     public string menuSceneName;
+    private bool isAppStarted = true;
     [SerializeField] private GameObject notifier;
     [SerializeField] private GameObject matchmakingObj;
     
     public event Action<PlayerData> LevelUpdate;
+
+    // 플레이어가 페널티로 잃은 도넛 (결과 화면 표시용)
+    public DonutEntry PlayerPenalizedDonut1 { get; private set; }
+    public DonutEntry PlayerPenalizedDonut2 { get; private set; }
+    // 상대방으로부터 획득한 도넛 (승리 시 결과 화면 표시용)
+    public DonutEntry CapturedDonut1 { get; private set; }
+    public DonutEntry CapturedDonut2 { get; private set; }
+    public FirebaseGameManager.GameOutcome LastGameOutcome { get; private set; } //게임 승패 저장
 
     // 페널티로 제거된 도넛 정보를 임시 저장하기 위한 변수
     private DonutEntry penalizedDonut1;
@@ -36,6 +45,8 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
+            if (DataManager.Instance != null)
+                DataManager.Instance.OnBoardDataLoaded += HandleDataLoadedForRewards;
         }
         else
         {
@@ -56,8 +67,9 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name != menuSceneName)
             SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive);
         
-        FirebaseAuthManager.Instance.Init();
-
+        // 앱 최초 실행 시에만 isAppStarted가 true인 상태로 Init 호출
+        FirebaseAuthManager.Instance.Init(isAppStarted);
+        
         StartCoroutine(Delay(2f));
     }
     
@@ -72,18 +84,43 @@ public class GameManager : MonoBehaviour
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 씬 이름이 menuSceneName일 때만 보상 반영
+        // 씬 이름이 menuSceneName일 때만 보상 반영 및 초기화
         if (scene.name == menuSceneName)
         {
+            // isAppStarted가 true이면, 앱 최초 실행 후 메뉴 씬이 처음 로드된 것.
+            if (isAppStarted)
+            {
+                // Start()에서 Init(true)가 이미 호출되었으므로, 플래그만 false로 변경.
+                isAppStarted = false;
+            }
+            else
+            {
+                // isAppStarted가 false이면, 게임이 끝나고 메뉴 씬으로 돌아온 것.
+                // Init(false)를 호출하여 MainPanel이 열리도록 함.
+                FirebaseAuthManager.Instance.Init(isAppStarted);
+            }
+            
             SetState(GameState.Lobby);
-            StartCoroutine(ApplyRewardsNextFrame());
         }
     }
 
     private void OnDestroy()
     {
         if (Instance == this)
+        {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            if (DataManager.Instance != null)
+                DataManager.Instance.OnBoardDataLoaded -= HandleDataLoadedForRewards;
+        }
+    }
+
+    private void HandleDataLoadedForRewards()
+    {
+        // 로비 씬으로 돌아왔을 때(게임이 끝난 직후), 그리고 앱 최초 실행이 아닐 때만 보상 로직 실행
+        if (State == GameState.Lobby && !isAppStarted)
+        {
+            ApplyResultRewards();
+        }
     }
 
 
@@ -101,6 +138,13 @@ public class GameManager : MonoBehaviour
     // 게임 시작
     public void StartGame()
     {
+        // 이전 게임의 결과 표시용 데이터 초기화
+        PlayerPenalizedDonut1 = null;
+        PlayerPenalizedDonut2 = null;
+        CapturedDonut1 = null;
+        CapturedDonut2 = null;
+        LastGameOutcome = FirebaseGameManager.GameOutcome.Draw; // 기본값으로 초기화
+
         SetState(GameState.Playing);
         UIManager.Instance.Open(PanelId.MatchingPopUp);
         FirebaseMatchmakingManager.Instance.StartMatchmaking();
@@ -123,6 +167,14 @@ public class GameManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// 게임 결과를 GameManager에 저장합니다.
+    /// </summary>
+    public void SetGameOutcome(FirebaseGameManager.GameOutcome outcome)
+    {
+        LastGameOutcome = outcome;
+    }
+
     //게임종료시의 UI로부터 받아올 보상 값들을 담을 변수
     private int pendingExp;
     private int pendingGold;
@@ -141,14 +193,36 @@ public class GameManager : MonoBehaviour
     {
         if (State == GameState.Lobby)
         {
+            // 1. 페널티 복구 로직 (DB에서 데이터를 다시 로드한 후 실행)
+            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Draw)
+            {
+                if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
+                {
+                    DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+                    DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+                    DataManager.Instance.PlayerData.soloScore += 10; // 점수 복구
+                    Debug.Log("무승부: 페널티로 제거되었던 도넛과 점수가 복구됩니다.");
+                }
+            }
+            else if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+            {
+                if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
+                {
+                    DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+                    DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+                    Debug.Log("승리: 페널티로 제거되었던 도넛이 복구됩니다.");
+                }
+            }
+            
             UIManager.Instance.Open(PanelId.MainPanel);
             
             int oldLevel = DataManager.Instance.PlayerData.level;
             UIManager.Instance.Open(PanelId.MainPanel);
             
             Debug.Log(">>>>>> 게임보상을 반영합니다.");
-            // 실제 데이터 반영
-            DataManager.Instance.PlayerData.exp += pendingExp;
+            // 2. 실제 데이터 반영 (경험치, 골드, 포인트)
+            
+            LevelUp(pendingExp);
             DataManager.Instance.PlayerData.gold += pendingGold;
             DataManager.Instance.PlayerData.soloScore += pendingPoint;
 
@@ -161,6 +235,13 @@ public class GameManager : MonoBehaviour
                 UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
             }
             
+            // 3. 승리 시 상대 도넛 보상 지급
+            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+            {
+                if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
+                if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
+            }
+            
             // 보류 중인 보상 도넛 지급
             foreach (var donutEntry in pendingRewardDonuts)
             {
@@ -171,11 +252,14 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            // pending 값 초기화
+            // 4. pending 값 초기화
             pendingExp = 0;
             pendingGold = 0;
             pendingPoint = 0;
             pendingRewardDonuts.Clear();
+            
+            // 5. 모든 결과 및 보상이 적용된 최종 데이터를 Firestore에 저장
+            _ = DataManager.Instance.SaveAllUserDataAsync();
         }
     }
     private IEnumerator ApplyRewardsNextFrame()
@@ -185,12 +269,12 @@ public class GameManager : MonoBehaviour
     }
 
     // 레벨업 로직
-    public void LevelUp()
+    public void LevelUp(int getExp)
     {
         if(DataManager.Instance.PlayerData.level >= 20)
             return;
         
-        DataManager.Instance.PlayerData.exp += 20;
+        DataManager.Instance.PlayerData.exp += getExp;
     
         // 100 이 넘으면 레벨업
         if (DataManager.Instance.PlayerData.exp >= 100)
@@ -209,7 +293,7 @@ public class GameManager : MonoBehaviour
     }
     private int index1;
     private int index2;
-    public void ApplyStartGamePenalty(int _index1, int _index2)
+    public void ApplyStartGamePenalty(int _index1, int _index2, List<DonutEntry> opponentDonuts)
     {
         if (DataManager.Instance == null) return;
         index1 = _index1;
@@ -228,8 +312,26 @@ public class GameManager : MonoBehaviour
         // 1-1. 페널티 적용 전, 복구를 위해 현재 도넛 정보와 인덱스 저장
         this.penaltyIndex1 = index1;
         this.penalizedDonut1 = currentDonuts[index1];
+        this.PlayerPenalizedDonut1 = currentDonuts[index1]; // 결과 화면 표시용으로 저장
         this.penaltyIndex2 = index2;
         this.penalizedDonut2 = currentDonuts[index2];
+        this.PlayerPenalizedDonut2 = currentDonuts[index2]; // 결과 화면 표시용으로 저장
+
+        // 1-2. (승리 시) 획득할 상대방 도넛을 미리 저장
+        if (opponentDonuts != null)
+        {
+            List<DonutEntry> availableOpponentDonuts = opponentDonuts.Where(d => d != null).ToList();
+            if (availableOpponentDonuts.Count >= 2 && index1 < availableOpponentDonuts.Count && index2 < availableOpponentDonuts.Count && index1 != index2)
+            {
+                CapturedDonut1 = availableOpponentDonuts[index1];
+                CapturedDonut2 = availableOpponentDonuts[index2];
+                Debug.Log($"결과 화면에 표시할 획득 예정 도넛으로 저장: {CapturedDonut1.id}, {CapturedDonut2.id}");
+            }
+            else
+            {
+                Debug.LogWarning("상대방 도넛 정보가 충분하지 않아 획득 예정 도넛을 저장할 수 없습니다.");
+            }
+        }
 
         // 2. 새로운 데이터 상태 계산
         currentDonuts[index1] = null;
@@ -300,38 +402,21 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 승리 시 상대방의 도넛 엔트리에서 랜덤으로 2개를 복사하여 자신의 인벤토리에 추가합니다.
+    /// 승리 시, 미리 저장해둔 상대방 도넛을 보상으로 지급 대기열에 추가합니다.
     /// </summary>
-    /// <param name="opponentDonuts">상대방의 도넛 엔트리 리스트</param>
-    public void ProcessDonutCapture(List<DonutEntry> opponentDonuts)
+    public void ProcessDonutCapture()
     {
-        if (DataManager.Instance == null || opponentDonuts == null || opponentDonuts.Count == 0)
-        {
-            Debug.LogWarning("도넛 획득 실패: 상대방 도넛 정보가 유효하지 않습니다.");
-            return;
-        }
-
-        List<DonutEntry> availableOpponentDonuts = opponentDonuts.Where(d => d != null).ToList();
-
-        if (availableOpponentDonuts.Count < 2)
-        {
-            Debug.LogWarning("도넛 획득 실패: 상대방의 유효한 도넛이 2개 미만입니다.");
-            return;
-        }
-
-        DonutEntry capturedDonut1 = availableOpponentDonuts[index1];
-        DonutEntry capturedDonut2 = availableOpponentDonuts[index2];
-
-        if (capturedDonut1 != null && capturedDonut2 != null)
+        if (CapturedDonut1 != null && CapturedDonut2 != null)
         {
             // 보상 도넛을 즉시 추가하지 않고, 나중에 안전하게 지급하기 위해 임시 리스트에 추가합니다.
-            pendingRewardDonuts.Add(capturedDonut1);
-            pendingRewardDonuts.Add(capturedDonut2);
-            Debug.Log($"보상 도넛 2개({capturedDonut1.id}, {capturedDonut2.id})를 획득하여 보류 중입니다.");
+            pendingRewardDonuts.Add(CapturedDonut1);
+            pendingRewardDonuts.Add(CapturedDonut2);
+            Debug.Log($"보상 도넛 2개({CapturedDonut1.id}, {CapturedDonut2.id})를 획득하여 보류 중입니다.");
         }
         else
         {
-            Debug.LogError("도넛 획득 오류: 선택된 도넛 중 null이 있습니다. 로직을 확인하세요.");
+            Debug.LogWarning("도넛 획득 실패: 캡처할 도넛 정보가 미리 설정되지 않았습니다.");
         }
     }
+
 }

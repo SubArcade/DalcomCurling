@@ -256,7 +256,6 @@ public class StoneShoot_Firebase : MonoBehaviour
     #region 입력 처리 (Input Handling)
     /// <summary>
     /// 조준 상태(Aiming)에서 모든 입력을 처리합니다.
-    /// 터치/마우스 위치에 따라 힘, 방향, 회전, 발사 입력을 구분하여 받습니다.
     /// </summary>
     private void HandleAimingInput()
     {
@@ -303,6 +302,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 if (inputArea != null && RectTransformUtility.RectangleContainsScreenPoint(inputArea, touchPosition, null))
                 {
                     StartDrag(touchPosition, DragType.PowerDirection);
+                    uiLaunch.FireShotReadyTwoUI(); // 조작이 시작되면 도넛 선택 못하도록 UI꺼주기
                 }
             }
             else if (isTouchMoved && IsDragging && CurrentDragType == DragType.PowerDirection)

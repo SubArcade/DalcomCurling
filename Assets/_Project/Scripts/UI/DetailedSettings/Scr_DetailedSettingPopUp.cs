@@ -48,12 +48,25 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 
     [Header("닫기버튼")]
     [SerializeField] private Button closeButton;
-
+    
+    [Header("팝업창")]
+    [SerializeField] private GameObject servicePolicyPopup;
+    [SerializeField] private GameObject privacyNoticePopup;
+    [SerializeField] private Button servicePolicyButton;
+    [SerializeField] private Button privacyNoticeButton;
+    
     void Awake()
     {
         accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
         accountExit.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DeleteAccountPopUp));
-        gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));          
+        gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));
+        accountIdText.text = $"User ID : {DataManager.Instance.PlayerData.nickname}";
+        servicePolicyButton.onClick.AddListener(() => servicePolicyPopup.SetActive(true));
+        privacyNoticeButton.onClick.AddListener(() => privacyNoticePopup.SetActive(true));
+    }
+    void OnEnable()
+    {
+        accountIdText.text = $"User ID : {DataManager.Instance.PlayerData.nickname}";
     }
     void Start()
     {

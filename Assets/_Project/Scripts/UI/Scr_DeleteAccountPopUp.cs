@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -26,14 +27,16 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
 
     }
 
-    private void OnConfirmBtn() 
+    private async void OnConfirmBtn() 
     {
-        string Text = input.text.Trim();
+        string text = input.text.Trim();
 
-        if (Text == "DALCOM")
+        if (text.Equals("DALCOM", StringComparison.OrdinalIgnoreCase))
         {
             Debug.Log("계정삭제 완료!!");
+            await FirebaseAuthManager.Instance.DeleteAccountAsync();
             UIManager.Instance.Close(PanelId.DeleteAccountPopUp);
+            UIManager.Instance.Open(PanelId.LoginPanel);
         }
         else 
         {

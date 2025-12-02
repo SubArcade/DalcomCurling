@@ -181,6 +181,7 @@ public class UIManager : MonoBehaviour
             case PanelId.MatchingPopUp:
                 AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.match_search_start, true);
                 currentPanel[PanelId.MainPanel].SetActive(true);
+                currentPanel[PanelId.ReadyMenuPanel].SetActive(true);
                 break;
             default:
                 currentPanel[PanelId.MainPanel].SetActive(true);
