@@ -84,6 +84,9 @@ public class FirebaseGameManager : MonoBehaviour
     [Header("연결 상태 관리")]
     [SerializeField] private float heartbeatInterval = 10f; // 생존 신호를 보내는 주기 (초)
     [SerializeField] private float disconnectionThreshold = 25f; // 연결 끊김으로 판단하는 임계 시간 (초)
+    
+    // --- SO 연결 ---\
+    public  EffectSO effectSo { get; private set; }
 
     // --- 게임 내부 변수 ---
     private float initialFixedDeltaTime;
@@ -1302,6 +1305,11 @@ public class FirebaseGameManager : MonoBehaviour
     public int GetCurrentStoneId()
     {
         return _currentGame.DonutsIndex[myUserId];
+    }
+
+    public string GetMyUserId()
+    {
+        return myUserId;
     }
 
     #endregion

@@ -13,12 +13,12 @@ public enum DonutDexViewState
 public enum EffectType
 {
     None,
-    a,
-    b,
-    c,
-    d,
-    e,
-    f,
+    Red,
+    Blue,
+    Magic,
+    Star,
+    //e,
+    //f,
 }
 
 public enum CharacterType

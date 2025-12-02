@@ -122,9 +122,9 @@ public class Scr_ShopPopUp : MonoBehaviour
         completeCloseButton.onClick.AddListener(() => completePopup.SetActive(false));
         
         // 구매 버튼 이벤트
-        effectItem1.onClick.AddListener(() => EffectBuy(EffectType.a, 50));
-        effectItem2.onClick.AddListener(() => EffectBuy(EffectType.b, 100));
-        effectItem3.onClick.AddListener(() => EffectBuy(EffectType.c, 100));
+        effectItem1.onClick.AddListener(() => EffectBuy(EffectType.Blue, 50));
+        effectItem2.onClick.AddListener(() => EffectBuy(EffectType.Magic, 100));
+        effectItem3.onClick.AddListener(() => EffectBuy(EffectType.Star, 100));
         
         characterItem1.onClick.AddListener(() => CharacterBuy(CharacterType.a, 500));
         characterItem2.onClick.AddListener(() => CharacterBuy(CharacterType.b, 500));
