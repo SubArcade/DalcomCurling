@@ -54,6 +54,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private Image EpitheImage2;
     [SerializeField] private Image timeLineEpitheImage1;//timelineUI의 부모이미지입니다
     [SerializeField] private Image timeLineEpitheImage2;
+    [SerializeField] private Image timeLinePlayerCharacter1; //타임라인UI의 플레이어캐릭터 이미지입니다.
+    [SerializeField] private Image timeLinePlayerCharacter2;
+    [SerializeField] private CharacterSO characterSO; //so 넣어주시면됩니다
     [SerializeField] private NamePlaateSO namePlateSO; //so넣어주시면됩니다.
 
 
@@ -148,20 +151,35 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
             // 상대방 인벤토리 UI 채우기 (오프닝 타임라인) 
             PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
+  
             // 인게임UI의 칭호 텍스트 반영
             if (EpitheText1 != null)
                 EpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, EpitheImage1);
 
             if (EpitheText2 != null)
                 EpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, EpitheImage2);
+ 
             //타임라인UI의 칭호 텍스트 반영
             if (timeLineEpitheText1 != null)
                 timeLineEpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, timeLineEpitheImage1);
 
             if (timeLineEpitheText2 != null)
                 timeLineEpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, timeLineEpitheImage2);
+    
+            // ⭐ 타임라인 UI 캐릭터 이미지 반영
+            if (timeLinePlayerCharacter1 != null)
+            {
+                var myCharSprite = characterSO.GetCharacterSprite(MyProfile.Inventory.curCharacterType);
+                timeLinePlayerCharacter1.sprite = myCharSprite;
+                timeLinePlayerCharacter1.enabled = (myCharSprite != null);
+            }
 
-
+            if (timeLinePlayerCharacter2 != null)
+            {
+                var oppCharSprite = characterSO.GetCharacterSprite(OpponentProfile.Inventory.curCharacterType);
+                timeLinePlayerCharacter2.sprite = oppCharSprite;
+                timeLinePlayerCharacter2.enabled = (oppCharSprite != null);
+            }
         }
         else
         {
@@ -465,4 +483,5 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             default: return type.ToString();
         }
     }
+
 }
