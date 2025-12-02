@@ -77,21 +77,22 @@ public class DataManager : MonoBehaviour
     {
         email = "",
         nickname = "Dalcom",
-        gold = 5000,
-        gem = 1000,
-        energy = 2000,
+        gold = 0,
+        gem = 0,
+        energy = 50,
         level = 1,
         exp = 0,
         lastAt = 0,
-        maxEnergy = 50,
-        perSecEnergy = 10,
-        soloScore = 0,
-        soloTier = GameTier.Bronze,
-        levelMax = 20,
         gainNamePlateType =
         {
             NamePlateType.NONE
-        }
+        },
+        soloScore = 0,
+        soloTier = GameTier.Bronze,
+        changeNicknameCount = 0,
+        maxEnergy = 50,
+        perSecEnergy = 10,  // 테스트
+        levelMax = 20,
     };
     [SerializeField] private InventoryData firstInventoryData = new InventoryData()
     {
@@ -102,7 +103,7 @@ public class DataManager : MonoBehaviour
             null,
             null,
             null
-        }
+        },
     };
     [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
     {
@@ -116,7 +117,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] private QuestData firstQuestData = new QuestData()
     {
         maxCount = 5,
-        refreshCount =5,
+        refreshCount = 5,
         baseGold = 0,
     };
 
@@ -259,7 +260,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 기본 인벤토리 데이터
-    private void BaseInventoryData()
+    public void BaseInventoryData()
     {
         InventoryData.hardDonutCodexDataList = new List<DonutCodexData>();
         InventoryData.softDonutCodexDataList = new List<DonutCodexData>();
@@ -294,7 +295,7 @@ public class DataManager : MonoBehaviour
         //Debug.Log("실행완료");
     }
 
-    private void FirstBaseInventoryData()
+    public void FirstBaseInventoryData()
     {
         //EnsureDonutSlots();
         userData.inventory = firstInventoryData;
@@ -310,7 +311,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 처음 머지보드 데이터 셋
-    private void FirstBaseMergeBoardData()
+    public void FirstBaseMergeBoardData()
     {
         MergeBoardData.cells = new List<CellData>();
 
