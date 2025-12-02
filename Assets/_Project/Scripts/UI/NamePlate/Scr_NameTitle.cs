@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,11 +17,13 @@ public class Scr_NameTitle : MonoBehaviour
         LocalizationManager.Instance.OnLanguageChanged += ApplyLocalizedText;
         LoadNamePlateData();
         ApplyLocalizedText();
+        SoundManager.Instance.buttonClick();
     }
 
     private void OnDisable()
     {
         LocalizationManager.Instance.OnLanguageChanged -= ApplyLocalizedText;
+        SoundManager.Instance.buttonClick();
     }
     
     /// <summary>
