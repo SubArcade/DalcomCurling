@@ -23,7 +23,7 @@ public class SceneLoader : MonoBehaviour
     }
     
     // 로컬
-    public void LoadLocal(string sceneName, bool wait = false, Action onFinish = null)
+    public void  LoadLocal(string sceneName, bool wait = false, Action onFinish = null)
     {
         print("Loading local scene: " + sceneName);
         UIManager.Instance?.ShowLoading("Loading...");

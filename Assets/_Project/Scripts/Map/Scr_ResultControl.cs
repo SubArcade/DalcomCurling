@@ -189,7 +189,8 @@ public class Scr_ResultControl : MonoBehaviour
         {
             if (SceneLoader.Instance != null)
             {
-                SceneLoader.Instance.LoadLocal(GameManager.Instance.menuSceneName);
+                //SceneLoader.Instance.LoadLocal(GameManager.Instance.menuSceneName);
+                GameManager.Instance.EndGame();
             }
             else
             {
