@@ -140,6 +140,17 @@ public class DataManager : MonoBehaviour
         OnUserDataChanged?.Invoke(PlayerData);
     }
 
+    public void ExpChange(int exp) 
+    {
+        PlayerData.exp = exp;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
+    public void ScoreChange(int score) 
+    {
+        PlayerData.soloScore = score;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
     public void LevelChange(int level) 
     {
         PlayerData.level = level;
@@ -818,7 +829,7 @@ public class DataManager : MonoBehaviour
     
 
     // 랭크 구분 함수 ( 랭크를 디비에서 계산해서 넣어줘야 함 )
-    private GameTier CalculateTier(int score, int? rank = null)
+    public GameTier CalculateTier(int score, int? rank = null)
     {
         // 챌린저 구간 랭크 값 등수 받아와야함
         // 1) 챌린저 구간 ( 디비의 랭크 기준 )

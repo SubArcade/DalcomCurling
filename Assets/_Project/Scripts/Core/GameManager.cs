@@ -178,9 +178,9 @@ public class GameManager : MonoBehaviour
     }
 
     //게임종료시의 UI로부터 받아올 보상 값들을 담을 변수
-    private int pendingExp;
-    private int pendingGold;
-    private int pendingPoint;
+    public int pendingExp;
+    public int pendingGold;
+    public int pendingPoint;
     private List<DonutEntry> pendingRewardDonuts = new List<DonutEntry>();
 
     public void SetResultRewards(int level, int gold, int point) //이부분을 호출
