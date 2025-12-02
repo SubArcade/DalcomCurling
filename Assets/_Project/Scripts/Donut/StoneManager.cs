@@ -34,6 +34,50 @@ public class StoneManager : MonoBehaviour
     public StoneForceController_Firebase.Team _currentTurnStoneTeam { get; private set; }
     public StoneForceController_Firebase.Team myTeam { get; private set; } = StoneForceController_Firebase.Team.None;
     private List<StonePosition> lastStonePosition = new List<StonePosition>();
+    
+    [Header("도넛 상성 및 레벨에 따른 질량값 조절")] 
+    [SerializeField]
+    private float winMinMass = 1.4f;
+    [SerializeField]
+    private float winMaxMass = 2.6f;
+    [SerializeField]
+    private float drawMinMass = 2.8f;
+    [SerializeField]
+    private float drawMaxMass = 5.2f;
+    [SerializeField]
+    private float loseMinMass = 5.6f;
+    [SerializeField]
+    private float loseMaxMass = 10.4f;
+
+    public float WinMinMass
+    {
+        get{ return winMinMass; }
+    }
+
+    public float WinMaxMass
+    {
+        get{return winMaxMass; }
+    }
+
+    public float DrawMinMass
+    {
+        get { return drawMinMass; }
+    }
+
+    public float DrawMaxMass
+    {
+        get {return  drawMaxMass; }
+    }
+
+    public float LoseMinMass
+    {
+        get { return loseMinMass; }
+    }
+
+    public float LoseMaxMass
+    {
+        get { return loseMaxMass; }
+    }
 
     [Header("아웃 판정을 위한 라인 오브젝트 참조")]
     public Transform endHogLine;
