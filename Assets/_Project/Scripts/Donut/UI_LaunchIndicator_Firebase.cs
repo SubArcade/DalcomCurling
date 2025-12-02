@@ -346,7 +346,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 
                 getDonut = "획득 도넛";
                 
-                GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
+                //GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
                 GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
                 break;
             case FirebaseGameManager.GameOutcome.Lose:
