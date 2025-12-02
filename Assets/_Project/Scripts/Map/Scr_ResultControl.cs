@@ -27,6 +27,19 @@ public class Scr_ResultControl : MonoBehaviour
     {
         // 결과창이 활성화될 때마다 UI를 최신 게임 결과에 맞게 설정.
         SetupUIForGameOutcome();
+
+        // 결과창이 뜨면 20초 후에 자동 종료
+        DOVirtual.DelayedCall(20f, () =>
+        {
+            if (SceneLoader.Instance != null)
+            {
+                GameManager.Instance.EndGame();
+            }
+            else
+            {
+                Debug.LogError("SceneLoader.Instance를 찾을 수 없습니다.");
+            }
+        }).SetId("endgame");
     }
 
     void Start()
@@ -196,7 +209,7 @@ public class Scr_ResultControl : MonoBehaviour
             {
                 Debug.LogError("SceneLoader.Instance를 찾을 수 없습니다.");
             }
-        });
+        }).SetId("endgame");
     }
 
     /// <summary>
@@ -220,6 +233,9 @@ public class Scr_ResultControl : MonoBehaviour
         return donutData.sprite;
     }
 
-    
+    private void OnDestroy()
+    {
+        DOTween.Kill("endgame");
+    }
 }
 
