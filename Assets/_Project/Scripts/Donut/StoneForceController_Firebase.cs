@@ -265,6 +265,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 
             rigid.velocity = newVelocity * 1.0f; // 여기 계수 바꾸면 튕기는 정도도 바뀜
             isCollided = true;
+            donutParticleSystem.PlayCollisionParticle(other);
         }
         
     }

@@ -73,6 +73,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     private Vector3 originalScale;
     private Vector3 newScale;
     private bool particleTrailFinished = false;
+    private bool hasSelectedEffect = false;
     
     //fixedUpdate 내부에서 변수 생성을 하지 않도록 미리 생성한 변수
     private Vector3 velocity;
@@ -98,7 +99,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
      
      void Update()
      {
-         if (initialized && !particleTrailFinished)
+         if (initialized && !particleTrailFinished && hasSelectedEffect)
          {
              // 1. 현재 속도 벡터를 가져옵니다.
              velocity = donutRigidbody.velocity;
@@ -185,16 +186,17 @@ public class Scr_DonutParticleSystem : MonoBehaviour
         }
         else
         {
-            var effectSo = FirebaseGameManager.Instance.effectSo.GetEffectSO(effectType); //EffectSo에서 오브젝트 모음을 가져옴
+            var effectSo = FirebaseGameManager.Instance.EffectSoObject.GetEffectSO(effectType); //EffectSo에서 오브젝트 모음을 가져옴
             selectedEffectType = effectType; // 선택된 타입을 저장해둠
             selectedAura = effectSo.auraEffect; // 오라 이펙트 가져옴
             selectedCollision = effectSo.collisionEffect; // 충돌 이펙트 가져옴
             selectedTrail = effectSo.trailEffect; // 꼬리 이펙트 가져옴
             trailEnabled = true; // 꼬리 활성화
             initialized = true; // update문에서 꼬리 이펙트를 재생 시킬 준비를 마침
+            hasSelectedEffect = true; //이펙트가 존재한다고 알림
             
             CreateCollisionParticleToChildren(); // 충돌 파티클 미리 만들어놓기
-            Instantiate(selectedAura, transform.position, Quaternion.identity); // 오라 생성
+            Instantiate(selectedAura, transform.position, Quaternion.identity, transform); // 오라 생성
             //particleSystemParent = Instantiate(GetTrailPrefab(selectedTrail), transform.position, rotationOffset);
             particleSystemParent = Instantiate(selectedTrail, transform.position, rotationOffset);
             trailParticleSystem = particleSystemParent.transform.GetChild(0).GetComponent<ParticleSystem>();
@@ -220,7 +222,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
 
     private void CreateTeamCircle(GameObject teamCircle)
     {
-        currentTeamCircleObject = Instantiate(teamCircle, transform.position, Quaternion.identity);
+        currentTeamCircleObject = Instantiate(teamCircle, transform.position, Quaternion.Euler(90f,0f,0f), transform);
     }
 
     public void PlayCollisionParticle(Collision collision) // 충돌시 StoneForceController_Firebase에서 호출할 함수. 파티클을 재생시킴
