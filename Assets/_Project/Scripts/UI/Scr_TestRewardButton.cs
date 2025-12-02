@@ -62,6 +62,10 @@ public class Scr_TestRewardButton : MonoBehaviour
                 GiveGiftBox();
                 UIManager.Instance.Open(PanelId.MainPanel);
                 break;
+            case AdType.Gem:
+                DataManager.Instance.PlayerData.gem += reward;
+                DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem);
+                break;
         }
         Debug.Log($"보상 획득: +{amount} {type}");
     }

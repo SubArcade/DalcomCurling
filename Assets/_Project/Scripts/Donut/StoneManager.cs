@@ -957,4 +957,10 @@ public class StoneManager : MonoBehaviour
             floatingText.SetText(message);
         }
     }
+
+    public void GetStartPosZ(out float start, out float end) // 발사후 이동 거리를 표시하기 위함
+    {
+        start = transform.GetComponent<StoneShoot_Firebase>().startHogLine.position.z; // 도넛의 발사 시작 z 좌표
+        end = endHogLine.position.z; // 엔드 호그 라인 z 좌표
+    }
 }

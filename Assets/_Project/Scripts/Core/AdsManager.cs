@@ -9,7 +9,8 @@ public enum AdType
     TEST,
     ENERGY,
     REFRESH,
-    GIFTBOX
+    GIFTBOX,
+    Gem
 }
 
 public class AdsRewarded : MonoBehaviour
@@ -25,7 +26,7 @@ public class AdsRewarded : MonoBehaviour
     private const string RefreshAD_UNIT_ID = "ca-app-pub-4548432662417935/3823474752"; // 퀘스트 새로고침
     private const string GiftBoxAD_UNIT_ID = "ca-app-pub-4548432662417935/3098948422"; // 기프트박스
 #if UNITY_ANDROID
-
+    
 #elif UNITY_IOS
     private const string AD_UNIT_ID = "apple"; // 아이폰
 #else

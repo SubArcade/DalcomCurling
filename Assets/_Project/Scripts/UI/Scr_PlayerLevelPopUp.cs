@@ -74,6 +74,14 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("닫기 버튼")] private Button rankTierCloseButton;
     [SerializeField, Tooltip("열기 버튼")] private Button rankTierOpenButton;
     
+    [SerializeField, Tooltip("칭호 SO")] private NamePlaateSO namePlateSO;
+    [SerializeField, Tooltip("티어 SO")] private Scr_TierSpriteSO rankTierSO;
+    
+    [SerializeField, Tooltip("닉네임")] private TMP_Text rankNicknameText;
+    [SerializeField, Tooltip("창호 텍스트")] private TMP_Text namePlateText;
+    [SerializeField, Tooltip("칭호 스프라이트")] private Image namePlateImage;
+    [SerializeField, Tooltip("점수")] private TMP_Text rankScoreText;
+    [SerializeField, Tooltip("랭크 이미지")] private Image rankSprite;
     
     private void OnEnable()
     {
@@ -95,6 +103,9 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
             reincarnationOnButton.gameObject.SetActive(false);
             reincarnationOffButton.gameObject.SetActive(true);
         }
+        
+        // 본인 랭크 티어 적용
+        SetRankTier();
     }
     
     // 텍스트 셋업
@@ -177,6 +188,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     {
         profilePanel.SetActive(isopen);
         rankPanel.SetActive(!isopen);
+        
         
     }
 
@@ -400,5 +412,17 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         
     }
     
+    private void SetRankTier()
+    {
+        var data = DataManager.Instance.PlayerData;
+        
+        rankNicknameText.text = data.nickname;
+        var namePlate = namePlateSO.GetByType(data.curNamePlateType);
+        namePlateText.text = namePlate.plateType.ToString();
+        namePlateImage.sprite = namePlate.plateSprite;
+        rankScoreText.text = data.soloScore.ToString();
+        rankSprite.sprite = rankTierSO.GetSprite(data.soloTier);
+        
+    }
 }
 

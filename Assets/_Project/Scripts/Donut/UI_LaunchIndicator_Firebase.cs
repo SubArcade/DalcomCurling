@@ -30,16 +30,21 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject result;
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject WaitThrowPopUp;
+    
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
-    [Header("결과창 보상 텍스트 갱신을 위한 변수")]
+    [Header("결과창 보상 갱신을 위한 변수")]
     [SerializeField] private TextMeshProUGUI expText; 
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI pointText;
-    [SerializeField] private TextMeshProUGUI resultText; // 승리 / 패배등 쓰여질 공간
+    [SerializeField] private TextMeshProUGUI resultText; // 승리,패배 결과 텍스트
+    [SerializeField] private TextMeshProUGUI getDonutText; // 승리,패배에 따라 획득/잃은 도넛 텍스트
+
+   
     [Header("플로팅 텍스트")]
     [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
 
@@ -231,12 +236,16 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public void FinishedUI(FirebaseGameManager.GameOutcome outcome) // 게임종료 - 결과창
     {
         AllcloseUI();
-        result.SetActive(true);
-        ResultRewardView(outcome);
+        WaitThrowPopUp.SetActive(false);
+        DOTween.Kill("WatingThrowUI");
+        ResultRewardView(outcome); //게임결과 설정
+        result.SetActive(true); // 결과창 on
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
         AllcloseUI();
+        DOTween.Kill("WatingThrowUI");
+        WaitThrowPopUp.SetActive(false);
         roundPanel.SetActive(true);
         donutEntry.SetActive(true);
         minimap.SetActive(true);
@@ -248,7 +257,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public void IdleUI() //기본 상단 UI만 출력되는 상태
     {
         AllcloseUI();
+        WaitThrowPopUp.SetActive(false);
         roundPanel.SetActive(true);
+    }
+    public void WatingThrowUI() 
+    {
+        AllcloseUI();
+        WaitThrowPopUp.SetActive(true);
     }
     public void AllcloseUI() // 모든 UI를 닫음
     {
@@ -256,25 +271,17 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
-        settingsPanel.SetActive(false);
+        settingsPanel.SetActive(false);        
     }
     public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
      // 반복 횟수 , 속도 거리등은 해당 객체 인스펙터에서 조절
         guide.gameObject.SetActive(true);
 
-        if (select == 1) {
-            guide.PlayVerticalDrag();
-        }
-        else if (select == 2) { 
-            guide.PlayHorizontalDrag();
-        }
-        else if (select == 3) {
-            guide.PlayTouchMove();
-        }
-        else {
-            Debug.Log("올바른 가이드 출력 번호가 아닙니다.");
-        }
+        if (select == 1) { guide.PlayVerticalDrag(); }
+        else if (select == 2) { guide.PlayHorizontalDrag(); }
+        else if (select == 3) { guide.PlayTouchMove(); }
+        else { Debug.Log("올바른 가이드 출력 번호가 아닙니다."); }
     }
     public void HideGuideUI()
     {
@@ -294,7 +301,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         for (int i = 0; i < slots.Count; i++)
         {
-            if (i < entries.Count)
+            // 항목이 존재하고, null이 아닌지 확인
+            if (i < entries.Count && entries[i] != null)
             {
                 slots[i].gameObject.SetActive(true);
                 // 표시 전용 슬롯은 클릭 기능이 필요 없으므로 onClickAction에 null 전달
@@ -302,17 +310,18 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             }
             else
             {
-                slots[i].gameObject.SetActive(false); // 남는 슬롯은 비활성화
+                slots[i].gameObject.SetActive(false); // 남는 슬롯 또는 null인 슬롯은 비활성화
             }
         }
     }
 
-    public void ResultRewardView(FirebaseGameManager.GameOutcome outcome) 
+    public void ResultRewardView(FirebaseGameManager.GameOutcome outcome)  //게임결과에따라 각종 데이터를 넣어줌 TODO:캐릭터이미지랑 레벨,랭킹도 넣어야함
     {
         int exp = 0;
         int rewardGold = 0;
         int rewardPoint = 0;
         string result = outcome.ToString();
+        string getDonut = "";
 
         switch (outcome)
         {
@@ -320,35 +329,40 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 exp = 15;
                 rewardGold = 150;
                 rewardPoint = 20; // 페널티 복구 10점 + 승리 보너스 10점
-                result = "VICTORY!";
+                result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_victoryText)}";
+                
+                getDonut = "획득 도넛";
+                
                 GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
-                GameManager.Instance.ProcessDonutCapture(OpponentProfile.Inventory.donutEntries); // 상대 도넛 획득
+                GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
                 break;
             case FirebaseGameManager.GameOutcome.Lose:
                 exp = 8;
                 rewardGold = 50;
                 rewardPoint = 0; // 솔로스코어는 미리 반영되었으므로 0
-                result = "DEFEAT!";
+                result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_defeatText)}";
                 break;
             case FirebaseGameManager.GameOutcome.Draw:
                 exp = 10;
                 rewardGold = 100;
                 rewardPoint = 0; // 페널티로 잃었던 10점 복구
                 result = "DRAW!";
+                getDonut = "획득 도넛";
                 GameManager.Instance.ProcessDrawOutcome(); // 페널티로 제거되었던 도넛 복구
                 break;
         }
 
         // UI 텍스트 갱신
-        // int previewLevel = DataManager.Instance.PlayerData.exp + exp; // 이 부분은 이제 필요 없음.
+        //int previewLevel = DataManager.Instance.PlayerData.exp + exp; 
 
         if (expText != null) expText.text = $"+{exp}";
         if (goldText != null) goldText.text = $"+{rewardGold}";
         if (pointText != null) pointText.text = $"+{rewardPoint}";
         if (resultText != null) resultText.text = $"{result}";
+        if (getDonutText != null) getDonutText.text = $"{getDonut}";
 
+        GameManager.Instance.SetGameOutcome(outcome); // 게임 결과 저장
         GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
-        //일단 게임종료후 레벨과 경험치 골드를 받는지만 확인하는 함수,
-        //나중에 패배, 탈주, 강종 등  승,패,무 고려해서 두명이 서로 다르게 나오도록 해야함
+
     }
 }

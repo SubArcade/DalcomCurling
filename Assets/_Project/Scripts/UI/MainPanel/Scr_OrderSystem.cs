@@ -464,6 +464,8 @@ public class Scr_OrderSystem : MonoBehaviour
         
         // 퀘스트 완료 보상 애널리틱스
         AnalyticsManager.Instance.QuestRewardComplete();
+        // 새로운 주문서 등장
+        SoundManager.Instance.receiptReward();
         
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)

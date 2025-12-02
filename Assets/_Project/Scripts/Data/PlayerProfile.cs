@@ -12,5 +12,7 @@ public class PlayerProfile
 {
     [field: SerializeField][FirestoreProperty] public string Nickname { get; set; }
     [field: SerializeField][FirestoreProperty] public string Email { get; set; }
+    [field: SerializeField][FirestoreProperty] public NamePlateType curNamePlateType { get; set; }
+    
     [field: SerializeField][FirestoreProperty] public InventoryData Inventory { get; set; } // DataManager.cs에 정의된 InventoryData 사용
 }

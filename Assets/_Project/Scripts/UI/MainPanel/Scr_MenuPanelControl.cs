@@ -99,7 +99,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
         gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
         energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
-        testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp);
+        //testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp());
         
         checkEntryButton.onClick.AddListener(() =>
         {
