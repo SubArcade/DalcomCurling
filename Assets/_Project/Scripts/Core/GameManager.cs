@@ -180,9 +180,9 @@ public class GameManager : MonoBehaviour
     }
 
     //게임종료시의 UI로부터 받아올 보상 값들을 담을 변수
-    private int pendingExp;
-    private int pendingGold;
-    private int pendingPoint;
+    public int pendingExp;
+    public int pendingGold;
+    public int pendingPoint;
     private List<DonutEntry> pendingRewardDonuts = new List<DonutEntry>();
 
     public void SetResultRewards(int level, int gold, int point) //이부분을 호출
@@ -240,12 +240,12 @@ public class GameManager : MonoBehaviour
             }
             
             // 3. 승리 시 상대 도넛 보상 지급
-            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
-            {
-                if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
-                if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
-            }
-            
+            //if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+            //{
+            //    if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
+            //    if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
+            //}
+
             // 보류 중인 보상 도넛 지급
             foreach (var donutEntry in pendingRewardDonuts)
             {

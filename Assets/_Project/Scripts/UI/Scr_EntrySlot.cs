@@ -108,8 +108,8 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         CheckMarkOff(dragged);
 
         SaveToInventory(); //도넛 값 넣기
-        
-        dragged.currentCell.ClearItem();
+
+        if (dragged.currentCell != null) dragged.currentCell.ClearItem();
         BoardManager.Instance.AutoSaveBoardLocal();
 
         // 해당 도넛 데이터 연동

@@ -188,10 +188,17 @@ public class StoneManager : MonoBehaviour
             }
         }
 
-
+        
         GameObject newStone = Instantiate(selectedPrefab, startPos, spawnPosition.rotation);
         _currentTurnStone = newStone.GetComponent<StoneForceController_Firebase>();
-        newStone.transform.GetComponent<Scr_DonutParticleSystem>().InitializeDonutParticles(_currentTurnStoneTeam);
+        
+        
+        PlayerProfile pf =  FirebaseGameManager.Instance.GetPlayerProfile(currentTurnPlayerId); // 현재 턴 유저의 프로파일을 받아옴
+        EffectType effectType = pf.Inventory.curEffectType; // 이 유저가 어떤 이펙트 타입을 골랐는지 가져옴
+        
+        // 이 도넛이 내꺼인지, 그리고 어떤 타입의 이펙트를 골랐는지 정보를 넘겨줌
+        newStone.transform.GetComponent<Scr_DonutParticleSystem>().InitializeDonutParticles(_currentTurnStoneTeam == myTeam, effectType);
+        
         donutSpawnedPositionY = newStone.transform.position.y;
 
         if (_currentTurnStone == null)
