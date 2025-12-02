@@ -238,12 +238,12 @@ public class GameManager : MonoBehaviour
             }
             
             // 3. 승리 시 상대 도넛 보상 지급
-            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
-            {
-                if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
-                if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
-            }
-            
+            //if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+            //{
+            //    if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
+            //    if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
+            //}
+
             // 보류 중인 보상 도넛 지급
             foreach (var donutEntry in pendingRewardDonuts)
             {
