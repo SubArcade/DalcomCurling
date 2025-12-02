@@ -221,9 +221,9 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         DataManager.Instance.BaseInventoryData();   // 도감 초기화
         DataManager.Instance.FirstBaseMergeBoardData(); // 보드판 초기화
         DataManager.Instance.MergeBoardData.tempGiftIds.Clear();    // 임시 보관칸 초기화
-        DataManager.Instance.MergeBoardData.generatorLevelHard = 0; 
-        DataManager.Instance.MergeBoardData.generatorLevelSoft = 0;
-        DataManager.Instance.MergeBoardData.generatorLevelMoist = 0;
+        DataManager.Instance.MergeBoardData.generatorLevelHard = 1; 
+        DataManager.Instance.MergeBoardData.generatorLevelSoft = 1;
+        DataManager.Instance.MergeBoardData.generatorLevelMoist = 1;
         DataManager.Instance.QuestData.questList1.Clear();
         DataManager.Instance.QuestData.questList2.Clear();
         DataManager.Instance.QuestData.questList3.Clear();
