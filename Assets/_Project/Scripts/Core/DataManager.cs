@@ -327,6 +327,7 @@ public class DataManager : MonoBehaviour
     {
         //EnsureDonutSlots();
         userData.inventory = firstInventoryData;
+        userData.inventory.donutEntries = firstInventoryData.donutEntries;
         userData.inventory.effectList = new List<EffectType>()
         {
             EffectType.None

@@ -8,6 +8,7 @@ public class Scr_EntryPopUP : MonoBehaviour
 {
     [Header("닫기 버튼")]
     [SerializeField] private Button CloseButton;
+    [SerializeField] public List<EntrySlot> entrySlots = new();
 
     void Start()
     {
