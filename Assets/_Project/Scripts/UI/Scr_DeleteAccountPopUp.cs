@@ -33,7 +33,7 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
 
         if (text.Equals("DALCOM", StringComparison.OrdinalIgnoreCase))
         {
-            Debug.Log("계정삭제 완료!!");
+            //Debug.Log("계정삭제 완료!!");
             await FirebaseAuthManager.Instance.DeleteAccountAsync();
             UIManager.Instance.Close(PanelId.DeleteAccountPopUp);
             UIManager.Instance.Open(PanelId.LoginPanel);
@@ -41,7 +41,7 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
         }
         else 
         {
-            Debug.Log("DALCOM을 제대로 입력하세요");
+            //Debug.Log("DALCOM을 제대로 입력하세요");
         }
     }
 }

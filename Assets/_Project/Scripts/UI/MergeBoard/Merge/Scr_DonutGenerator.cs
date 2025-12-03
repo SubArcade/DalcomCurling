@@ -72,7 +72,7 @@ public class DonutGenerator : MonoBehaviour
         // 6. 최종 생성
         DonutData result = list[Random.Range(0, list.Count)];
 
-        Debug.Log($"생성된 도넛: Type={selectedType}, Level={chosenLevel}, Name={result.id}");
+        //Debug.Log($"생성된 도넛: Type={selectedType}, Level={chosenLevel}, Name={result.id}");
         DataManager.Instance.AddCodexEntry(selectedType, result.id, chosenLevel);
         
         return result;

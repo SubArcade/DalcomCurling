@@ -28,6 +28,11 @@ public class SoundManager : MonoBehaviour
     private SoundGroup[] allSoundGroups;
     private Dictionary<string, EventReference> soundEventMap = new Dictionary<string, EventReference>();
 
+    [Header("발사시 재생되는 랜덤 음악 재생")]
+    [Tooltip("발사 시 재생할 5가지 SFX 이벤트를 여기에 할당합니다.")]
+    [SerializeField]
+    private EventReference[] launchSFXEvents;
+
     // BGM 재생 관리 필드
     private FMOD.Studio.EventInstance currentBGMInstance;
     private List<EventReference> currentBGMPlaylist;
@@ -76,7 +81,7 @@ public class SoundManager : MonoBehaviour
 
                     if (soundEventMap.ContainsKey(eventName))
                     {
-                        Debug.LogWarning($"[SoundManager] 딕셔너리에 이미 '{eventName}' 키가 존재합니다. 이벤트: {path}");
+                        //Debug.LogWarning($"[SoundManager] 딕셔너리에 이미 '{eventName}' 키가 존재합니다. 이벤트: {path}");
                         continue;
                     }
 
@@ -85,7 +90,7 @@ public class SoundManager : MonoBehaviour
                 }
             }
         }
-        Debug.Log($"[SoundManager] 사운드 맵 로드 완료. 총 {soundEventMap.Count}개 이벤트.");
+        //Debug.Log($"[SoundManager] 사운드 맵 로드 완료. 총 {soundEventMap.Count}개 이벤트.");
     }
 
     // FMOD 경로에서 이벤트 이름 추출 헬퍼
@@ -103,12 +108,13 @@ public class SoundManager : MonoBehaviour
         {
             return eventRef;
         }
-        Debug.LogWarning($"[SoundManager] 딕셔너리에서 '{eventName}' 이벤트 참조를 찾을 수 없습니다. 호출에 실패했습니다.");
+        //Debug.LogWarning($"[SoundManager] 딕셔너리에서 '{eventName}' 이벤트 참조를 찾을 수 없습니다. 호출에 실패했습니다.");
         return new EventReference(); // Null EventReference 반환
     }
 
     #endregion
 
+    #region BGM SFX 재생 관련 구성
     // BGM 재생 (그룹/플레이리스트 관리)
 
     /// SoundGroup 이름으로 BGM 플레이리스트를 시작합니다
@@ -119,7 +125,7 @@ public class SoundManager : MonoBehaviour
 
         if (group == null || group.Events == null || group.Events.Length == 0)
         {
-            Debug.LogWarning($"[SoundManager] '{groupName}' BGM 그룹을 찾을 수 없거나 이벤트가 비어 있습니다. BGM을 정지합니다.");
+            //Debug.LogWarning($"[SoundManager] '{groupName}' BGM 그룹을 찾을 수 없거나 이벤트가 비어 있습니다. BGM을 정지합니다.");
             StopBGM();
             return;
         }
@@ -129,11 +135,11 @@ public class SoundManager : MonoBehaviour
         // 현재 재생 목록과 새 목록이 동일하면 중복 재생 방지
         if (IsSamePlaylist(newPlaylist, currentBGMPlaylist))
         {
-            Debug.Log($"[SoundManager] 이미 '{groupName}' BGM 재생 목록이 재생 중입니다.");
+            //Debug.Log($"[SoundManager] 이미 '{groupName}' BGM 재생 목록이 재생 중입니다.");
             return;
         }
 
-        Debug.Log($"[SoundManager] BGM 플레이리스트 전환 시작: '{groupName}'");
+        //Debug.Log($"[SoundManager] BGM 플레이리스트 전환 시작: '{groupName}'");
         SwitchBGMPlaylist(newPlaylist, groupName);
     }
 
@@ -165,7 +171,7 @@ public class SoundManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[SoundManager] {playlistName} BGM 플레이리스트가 비어있습니다!");
+            //Debug.LogWarning($"[SoundManager] {playlistName} BGM 플레이리스트가 비어있습니다!");
         }
     }
 
@@ -180,32 +186,7 @@ public class SoundManager : MonoBehaviour
 
     private IEnumerator PlayBGMPlaylist(string playlistName)
     {
-        Debug.Log($"[SoundManager] {playlistName} BGM 플레이리스트 시작 (총 {currentBGMPlaylist.Count}곡)");
-
-        // InGameBGM은 단일 적응형 BGM으로 간주하고 별도 처리
-        bool isAdaptiveBGM = playlistName == "InGameBGM";
-
-        if (isAdaptiveBGM)
-        {
-            if (currentBGMPlaylist.Count == 0 || currentBGMPlaylist[0].IsNull)
-            {
-                Debug.LogWarning($"[SoundManager] InGameBGM 이벤트가 할당되지 않았습니다.");
-                yield break;
-            }
-
-            EventReference adaptiveBGM = currentBGMPlaylist[0];
-
-            StopBGMInternal();
-
-            // 인스턴스 생성 및 재생
-            currentBGMInstance = RuntimeManager.CreateInstance(adaptiveBGM);
-            currentBGMInstance.start();
-
-            Debug.Log("[SoundManager] InGameBGM (적응형/일반 BGM) 재생 시작. 코루틴 즉시 종료.");
-
-            // 씬 멈춤 방지를 위해 즉시 코루틴 종료 (⭐핵심⭐)
-            yield break;
-        }
+        //Debug.Log($"[SoundManager] {playlistName} BGM 플레이리스트 시작 (총 {currentBGMPlaylist.Count}곡)");
 
         // 일반 BGM 플레이리스트 루프 로직
         while (true)
@@ -219,7 +200,7 @@ public class SoundManager : MonoBehaviour
                 string path;
                 FMODUnity.RuntimeManager.StudioSystem.lookupPath(currentBGM.Guid, out path);
                 string bgmName = GetEventName(path);
-                Debug.Log($"[SoundManager] BGM 재생: {bgmName} (인덱스: {currentBGMIndex + 1}/{currentBGMPlaylist.Count})");
+                //Debug.Log($"[SoundManager] BGM 재생: {bgmName} (인덱스: {currentBGMIndex + 1}/{currentBGMPlaylist.Count})");
 
                 currentBGMInstance = RuntimeManager.CreateInstance(currentBGM);
                 currentBGMInstance.start();
@@ -239,7 +220,7 @@ public class SoundManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"[SoundManager] 빈 BGM 이벤트 참조 (인덱스: {currentBGMIndex})");
+                //Debug.LogWarning($"[SoundManager] 빈 BGM 이벤트 참조 (인덱스: {currentBGMIndex})");
                 yield break;
             }
         }
@@ -256,7 +237,7 @@ public class SoundManager : MonoBehaviour
         StopBGMInternal();
         currentBGMPlaylist = null;
         currentBGMIndex = 0;
-        Debug.Log("[SoundManager] BGM 정지됨.");
+        //Debug.Log("[SoundManager] BGM 정지됨.");
     }
 
     // SFX 재생 (세분화된 호출)
@@ -274,6 +255,7 @@ public class SoundManager : MonoBehaviour
             FMODUnity.RuntimeManager.PlayOneShot(sfxRef);
         }
     }
+    #endregion
 
     #region 아웃게임 SFX 사운드 모음
 
@@ -469,6 +451,36 @@ public class SoundManager : MonoBehaviour
         PlaySFX("20_Negative_09");
     }
 
+    // 발사시 나오는 사운드를 지정한 사운드중 하나가 랜덤으로 재생되게 하는 코드 추가
+    public void shotSound()
+    {
+        // 배열이 비어있는지 확인
+        if (launchSFXEvents == null || launchSFXEvents.Length == 0)
+        {
+            //Debug.LogWarning("[SoundManager] launchSFXEvents 배열이 비어 있어 shotSound를 재생할 수 없습니다.");
+            return;
+        }
+
+        // 1. 배열의 인덱스를 랜덤으로 선택합니다. (0부터 배열 길이 직전까지)
+        int randomIndex = Random.Range(0, launchSFXEvents.Length);
+
+        EventReference sfxRef = launchSFXEvents[randomIndex];
+
+        if (!sfxRef.IsNull)
+        {
+            // 2. 랜덤으로 선택된 사운드 하나만 재생합니다.
+            FMODUnity.RuntimeManager.PlayOneShot(sfxRef);
+
+            string path;
+            FMODUnity.RuntimeManager.StudioSystem.lookupPath(sfxRef.Guid, out path);
+            //Debug.Log($"[SoundManager] 샷 사운드 재생: {GetEventName(path)} (인덱스: {randomIndex})");
+        }
+        else
+        {
+            //Debug.LogWarning($"[SoundManager] shotSound에서 인덱스 {randomIndex}에 유효한 이벤트가 없습니다.");
+        }
+    }
+
     #endregion
 
     #region 사운드 볼륨 조절
@@ -478,7 +490,7 @@ public class SoundManager : MonoBehaviour
         volume = Mathf.Clamp01(volume);
         FMOD.Studio.Bus bgmBus = RuntimeManager.GetBus("bus:/BGM");
         bgmBus.setVolume(volume);
-        Debug.Log($"[SoundManager] BGM Bus 볼륨 설정됨: {volume}");
+        //Debug.Log($"[SoundManager] BGM Bus 볼륨 설정됨: {volume}");
     }
 
     public void SetSFXVolume(float volume)
@@ -486,7 +498,7 @@ public class SoundManager : MonoBehaviour
         volume = Mathf.Clamp01(volume);
         FMOD.Studio.Bus sfxBus = RuntimeManager.GetBus("bus:/SFX");
         sfxBus.setVolume(volume);
-        Debug.Log($"[SoundManager] SFX Bus 볼륨 설정됨: {volume}");
+        //Debug.Log($"[SoundManager] SFX Bus 볼륨 설정됨: {volume}");
     }
 
     #endregion

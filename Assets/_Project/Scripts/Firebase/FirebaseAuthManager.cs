@@ -57,7 +57,7 @@ public class FirebaseAuthManager
 
         if (auth.CurrentUser != null)
         {
-            Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
+            //Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
             // if (isfirst) UIManager.Instance.Open(PanelId.StartPanel);
             // else UIManager.Instance.Open(PanelId.MainPanel);
 
@@ -73,7 +73,7 @@ public class FirebaseAuthManager
         }
         else
         {
-            Debug.Log("로그인 필요 (게스트 또는 계정 로그인)");
+            //Debug.Log("로그인 필요 (게스트 또는 계정 로그인)");
             UIManager.Instance.Open(PanelId.LoginPanel);
         }
 
@@ -86,14 +86,14 @@ public class FirebaseAuthManager
             bool signed = (auth.CurrentUser != user && auth.CurrentUser != null);
             if (!signed && user != null)
             {
-                Debug.Log("로그아웃");
+                //Debug.Log("로그아웃");
                 LoginState?.Invoke(false);
             }
 
             user = auth.CurrentUser;
             if (signed)
             {
-                Debug.Log("로그인");
+                //Debug.Log("로그인");
                 LoginState?.Invoke(true);
             }
         }
@@ -106,13 +106,13 @@ public class FirebaseAuthManager
         {
             var result = await auth.CreateUserWithEmailAndPasswordAsync(email, password);
             user = result.User;
-            Debug.Log($"회원가입 완료: {user.Email}");
+            //Debug.Log($"회원가입 완료: {user.Email}");
 
             LoginState?.Invoke(true);
         }
         catch (Exception e)
         {
-            Debug.LogError($"회원가입 실패: {e.Message}");
+            //Debug.LogError($"회원가입 실패: {e.Message}");
             Debug.LogException(e);
         }
     }
@@ -124,7 +124,7 @@ public class FirebaseAuthManager
         {
             var result = await auth.SignInWithEmailAndPasswordAsync(email, password);
             user = result.User;
-            Debug.Log($"로그인 완료: {user.Email}");
+            //Debug.Log($"로그인 완료: {user.Email}");
 
             await DataManager.Instance.EnsureUserDocAsync(user.UserId, user.Email);
 
@@ -132,7 +132,7 @@ public class FirebaseAuthManager
         }
         catch (Exception e)
         {
-            Debug.LogError($"로그인 실패: {e.Message}");
+            //Debug.LogError($"로그인 실패: {e.Message}");
             Debug.LogException(e);
         }
     }
@@ -144,7 +144,7 @@ public class FirebaseAuthManager
         {
             var result = await auth.SignInAnonymouslyAsync();
             user = result.User;
-            Debug.Log($"익명 로그인 성공! User ID: {user.UserId}");
+            //Debug.Log($"익명 로그인 성공! User ID: {user.UserId}");
 
             await DataManager.Instance.EnsureUserDocAsync(user.UserId, user.Email ?? "guest");
 
@@ -153,7 +153,7 @@ public class FirebaseAuthManager
         }
         catch (Exception e)
         {
-            Debug.LogError($"익명 로그인 실패: {e.Message}");
+            //Debug.LogError($"익명 로그인 실패: {e.Message}");
             Debug.LogException(e);
         }
     }
@@ -161,7 +161,7 @@ public class FirebaseAuthManager
     public void Logout()
     {
         auth.SignOut();
-        Debug.Log("로그아웃");
+        //Debug.Log("로그아웃");
         LoginState?.Invoke(false);
         UIManager.Instance.Open(PanelId.LoginPanel);
     }

@@ -123,7 +123,7 @@ public class EnergyRegenNotifier : MonoBehaviour
         long used = (long)gained * playerData.perSecEnergy;
         playerData.lastAt += used;
 
-        Debug.Log($"[EnergyRegen] {before} → {playerData.energy} (+{gained}), elapsed={elapsed}s, carry={(elapsed - used)}s");
+        //Debug.Log($"[EnergyRegen] {before} → {playerData.energy} (+{gained}), elapsed={elapsed}s, carry={(elapsed - used)}s");
 
         // 가득이면 기준을 now로 스냅(선택, 보기 깔끔하게)
         if (playerData.energy >= playerData.maxEnergy)
