@@ -98,6 +98,10 @@ public class AdsRewarded : MonoBehaviour
                 adUnitId = GiftBoxAD_UNIT_ID;
                 break;
         }
+
+        // 새로고침 횟수 다차면 막기
+        if (DataManager.Instance.QuestData.currentChargeCount >= DataManager.Instance.QuestData.maxChargeCount)
+            return;
         
         RewardedAd.Load(adUnitId, request, (RewardedAd ad, LoadAdError error) =>
         {

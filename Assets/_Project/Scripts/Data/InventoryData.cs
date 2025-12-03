@@ -13,12 +13,12 @@ public enum DonutDexViewState
 public enum EffectType
 {
     None,
-    a,
-    b,
-    c,
-    d,
-    e,
-    f,
+    Red,
+    Blue,
+    Magic,
+    Star,
+    //e,
+    //f,
 }
 
 public enum CharacterType
@@ -44,6 +44,7 @@ public class DonutEntry
     [field: SerializeField, Tooltip("반발력")] [FirestoreProperty] public int resilience { get; set; }
     [field: SerializeField, Tooltip("마찰력")] [FirestoreProperty] public int friction { get; set; }
     [field: SerializeField, Tooltip("도넛 레벨")][FirestoreProperty] public int level { get; set; }
+    [field: SerializeField, Tooltip("준비화면 수치")][FirestoreProperty] public int donutAmount { get; set; }
 
 }
 
@@ -67,4 +68,7 @@ public class InventoryData
     [field: SerializeField, Tooltip("단단도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> hardDonutCodexDataList { get; set; } = new();
     [field: SerializeField, Tooltip("말랑도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> softDonutCodexDataList { get; set; } = new();
     [field: SerializeField, Tooltip("촉촉도넛 도감 상태")][FirestoreProperty] public List<DonutCodexData> moistDnutCodexDataList { get; set; } = new();
+    
+    // 상점 무료 젬
+    [field: SerializeField, Tooltip("촉촉도넛 도감 상태")][FirestoreProperty] public bool dailyFreeGemClaimed  {get; set;}
 }

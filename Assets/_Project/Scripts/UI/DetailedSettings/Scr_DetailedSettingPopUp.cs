@@ -45,7 +45,9 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     [SerializeField] private Button eventOffbutton;
     [SerializeField] private Button nightOnbutton;
     [SerializeField] private Button nightOffbutton;
-
+    
+    [SerializeField] private EnergyRegenNotifier notifier;
+    
     [Header("닫기버튼")]
     [SerializeField] private Button closeButton;
     
@@ -63,6 +65,8 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         accountIdText.text = $"User ID : {DataManager.Instance.PlayerData.nickname}";
         servicePolicyButton.onClick.AddListener(() => servicePolicyPopup.SetActive(true));
         privacyNoticeButton.onClick.AddListener(() => privacyNoticePopup.SetActive(true));
+        
+        notifier = FindObjectOfType<EnergyRegenNotifier>();
     }
     void OnEnable()
     {
@@ -126,12 +130,17 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             energyONbutton.gameObject.SetActive(false);
             energyOFFbutton.gameObject.SetActive(true);
+            // 알림 off
+            notifier.IsNotificationsEnabled(true);
+
         });
 
         energyOFFbutton.onClick.AddListener(() =>
         {
             energyOFFbutton.gameObject.SetActive(false);
             energyONbutton.gameObject.SetActive(true);
+            // 알림 On
+            notifier.IsNotificationsEnabled(false);
         });
 
         eventOnbutton.onClick.AddListener(() =>
@@ -150,12 +159,16 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         {
             nightOnbutton.gameObject.SetActive(false);
             nightOffbutton.gameObject.SetActive(true);
+            // 야간 알림 off
+            notifier.IsUseQuietHours(true);
         });
 
         nightOffbutton.onClick.AddListener(() =>
         {
             nightOffbutton.gameObject.SetActive(false);
             nightOnbutton.gameObject.SetActive(true);
+            // 야간 알림 on
+            notifier.IsUseQuietHours(false);
         });
 
         closeButton.onClick.AddListener(() =>

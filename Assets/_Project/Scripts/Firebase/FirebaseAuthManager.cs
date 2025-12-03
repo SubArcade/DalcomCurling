@@ -58,10 +58,18 @@ public class FirebaseAuthManager
         if (auth.CurrentUser != null)
         {
             Debug.Log($"자동 로그인 유지됨: UID = {auth.CurrentUser.UserId}");
-            if (isfirst) UIManager.Instance.Open(PanelId.StartPanel);
-            else UIManager.Instance.Open(PanelId.MainPanel);
+            // if (isfirst) UIManager.Instance.Open(PanelId.StartPanel);
+            // else UIManager.Instance.Open(PanelId.MainPanel);
 
             await DataManager.Instance.EnsureUserDocAsync(auth.CurrentUser.UserId, isAutoLogin: true);
+            if (GameManager.Instance.State != GameState.Lobby)
+            {
+                UIManager.Instance.Open(PanelId.MainPanel);
+            }
+            else
+            {
+                UIManager.Instance.Open(PanelId.StartPanel);
+            }
         }
         else
         {

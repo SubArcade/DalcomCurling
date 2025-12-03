@@ -31,20 +31,35 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject WaitThrowPopUp;
-    
+
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
 
     [Header("결과창 보상 갱신을 위한 변수")]
-    [SerializeField] private TextMeshProUGUI expText; 
+    [SerializeField] private TextMeshProUGUI expText;
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI pointText;
     [SerializeField] private TextMeshProUGUI resultText; // 승리,패배 결과 텍스트
     [SerializeField] private TextMeshProUGUI getDonutText; // 승리,패배에 따라 획득/잃은 도넛 텍스트
 
-   
+
+    [Header("칭호를 적용할 자신과 상대의 텍스트와 이미지")]
+    [SerializeField] private TextMeshProUGUI EpitheText1; //ingameUI의 EpitheText들입니다
+    [SerializeField] private TextMeshProUGUI EpitheText2; //ingameUI의 epitheText들입니다
+    [SerializeField] private TextMeshProUGUI timeLineEpitheText1; //timelineUI의 epitheText들입니다.
+    [SerializeField] private TextMeshProUGUI timeLineEpitheText2;
+    [SerializeField] private Image EpitheImage1; //ingameUI의 텍스트부모이미지입니다
+    [SerializeField] private Image EpitheImage2;
+    [SerializeField] private Image timeLineEpitheImage1;//timelineUI의 부모이미지입니다
+    [SerializeField] private Image timeLineEpitheImage2;
+    [SerializeField] private Image timeLinePlayerCharacter1; //타임라인UI의 플레이어캐릭터 이미지입니다.
+    [SerializeField] private Image timeLinePlayerCharacter2;
+    [SerializeField] private CharacterSO characterSO; //so 넣어주시면됩니다
+    [SerializeField] private NamePlaateSO namePlateSO; //so넣어주시면됩니다.
+
+
     [Header("플로팅 텍스트")]
     [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
 
@@ -97,7 +112,6 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         // 인게임 BGM을 재생 (Element 0으로 시작)
         SoundManager.Instance.PlayBGMGroup("InGameBGM");
-        SoundManager.Instance.SetBGMParameter(BGM_STATE_PARAMETER, 0f);
     }
 
     private void HandleProfilesLoaded()
@@ -136,6 +150,35 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
             // 상대방 인벤토리 UI 채우기 (오프닝 타임라인) 
             PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
+
+            // 인게임UI의 칭호 텍스트 반영
+            if (EpitheText1 != null)
+                EpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, EpitheImage1);
+
+            if (EpitheText2 != null)
+                EpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, EpitheImage2);
+
+            //타임라인UI의 칭호 텍스트 반영
+            if (timeLineEpitheText1 != null)
+                timeLineEpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, timeLineEpitheImage1);
+
+            if (timeLineEpitheText2 != null)
+                timeLineEpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, timeLineEpitheImage2);
+
+            // ⭐ 타임라인 UI 캐릭터 이미지 반영
+            if (timeLinePlayerCharacter1 != null)
+            {
+                var myCharSprite = characterSO.GetCharacterSprite(MyProfile.Inventory.curCharacterType);
+                timeLinePlayerCharacter1.sprite = myCharSprite;
+                timeLinePlayerCharacter1.enabled = (myCharSprite != null);
+            }
+
+            if (timeLinePlayerCharacter2 != null)
+            {
+                var oppCharSprite = characterSO.GetCharacterSprite(OpponentProfile.Inventory.curCharacterType);
+                timeLinePlayerCharacter2.sprite = oppCharSprite;
+                timeLinePlayerCharacter2.enabled = (oppCharSprite != null);
+            }
         }
         else
         {
@@ -224,7 +267,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         // 1. 위치 설정
         floatingText.transform.position = screenPosition;
-        
+
         // 2. 텍스트 설정
         floatingText.SetText(message);
 
@@ -266,7 +309,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         WaitThrowPopUp.SetActive(false);
         roundPanel.SetActive(true);
     }
-    public void WatingThrowUI() 
+    public void WatingThrowUI()
     {
         AllcloseUI();
         WaitThrowPopUp.SetActive(true);
@@ -277,7 +320,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
-        settingsPanel.SetActive(false);        
+        settingsPanel.SetActive(false);
     }
     public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
@@ -336,9 +379,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 rewardGold = 150;
                 rewardPoint = 20; // 페널티 복구 10점 + 승리 보너스 10점
                 result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_victoryText)}";
-                
+
                 getDonut = "획득 도넛";
-                
+
                 //GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
                 GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
                 break;
@@ -347,13 +390,16 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 rewardGold = 50;
                 rewardPoint = 0; // 솔로스코어는 미리 반영되었으므로 0
                 result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_defeatText)}";
+
+                getDonut = "잃은 도넛";
+
                 break;
             case FirebaseGameManager.GameOutcome.Draw:
                 exp = 10;
                 rewardGold = 100;
                 rewardPoint = 0; // 페널티로 잃었던 10점 복구
                 result = "DRAW!";
-                getDonut = "획득 도넛";
+                getDonut = "변동 없음";
                 GameManager.Instance.ProcessDrawOutcome(); // 페널티로 제거되었던 도넛 복구
                 break;
         }
@@ -371,36 +417,42 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
 
     }
-    
-    /// <summary>
-    /// 현재 턴 번호를 UI에 업데이트하고 BGM 전환 로직을 처리합니다.
-    /// </summary>
-    /// <param name="turn">현재 턴 번호.</param>
-    public void turnBGM(int turn)
+
+    // enum → 문자열 변환 함수
+    private string GetEpitheText(NamePlateType type, Image targetImage = null)
     {
-        // ⭐ 1. turnText가 유효한지 먼저 확인합니다.
-        if (turnText != null)
+        // SO에서 매핑된 NamePlate 가져오기
+        NamePlate plate = namePlateSO != null ? namePlateSO.GetByType(type) : null;
+
+        // 이미지 반영
+        if (targetImage != null)
         {
-            // 내부 턴 번호를 컬링 규칙에 맞게 가공 (1, 2, 3, 4, ...)
-            // (이 코드가 먼저 실행되어야 displayTurn 값이 갱신됩니다.)
-            displayTurn = (turn / 2) + 1;
-            turnText.text = $"Turn : {displayTurn}";
-
-            // ----------------------------------------------------
-            // ⭐ 2. BGM 전환 로직은 displayTurn 계산 후 별도의 if 문으로 체크합니다.
-
-            // 현재 displayTurn이 4 이상이고, 아직 BGM이 전환되지 않았다면
-            if (displayTurn >= 4 && !isSpecialMusicPlaying)
+            if (plate != null && plate.plateSprite != null)
             {
-                // 1. SoundManager에게 BGM 파라미터 값을 1.0f로 설정하라고 명령
-                SoundManager.Instance.SetBGMParameter(BGM_STATE_PARAMETER, 1f);
-                isSpecialMusicPlaying = true;
-
-                Debug.Log($"BGM 전환: 턴 {displayTurn} 도달! Element 1 음악으로 전환 명령");
+                targetImage.sprite = plate.plateSprite;
+                targetImage.enabled = true;
             }
-            // ----------------------------------------------------
+            else
+            {
+                targetImage.enabled = false;
+            }
         }
-        // ❌ 참고: bgmTransitionTurn 변수는 사용하지 않으므로 제거해야 합니다.
+
+        // 텍스트 반환 (한글 이름 우선)
+        if (plate != null && !string.IsNullOrEmpty(plate.koNamePlate))
+            return plate.koNamePlate;
+
+        // 기본 fallback
+        switch (type)
+        {
+            case NamePlateType.NONE: return "";
+            case NamePlateType.DoughNewbie: return "초보 조물러";
+            case NamePlateType.SoftTouch: return "말랑 조작자";
+            case NamePlateType.DoughHandler: return "반죽 핸들러";
+            case NamePlateType.DonutPilot: return "도넛 파일럿";
+            case NamePlateType.DonutMaster: return "도넛 마스터";
+            default: return type.ToString();
+        }
     }
 
 }

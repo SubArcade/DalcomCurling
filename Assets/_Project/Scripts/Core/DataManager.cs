@@ -77,21 +77,22 @@ public class DataManager : MonoBehaviour
     {
         email = "",
         nickname = "Dalcom",
-        gold = 5000,
-        gem = 1000,
-        energy = 2000,
+        gold = 0,
+        gem = 0,
+        energy = 50,
         level = 1,
         exp = 0,
         lastAt = 0,
-        maxEnergy = 50,
-        perSecEnergy = 10,
-        soloScore = 0,
-        soloTier = GameTier.Bronze,
-        levelMax = 20,
         gainNamePlateType =
         {
             NamePlateType.NONE
-        }
+        },
+        soloScore = 0,
+        soloTier = GameTier.Bronze,
+        changeNicknameCount = 0,
+        maxEnergy = 50,
+        perSecEnergy = 10,  // 테스트
+        levelMax = 20,
     };
     [SerializeField] private InventoryData firstInventoryData = new InventoryData()
     {
@@ -102,6 +103,15 @@ public class DataManager : MonoBehaviour
             null,
             null,
             null
+        },
+        dailyFreeGemClaimed = false,
+        effectList = new List<EffectType>()
+        {
+            EffectType.None,
+        },
+        characterList = new List<CharacterType>()
+        {
+            CharacterType.None
         }
     };
     [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
@@ -116,7 +126,9 @@ public class DataManager : MonoBehaviour
     [SerializeField] private QuestData firstQuestData = new QuestData()
     {
         maxCount = 5,
-        refreshCount =5,
+        refreshCount = 5,
+        maxChargeCount = 3,
+        currentChargeCount = 0,
         baseGold = 0,
     };
 
@@ -140,6 +152,17 @@ public class DataManager : MonoBehaviour
         OnUserDataChanged?.Invoke(PlayerData);
     }
 
+    public void ExpChange(int exp) 
+    {
+        PlayerData.exp = exp;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
+    public void ScoreChange(int score) 
+    {
+        PlayerData.soloScore = score;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
     public void LevelChange(int level) 
     {
         PlayerData.level = level;
@@ -220,6 +243,7 @@ public class DataManager : MonoBehaviour
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             FirstBaseMergeBoardData();
             BaseQuestData(baseGold, RefreshCount, maxCount);
+            FirstBaseQuestData();
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
@@ -259,7 +283,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 기본 인벤토리 데이터
-    private void BaseInventoryData()
+    public void BaseInventoryData()
     {
         InventoryData.hardDonutCodexDataList = new List<DonutCodexData>();
         InventoryData.softDonutCodexDataList = new List<DonutCodexData>();
@@ -294,10 +318,18 @@ public class DataManager : MonoBehaviour
         //Debug.Log("실행완료");
     }
 
-    private void FirstBaseInventoryData()
+    public void FirstBaseInventoryData()
     {
         //EnsureDonutSlots();
         userData.inventory = firstInventoryData;
+        userData.inventory.effectList = new List<EffectType>()
+        {
+            EffectType.None
+        };
+        userData.inventory.characterList = new List<CharacterType>()
+        {
+            CharacterType.None
+        };
     }
     
     
@@ -310,7 +342,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 처음 머지보드 데이터 셋
-    private void FirstBaseMergeBoardData()
+    public void FirstBaseMergeBoardData()
     {
         MergeBoardData.cells = new List<CellData>();
 
@@ -330,6 +362,11 @@ public class DataManager : MonoBehaviour
                 MergeBoardData.cells.Add(cellData);
             }
         }
+
+        MergeBoardData.generatorLevelHard = 1;
+        MergeBoardData.generatorLevelSoft = 1;
+        MergeBoardData.generatorLevelMoist = 1;
+        
     }
 
     // 기본 퀘스트 데이터
@@ -339,6 +376,13 @@ public class DataManager : MonoBehaviour
         QuestData.refreshCount = RefreshCount;
         QuestData.maxCount = MaxCount;
     }
+
+    private void FirstBaseQuestData()
+    {
+        QuestData.currentChargeCount = firstQuestData.currentChargeCount;
+        QuestData.maxChargeCount = firstQuestData.maxChargeCount;
+    }
+    
     // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
     public async Task UpdateUserDataAsync(
@@ -818,7 +862,7 @@ public class DataManager : MonoBehaviour
     
 
     // 랭크 구분 함수 ( 랭크를 디비에서 계산해서 넣어줘야 함 )
-    private GameTier CalculateTier(int score, int? rank = null)
+    public GameTier CalculateTier(int score, int? rank = null)
     {
         // 챌린저 구간 랭크 값 등수 받아와야함
         // 1) 챌린저 구간 ( 디비의 랭크 기준 )

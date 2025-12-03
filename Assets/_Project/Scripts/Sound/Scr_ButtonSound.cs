@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ButtonSound : MonoBehaviour
@@ -16,6 +18,14 @@ public class ButtonSound : MonoBehaviour
         {
             toggle.onValueChanged.AddListener(delegate {OnButtonClicked();});
         }
+        
+        TMP_Dropdown tmpDropdown = GetComponent<TMP_Dropdown>();
+        if (tmpDropdown != null)
+        {
+            tmpDropdown.onValueChanged.AddListener(delegate { OnButtonClicked(); });
+        }
+
+
     }
 
     private void OnButtonClicked()
@@ -25,4 +35,7 @@ public class ButtonSound : MonoBehaviour
             SoundManager.Instance.buttonClick();
         }
     }
+
+    
+
 }

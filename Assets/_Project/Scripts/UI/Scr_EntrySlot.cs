@@ -198,7 +198,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         // fromSlot(=targetItem이 들어간 자리)
         if (fromSlot.currentItem != null)
             fromSlot.SaveToInventory();
-
+        
         // 해당 도넛 데이터 연동
         DataManager.Instance.SetDonutAt(slotIndex, false, donutData: currentItem.donutData);
 

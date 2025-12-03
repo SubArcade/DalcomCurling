@@ -13,15 +13,19 @@ MonoBehaviour:
   m_Name: EffectSO
   m_EditorClassIdentifier: 
   effectSoList:
-  - effectType: 1
-    effectPrefab: {fileID: 0}
+  - effectType: 0
+    auraEffect: {fileID: 0}
+    collisionEffect: {fileID: 0}
+    trailEffect: {fileID: 0}
   - effectType: 2
-    effectPrefab: {fileID: 0}
+    auraEffect: {fileID: 4823518202205099639, guid: 21d5a35a5e6529f409af66b05f3a786d, type: 3}
+    collisionEffect: {fileID: 3223031359271505891, guid: 62d5298ce92ee8a4c87039604bc35cea, type: 3}
+    trailEffect: {fileID: 8828913270134644546, guid: 3014a308a9169ce48b1e812fa107dbaf, type: 3}
   - effectType: 3
-    effectPrefab: {fileID: 0}
+    auraEffect: {fileID: 8846737274113074935, guid: e25f35359464b9842bcb70e5cf33d845, type: 3}
+    collisionEffect: {fileID: 8680269734529306505, guid: f101149649eaa1c4db408647ecc4a75e, type: 3}
+    trailEffect: {fileID: 8105017068113891617, guid: 8d3dc79f433e0d14f89a8d3a2ed4c8b0, type: 3}
   - effectType: 4
-    effectPrefab: {fileID: 0}
-  - effectType: 5
-    effectPrefab: {fileID: 0}
-  - effectType: 6
-    effectPrefab: {fileID: 0}
+    auraEffect: {fileID: 6532625474870085665, guid: 8113ab960f8c6534b8fc0f6b1445e0c0, type: 3}
+    collisionEffect: {fileID: 8789051029499178978, guid: 19edcbe757b6bac47a97ae1f82deb8e7, type: 3}
+    trailEffect: {fileID: 8300941046603710838, guid: 9d90df4e1cea7384b964dd674b450f51, type: 3}
