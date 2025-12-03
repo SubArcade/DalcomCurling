@@ -574,7 +574,7 @@ public class FirebaseGameManager : MonoBehaviour
         if (_currentGame.LastShot == null) return;
 
 
-        Debug.Log($"lastshotId : {_currentGame.LastShot.PlayerId}");
+        //Debug.Log($"lastshotId : {_currentGame.LastShot.PlayerId}");
         if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
         {
             _localState = LocalGameState.SimulatingOpponentShot;

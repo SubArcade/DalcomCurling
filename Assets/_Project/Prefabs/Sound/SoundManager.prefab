@@ -1,0 +1,296 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &489851616641488989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4702998027020427096}
+  - component: {fileID: 6857076243670532811}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4702998027020427096
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489851616641488989}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6857076243670532811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489851616641488989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99b0e3e14aca1b844a00d8c6d8f53279, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allSoundGroups:
+  - Name: OutGameBGM
+    Events:
+    - Guid:
+        Data1: 1963013053
+        Data2: 1187844399
+        Data3: 1168478103
+        Data4: -1984601723
+      Path: event:/music_kids_play_loop_01
+    - Guid:
+        Data1: 1839474596
+        Data2: 1221702242
+        Data3: -1468537698
+        Data4: 136731365
+      Path: event:/music_fun_funky_whistle_groove_loop
+    - Guid:
+        Data1: -1232166581
+        Data2: 1299268528
+        Data3: -97496183
+        Data4: 879539161
+      Path: event:/music_candyland
+  - Name: InGameBGM
+    Events:
+    - Guid:
+        Data1: -2121313358
+        Data2: 1111895460
+        Data3: -1690304602
+        Data4: 1819972785
+      Path: event:/music_happy_high_pop_advertising_jingle
+    - Guid:
+        Data1: -888270042
+        Data2: 1294993507
+        Data3: 2086759590
+        Data4: 892043932
+      Path: event:/music_comedy_quirky_fun_knockout
+  - Name: OutGameSFX
+    Events:
+    - Guid:
+        Data1: 1855664545
+        Data2: 1301068822
+        Data3: -1660785275
+        Data4: -761610754
+      Path: event:/01_ui_menu_button_beep_19
+    - Guid:
+        Data1: -535840934
+        Data2: 1096826474
+        Data3: -1383558003
+        Data4: -933141481
+      Path: event:/02_item_pickup_swipe_01
+    - Guid:
+        Data1: -1505541401
+        Data2: 1329844208
+        Data3: -1950729284
+        Data4: 852423885
+      Path: event:/03_collect_item_13
+    - Guid:
+        Data1: -265722718
+        Data2: 1131006166
+        Data3: 1881268879
+        Data4: 568975319
+      Path: event:/04_happy_collect_item_01
+    - Guid:
+        Data1: 574984449
+        Data2: 1120146237
+        Data3: 435680672
+        Data4: 1364889268
+      Path: event:/05_collect_item_11
+    - Guid:
+        Data1: -1914650960
+        Data2: 1316052323
+        Data3: 322896821
+        Data4: 1717570865
+      Path: event:/06_jingle_chime_16_negative
+    - Guid:
+        Data1: -1008783968
+        Data2: 1285567867
+        Data3: 1530882177
+        Data4: -510153499
+      Path: event:/07_ui_menu_button_beep_23
+    - Guid:
+        Data1: -1413824819
+        Data2: 1119145171
+        Data3: -1802324851
+        Data4: 457394145
+      Path: event:/08_collectable_item_bonus_03
+    - Guid:
+        Data1: -1100016965
+        Data2: 1256071109
+        Data3: -1097221490
+        Data4: 104122800
+      Path: event:/09_collect_item_15
+    - Guid:
+        Data1: 2022440677
+        Data2: 1240206244
+        Data3: -2063651179
+        Data4: 1298382515
+      Path: event:/10_coin_bag_ring_gemstone_item_15
+  - Name: InGameSFX
+    Events:
+    - Guid:
+        Data1: 1583459940
+        Data2: 1116925236
+        Data3: 1081422248
+        Data4: 451118531
+      Path: event:/01_explosion_small_02
+    - Guid:
+        Data1: 1654212952
+        Data2: 1341395447
+        Data3: -1626605694
+        Data4: -2065313581
+      Path: event:/02_punch_grit_wet_impact_03
+    - Guid:
+        Data1: 1080452027
+        Data2: 1139091113
+        Data3: 1981321861
+        Data4: 276571646
+      Path: event:/03_sci-fi_power_up_03
+    - Guid:
+        Data1: 341625300
+        Data2: 1268170450
+        Data3: 334973591
+        Data4: 86178138
+      Path: event:/04_ui_menu_button_beep_19
+    - Guid:
+        Data1: -1359784041
+        Data2: 1274890788
+        Data3: 1786972834
+        Data4: -533739175
+      Path: event:/05_powerup_whiz_nightvision_goggles_on_01
+    - Guid:
+        Data1: 769591066
+        Data2: 1103677133
+        Data3: 1534111140
+        Data4: -1448838922
+      Path: event:/06_whistle_slide_up_06
+    - Guid:
+        Data1: 786693447
+        Data2: 1123323472
+        Data3: -552786515
+        Data4: 1321876739
+      Path: event:/07_ui_menu_button_beep_11
+    - Guid:
+        Data1: 588343179
+        Data2: 1078623726
+        Data3: -2005552248
+        Data4: 32294574
+      Path: event:/08_chime_bell_02
+    - Guid:
+        Data1: 764958592
+        Data2: 1273639903
+        Data3: -606682727
+        Data4: -1901312661
+      Path: event:/09_ui_menu_button_confirm_01
+    - Guid:
+        Data1: 409858063
+        Data2: 1075603359
+        Data3: 1765511308
+        Data4: -933581003
+      Path: event:/10_ui_menu_button_confirm_06
+    - Guid:
+        Data1: 1114179745
+        Data2: 1264953251
+        Data3: 1386902449
+        Data4: -2072770245
+      Path: event:/11_cartoon_electronic_computer_code_07
+    - Guid:
+        Data1: -1226636329
+        Data2: 1232501380
+        Data3: -699554420
+        Data4: -857235475
+      Path: event:/12_ice_cracking_melting_02
+    - Guid:
+        Data1: -857887789
+        Data2: 1214241296
+        Data3: 1247934853
+        Data4: -377621488
+      Path: event:/13_02_Synth_Boing_4
+    - Guid:
+        Data1: -942994430
+        Data2: 1139647153
+        Data3: 1063432601
+        Data4: 1577627198
+      Path: event:/14_cartoon_boing_jump_15
+    - Guid:
+        Data1: 1654231748
+        Data2: 1285448270
+        Data3: -1031633762
+        Data4: -291799128
+      Path: event:/15_comedy_bite_chew_05
+    - Guid:
+        Data1: -1688675110
+        Data2: 1213088785
+        Data3: -2052465
+        Data4: 1930162425
+      Path: event:/16_ui_menu_button_beep_13
+    - Guid:
+        Data1: 655252589
+        Data2: 1125138235
+        Data3: 1470357659
+        Data4: -1955484999
+      Path: event:/17_ui_menu_popup_message_07
+    - Guid:
+        Data1: 1035909684
+        Data2: 1201225306
+        Data3: 779691181
+        Data4: 1329159828
+      Path: event:/18_music_sting_short_groovy_flute_03
+    - Guid:
+        Data1: 757375494
+        Data2: 1305882197
+        Data3: 198694030
+        Data4: 1015270840
+      Path: event:/19_Positive_07
+    - Guid:
+        Data1: 1482465306
+        Data2: 1338157334
+        Data3: 789915565
+        Data4: 443195162
+      Path: event:/20_Negative_09
+  launchSFXEvents:
+  - Guid:
+      Data1: 406480389
+      Data2: 1188233145
+      Data3: -938154312
+      Data4: 1809752516
+    Path: event:/21_Whoosh Swoosh
+  - Guid:
+      Data1: 1566900566
+      Data2: 1104618913
+      Data3: -1934682743
+      Data4: 375325935
+    Path: event:/22_Whoosh Swoosh
+  - Guid:
+      Data1: 1693081279
+      Data2: 1313690262
+      Data3: -583371601
+      Data4: 1283807500
+    Path: event:/23_Whoosh Swoosh
+  - Guid:
+      Data1: 771072964
+      Data2: 1158769147
+      Data3: -461538925
+      Data4: 626223852
+    Path: event:/24_Whoosh Swoosh
+  - Guid:
+      Data1: -283335447
+      Data2: 1243921246
+      Data3: -412793933
+      Data4: -1502044802
+    Path: event:/25_Whoosh Swoosh

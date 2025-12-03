@@ -52,11 +52,11 @@ public class AdsRewarded : MonoBehaviour
         {
             if (initStatus == null)
             {
-                Debug.LogError("[AdMob] Initialization failed.");
+                //Debug.LogError("[AdMob] Initialization failed.");
                 return;
             }
 
-            Debug.Log("[AdMob] Initialization complete.");
+            //Debug.Log("[AdMob] Initialization complete.");
 
             // 어댑터 상태 로그 출력
             foreach (var adapter in initStatus.getAdapterStatusMap())

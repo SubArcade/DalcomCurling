@@ -133,7 +133,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape) && GameState.Lobby == State)
         {
-            Debug.Log("뒤로가기 눌림!");
+            //Debug.Log("뒤로가기 눌림!");
             // 팝업 띄우기
             UIManager.Instance.Open(PanelId.ExitPopup);
         }
@@ -158,7 +158,7 @@ public class GameManager : MonoBehaviour
     // 게임 끝 -> 메인화면으로 다시 전환
     public async void EndGame()
     {
-        Debug.Log("EndGame 실행");
+        //Debug.Log("EndGame 실행");
         SceneLoader.Instance.LoadLocal(menuSceneName);
         
         await Task.Yield();
@@ -217,7 +217,7 @@ public class GameManager : MonoBehaviour
                     DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
                     DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
                     DataManager.Instance.PlayerData.soloScore += 10; // 점수 복구
-                    Debug.Log("무승부: 페널티로 제거되었던 도넛과 점수가 복구됩니다.");
+                    //Debug.Log("무승부: 페널티로 제거되었던 도넛과 점수가 복구됩니다.");
                 }
             }
             else if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
@@ -226,7 +226,7 @@ public class GameManager : MonoBehaviour
                 {
                     DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
                     DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
-                    Debug.Log("승리: 페널티로 제거되었던 도넛이 복구됩니다.");
+                    //Debug.Log("승리: 페널티로 제거되었던 도넛이 복구됩니다.");
                 }
             }
             
@@ -235,7 +235,7 @@ public class GameManager : MonoBehaviour
             int oldLevel = DataManager.Instance.PlayerData.level;
             UIManager.Instance.Open(PanelId.MainPanel);
             
-            Debug.Log(">>>>>> 게임보상을 반영합니다.");
+            //Debug.Log(">>>>>> 게임보상을 반영합니다.");
             // 2. 실제 데이터 반영 (경험치, 골드, 포인트)
             
             LevelUp(pendingExp);
@@ -321,7 +321,7 @@ public class GameManager : MonoBehaviour
 
         if (currentDonuts == null || currentDonuts.Count < 5)
         {
-            Debug.LogWarning("페널티를 적용할 수 없습니다: 도넛 인벤토리가 초기화되지 않았습니다.");
+            //Debug.LogWarning("페널티를 적용할 수 없습니다: 도넛 인벤토리가 초기화되지 않았습니다.");
             return;
         }
 
@@ -449,11 +449,11 @@ public class GameManager : MonoBehaviour
             DailyReset?.Invoke();
             DataManager.Instance.QuestData.currentChargeCount = 0;
             DataManager.Instance.InventoryData.dailyFreeGemClaimed = true;
-            Debug.Log("[Daily] 오늘자 리셋 완료");
+            //Debug.Log("[Daily] 오늘자 리셋 완료");
         }
         else
         {
-            Debug.Log("[Daily] 이미 오늘 리셋 완료 상태");
+            //Debug.Log("[Daily] 이미 오늘 리셋 완료 상태");
         }
     }
 }
