@@ -12,7 +12,7 @@ public class FirebaseInitializer : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log("FirebaseInitializer Awake() 호출됨");
+        //Debug.Log("FirebaseInitializer Awake() 호출됨");
         if (Instance == null)
         {            
             Instance = this;
@@ -26,7 +26,7 @@ public class FirebaseInitializer : MonoBehaviour
 
     async void Start()
     {
-        Debug.Log("FirebaseInitializer Start() 호출됨, 초기화 시작...");
+        //Debug.Log("FirebaseInitializer Start() 호출됨, 초기화 시작...");
         await InitializeFirebase(); // Firebase 초기화 비동기 실행
     }
 
@@ -36,12 +36,12 @@ public class FirebaseInitializer : MonoBehaviour
         var dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync(); // Firebase SDK가 내부적으로 필요한 모듈(Google Play 서비스 등)을 사용할 수 있는지 확인.
         if (dependencyStatus == DependencyStatus.Available)
         {            
-            Debug.Log("Firebase가 성공적으로 초기화되었습니다.");
+            //Debug.Log("Firebase가 성공적으로 초기화되었습니다.");
             IsInitialized = true;
         }
         else
         {
-            Debug.LogError($"Firebase 초기화에 실패했습니다: {dependencyStatus}");
+            //Debug.LogError($"Firebase 초기화에 실패했습니다: {dependencyStatus}");
             IsInitialized = false;
         }
     }

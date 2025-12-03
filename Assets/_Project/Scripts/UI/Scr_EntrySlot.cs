@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class EntrySlot : MonoBehaviour, IDropHandler
+public class EntrySlot : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     [Header("현재 슬롯에 들어있는 도넛")]
     public MergeItemUI currentItem;
@@ -291,5 +291,15 @@ public class EntrySlot : MonoBehaviour, IDropHandler
 
             currentItem = null;
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        var highlight = BoardManager.Instance.selectionHighlight;
+        if (highlight == null) return;
+
+        highlight.gameObject.SetActive(true);
+        highlight.transform.SetParent(transform, false);
+        highlight.rectTransform.anchoredPosition = Vector2.zero;
     }
 }

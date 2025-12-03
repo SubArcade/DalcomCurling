@@ -208,6 +208,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
 
     private void CreateTeamCircle(GameObject teamCircle)
     {
+        //Vector3 newPos = new Vector3(transform.position.x, transform.position.y + 0.02f, transform.position.z);
         currentTeamCircleObject = Instantiate(teamCircle, transform.position, Quaternion.Euler(90f,0f,0f), transform);
     }
 

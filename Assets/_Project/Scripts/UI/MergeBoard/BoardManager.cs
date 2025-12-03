@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using static Cinemachine.DocumentationSortingAttribute;
 using static UnityEngine.EventSystems.EventTrigger;
+using DG.Tweening;
 
 public class BoardManager : MonoBehaviour
 {
@@ -222,7 +222,8 @@ public class BoardManager : MonoBehaviour
         foreach (var c in cells)
         {
             if (c == null || !c.isActive || c == generatorCell) continue;
-            if (c.IsEmpty()) available.Add(c);
+            if (c.IsEmpty() && c.isTempOccupied == false)
+                available.Add(c);
         }
         
         return available.Count > 0 ? available[Random.Range(0, available.Count)] : null;
@@ -270,10 +271,10 @@ public class BoardManager : MonoBehaviour
         }
 
         // 공용 도넛 프리팹으로 생성
-        GameObject donutObj = Instantiate(donutPrefab, target.transform);
+        GameObject donutObj = Instantiate(donutPrefab, generatorCell.transform);
         RectTransform rt = donutObj.GetComponent<RectTransform>();
         rt.anchoredPosition = Vector2.zero;
-        rt.localScale = Vector3.one;
+        rt.localScale = Vector3.zero;
 
         // 스프라이트, ID, 기타 정보 적용
         var item = donutObj.GetComponent<MergeItemUI>();
@@ -281,17 +282,43 @@ public class BoardManager : MonoBehaviour
         img.sprite = donutData.sprite;
         item.donutData = donutData;
         item.donutId = donutData.id;
-        target.SetItem(item, donutData);
 
+        //이동 시 캔버스 부모로
+        Canvas rootCanvas = generatorCell.GetComponentInParent<Canvas>();
+        donutObj.transform.SetParent(rootCanvas.transform, true);
 
-        // + 생성기에서 도넛을 생성 했을때 나는 사운드 ---
-        if (SoundManager.Instance != null)
+        target.isTempOccupied = true;
+
+        rt.DOScale(1.1f, 0.15f).SetEase(Ease.OutBack).OnComplete(() =>
         {
-            SoundManager.Instance.createDonut();
-        }
+            // target UI 위치 계산
+            RectTransform canvasRect = rootCanvas.transform as RectTransform;
 
-        //Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
-        AutoSaveBoardLocal();
+            Vector2 uiTargetPos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect,
+                RectTransformUtility.WorldToScreenPoint(null, target.transform.position),
+                null,
+                out uiTargetPos
+            );
+
+            // 이동
+            rt.DOAnchorPos(uiTargetPos, 0.25f).SetEase(Ease.InOutQuad).OnComplete(() =>
+            {
+                // 도착 후 셀로 되돌리기
+                donutObj.transform.SetParent(target.transform, false);
+                rt.anchoredPosition = Vector2.zero;
+                rt.localScale = Vector3.one;
+
+                target.isTempOccupied = false;
+                target.SetItem(item, donutData);
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.createDonut();
+
+                AutoSaveBoardLocal();
+            });
+        });
     }
 
     //인게임 도넛 획득

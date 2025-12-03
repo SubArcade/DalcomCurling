@@ -74,6 +74,8 @@ public class Scr_OrderSystem : MonoBehaviour
     private bool isRewarding2 = false;
     private bool isRewarding3 = false;
 
+    //주문서가 중복으로 완료처리하지 않도록 막는 플래그
+    private bool isOrderClearing = false;
 
     //저장된퀘스트가 있는지 없는지 판단용도 변수
     private bool isRestored = false;
@@ -436,19 +438,41 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 완료시 버튼 상호작용
     public void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
     {
-        //보드에서 주문서 도넛 제거
+        //다른주문서 처리중에는 리턴
+        if (isOrderClearing) return;
+
+        //윗줄 넘어왔으면처리중으로 전환
+        isOrderClearing = true;
+
+        // 모든 완료 버튼 잠시 비활성화 (시각적으로도 눌리지 않게)
+        SetCompleteImageRed(completeObject1);
+        SetCompleteImageRed(completeObject2);
+        SetCompleteImageRed(completeObject3);
+        // ⭐ 눌린 버튼은 조금 더 짙은 원래색으로 표시
+        SetPressedButtonColor(completeObject);
+
+
+        //퀘스트 클리어 시 같은 도넛을 전부 없애버리는것을 방지하기위한 체크변수
+        var idsToRemove = new List<string>(orderDonutIDs);
+        //셀 전체검사
         foreach (var cell in BoardManager.Instance.GetAllCells())
-        {
+        {   //셀이 비활성화거나 비어있으면 건너뜀
             if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
 
-            if (orderDonutIDs.Contains(cell.donutId))
-            {
+            if (idsToRemove.Contains(cell.donutId))
+            {   //제거대상이 있으면 파괴
                 if (cell.occupant != null)
-                    Destroy(cell.occupant.gameObject); // 도넛 오브젝트 제거
+                    Destroy(cell.occupant.gameObject);
+                //셀을 비움
+                cell.ClearItem();
+                //1개만 삭제
+                idsToRemove.Remove(cell.donutId);
 
-                cell.ClearItem(); // 셀 정보 초기화
+                // ⭐ 같은 ID 하나 제거했으면 루프 종료
+                break;
             }
         }
+
         //보상골드 지급
         int reward = 0;
         if (completeObject == completeObject1) reward = rewardGold1;
@@ -456,14 +480,17 @@ public class Scr_OrderSystem : MonoBehaviour
         else if (completeObject == completeObject3) reward = rewardGold3;
 
         // 보상 지급 후 버튼 비활성화
-        var button = completeObject.GetComponent<Button>();
-        if (button != null)
-            button.interactable = false;
+        //var button = completeObject.GetComponent<Button>();
+        //if (button != null)
+        //    button.interactable = false;
 
         //컴플리트버튼 유지를 위해 true 적용
         if (completeObject == completeObject1) isRewarding1 = true;
         else if (completeObject == completeObject2) isRewarding2 = true;
         else if (completeObject == completeObject3) isRewarding3 = true;
+
+        //클릭직후 완료버튼 즉시숨김
+        completeObject.SetActive(false);
 
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;
@@ -499,6 +526,17 @@ public class Scr_OrderSystem : MonoBehaviour
         var button = completeObject.GetComponent<Button>();
         if (button != null)
             button.interactable = true;
+
+        // 처리중이 다끝나면 모든 완료 버튼 다시 활성화
+        ResetCompleteImageColor(completeObject1);
+        ResetCompleteImageColor(completeObject2);
+        ResetCompleteImageColor(completeObject3);
+        // ⭐ 눌린 버튼만 원래 색(#66E3AD)으로 복원
+        ResetCompleteImageColor(completeObject);
+
+
+        //이제 다른 주문서 완료가능
+        isOrderClearing = false;
     }
 
     //게임 시작할때 이전 퀘스트정보 불러오기
@@ -639,6 +677,44 @@ public class Scr_OrderSystem : MonoBehaviour
         else
         {
             DataManager.Instance.QuestData.refreshCount = DataManager.Instance.QuestData.maxCount;
+        }
+    }
+    // HEX → Color 변환 함수
+    private Color HexToColor(string hex)
+    {
+        if (ColorUtility.TryParseHtmlString(hex, out var color))
+            return color;
+        return Color.white;
+    }
+
+    // Complete 버튼의 Image 색상을 옅은 붉은색으로 바꾸기
+    private void SetCompleteImageRed(GameObject completeObject)
+    {
+        var img = completeObject.GetComponent<Image>();
+        if (img != null)
+        {
+            img.color = new Color(1f, 0.5f, 0.5f, 1f); // 옅은 붉은색
+        }
+    }
+
+    // Complete 버튼의 Image 색상을 원래 색(#66E3AD)으로 복원하기
+    private void ResetCompleteImageColor(GameObject completeObject)
+    {
+        var img = completeObject.GetComponent<Image>();
+        if (img != null)
+        {
+            img.color = HexToColor("#66E3AD"); // 원래 색상
+        }
+    }
+
+    // 눌린 버튼을 원래 색(#66E3AD)보다 조금 더 짙게 표시
+    private void SetPressedButtonColor(GameObject completeObject)
+    {
+        var img = completeObject.GetComponent<Image>();
+        if (img != null)
+        {
+            // 원래 색보다 조금 더 짙은 톤 (예: #4CCB95)
+            img.color = HexToColor("#4CCB95");
         }
     }
 

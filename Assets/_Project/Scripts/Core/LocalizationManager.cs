@@ -165,6 +165,18 @@ public enum LocalizationKey
     ingame_streak,
 
     ingame_surrenderText, //항복
+
+    Label_noGem, //젬부족 상점관련
+    Label_alreadyBuy, //이미 구매
+    Label_completeBuy, //구매완료
+
+    login_selectAccount, //로그인 패널
+    login_googleLogin,
+    login_guestLogin,
+
+    ingame_waitingTextwhenWin, //인게임 결과창에 반영될 승패무 관련 텍스트
+    ingame_waitingTextwhenLose,
+    ingame_waitingTextwhenDraw,
 }
 
 public class LocalizationManager : MonoBehaviour

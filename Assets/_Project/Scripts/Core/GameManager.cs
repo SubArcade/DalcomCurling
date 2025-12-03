@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape) && GameState.Lobby == State)
         {
-            Debug.Log("뒤로가기 눌림!");
+            //Debug.Log("뒤로가기 눌림!");
             // 팝업 띄우기
             UIManager.Instance.Open(PanelId.ExitPopup);
         }
@@ -291,7 +291,7 @@ public class GameManager : MonoBehaviour
 
         if (currentDonuts == null || currentDonuts.Count < 5)
         {
-            Debug.LogWarning("페널티를 적용할 수 없습니다: 도넛 인벤토리가 초기화되지 않았습니다.");
+            //Debug.LogWarning("페널티를 적용할 수 없습니다: 도넛 인벤토리가 초기화되지 않았습니다.");
             return;
         }
 
@@ -421,11 +421,11 @@ public class GameManager : MonoBehaviour
             DailyReset?.Invoke();
             DataManager.Instance.QuestData.currentChargeCount = 0;
             DataManager.Instance.InventoryData.dailyFreeGemClaimed = true;
-            Debug.Log("[Daily] 오늘자 리셋 완료");
+            //Debug.Log("[Daily] 오늘자 리셋 완료");
         }
         else
         {
-            Debug.Log("[Daily] 이미 오늘 리셋 완료 상태");
+            //Debug.Log("[Daily] 이미 오늘 리셋 완료 상태");
         }
     }
 }
