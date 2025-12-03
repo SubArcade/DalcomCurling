@@ -108,6 +108,30 @@ public class Scr_donutShell : MonoBehaviour
                 DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem);
                 // 도넛으로 변경
                 DonutData donutData = DataManager.Instance.GetDonutData(donutType, level);
+                switch (donutType)
+                {
+                    case DonutType.Hard:
+                        DataManager.Instance.InventoryData.hardDonutCodexDataList[level -1] = new DonutCodexData()
+                        {
+                            id = donutData.id,
+                            donutDexViewState = DonutDexViewState.Donut
+                        };
+                        break;
+                    case DonutType.Soft:
+                        DataManager.Instance.InventoryData.softDonutCodexDataList[level -1] = new DonutCodexData()
+                        {
+                            id = donutData.id,
+                            donutDexViewState = DonutDexViewState.Donut
+                        };
+                        break;
+                    case DonutType.Moist:
+                        DataManager.Instance.InventoryData.moistDnutCodexDataList[level -1] = new DonutCodexData()
+                        {
+                            id = donutData.id,
+                            donutDexViewState = DonutDexViewState.Donut
+                        };
+                        break;
+                }
                 SetType(DonutDexViewState.Donut, donutData.sprite);
                 break;
             default:

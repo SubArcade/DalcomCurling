@@ -15,6 +15,9 @@ public class Scr_ShopPopUp : MonoBehaviour
     [SerializeField] private Toggle goldShopBtn;
     [SerializeField] private Image goldShopImg;
     [SerializeField] private Outline goldShopOutline;
+    [SerializeField] private Button dailyFreeGemBtn;
+    [SerializeField] private Color activateColor;
+    [SerializeField] private Color deactivateColor;
 
     [Header("로비로 돌아가기 버튼")]
     [SerializeField] private Button robbyButton;
@@ -122,22 +125,27 @@ public class Scr_ShopPopUp : MonoBehaviour
         completeCloseButton.onClick.AddListener(() => completePopup.SetActive(false));
         
         // 구매 버튼 이벤트
-        effectItem1.onClick.AddListener(() => EffectBuy(EffectType.a, 50));
-        effectItem2.onClick.AddListener(() => EffectBuy(EffectType.b, 100));
-        effectItem3.onClick.AddListener(() => EffectBuy(EffectType.c, 100));
+        effectItem1.onClick.AddListener(() => EffectBuy(EffectType.Blue, 50));
+        effectItem2.onClick.AddListener(() => EffectBuy(EffectType.Magic, 100));
+        effectItem3.onClick.AddListener(() => EffectBuy(EffectType.Star, 100));
         
         characterItem1.onClick.AddListener(() => CharacterBuy(CharacterType.a, 500));
         characterItem2.onClick.AddListener(() => CharacterBuy(CharacterType.b, 500));
+        
+        // 하루 무료 버튼
+        dailyFreeGemBtn.onClick.AddListener(() => SetDailyFreeGemButton(DataManager.Instance.InventoryData.dailyFreeGemClaimed));
     }
     void OnEnable()
     {
         DataManager.Instance.OnUserDataChanged += HandleUserDataChanged;
         SetPlayerText(DataManager.Instance.PlayerData);
+        GameManager.Instance.DailyReset += HandleDailyReset;
     }
 
     void OnDisable()
     {
         DataManager.Instance.OnUserDataChanged -= HandleUserDataChanged;
+        GameManager.Instance.DailyReset -= HandleDailyReset;
     }
     private void HandleUserDataChanged(PlayerData playerData)
     {
@@ -145,13 +153,13 @@ public class Scr_ShopPopUp : MonoBehaviour
     }
 
     //캐시샵열기용
-    private void ShowCashShopUI()
+    public void ShowCashShopUI()
     {
         transform.Find("CashUIBackground").gameObject.SetActive(true);
         transform.Find("GoldUIBackground").gameObject.SetActive(false);
     }
     //골드샵열기용
-    private void ShowGoldShopUI()
+    public void ShowGoldShopUI()
     {
         transform.Find("CashUIBackground").gameObject.SetActive(false);
         transform.Find("GoldUIBackground").gameObject.SetActive(true);
@@ -209,5 +217,30 @@ public class Scr_ShopPopUp : MonoBehaviour
         DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem);
         SetPlayerText(DataManager.Instance.PlayerData);
         completePopup.SetActive(true);
+    }
+
+    private void HandleDailyReset()
+    {
+        SetDailyFreeGemButton(true, true);   
+    }
+    
+    // 무료 버튼 활성화 여부
+    public void SetDailyFreeGemButton(bool canClaim, bool reset = false)
+    {
+        if (reset)
+        {
+            canClaim = true;
+            dailyFreeGemBtn.interactable = canClaim;
+            dailyFreeGemBtn.image.color = canClaim ? activateColor : deactivateColor;
+        }
+
+        if (canClaim)
+        {
+            DataManager.Instance.InventoryData.dailyFreeGemClaimed = false;
+            DataManager.Instance.PlayerData.gem += 5;
+            DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem);
+        }
+        dailyFreeGemBtn.interactable = canClaim;
+        dailyFreeGemBtn.image.color = canClaim ? activateColor : deactivateColor;
     }
 }

@@ -8,6 +8,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 {
     public float stoneForce { get; private set; }
     public int donutId; // 발사한 인덱스를 기준으로 인게임에서 도넛을 찾을때 쓰는 ID
+    private int donutLevel = 1; // 현재 도넛의 엔트리에서의 설정 레벨
     public string DonutTypeAndNumber { get; private set; } // 도넛의 종류를 식별하는 ID (예: "Soft_15")
 
     // 도넛의 물리적 속성
@@ -33,6 +34,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     private PhysicMaterial physicMaterial;
     private Coroutine spinVisualCoroutine = null;
     private Scr_DonutParticleSystem donutParticleSystem;
+    private StoneManager stoneManager;
 
     // private StoneShoot shoot; // 더 이상 StoneShoot을 직접 참조하지 않습니다.
     private float initialFrictionValue;
@@ -43,6 +45,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 
     public float sweepFrictionValue;
 
+    
     //public bool isStartingTeam { get; private set; }
 
     // StoneShoot.Team 대신 사용할 Team enum (또는 FirebaseGameManager에서 관리)
@@ -57,6 +60,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     void Awake()
     {
         rigid = GetComponent<Rigidbody>();
+        stoneManager = FirebaseGameManager.Instance.StoneManagerInGM;
         //CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
         
         if (!transform.TryGetComponent<CapsuleCollider>(out  CapsuleCollider capsuleCollider))
@@ -128,6 +132,8 @@ public class StoneForceController_Firebase : MonoBehaviour
         this.type = type;
         this.donutId = donutId;
         this.DonutTypeAndNumber = donutTypeId;
+        //donutLevel 받아와야 함
+        
         this.DonutWeight = weight;
         this.DonutResilience = resilience;
         this.DonutFriction = friction;
@@ -185,6 +191,7 @@ public class StoneForceController_Firebase : MonoBehaviour
         }
         attackMoveFinished = true;
         rigid.angularVelocity = Vector3.zero;
+        this.enabled = false;
         //Debug.Log($"sidewaysForceAddCount = {sidewaysForceAddCount}");
     }
 
@@ -193,37 +200,59 @@ public class StoneForceController_Firebase : MonoBehaviour
         isPassedEndHogLine = true;
     }
 
-    public void ChangeMassByCompatibility(DonutType attackerType) // 공격자와의 속성 상성관계에 따라 현재 도넛의 질량을 바꿈
+    public void ChangeMassByCompatibility(DonutType attackerType, int attackerLevel = 1) // 공격자와의 속성 상성관계에 따라 현재 도넛의 질량을 바꿈
     {
+        int levelDiff = donutLevel - attackerLevel + 29; //내 레벨에서 공격자 도넛의 레벨을 뺌. 결과값이 높을수록 수비자가 강함. 
+        // 0~58의 수치로 만들기 위해 29를 더함
+
+        float normalizedDiff = Mathf.Clamp01(levelDiff / 58.0f);
         switch (attackerType)
         {
             case DonutType.Hard:
                 if (type == DonutType.Hard) // 단단
                 {
-                    rigid.mass = 4f; // 단단이 단단한테 비김
+                    //rigid.mass = 4f; // 단단이 단단한테 비김
+                    float rawVal = Mathf.Lerp(stoneManager.DrawMinMass, stoneManager.DrawMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
                 else if (type == DonutType.Moist) // 촉촉
                 {
-                    rigid.mass = 2f; // 단단이 촉촉한테 이김
+                    //rigid.mass = 2f; // 단단이 촉촉한테 이김
+                    float rawVal = Mathf.Lerp(stoneManager.WinMinMass, stoneManager.WinMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
                 else if (type == DonutType.Soft) // 말랑
                 {
-                    rigid.mass = 8f; // 단단이 말랑한테 짐
+                    //rigid.mass = 8f; // 단단이 말랑한테 짐
+                    float rawVal = Mathf.Lerp(stoneManager.LoseMinMass, stoneManager.LoseMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
                // Debug.Log($"상대 : {attackerType}, 나 : {type}, 설정된 Mass : {rigid.mass}");
                 break;
             case DonutType.Moist:
                 if (type == DonutType.Hard)
                 {
-                    rigid.mass = 8f; // 촉촉이 단단한테 짐
+                    //rigid.mass = 8f; // 촉촉이 단단한테 짐
+                    float rawVal = Mathf.Lerp(stoneManager.LoseMinMass, stoneManager.LoseMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
                 else if (type == DonutType.Moist)
                 {
-                    rigid.mass = 4f; // 촉촉이 촉촉한테 비김
+                    //rigid.mass = 4f; // 촉촉이 촉촉한테 비김
+                    float rawVal = Mathf.Lerp(stoneManager.DrawMinMass, stoneManager.DrawMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
                 else if (type == DonutType.Soft)
                 {
-                    rigid.mass = 2f; // 촉촉이 말랑을 이김
+                    //rigid.mass = 2f; // 촉촉이 말랑을 이김
+                    float rawVal = Mathf.Lerp(stoneManager.WinMinMass, stoneManager.WinMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
               //  Debug.Log($"상대 : {attackerType}, 나 : {type}, 설정된 Mass : {rigid.mass}");
                 
@@ -232,15 +261,24 @@ public class StoneForceController_Firebase : MonoBehaviour
             case DonutType.Soft:
                 if (type == DonutType.Hard)
                 {
-                    rigid.mass = 2f; // 말랑이 단단을 이김
+                    //rigid.mass = 2f; // 말랑이 단단을 이김
+                    float rawVal = Mathf.Lerp(stoneManager.WinMinMass, stoneManager.WinMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
                 else if (type == DonutType.Moist) 
                 {
-                    rigid.mass = 8f; // 말랑이 촉촉한테 짐
+                    //rigid.mass = 8f; // 말랑이 촉촉한테 짐
+                    float rawVal = Mathf.Lerp(stoneManager.LoseMinMass, stoneManager.LoseMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
                 else if (type == DonutType.Soft)
                 {
-                    rigid.mass = 4f; // 말랑이 말랑한테 비김
+                    //rigid.mass = 4f; // 말랑이 말랑한테 비김
+                    float rawVal = Mathf.Lerp(stoneManager.DrawMinMass, stoneManager.DrawMaxMass, normalizedDiff); // 비율로 최소값과 최대값 사이를 보간
+                    float resultVal = Mathf.Round(rawVal * 10) / 10f; // 둘째자리에서 반올림하여 첫째자리까지만 남김
+                    rigid.mass = resultVal; // 질량값에 대입
                 }
 //                Debug.Log($"상대 : {attackerType}, 나 : {type}, 설정된 Mass : {rigid.mass}");
                 
@@ -265,6 +303,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 
             rigid.velocity = newVelocity * 1.0f; // 여기 계수 바꾸면 튕기는 정도도 바뀜
             isCollided = true;
+            donutParticleSystem.PlayCollisionParticle(other);
         }
         
     }

@@ -375,10 +375,8 @@ MonoBehaviour:
   trailLightPrefab: {fileID: 8300941046603710838, guid: 9d90df4e1cea7384b964dd674b450f51, type: 3}
   trailMagicPrefab: {fileID: 8105017068113891617, guid: 8d3dc79f433e0d14f89a8d3a2ed4c8b0, type: 3}
   trailIcePrefab: {fileID: 8828913270134644546, guid: 3014a308a9169ce48b1e812fa107dbaf, type: 3}
-  collosionRed: {fileID: 8266973246824036584, guid: c3180137f992baa4da0e96ec1a3eeac5, type: 3}
-  collosionBlue: {fileID: 3223031359271505891, guid: 62d5298ce92ee8a4c87039604bc35cea, type: 3}
-  collosionMagic: {fileID: 8680269734529306505, guid: f101149649eaa1c4db408647ecc4a75e, type: 3}
-  collosionStar: {fileID: 8789051029499178978, guid: 19edcbe757b6bac47a97ae1f82deb8e7, type: 3}
+  trailElectricPrefab: {fileID: 0}
+  CrashParticlePrefab: {fileID: 3223031359271505891, guid: 62d5298ce92ee8a4c87039604bc35cea, type: 3}
   CrashParticleDuation: 2
   targetLayerName: Donut
   minCrashForce: 1
@@ -460,10 +458,6 @@ PrefabInstance:
     - target: {fileID: 1905852490699975064, guid: 489b1f00ea6440d46bb83a481bc1c40a, type: 3}
       propertyPath: m_Name
       value: Star_Choco_1 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8105293432586930888, guid: 489b1f00ea6440d46bb83a481bc1c40a, type: 3}
-      propertyPath: m_Enabled
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

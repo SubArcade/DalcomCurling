@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,7 +22,8 @@ public class GameManager : MonoBehaviour
     private bool isAppStarted = true;
     [SerializeField] private GameObject notifier;
     [SerializeField] private GameObject matchmakingObj;
-    
+    public long lastDailyReset;
+    public event Action DailyReset;
     public event Action<PlayerData> LevelUpdate;
 
     // 플레이어가 페널티로 잃은 도넛 (결과 화면 표시용)
@@ -80,6 +82,7 @@ public class GameManager : MonoBehaviour
         
         notifier.SetActive(true);
         matchmakingObj.SetActive(true);
+        CheckDailyReset();
     }
     
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -97,7 +100,7 @@ public class GameManager : MonoBehaviour
             {
                 // isAppStarted가 false이면, 게임이 끝나고 메뉴 씬으로 돌아온 것.
                 // Init(false)를 호출하여 MainPanel이 열리도록 함.
-                FirebaseAuthManager.Instance.Init(isAppStarted);
+               // FirebaseAuthManager.Instance.Init(isAppStarted);
             }
             
             SetState(GameState.Lobby);
@@ -153,10 +156,21 @@ public class GameManager : MonoBehaviour
     }
     
     // 게임 끝 -> 메인화면으로 다시 전환
-    public void EndGame()
+    public async void EndGame()
     {
         Debug.Log("EndGame 실행");
         SceneLoader.Instance.LoadLocal(menuSceneName);
+        
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        await Task.Yield();
+        
         UIManager.Instance.Open(PanelId.MainPanel);
         SetState(GameState.Lobby);
     }
@@ -178,9 +192,9 @@ public class GameManager : MonoBehaviour
     }
 
     //게임종료시의 UI로부터 받아올 보상 값들을 담을 변수
-    private int pendingExp;
-    private int pendingGold;
-    private int pendingPoint;
+    public int pendingExp;
+    public int pendingGold;
+    public int pendingPoint;
     private List<DonutEntry> pendingRewardDonuts = new List<DonutEntry>();
 
     public void SetResultRewards(int level, int gold, int point) //이부분을 호출
@@ -238,12 +252,12 @@ public class GameManager : MonoBehaviour
             }
             
             // 3. 승리 시 상대 도넛 보상 지급
-            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
-            {
-                if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
-                if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
-            }
-            
+            //if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+            //{
+            //    if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
+            //    if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
+            //}
+
             // 보류 중인 보상 도넛 지급
             foreach (var donutEntry in pendingRewardDonuts)
             {
@@ -279,13 +293,13 @@ public class GameManager : MonoBehaviour
         DataManager.Instance.PlayerData.exp += getExp;
     
         // 100 이 넘으면 레벨업
-        if (DataManager.Instance.PlayerData.exp >= 100)
+        while (DataManager.Instance.PlayerData.exp >= 100)
         {
             DataManager.Instance.PlayerData.level += 1;
             DataManager.Instance.PlayerData.exp -= 100;
             
             LevelUpdate.Invoke(DataManager.Instance.PlayerData);
-            UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
+            //UIManager.Instance.Open(PanelId.LevelUpRewardPopUp); // ApplyResultRewards에서 처리
             // 레벨업 보상상자
            // BoardManager.Instance.SpawnGiftBox();
            // 레벨업팝업UI 컴포넌트로 달린 스크립트에보상상자 주는 함수있슴니다
@@ -421,4 +435,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 하루 리셋
+    public void CheckDailyReset()
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    
+        // 오늘 00:00 UTC 기준 (혹은 KST 00:00)
+        DateTimeOffset today = DateTimeOffset.UtcNow.Date; 
+        long todayStart = today.ToUnixTimeSeconds();
+
+        if (lastDailyReset < todayStart)
+        {
+            DailyReset?.Invoke();
+            DataManager.Instance.QuestData.currentChargeCount = 0;
+            DataManager.Instance.InventoryData.dailyFreeGemClaimed = true;
+            Debug.Log("[Daily] 오늘자 리셋 완료");
+        }
+        else
+        {
+            Debug.Log("[Daily] 이미 오늘 리셋 완료 상태");
+        }
+    }
 }

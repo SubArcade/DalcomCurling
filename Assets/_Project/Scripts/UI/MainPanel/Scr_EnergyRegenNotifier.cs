@@ -15,6 +15,10 @@ public class EnergyRegenNotifier : MonoBehaviour
     [Header("알림창에 보일 메시지")]
     [SerializeField] private string messageTitle = "에너지 가득!";
     [SerializeField] private string messageText = $"에너지가 회복되었어요.";
+    
+    [Header("야간 알림 차단 시간")]
+    [SerializeField] private int quietStartHour = 22;
+    [SerializeField] private int quietEndHour = 8;
 
     // 알림 중복 방지용 (마지막 예약 ID 기억)
 #if UNITY_ANDROID
@@ -35,6 +39,23 @@ public class EnergyRegenNotifier : MonoBehaviour
     void OnEnable()  => DataManager.Instance.PauseChanged += OnPauseChanged;
     void OnDisable() => DataManager.Instance.PauseChanged -= OnPauseChanged;
 
+    public void IsNotificationsEnabled(bool value)
+    {
+        DataManager.Instance.PlayerData.energyFullRecharged = value;
+        Debug.Log(DataManager.Instance.PlayerData.energyFullRecharged);
+        
+        if (!value)
+            CancelAllEnergyNotifications();
+        else
+            RescheduleNotification();
+    }
+    
+    public void IsUseQuietHours(bool value)
+    {
+        DataManager.Instance.PlayerData.nightNotif = value;
+        Debug.Log(DataManager.Instance.PlayerData.nightNotif);
+    }
+    
     private void OnPauseChanged(bool isPaused)
     {
         if (isPaused)
@@ -65,7 +86,12 @@ public class EnergyRegenNotifier : MonoBehaviour
         }
         
         LazyRegen();            // 누적 시간만큼 회복
-        RescheduleNotification(); // 가득 차는 시점에 알림 재예약
+        //RescheduleNotification(); // 가득 차는 시점에 알림 재예약
+        
+        if (DataManager.Instance.PlayerData.energyFullRecharged)
+            RescheduleNotification();
+        else
+            CancelAllEnergyNotifications();
     }
 
     // 경과 시간만큼 회복(5분=300초당 +1), 잔여초 보존
@@ -108,6 +134,13 @@ public class EnergyRegenNotifier : MonoBehaviour
     private void RescheduleNotification()
     {
 #if UNITY_ANDROID
+        // 알림 끄기
+        if (!DataManager.Instance.PlayerData.energyFullRecharged)
+        {
+            Debug.Log("[EnergyRegen] Notifications disabled, skip scheduling.");
+            return;
+        }
+        
         // 기존 예약 취소(이 채널에서 보낸 마지막 알림만 취소)
         if (_lastScheduledId.HasValue)
         {
@@ -124,15 +157,18 @@ public class EnergyRegenNotifier : MonoBehaviour
 
         // FireTime은 LocalTime으로 넣기
         var fireLocal = fullUtc.Value.ToLocalTime();
+        
+        // 야간 시간
+        if (DataManager.Instance.PlayerData.nightNotif)
+        {
+            fireLocal = AdjustToAllowedTime(fireLocal);
+        }
 
         var n = new AndroidNotification
         {
             Title    = messageTitle,
             Text     = messageText,
             FireTime = fireLocal,
-            // (선택) 고급 옵션
-            // SmallIcon = "icon_32", LargeIcon = "icon_128",
-            // ShouldAutoCancel = true,
         };
 
         int id = AndroidNotificationCenter.SendNotification(n, CHANNEL_ID);
@@ -212,5 +248,57 @@ public class EnergyRegenNotifier : MonoBehaviour
 
         return (int)remainInCycle;
     }
+    
+    // localTime이 조용한 시간(22:00 ~ 08:00) 안인지 체크
+    private bool IsInQuietHours(DateTime localTime)
+    {
+        int hour = localTime.Hour;
+
+        // 22 ~ 08 처럼 날짜를 넘기는 구간
+        if (quietStartHour > quietEndHour)
+        {
+            // 22~23 또는 0~7
+            return (hour >= quietStartHour) || (hour < quietEndHour);
+        }
+        else
+        {
+            // 예: 1~5 같이 하루 안에서 끝나는 구간
+            return (hour >= quietStartHour) && (hour < quietEndHour);
+        }
+    }
+
+    // 조용한 시간이라면, 다음 허용 시간(여기서는 아침 8시)으로 밀어줌
+    private DateTime AdjustToAllowedTime(DateTime localTime)
+    {
+        if (!IsInQuietHours(localTime))
+            return localTime;
+
+        // 22~08 형태(밤→다음날 아침)
+        if (quietStartHour > quietEndHour)
+        {
+            if (localTime.Hour >= quietStartHour)
+            {
+                // 밤 22시 이후면 "다음날 08:00"로
+                var nextDay = localTime.Date.AddDays(1);
+                return new DateTime(nextDay.Year, nextDay.Month, nextDay.Day, quietEndHour, 0, 0);
+            }
+            else
+            {
+                // 0~7 시면 "오늘 08:00"로
+                var today = localTime.Date;
+                return new DateTime(today.Year, today.Month, today.Day, quietEndHour, 0, 0);
+            }
+        }
+        else
+        {
+            // 일반 구간(예: 1~5 등)을 지원하려면 여기를 쓰면 됨 (지금은 안 써도 됨)
+            var today = localTime.Date;
+            var allowed = new DateTime(today.Year, today.Month, today.Day, quietEndHour, 0, 0);
+            if (allowed <= localTime)
+                allowed = allowed.AddDays(1);
+            return allowed;
+        }
+    }
+
     
 }

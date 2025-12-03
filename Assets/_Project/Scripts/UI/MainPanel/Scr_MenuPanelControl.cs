@@ -96,10 +96,14 @@ public class Scr_MenuPanelControl : MonoBehaviour
         startBattle.onClick.AddListener(() => GameManager.Instance.StartGame());
         readyButton.onClick.AddListener(CheckReadyPanel);
         //goldShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp)); //PM요청으로 주석처리
-        gemShopButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.ShopPopUp));
+        gemShopButton.onClick.AddListener(() =>
+        {
+            UIManager.Instance.Open(PanelId.ShopPopUp);
+            ShopPopUp.GetComponent<Scr_ShopPopUp>().ShowCashShopUI();
+        });
         energyRechargeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.EnergyRechargePopUp));
         orderRefreshButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.OrderRefreshPopUp));
-        //testLevelUpButton.onClick.AddListener(GameManager.Instance.LevelUp());
+        testLevelUpButton.onClick.AddListener(() => GameManager.Instance.LevelUp(50));
         
         checkEntryButton.onClick.AddListener(() =>
         {

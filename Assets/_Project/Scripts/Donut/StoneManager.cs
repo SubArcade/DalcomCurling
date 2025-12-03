@@ -34,7 +34,42 @@ public class StoneManager : MonoBehaviour
     public StoneForceController_Firebase.Team _currentTurnStoneTeam { get; private set; }
     public StoneForceController_Firebase.Team myTeam { get; private set; } = StoneForceController_Firebase.Team.None;
     private List<StonePosition> lastStonePosition = new List<StonePosition>();
+    
+    [Header("도넛 상성 및 레벨에 따른 질량값 조절")] 
+    [SerializeField]
+    private float winMinMass = 1.4f;
+    [SerializeField]
+    private float winMaxMass = 2.6f;
+    [SerializeField]
+    private float drawMinMass = 2.8f;
+    [SerializeField]
+    private float drawMaxMass = 5.2f;
+    [SerializeField]
+    private float loseMinMass = 5.6f;
+    [SerializeField]
+    private float loseMaxMass = 10.4f;
 
+    public float WinMinMass => winMinMass;
+    public float WinMaxMass => winMaxMass;
+    public float DrawMinMass => drawMinMass;
+    public float DrawMaxMass => drawMaxMass;
+    public float LoseMinMass => loseMinMass;
+    public float LoseMaxMass => loseMaxMass;
+
+    [Header("내 도넛과 상대 도넛을 구분하기 위한 프리팹")] 
+    [SerializeField] private GameObject myTeamCircle;
+    [SerializeField] private GameObject otherTeamCircle;
+
+    public GameObject MyTeamCircle
+    {
+        get { return myTeamCircle; }
+    }
+
+    public GameObject OtherTeamCircle
+    {
+        get{return otherTeamCircle;}
+    }
+    
     [Header("아웃 판정을 위한 라인 오브젝트 참조")]
     public Transform endHogLine;
     public Transform backLine;
@@ -188,10 +223,17 @@ public class StoneManager : MonoBehaviour
             }
         }
 
-
+        
         GameObject newStone = Instantiate(selectedPrefab, startPos, spawnPosition.rotation);
         _currentTurnStone = newStone.GetComponent<StoneForceController_Firebase>();
-        newStone.transform.GetComponent<Scr_DonutParticleSystem>().InitializeDonutParticles(_currentTurnStoneTeam);
+        
+        
+        PlayerProfile pf =  FirebaseGameManager.Instance.GetPlayerProfile(currentTurnPlayerId); // 현재 턴 유저의 프로파일을 받아옴
+        EffectType effectType = pf.Inventory.curEffectType; // 이 유저가 어떤 이펙트 타입을 골랐는지 가져옴
+        
+        // 이 도넛이 내꺼인지, 그리고 어떤 타입의 이펙트를 골랐는지 정보를 넘겨줌
+        newStone.transform.GetComponent<Scr_DonutParticleSystem>().InitializeDonutParticles(_currentTurnStoneTeam == myTeam, effectType);
+        
         donutSpawnedPositionY = newStone.transform.position.y;
 
         if (_currentTurnStone == null)

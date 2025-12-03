@@ -11,13 +11,14 @@ using UnityEngine.PlayerLoop;
 
 /// <summary>
 /// 이 스크립트는 컬링 게임의 전체적인 흐름(상태)을 관리하는 중요한 역할을 합니다.
-    /// Firebase Firestore와 연동하여 게임의 상태를 실시간으로 업데이트하고,
+/// Firebase Firestore와 연동하여 게임의 상태를 실시간으로 업데이트하고,
 /// 플레이어의 행동(샷 발사, 예측 결과 전송 등)에 따라 게임을 진행합니다.
 /// </summary>
 public class FirebaseGameManager : MonoBehaviour
 {
     // 게임 결과를 나타내는 열거형
-    public enum GameOutcome {
+    public enum GameOutcome
+    {
         Win,
         Lose,
         Draw
@@ -63,6 +64,8 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private UI_LaunchIndicator_Firebase UI_LaunchIndicator_Firebase; // UI제어 스크립트
     [SerializeField] private DonutSelectionUI donutSelectionUI; // 도넛 선택 UI 스크립트
 
+    public StoneManager StoneManagerInGM => stoneManager;
+    
     // --- 플레이어 프로필 정보 ---
     private Dictionary<string, PlayerProfile> _playerProfiles;
 
@@ -84,6 +87,14 @@ public class FirebaseGameManager : MonoBehaviour
     [Header("연결 상태 관리")]
     [SerializeField] private float heartbeatInterval = 10f; // 생존 신호를 보내는 주기 (초)
     [SerializeField] private float disconnectionThreshold = 25f; // 연결 끊김으로 판단하는 임계 시간 (초)
+
+    // --- SO 연결 ---\
+    [SerializeField] private EffectSO effectSo;
+
+    public EffectSO EffectSoObject
+    {
+        get { return effectSo; }
+    }
 
     // --- 게임 내부 변수 ---
     private float initialFixedDeltaTime;
@@ -216,7 +227,7 @@ public class FirebaseGameManager : MonoBehaviour
             //Debug.Log("로컬 상태가 FinishedGame이므로 스냅샷 처리를 무시합니다.");
             return;
         }
-        
+
         if (!snapshot.Exists) return;
 
         Game newGameData;
@@ -284,8 +295,15 @@ public class FirebaseGameManager : MonoBehaviour
                 {
                     _localState = LocalGameState.InTimeline; // 중복 실행 방지를 위해 InTimeline 상태로 변경
                     UI_LaunchIndicator_Firebase.AllcloseUI(); //게임 UI를 모두 닫아둠
-                    
-                    
+
+                    // isFirstTurn은 게임 전체의 첫 턴일 때만 true입니다.
+                    // 따라서, 새 라운드가 시작될 때(!isFirstTurn) UI를 초기화합니다.
+                    if (!isFirstTurn)
+                    {
+                        UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(0); // 턴 UI를 1로 리셋
+                    }
+
+
                     // [짧은 타임라인 실행 > InProgress로 상태 변경] 로직을 Action으로 묶어 재사용.
                     Action playShortTimelineAndStartGame = () =>
                     {
@@ -318,19 +336,23 @@ public class FirebaseGameManager : MonoBehaviour
                         SoundManager.Instance.appearEntry();
 
                         // 사운드 출력 테스트용 +++
-                        DOVirtual.DelayedCall(2f, () => {
+                        DOVirtual.DelayedCall(2f, () =>
+                        {
                             //SoundManager.Instance.selectDonut();
                         });
 
-                        DOVirtual.DelayedCall(7.7f, () => {
+                        DOVirtual.DelayedCall(7.5f, () =>
+                        {
                             SoundManager.Instance.appearVS();
                         });
                         // 8.5초의 연출 대기시간을 기다림
-                        DOVirtual.DelayedCall(8.5f, () => {
-                            
+                        DOVirtual.DelayedCall(8.5f, () =>
+                        {
+
                             playShortTimelineAndStartGame();
-                            
-                            if (_currentGame.RoundStartingPlayerId != myUserId){
+
+                            if (_currentGame.RoundStartingPlayerId != myUserId)
+                            {
                                 // 후공일때 상대방을 기다리는중 UI
                                 DOVirtual.DelayedCall(2.5f, () =>
                                 {
@@ -348,7 +370,8 @@ public class FirebaseGameManager : MonoBehaviour
                         roundDataUpdated = false;
                         playShortTimelineAndStartGame();
 
-                        if (_currentGame.RoundStartingPlayerId != myUserId) {
+                        if (_currentGame.RoundStartingPlayerId != myUserId)
+                        {
                             // 후공일때 상대방을 기다리는중 UI
                             DOVirtual.DelayedCall(2.5f, () =>
                             {
@@ -393,10 +416,10 @@ public class FirebaseGameManager : MonoBehaviour
                 //gameCamControl?.SwitchCamera(START_VIEW_CAM);
                 gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
 
-               // if (stoneManager.roundCount != _currentGame.RoundNumber)
-                
+                // if (stoneManager.roundCount != _currentGame.RoundNumber)
 
-                
+
+
                 // if (stoneManager.roundCount != _currentGame.RoundNumber)
                 // {
                 //     Debug.Log($"stoneManager.roundCount: {stoneManager.roundCount}, _currentGame.RoundNumber: {_currentGame.RoundNumber}");
@@ -408,7 +431,7 @@ public class FirebaseGameManager : MonoBehaviour
                     //Debug.Log("OnRoundEnd 호출되었음");
                     OnRoundEnd();
                 }
-                
+
 
                 break;
 
@@ -433,15 +456,15 @@ public class FirebaseGameManager : MonoBehaviour
             stoneManager?.SyncPositions(_cachedPrediction.FinalStonePositions);
             _cachedPrediction = null; // 사용한 예측 결과는 비웁니다.
         }
-        
-        
+
+
         // 턴이 변경될 때마다 UI에 현재 턴 번호를 업데이트합니다.
         UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
-        
+
         // 일반적인 턴 시작일 때만 기본 카메라로 전환합니다.
         // bool isExecutingPreparedShot = usePreparedShot && _isMyTurn && _localState == LocalGameState.PreparingShot;
         // if (!isExecutingPreparedShot)
-        
+
         //if (_isMyTurn && _localState != LocalGameState.WaitingForInput || !_isMyTurn)
         if (_isMyTurn && _localState != LocalGameState.WaitingForInput)
         {
@@ -451,7 +474,7 @@ public class FirebaseGameManager : MonoBehaviour
                 gameCamControl?.SwitchCamera(START_VIEW_CAM); // 내 턴 시작 시 카메라를 기본 뷰로 전환
             });
         }
-        
+
         if (_isMyTurn)
         {
             //UI_LaunchIndicator_Firebase.IdleUI(); // 내 턴이 시작되면 패널을 확실히 끔
@@ -474,7 +497,7 @@ public class FirebaseGameManager : MonoBehaviour
                 Debug.Log("내 턴 시작. 입력을 준비합니다.");
                 UI_LaunchIndicator_Firebase.ShowFloatingText("Your Turn", new Vector3(Screen.width / 2, Screen.height * 0.4f, 0));
                 _localState = LocalGameState.WaitingForInput;
-        
+
                 UI_LaunchIndicator_Firebase.FireShotReadyUI(); //입력준비 UI
 
                 //카운트다운 활성화
@@ -487,7 +510,7 @@ public class FirebaseGameManager : MonoBehaviour
                     Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
                     return;
                 }
-        
+
                 Rigidbody donutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut);
                 if (donutRigid != null)
                 {
@@ -507,7 +530,7 @@ public class FirebaseGameManager : MonoBehaviour
             SuccessfullyShotInTime = false;
             inputController?.DisableInput();
             _localState = LocalGameState.Idle;
-            
+
             DOVirtual.DelayedCall(2.5f, () => //점수 하이라이트가 2초이므로 기다림
             {
                 UI_LaunchIndicator_Firebase.WatingThrowUI(); // 기다림 UI 출력
@@ -516,7 +539,7 @@ public class FirebaseGameManager : MonoBehaviour
             StoneForceController_Firebase.Team team = StoneForceController_Firebase.Team.None;
             int score = 0;
             float delayTime = 0;
-            stoneManager?.CalculateScore(out team, out score, out List<int> donutIds,true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
+            stoneManager?.CalculateScore(out team, out score, out List<int> donutIds, true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
             if (team == StoneForceController_Firebase.Team.None && score == -99) //하우스에 도넛이 없으면 score를 0반환, 있으면 -99반환 
             {
                 delayTime = 2f; //도넛 하이라이트 지속해줄 시간
@@ -529,12 +552,16 @@ public class FirebaseGameManager : MonoBehaviour
 
             DOVirtual.DelayedCall(delayTime, () =>
             {
+                // 게임이 종료된 상태라면 UI를 닫지 않고 그냥 리턴합니다.
+                if (_localState == LocalGameState.FinishedGame || (_currentGame != null && _currentGame.GameState == "Finished"))
+                {
+                    return;
+                }
                 UI_LaunchIndicator_Firebase.IdleUI(); //기본 UI
                 gameCamControl?.SwitchCamera(START_VIEW_CAM);
-                
+
             });
-        
-            
+
         }
     }
 
@@ -545,7 +572,7 @@ public class FirebaseGameManager : MonoBehaviour
     private void HandleNewShot()
     {
         if (_currentGame.LastShot == null) return;
-        
+
 
         Debug.Log($"lastshotId : {_currentGame.LastShot.PlayerId}");
         if (_currentGame.LastShot.PlayerId != myUserId && _localState == LocalGameState.Idle)
@@ -687,19 +714,19 @@ public class FirebaseGameManager : MonoBehaviour
                 }
 
                 //ResetGameDatas(nextRoundStarterId, false);
-                
+
                 // 3라운드가 끝났으면 게임 종료, 아니면 지속
                 // 2라운드가 끝났지만, 점수차가 5점이상이 나면 3라운드에서 4점을 따라잡더라도 이길수 없으므로 콜드게임 처리
-                 if (_currentGame.RoundNumber >= 3 || 
-                     (_currentGame.RoundNumber == 2 && Math.Abs(aTeamScore - bTeamScore) >= 5))
-                 {
-                     ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds,true); // 게임 끝내기 위한 정보들도 전송해야함
-                 }
-                 else
-                 {
-                     ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds,false); // 다음 라운드를 위한 정보들 전송
-                 }
-                
+                if (_currentGame.RoundNumber >= 3 ||
+                    (_currentGame.RoundNumber == 2 && Math.Abs(aTeamScore - bTeamScore) >= 5))
+                {
+                    ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds, true); // 게임 끝내기 위한 정보들도 전송해야함
+                }
+                else
+                {
+                    ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds, false); // 다음 라운드를 위한 정보들 전송
+                }
+
             }
             else // 일반적인 턴에서 다음턴으로 넘겨줌
             {
@@ -800,7 +827,7 @@ public class FirebaseGameManager : MonoBehaviour
         {
             CleanupGameDocuments();
         }
-               
+
     }
 
     /// <summary>
@@ -835,9 +862,9 @@ public class FirebaseGameManager : MonoBehaviour
         {
             stoneManager.DonutOut(donutRigid.transform.GetComponent<StoneForceController_Firebase>(), "Tap Failed");
         }
-    
+
         _justTimedOut = true; // 타임아웃으로 턴을 놓쳤음을 기록
-    
+
         var zeroDict = new Dictionary<string, float> { { "x", 0 }, { "y", 0 }, { "z", 0 } };
         LastShot failedShotData = new LastShot()
         {
@@ -849,7 +876,7 @@ public class FirebaseGameManager : MonoBehaviour
             //ReleasePosition = zeroDict,
             DonutTypeAndNumber = donutTypeAndNumber
         };
-    
+
         SubmitShot(failedShotData);
         _localState = LocalGameState.WaitingForPrediction;
     }
@@ -873,11 +900,11 @@ public class FirebaseGameManager : MonoBehaviour
                 }
             }
         }
-        
+
         // 공통 로직 호출
         ProcessShotSubmission(shotData);
     }
-    
+
     /// <summary>
     /// 돌 조작 스크립트에서 샷이 확정되었을 때 호출됩니다.
     /// 샷 데이터를 Firebase에 전송하고 입력을 비활성화합니다.
@@ -899,10 +926,10 @@ public class FirebaseGameManager : MonoBehaviour
         {
             // 현재 선택된 도넛을 가져옵니다.
             DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
-        
+
             // LastShot 데이터에 도넛 ID를 저장합니다.
             shotData.DonutTypeAndNumber = selectedDonut?.id;
-            
+
             // UI에서 사용된 도넛을 비활성화 처리합니다.
             donutSelectionUI?.MarkDonutAsUsed(usedIndex);
         }
@@ -989,7 +1016,7 @@ public class FirebaseGameManager : MonoBehaviour
             StoneForceController_Firebase.Team team = StoneForceController_Firebase.Team.None;
             int score = 0;
             float delayTime = 0;
-            stoneManager?.CalculateScore(out team, out score, out List<int> donutIds,true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
+            stoneManager?.CalculateScore(out team, out score, out List<int> donutIds, true); // 마지막에 true를 통해 딱 하나의 도넛만을 필요하다고 알림
             if (team == StoneForceController_Firebase.Team.None && score == -99) //하우스에 도넛이 없으면 score를 0반환, 있으면 -99반환 
             {
                 delayTime = 2f; //도넛 하이라이트 지속해줄 시간
@@ -1031,33 +1058,33 @@ public class FirebaseGameManager : MonoBehaviour
                     // }
                     // else
                     // {
-                        // 일반적인 상대 턴 종료 후, 내 샷을 미리 준비합니다.
-                        //Debug.Log("상대 턴 시뮬레이션 완료. 내 샷을 미리 준비합니다.");
-                        if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
-                             && stoneManager.aShotIndex >= shotsPerRound - 1)
-                            || (stoneManager.myTeam == StoneForceController_Firebase.Team.B
-                                && stoneManager.bShotIndex >= shotsPerRound - 1))
+                    // 일반적인 상대 턴 종료 후, 내 샷을 미리 준비합니다.
+                    //Debug.Log("상대 턴 시뮬레이션 완료. 내 샷을 미리 준비합니다.");
+                    if ((stoneManager.myTeam == StoneForceController_Firebase.Team.A
+                         && stoneManager.aShotIndex >= shotsPerRound - 1)
+                        || (stoneManager.myTeam == StoneForceController_Firebase.Team.B
+                            && stoneManager.bShotIndex >= shotsPerRound - 1))
+                    {
+                        //Debug.Log("라운드에 발사가능한 횟수가 끝나서 내 턴으로 돌아오지 않습니다");
+                    }
+                    else
+                    {
+                        DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
+                        if (selectedDonut == null)
                         {
-                            //Debug.Log("라운드에 발사가능한 횟수가 끝나서 내 턴으로 돌아오지 않습니다");
+                            //Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
+                            return;
+                        }
+
+                        _currentTurnDonutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut, myUserId);
+                        if (_currentTurnDonutRigid != null)
+                        {
+                            CountDownStart(10f); // Use the new signature
                         }
                         else
                         {
-                            DonutEntry selectedDonut = donutSelectionUI?.GetSelectedDonut();
-                            if (selectedDonut == null)
-                            {
-                                //Debug.LogError("발사할 도넛이 선택되지 않았거나 DonutSelectionUI가 할당되지 않았습니다.");
-                                return;
-                            }
-
-                            _currentTurnDonutRigid = stoneManager?.SpawnStone(_currentGame, selectedDonut, myUserId);
-                            if (_currentTurnDonutRigid != null)
-                            {
-                                CountDownStart(10f); // Use the new signature
-                            }
-                            else
-                            {
-                                //Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
-                            }
+                            //Debug.Log("아마 발사횟수가 끝났을 가능성이 높음");
+                        }
                         //}
                     }
                 }
@@ -1085,15 +1112,15 @@ public class FirebaseGameManager : MonoBehaviour
     {
         // 라운드 변경 시 턴 UI를 강제 동기화하여 점수 계산시 턴 정보 일치화.
         UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(7);
-        
+
         // 카메라 움직임 필요
         stoneManager?.SyncPositions(_currentGame.PredictedResult.FinalStonePositions);
-                
+
         gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
         roundDataUpdated = true;
 
         //stoneManager.CalculateScore(out StoneForceController_Firebase.Team team, out int score, out List<int> donutIds);
-        stoneManager?.VisualizeScoreDonuts(_currentGame.ScoredDonuts.Team,  _currentGame.ScoredDonuts.StoneId);
+        stoneManager?.VisualizeScoreDonuts(_currentGame.ScoredDonuts.Team, _currentGame.ScoredDonuts.StoneId);
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
         string nextState;
@@ -1127,9 +1154,9 @@ public class FirebaseGameManager : MonoBehaviour
             //stoneManager?.ClearOldDonutsInNewRound(_currentGame);
             db.Collection("games").Document(gameId).UpdateAsync(updates);
         });
-            
-        
-        
+
+
+
     }
 
     public void UpdateScoreInLocal(StoneForceController_Firebase.Team winner, int score)
@@ -1150,16 +1177,16 @@ public class FirebaseGameManager : MonoBehaviour
         //Debug.Log($"승리팀 : {winner}, 점수 : {score}");
     }
 
-    private void ResetGameDatas(string nextPlayerId, StoneForceController_Firebase.Team team, 
-        List<int> scoredDonutIds,bool isFinished = false) // 다음 라운드 시작 플레이어를 파라미터로 받음
+    private void ResetGameDatas(string nextPlayerId, StoneForceController_Firebase.Team team,
+        List<int> scoredDonutIds, bool isFinished = false) // 다음 라운드 시작 플레이어를 파라미터로 받음
     {
-        
+
         if (isFinished) // 만약 게임이 끝났다면
         {
             nextPlayerId = "Finished"; // 다음 플레이어 이름에 Finished를 적어서 상대방에게 게임 끝남을 알림
         }
-        
-        
+
+
         // PredictedResult result = new PredictedResult
         // {
         //     PredictingPlayerId = myUserId,
@@ -1201,7 +1228,7 @@ public class FirebaseGameManager : MonoBehaviour
         //     stoneManager?.ClearOldDonutsInNewRound(_currentGame, currentRound);
         //     UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
         // });
-        
+
     }
     /// <summary>
     /// 샷 발사 시 탭 입력을 실패했을 때 호출됩니다.
@@ -1239,7 +1266,7 @@ public class FirebaseGameManager : MonoBehaviour
             Direction = zeroDict, // 발사 방향
             DonutTypeAndNumber = donutTypeAndNumber// 시간 초과된 도넛의 ID를 명시적으로 전달
         };
-        SubmitShot(failedShotData); 
+        SubmitShot(failedShotData);
         _localState = LocalGameState.WaitingForPrediction;
         // DOVirtual.DelayedCall(1.0f, () =>
         // {
@@ -1304,6 +1331,11 @@ public class FirebaseGameManager : MonoBehaviour
         return _currentGame.DonutsIndex[myUserId];
     }
 
+    public string GetMyUserId()
+    {
+        return myUserId;
+    }
+
     #endregion
 
     #region 도넛 교체 관련
@@ -1311,22 +1343,22 @@ public class FirebaseGameManager : MonoBehaviour
     /// <summary>
     /// DonutSelectionUI에서 다른 도넛을 선택했을 때 호출되는 이벤트 핸들러입니다.
     /// </summary>
-        private void OnDonutChanged(DonutEntry newDonut)
+    private void OnDonutChanged(DonutEntry newDonut)
+    {
+        if (_justTimedOut)
         {
-            if (_justTimedOut)
-            {
-                _justTimedOut = false;
-                //Debug.Log("얘가 자꾸 도넛 발사 실패하면 호출되서 막아버림");
-                return;
-            }
-            // 입력대기 상태면 도넛을 교체 할 수 있게
-            if (_localState == LocalGameState.WaitingForInput)
-            {
-                
-                //Debug.Log($"선택한 도넛이 {newDonut.id}(으)로 변경되어 교체합니다.");
-                ReplaceCurrentStone(newDonut);
-            }
+            _justTimedOut = false;
+            //Debug.Log("얘가 자꾸 도넛 발사 실패하면 호출되서 막아버림");
+            return;
         }
+        // 입력대기 상태면 도넛을 교체 할 수 있게
+        if (_localState == LocalGameState.WaitingForInput)
+        {
+
+            //Debug.Log($"선택한 도넛이 {newDonut.id}(으)로 변경되어 교체합니다.");
+            ReplaceCurrentStone(newDonut);
+        }
+    }
 
     /// <summary>
     /// 현재 턴에 생성된 돌을 파괴하고 새로운 돌로 교체합니다.
@@ -1345,7 +1377,7 @@ public class FirebaseGameManager : MonoBehaviour
             // SpawnStone에서 shotIndex를 기준으로 다시 리스트에 할당할 것이기 때문입니다.
             Destroy(currentStone.gameObject);
         }
-    
+
         // 2. shotIndex를 1 감소시켜 SpawnStone에서 올바른 인덱스를 다시 사용하도록 함
         // (SpawnStone 내부에서 shotIndex가 1 증가하기 때문)
         if (stoneManager.myTeam == StoneForceController_Firebase.Team.A)
@@ -1413,7 +1445,7 @@ public class FirebaseGameManager : MonoBehaviour
                 UI_LaunchIndicator_Firebase?.ShowGuideUI(1);
             }
         }).SetId("GuideTimer1");
-        
+
         int _remainingTime = (int)time;
         ControlCountdown(true);
         countDownTween = DOTween.To(
@@ -1462,7 +1494,7 @@ public class FirebaseGameManager : MonoBehaviour
         countDownTween = null;
         ControlCountdown(false);
     }
-     
+
     public void Change_SuccessfullyShotInTime_To_True()
     {
         SuccessfullyShotInTime = true;

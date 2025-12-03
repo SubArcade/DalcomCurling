@@ -37,6 +37,7 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
             await FirebaseAuthManager.Instance.DeleteAccountAsync();
             UIManager.Instance.Close(PanelId.DeleteAccountPopUp);
             UIManager.Instance.Open(PanelId.LoginPanel);
+            input.text = string.Empty;
         }
         else 
         {

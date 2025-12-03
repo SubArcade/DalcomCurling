@@ -21,6 +21,7 @@ public class Scr_IAPGem : MonoBehaviour
     
     public void OnPurchaseSuccess(Order order)
     {
+        Debug.Log($"[IAP] OnPurchaseSuccess 호출 from {name}, instanceID={GetInstanceID()}");
         var cart = order.CartOrdered;
         var items = cart.Items();
         if (items == null || items.Count == 0)
@@ -30,7 +31,7 @@ public class Scr_IAPGem : MonoBehaviour
         }
 
         string purchasedId = items[0].Product.definition.id;
-        
+        Debug.Log($"[IAP] OnPurchaseSuccess from {name} (instanceID={GetInstanceID()}), product={purchasedId}");
         if (purchasedId == productGemType.ToString())
         {
             Debug.Log($"[IAP] 구매 성공! productId = {purchasedId}, 지급 젬 = {rewardGem}");
