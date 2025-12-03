@@ -460,6 +460,7 @@ public class FirebaseGameManager : MonoBehaviour
 
         // 턴이 변경될 때마다 UI에 현재 턴 번호를 업데이트합니다.
         UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
+        UI_LaunchIndicator_Firebase?.TurnColor(_isMyTurn);
 
         // 일반적인 턴 시작일 때만 기본 카메라로 전환합니다.
         // bool isExecutingPreparedShot = usePreparedShot && _isMyTurn && _localState == LocalGameState.PreparingShot;
@@ -516,6 +517,7 @@ public class FirebaseGameManager : MonoBehaviour
                 {
                     _currentTurnDonutRigid = donutRigid;
                     CountDownStart(10.0f);
+                    UI_LaunchIndicator_Firebase?.TurnColor(true);
                     //inputController?.EnableInput(donutRigid);
                 }
                 else
@@ -1080,6 +1082,7 @@ public class FirebaseGameManager : MonoBehaviour
                         if (_currentTurnDonutRigid != null)
                         {
                             CountDownStart(10f); // Use the new signature
+                            UI_LaunchIndicator_Firebase?.TurnColor(true);
                         }
                         else
                         {

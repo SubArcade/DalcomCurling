@@ -32,6 +32,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject WaitThrowPopUp;
     [SerializeField] private GameObject timeLineUI;
+    [SerializeField] private Image turnPanel;
 
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
@@ -460,4 +461,17 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         }
     }
 
+    public void TurnColor(bool isMyTurn)
+    {
+        if (turnPanel == null) return;
+
+        if (isMyTurn)
+        {
+            turnPanel.color = Color.green;
+        }
+        else
+        {
+            turnPanel.color = Color.red;
+        }
+    }
 }
