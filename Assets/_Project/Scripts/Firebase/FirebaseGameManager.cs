@@ -81,7 +81,7 @@ public class FirebaseGameManager : MonoBehaviour
 
     // --- 게임 시스템 변수 ---
     public float timeMultiplier { get; private set; } = 4f; //게임 빨리감기 속도를 결정할 변수, 읽기전용 (기본값 5)
-    public float fixedTimeMultiplier { get; private set; } = 0.0025f;
+    public float fixedTimeMultiplier { get; private set; } = 0.004f; // 기존 0.0025(8배)
 
     // --- 게임 연결 상태 변수 ---
     [Header("연결 상태 관리")]
