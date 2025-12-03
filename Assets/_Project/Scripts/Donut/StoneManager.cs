@@ -49,36 +49,27 @@ public class StoneManager : MonoBehaviour
     [SerializeField]
     private float loseMaxMass = 10.4f;
 
-    public float WinMinMass
+    public float WinMinMass => winMinMass;
+    public float WinMaxMass => winMaxMass;
+    public float DrawMinMass => drawMinMass;
+    public float DrawMaxMass => drawMaxMass;
+    public float LoseMinMass => loseMinMass;
+    public float LoseMaxMass => loseMaxMass;
+
+    [Header("내 도넛과 상대 도넛을 구분하기 위한 프리팹")] 
+    [SerializeField] private GameObject myTeamCircle;
+    [SerializeField] private GameObject otherTeamCircle;
+
+    public GameObject MyTeamCircle
     {
-        get{ return winMinMass; }
+        get { return myTeamCircle; }
     }
 
-    public float WinMaxMass
+    public GameObject OtherTeamCircle
     {
-        get{return winMaxMass; }
+        get{return otherTeamCircle;}
     }
-
-    public float DrawMinMass
-    {
-        get { return drawMinMass; }
-    }
-
-    public float DrawMaxMass
-    {
-        get {return  drawMaxMass; }
-    }
-
-    public float LoseMinMass
-    {
-        get { return loseMinMass; }
-    }
-
-    public float LoseMaxMass
-    {
-        get { return loseMaxMass; }
-    }
-
+    
     [Header("아웃 판정을 위한 라인 오브젝트 참조")]
     public Transform endHogLine;
     public Transform backLine;

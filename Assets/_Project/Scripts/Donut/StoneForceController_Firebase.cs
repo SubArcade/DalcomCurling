@@ -60,7 +60,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     void Awake()
     {
         rigid = GetComponent<Rigidbody>();
-        stoneManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<StoneManager>();
+        stoneManager = FirebaseGameManager.Instance.StoneManagerInGM;
         //CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
         
         if (!transform.TryGetComponent<CapsuleCollider>(out  CapsuleCollider capsuleCollider))
@@ -191,6 +191,7 @@ public class StoneForceController_Firebase : MonoBehaviour
         }
         attackMoveFinished = true;
         rigid.angularVelocity = Vector3.zero;
+        this.enabled = false;
         //Debug.Log($"sidewaysForceAddCount = {sidewaysForceAddCount}");
     }
 
