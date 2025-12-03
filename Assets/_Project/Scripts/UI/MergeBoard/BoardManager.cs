@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static Cinemachine.DocumentationSortingAttribute;
 using static UnityEngine.EventSystems.EventTrigger;
 using DG.Tweening;
+using Random = UnityEngine.Random;
 
 public class BoardManager : MonoBehaviour
 {
@@ -55,16 +57,21 @@ public class BoardManager : MonoBehaviour
         tempStorageSlot = FindObjectOfType<TempStorageSlot>();
     }
 
+    private void OnEnable()
+    {
+        SetBoard();
+    }
+
     void Start()
     {
         selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
         //GenerateBoard();
         //UpdateBoardUnlock(1);
-        SetBoard();
+        //SetBoard();
     }
 
-    private void SetBoard()
+    public void SetBoard()
     {
         if (!isCompleted)
         {
@@ -77,8 +84,7 @@ public class BoardManager : MonoBehaviour
             LoadBoardLocal();
         }
     }
-
-
+    
     public void ResetBoard()
     {
         foreach (Transform child in transform)
@@ -92,20 +98,36 @@ public class BoardManager : MonoBehaviour
             }
         }
     }
-    public void ResetEntry()
+    public void ResetEntry(int index = 100)
     {
         if (entryPopupObj.GetComponent<Scr_EntryPopUP>() == null)
             return;
         
+        Debug.Log("[BoardManager] ResetBoard 호출");
         var entryObj = entryPopupObj.GetComponent<Scr_EntryPopUP>();
-        foreach (var child in entryObj.entrySlots)
+
+        if (index != 100)
         {
-            var item = child.gameObject.GetComponentInChildren<MergeItemUI>();
-            
+            var item = entryObj.entrySlots[index].gameObject.GetComponentInChildren<MergeItemUI>();
             if (item != null)
             {
-                Debug.Log("[BoardManager] ResetBoard → " + item.name);
+                //Debug.Log("[BoardManager] ResetBoard → " + item.name);
+                entryObj.entrySlots[index].currentItem = null;
                 Destroy(item.gameObject);
+            }
+        }
+        else
+        {
+            foreach (var child in entryObj.entrySlots)
+            {
+                var item = child.gameObject.GetComponentInChildren<MergeItemUI>();
+                
+                if (item != null)
+                {
+                    //Debug.Log("[BoardManager] ResetBoard → " + item.name);
+                    child.currentItem = null;
+                    Destroy(item.gameObject);
+                }
             }
         }
     }

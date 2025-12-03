@@ -25,6 +25,9 @@ public class Scr_CharacterSlot : MonoBehaviour
         {
             activeImage.SetActive(true);
             DataManager.Instance.InventoryData.curCharacterType = characterType;
+            
+            // 애널리틱스 이펙트 변경
+            AnalyticsManager.Instance.ReadyEquip();
         }
         else
         {

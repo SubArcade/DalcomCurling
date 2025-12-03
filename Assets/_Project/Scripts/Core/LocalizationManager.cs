@@ -16,6 +16,7 @@ public enum LocalizationKey
     Label_Account, //계정
     Label_DeleteAccount, //계정삭제
     Label_AccountLink, //구글 계정 연동
+    Label_AccountLinkDeactivate, //구글 계정 연동
     Label_GameSetting, //게임설정
     Label_AlarmSetting, //알람설정
     Label_AlarmText, //알람설정 바로 아래 텍스트

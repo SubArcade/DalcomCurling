@@ -43,8 +43,8 @@ public class Scr_ResultControl : MonoBehaviour
     [SerializeField] private Scr_TierSpriteSO tierSpriteSO; //티어 이미지 연결용
     [SerializeField] private CharacterSO characterSO; //캐릭터 이미지 연결용
 
-    private Sprite capturedDonutSprite1;
-    private Sprite capturedDonutSprite2;
+    [SerializeField] private Sprite capturedDonutSprite1;
+    [SerializeField] private Sprite capturedDonutSprite2;
     private int selectionCount = 0;
 
     void OnEnable()
@@ -128,6 +128,8 @@ public class Scr_ResultControl : MonoBehaviour
             button.onClick.AddListener(() => OnDonutSelectionClicked(button));
         }
 
+        donut_1.gameObject.SetActive(true);
+        donut_2.gameObject.SetActive(true);
         donut_1.sprite = capturedDonutSprite1;
         donut_2.sprite = capturedDonutSprite2;
     }
@@ -162,6 +164,8 @@ public class Scr_ResultControl : MonoBehaviour
             touchDonutList[i].gameObject.SetActive(false);
         }
 
+        donut_1.gameObject.SetActive(true);
+        donut_2.gameObject.SetActive(true);
         donut_1.sprite = capturedDonutSprite1;
         donut_2.sprite = capturedDonutSprite2;
     }
@@ -273,27 +277,29 @@ public class Scr_ResultControl : MonoBehaviour
 
     private void SetwitePanel1(int getExp) 
     {
-        var player = DataManager.Instance.PlayerData;
-        int maxExp = 100;
+        //var player = DataManager.Instance.PlayerData;
+        int exp = DataManager.Instance.PlayerData.exp;
+        int level = DataManager.Instance.PlayerData.level;
+        int maxExp = level * 100;
 
         //얻은 경험치와 레벨업여부판단변수
-        int newExp = player.exp + getExp;
+        int newExp = exp + getExp;
         bool isLevelUp = false;
 
         if (newExp > maxExp) 
         {
-            player.level++;
-            DataManager.Instance.LevelChange(player.level++);
+            level++;
+            //DataManager.Instance.LevelChange(player.level++);
             newExp -= maxExp;
             isLevelUp = true;
         }
-        player.exp = newExp;
-        DataManager.Instance.ExpChange(player.exp);
+        exp = newExp;
+        //DataManager.Instance.ExpChange(player.exp);
 
         //UI반영
-        levelText.text = $"{player.level}";
+        levelText.text = $"{level}";
         expUpText.text = $"+{getExp}EXP";
-        expText.text = $"{newExp}/{maxExp} EXP";
+        expText.text = $"{newExp - maxExp + 100}/100 EXP";
         expGage.fillAmount = (float)newExp / maxExp;
 
         levelUpText.gameObject.SetActive(isLevelUp);
@@ -313,9 +319,11 @@ public class Scr_ResultControl : MonoBehaviour
 
     private void SetwitePanel2(int getPoint)
     {
-        var player = DataManager.Instance.PlayerData;
-        GameTier oldTier = player.soloTier;
-        int oldScore = player.soloScore;
+        //var player = DataManager.Instance.PlayerData;
+        GameTier oldTier = DataManager.Instance.PlayerData.soloTier;
+        int oldScore = DataManager.Instance.PlayerData.soloScore;
+        //GameTier oldTier = player.soloTier;
+        //int oldScore = player.soloScore;
 
         //점수갱신
         int newScore = oldScore + getPoint;
@@ -374,10 +382,10 @@ public class Scr_ResultControl : MonoBehaviour
             rankUpText.gameObject.SetActive(false);
             rankUpText.text = "";
         }
-        player.soloScore = newScore;
-        player.soloTier = newTier;
-        DataManager.Instance.ScoreChange(player.soloScore);
-        DataManager.Instance.PlayerData.soloTier = player.soloTier;
+        // player.soloScore = newScore;
+        // player.soloTier = newTier;
+        //DataManager.Instance.ScoreChange(player.soloScore);
+        //DataManager.Instance.PlayerData.soloTier = player.soloTier;
     }
 
     private void SetCharacterImage()

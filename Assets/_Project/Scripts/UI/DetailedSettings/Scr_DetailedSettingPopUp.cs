@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,7 +9,8 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 {
     //계정 옵션
     [Header("계정연동")]
-    [SerializeField] private Button accountLink;
+    [SerializeField] private Button accountLinkBtn;
+    [SerializeField] private Button accountLinkDeactivateBtn;
 
     [Header("계정삭제")]
     [SerializeField] private Button accountExit;
@@ -59,7 +61,12 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     
     void Awake()
     {
-        accountLink.onClick.AddListener(FirebaseAuthManager.Instance.ConnectGpgsAccount);
+        accountLinkBtn.onClick.AddListener(() =>
+        {
+            if (DataManager.Instance.PlayerData.authProviderType == AuthProviderType.Guest)
+                FirebaseAuthManager.Instance.ConnectGpgsAccount();
+        });
+        
         accountExit.onClick.AddListener(() => UIManager.Instance.Open(PanelId.DeleteAccountPopUp));
         gameHelpBtn.onClick.AddListener(() =>UIManager.Instance.Open(PanelId.GameHelpPopup));
         accountIdText.text = $"User ID : {DataManager.Instance.PlayerData.nickname}";
@@ -70,8 +77,13 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
     }
     void OnEnable()
     {
+        FirebaseAuthManager.Instance.GpgsLink += SetGpgsBtn;
         accountIdText.text = $"User ID : {DataManager.Instance.PlayerData.nickname}";
+        SetGpgsBtn();
     }
+
+    private void OnDisable() => FirebaseAuthManager.Instance.GpgsLink -= SetGpgsBtn;
+
     void Start()
     {
         // BGM 설정
@@ -304,4 +316,17 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
         gage.fillAmount = restoredValue;
 
     }
+
+    private void SetGpgsBtn()
+    {
+        if (DataManager.Instance.PlayerData.authProviderType == AuthProviderType.Guest)
+        {
+            accountLinkDeactivateBtn.gameObject.SetActive(false);
+        }
+        else
+        {
+            accountLinkDeactivateBtn.gameObject.SetActive(true);
+        }
+    }
+    
 }

@@ -209,11 +209,11 @@ public class GameManager : MonoBehaviour
         
         //DataManager.Instance.PlayerData.exp += pendingExp;
         DataManager.Instance.PlayerData.gold += pendingGold;
-        //DataManager.Instance.PlayerData.soloScore += pendingPoint;
+        DataManager.Instance.PlayerData.soloScore += pendingPoint;
         Debug.Log($"pendingGold : {pendingGold}, pendingPoint : {pendingPoint}");
 
         DataManager.Instance.GoldChange(DataManager.Instance.PlayerData.gold);
-        DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);            
+        //DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);            
 
         
         // 3. 승리 시 상대 도넛 보상 지급
@@ -232,15 +232,14 @@ public class GameManager : MonoBehaviour
                 BoardManager.Instance.AddRewardDonut(rewardDonut);
             }
         }
-        
-        
-        //LevelUp(pendingExp);
-        LevelUp(0);
+
+        //DataManager.Instance.PlayerData.exp -= pendingExp;
+        LevelUp(pendingExp);
         // 레벨업 팝업 조건
-        if (DataManager.Instance.PlayerData.level > oldLevel)
-        {
-            UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
-        }
+        // if (DataManager.Instance.PlayerData.level > oldLevel)
+        // {
+        //     UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
+        // }
 
         // 4. pending 값 초기화
         pendingExp = 0;
@@ -260,19 +259,21 @@ public class GameManager : MonoBehaviour
             return;
         
         DataManager.Instance.PlayerData.exp += getExp;
-    
+        Debug.Log($"exp : {DataManager.Instance.PlayerData.exp}");
+        
         // 100 이 넘으면 레벨업
-        while (DataManager.Instance.PlayerData.exp >= 100)
+        if (DataManager.Instance.PlayerData.exp >= DataManager.Instance.PlayerData.level * 100)
         {
+            Debug.Log($"레벨업 {DataManager.Instance.PlayerData.level} / {DataManager.Instance.PlayerData.exp / (DataManager.Instance.PlayerData.level * 100)}");
             DataManager.Instance.PlayerData.level += 1;
-            DataManager.Instance.PlayerData.exp -= 100;
+            DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);
             
             LevelUpdate.Invoke(DataManager.Instance.PlayerData);
-            //UIManager.Instance.Open(PanelId.LevelUpRewardPopUp); // ApplyResultRewards에서 처리
+            UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
             // 레벨업 보상상자
-           // BoardManager.Instance.SpawnGiftBox();
-           // 레벨업팝업UI 컴포넌트로 달린 스크립트에보상상자 주는 함수있슴니다
-           BoardManager.Instance.RefreshBoardUnlock();
+            //BoardManager.Instance.SpawnGiftBox();
+            // 레벨업팝업UI 컴포넌트로 달린 스크립트에보상상자 주는 함수있슴니다
+            BoardManager.Instance.RefreshBoardUnlock();
         }
         
     }

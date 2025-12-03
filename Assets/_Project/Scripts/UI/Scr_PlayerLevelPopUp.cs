@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class Scr_PlayerLevelPopUp : MonoBehaviour
@@ -25,7 +23,9 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [SerializeField, Tooltip("닉네임")] private TMP_Text nicknameText;
     [SerializeField, Tooltip("경험치")] private TMP_Text expText;
     [SerializeField, Tooltip("경험치 게이지")] private Image expFillImage;
-    [SerializeField, Tooltip("칭호")] private TMP_Text nameTitleText;
+    [SerializeField, Tooltip("칭호 SO")] private NamePlaateSO nameTitleSO;
+    [SerializeField, Tooltip("칭호 텍스트")] private TMP_Text nameTitleText;
+    [SerializeField, Tooltip("칭호 이미지")] private Image nameTitleImage;
     [SerializeField, Tooltip("칭호 버튼")] private Button nameTitleButton;
     [SerializeField, Tooltip("환생 설명 버튼")] private Button explanationButton;
     [SerializeField, Tooltip("랭킹 스크롤바")] private ScrollRect scrollRect;
@@ -115,9 +115,15 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         //Debug.Log("텍스트 셋업");
         levelText.text = DataManager.Instance.PlayerData.level.ToString();
         nicknameText.text = DataManager.Instance.PlayerData.nickname;
-        expText.text = $"{DataManager.Instance.PlayerData.exp}/100 EXP";
-        nameTitleText.text = DataManager.Instance.PlayerData.curNamePlateType.ToString();
-        expFillImage.fillAmount = DataManager.Instance.PlayerData.exp / 100f;
+        expText.text = $"{DataManager.Instance.PlayerData.exp - (DataManager.Instance.PlayerData.level * 100) + 100}/100 EXP";
+        
+        if (LocalizationManager.Instance.CurrentLanguage == "ko")
+            nameTitleText.text = nameTitleSO.GetByType(DataManager.Instance.PlayerData.curNamePlateType).koNamePlate;
+        else
+            nameTitleText.text = nameTitleSO.GetByType(DataManager.Instance.PlayerData.curNamePlateType).enNamePlate;
+        
+        nameTitleImage.sprite = nameTitleSO.GetByType(DataManager.Instance.PlayerData.curNamePlateType).plateSprite;
+        expFillImage.fillAmount = (DataManager.Instance.PlayerData.exp - (DataManager.Instance.PlayerData.level * 100) + 100) / 100f;
     }
     
     private void Awake()
@@ -219,12 +225,12 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         data.energy = 50;
         data.gold = 0;
         data.soloScore = 0;
-        DataManager.Instance.FirstBaseInventoryData();  // 엔트리 초기화
-        DataManager.Instance.BaseInventoryData();   // 도감 초기화
-        DataManager.Instance.FirstBaseMergeBoardData(); // 보드판 초기화
         BoardManager.Instance.ResetBoard();
         BoardManager.Instance.ResetEntry();
         BoardManager.Instance.ResetTempGiftIds();
+        DataManager.Instance.FirstBaseInventoryData();  // 엔트리 초기화
+        DataManager.Instance.BaseInventoryData();   // 도감 초기화
+        DataManager.Instance.FirstBaseMergeBoardData(); // 보드판 초기화
         scrOrderSystem.ResetQuest();
         DataManager.Instance.MergeBoardData.tempGiftIds.Clear();    // 임시 보관칸 초기화
         
@@ -351,7 +357,12 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         }
 
         DataManager.Instance.PlayerData.curNamePlateType = type;
-        nameTitleText.text = type.ToString();
+        if (LocalizationManager.Instance.CurrentLanguage == "ko")
+            nameTitleText.text = nameTitleSO.GetByType(type).koNamePlate;
+        else
+            nameTitleText.text = nameTitleSO.GetByType(type).enNamePlate;
+
+        nameTitleImage.sprite = nameTitleSO.GetByType(type).plateSprite;
         Debug.Log($"선택된 칭호 변경됨: {type}");
     }
 

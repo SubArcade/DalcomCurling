@@ -216,6 +216,7 @@ public class DataManager : MonoBehaviour
         int baseGold = firstQuestData.baseGold;
         int RefreshCount = firstQuestData.refreshCount;
         int maxCount = firstQuestData.maxCount;
+        PlayerData.authProviderType = authProviderType;
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();

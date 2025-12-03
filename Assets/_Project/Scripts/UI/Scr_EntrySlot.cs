@@ -244,7 +244,8 @@ public class EntrySlot : MonoBehaviour, IDropHandler, IPointerClickHandler
     //엔트리 도넛 불러오기
     public void LoadFromInventory()
     {
-        BoardManager.Instance.ResetEntry();
+        BoardManager.Instance.ResetEntry(slotIndex);
+        Debug.Log("[EntrySlot] LoadFromInventory 호출");
         var inv = DataManager.Instance.InventoryData.donutEntries;
 
         if (slotIndex < 0 || slotIndex >= inv.Count)

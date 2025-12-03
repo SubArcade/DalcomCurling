@@ -86,10 +86,13 @@ public class AnalyticsManager : MonoBehaviour
 
     // 상점 Shop
     public void ShopPurchaseTry() => LogCount("shop_purchase_try", "Shop");
-    public void ShopPurchaseResult() => LogCount("shop_purchase_result", "Shop");
+    public void ShopPurchaseResult(bool success) =>
+        FirebaseAnalytics.LogEvent("shop_purchase_result",
+            new Parameter("category", "Shop"),
+            new Parameter("result", success ? "Success" : "Fail"));
 
     // 엔트리/레디 Entry/Ready
-    public void ReadyEquip(string donutType) => LogCount("ready_equip", "Entry/Ready");
+    public void ReadyEquip() => LogCount("ready_equip", "Entry/Ready");
     public void ReadyDonutAdjust() => LogCount("ready_donut_adjust", "Entry/Ready");
     
     // 매칭 Match

@@ -31,6 +31,8 @@ public class FirebaseAuthManager
     public string UserId => user?.UserId;
     public Action<bool> LoginState;
 
+    public event Action GpgsLink;
+
     // 변경에 이렇게 기능이 Firebase Auth에 존재
     // 이메일 변경
     //await FirebaseAuth.DefaultInstance.CurrentUser.UpdateEmailAsync(newEmail);
@@ -282,7 +284,9 @@ public class FirebaseAuthManager
                     Debug.Log("[GPGS] 게스트 계정에 GPGS 연동 완료");
 
                     // 이후 유저 데이터 보장
+                    DataManager.Instance.PlayerData.authProviderType = AuthProviderType.GooglePlay;
                     await DataManager.Instance.EnsureUserDocAsync(auth.CurrentUser.UserId, isAutoLogin: true);
+                    GpgsLink?.Invoke();
                 }
                 catch (System.Exception e)
                 {
