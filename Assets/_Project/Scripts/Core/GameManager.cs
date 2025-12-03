@@ -293,13 +293,13 @@ public class GameManager : MonoBehaviour
         DataManager.Instance.PlayerData.exp += getExp;
     
         // 100 이 넘으면 레벨업
-        if (DataManager.Instance.PlayerData.exp >= 100)
+        while (DataManager.Instance.PlayerData.exp >= 100)
         {
             DataManager.Instance.PlayerData.level += 1;
             DataManager.Instance.PlayerData.exp -= 100;
             
             LevelUpdate.Invoke(DataManager.Instance.PlayerData);
-            UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
+            //UIManager.Instance.Open(PanelId.LevelUpRewardPopUp); // ApplyResultRewards에서 처리
             // 레벨업 보상상자
            // BoardManager.Instance.SpawnGiftBox();
            // 레벨업팝업UI 컴포넌트로 달린 스크립트에보상상자 주는 함수있슴니다
