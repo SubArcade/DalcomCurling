@@ -8,7 +8,7 @@ public class StoneForceController_Firebase : MonoBehaviour
 {
     public float stoneForce { get; private set; }
     public int donutId; // 발사한 인덱스를 기준으로 인게임에서 도넛을 찾을때 쓰는 ID
-    private int donutLevel = 1; // 현재 도넛의 엔트리에서의 설정 레벨
+    public int donutSettingAmount { get; private set; } = 1; // 현재 도넛의 엔트리에서의 설정 레벨
     public string DonutTypeAndNumber { get; private set; } // 도넛의 종류를 식별하는 ID (예: "Soft_15")
 
     // 도넛의 물리적 속성
@@ -26,7 +26,7 @@ public class StoneForceController_Firebase : MonoBehaviour
     private float spinAmountFactor = 600f; // 회전값을 얼마나 시각화 할지를 적용하는 변수 ( 높을수록 많이 회전 ) , 기본값 1.5
     private float sidewaysForceFactor = 4f; // 회전값을 통해 얼마나 옆으로 휘게 할지 적용하는 변수 ( 높을수록 많이 휨 ) , 기본값 5, 0.07(기존로직)
     //private float sidewaysForceSpeedLimit = 0f; // 속도가 몇%가 될때까지 옆으로 휘는 힘을 가할건지 ( 낮을수록 오래 휨 ), 기본값 0.4
-    private int sidewaysForceAddLimit = 1200; // 동일한 횟수만큼만 옆으로 밀리는 힘을 주어서 각 환경에서 싱크가 일치하도록 도움
+    private int sidewaysForceAddLimit = 1100; // 동일한 횟수만큼만 옆으로 밀리는 힘을 주어서 각 환경에서 싱크가 일치하도록 도움
     private int sidewaysForceAddCount = 0; // 현재까지 옆으로 밀리는 힘을 준 횟수
     //private float sweepSidewaysForceFactor = 0.3f; // 스위핑으로 양옆으로 얼마나 휘게 만들지 ( 높을수록 많이 휨 ) , 기본값 0.3
     private Rigidbody rigid;
@@ -81,7 +81,7 @@ public class StoneForceController_Firebase : MonoBehaviour
             sidewaysForceAddCount++;
             
             
-            if (sidewaysForceAddCount % 2 == 0 && sidewaysForceAddCount > 200)
+            if (sidewaysForceAddCount % 2 == 0 && sidewaysForceAddCount > 100)
             {
                 rigid.AddForce(
                     Vector3.right * spinForce * sidewaysForceFactor * 0.01f,
@@ -126,59 +126,15 @@ public class StoneForceController_Firebase : MonoBehaviour
     }
 
     // StoneShoot.Team 대신 직접 정의한 Team enum 사용
-    public void InitializeDonut(Team team, DonutType type,int donutId, string donutTypeId, int weight, int resilience, int friction) // 도넛의 팀과 id, 물리 속성을 적용
+    public void InitializeDonut(Team team, DonutType type,int donutId, string donutTypeId, int amount) // 도넛의 팀과 id, 물리 속성을 적용
     {
         this.team = team;
         this.type = type;
         this.donutId = donutId;
         this.DonutTypeAndNumber = donutTypeId;
+        donutSettingAmount = amount;
         //donutLevel 받아와야 함
-        
-        this.DonutWeight = weight;
-        this.DonutResilience = resilience;
-        this.DonutFriction = friction;
 
-        // 무게를 Rigidbody의 질량으로 설정
-        if (rigid != null)
-        {
-           // rigid.mass = DonutWeight;
-        }
-
-        // // 반발력과 마찰력은 PhysicMaterial을 통해 설정합니다.
-        // if (physicMaterial == null)
-        // {
-        //     MeshCollider meshCollider = transform.GetComponent<MeshCollider>();
-        //     if (meshCollider != null)
-        //     {
-        //         // 다른 돌에 영향을 주지 않도록 공유된 물리 재질의 인스턴스를 생성합니다.
-        //         physicMaterial = new PhysicMaterial(gameObject.name + "_PhysicMaterial");
-        //         meshCollider.material = physicMaterial;
-        //     }
-        //     else
-        //     {
-        //         Debug.LogError("InitializeDonut: MeshCollider가 없어 물리 속성을 적용할 수 없습니다.");
-        //         return;
-        //     }
-        // }
-        // 반발력과 마찰력은 PhysicMaterial을 통해 설정합니다.
-        if (physicMaterial == null)
-        {
-            //CapsuleCollider capsuleCollider = transform.GetComponent<CapsuleCollider>();
-            if (!transform.TryGetComponent<CapsuleCollider>(out CapsuleCollider capsuleCollider))
-            {
-                Debug.LogError("InitializeDonut: CapsuleCollider가 없어 물리 속성을 적용할 수 없습니다.");
-                return;
-            }
-            // 다른 돌에 영향을 주지 않도록 공유된 물리 재질의 인스턴스를 생성합니다.
-            physicMaterial = new PhysicMaterial(gameObject.name + "_PhysicMaterial");
-            capsuleCollider.material = physicMaterial;
-        }
-
-        // int 값을 float (0~1) 범위로 변환하여 적용합니다. (예: 10 -> 1.0, 5 -> 0.5)
-        // 이 변환 방식은 기획에 따라 달라질 수 있습니다.
-        // physicMaterial.bounciness = Mathf.Clamp01(DonutResilience / 10.0f);
-        // physicMaterial.dynamicFriction = Mathf.Clamp01(DonutFriction / 10.0f);
-        initialFrictionValue = physicMaterial.dynamicFriction; // 스위핑 로직을 위해 초기 마찰값 업데이트
     }
 
 
@@ -200,12 +156,12 @@ public class StoneForceController_Firebase : MonoBehaviour
         isPassedEndHogLine = true;
     }
 
-    public void ChangeMassByCompatibility(DonutType attackerType, int attackerLevel = 1) // 공격자와의 속성 상성관계에 따라 현재 도넛의 질량을 바꿈
+    public void ChangeMassByCompatibility(DonutType attackerType, int attackerAmount = 1) // 공격자와의 속성 상성관계에 따라 현재 도넛의 질량을 바꿈
     {
-        int levelDiff = donutLevel - attackerLevel + 29; //내 레벨에서 공격자 도넛의 레벨을 뺌. 결과값이 높을수록 수비자가 강함. 
+        int amountDiff = donutSettingAmount - attackerAmount + 29; //내 레벨에서 공격자 도넛의 레벨을 뺌. 결과값이 높을수록 수비자가 강함. 
         // 0~58의 수치로 만들기 위해 29를 더함
 
-        float normalizedDiff = Mathf.Clamp01(levelDiff / 58.0f);
+        float normalizedDiff = Mathf.Clamp01(amountDiff / 58.0f);
         switch (attackerType)
         {
             case DonutType.Hard:
