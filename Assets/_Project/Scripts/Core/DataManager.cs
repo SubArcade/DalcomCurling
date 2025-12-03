@@ -112,7 +112,8 @@ public class DataManager : MonoBehaviour
         characterList = new List<CharacterType>()
         {
             CharacterType.None
-        }
+        },
+        
     };
     [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
     {
@@ -122,6 +123,10 @@ public class DataManager : MonoBehaviour
         cellMax = 49,
         cellWidth = 7,
         cellLength = 7,
+        tempGiftIds = new List<string>()
+        {
+            null
+        }
     };
     [SerializeField] private QuestData firstQuestData = new QuestData()
     {
@@ -330,6 +335,7 @@ public class DataManager : MonoBehaviour
         {
             CharacterType.None
         };
+        
     }
     
     
@@ -367,6 +373,7 @@ public class DataManager : MonoBehaviour
         MergeBoardData.generatorLevelSoft = 1;
         MergeBoardData.generatorLevelMoist = 1;
         
+        MergeBoardData.tempGiftIds = firstMergeBoardData.tempGiftIds;
     }
 
     // 기본 퀘스트 데이터

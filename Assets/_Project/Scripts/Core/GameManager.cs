@@ -207,6 +207,7 @@ public class GameManager : MonoBehaviour
     // 게임 종료 후 바로 실행되는 함수
     public void ApplyResultRewards()
     {
+        Debug.Log("ApplyResultRewards 작동111111111111111111111111111");
         if (State == GameState.Lobby)
         {
             // 1. 페널티 복구 로직 (DB에서 데이터를 다시 로드한 후 실행)
