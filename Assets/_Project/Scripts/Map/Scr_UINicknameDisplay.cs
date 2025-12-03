@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 using TMPro;
-using System;
+using UnityEngine;
 
 /// <summary>
 /// 게임 시작 시 플레이어 또는 상대방의 닉네임을 TextMeshProUGUI에 표시하는 스크립트입니다.
@@ -8,8 +8,6 @@ using System;
 /// </summary>
 public class UINicknameDisplay : MonoBehaviour
 {
-    //Todo : AI로 짯더니 동작은 하는데 코드 가독성 최악임, 리펙토링
-
     [SerializeField] private TextMeshProUGUI nicknameText; // 닉네임을 표시할 TextMeshProUGUI 객체
     [SerializeField] private bool displayMyNickname = true; // true면 내 닉네임, false면 상대방 닉네임 표시
 

@@ -1,9 +1,9 @@
 ﻿
-using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Firebase.Firestore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -87,6 +87,13 @@ public class Game
 
     [FirestoreProperty]
     public string FinishReason { get; set; } // 게임 종료 사유를 저장하는 속성
+    
+    [FirestoreProperty]
+    public string LastUploaderId { get; set; }
+    
+    [FirestoreProperty]
+    public ScoredDonuts ScoredDonuts { get; set; }
+    
 }
 
 [FirestoreData]
@@ -100,9 +107,9 @@ public class LastShot
     public float Force { get; set; }
     [FirestoreProperty] public float Spin { get; set; }
     [FirestoreProperty] public Dictionary<string, float> Direction { get; set; }
-    [FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
+    //[FirestoreProperty] public Dictionary<string, float> ReleasePosition { get; set; } // 릴리즈 시점의 위치
     [FirestoreProperty, ServerTimestamp] public Timestamp Timestamp { get; set; }
-    [FirestoreProperty] public string DonutId { get; set; } // 발사된 도넛의 ID
+    [FirestoreProperty] public string DonutTypeAndNumber { get; set; } // 발사된 도넛의 ID
 }
 
 [FirestoreData]
@@ -126,7 +133,25 @@ public class StonePosition
     [FirestoreProperty]
     public string Team { get; set; }
     [FirestoreProperty]
+    public string DonutTypeAndNumber { get; set; } // 발사된 도넛의 종류를 식별하기 위한 ID
+    [FirestoreProperty]
+    public int Weight { get; set; } // 도넛 무게
+    [FirestoreProperty]
+    public int Resilience { get; set; } // 도넛 탄성
+    [FirestoreProperty]
+    public int Friction { get; set; } // 도넛 마찰
+    [FirestoreProperty]
     public Dictionary<string, float> Position { get; set; } // Vector3 저장용
+}
+
+[FirestoreData]
+public class ScoredDonuts
+{
+    [FirestoreProperty]
+    public List<int> StoneId { get; set; }
+    
+    [FirestoreProperty]
+    public string Team { get; set; }
 }
 
 
@@ -169,10 +194,16 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    void Start()
+    
+    async void Start()
     {
         // Firestore 인스턴스를 초기화합니다.
+        
+        while (!FirebaseInitializer.IsInitialized)
+        {
+            await System.Threading.Tasks.Task.Yield();
+        }
+        
         db = FirebaseFirestore.DefaultInstance;
         //matchmakingButton.onClick.AddListener(()=>StartMatchmaking());
     }
@@ -214,89 +245,108 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         //매칭버튼을 누르면 버튼 비활성화
         //if (matchmakingButton != null) { matchmakingButton.interactable = false; }
         //if (matchmakingStatusText != null) { matchmakingStatusText.text = "매칭중"; matchmakingStatusText.gameObject.SetActive(true); }
-
-        string userId = FirebaseAuthManager.Instance.UserId;
-        if (string.IsNullOrEmpty(userId))
+        try
         {
-            Debug.LogError("로그인하지 않은 상태에서는 매치메이킹을 시작할 수 없습니다.");
-            return;
-        }
+            if (db == null)
+            {
+                Debug.LogError("[매치메이킹] Firestore db가 null입니다.");
+                return;
+            }
+            
+            string userId = FirebaseAuthManager.Instance.UserId;
+            Debug.Log($"[매치메이킹] userId: {userId}");
+            if (string.IsNullOrEmpty(userId))
+            {
+                Debug.LogError("로그인하지 않은 상태에서는 매치메이킹을 시작할 수 없습니다.");
+                return;
+            }
+            
+            Debug.Log("[매치메이킹] Firestore GetSnapshotAsync 호출 직전");
+            // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
+            DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync();
+            Debug.Log("[매치메이킹] Firestore GetSnapshotAsync 호출 끝");
+            
+            if (!userDoc.Exists)
+            {
+                Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
+                return;
+            }
+            
+            Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 직전");
+            // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
+            PlayerData playerData = userDoc.ConvertTo<PlayerData>();
+            Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 끝");
+            int playerSoloScore = playerData.soloScore;
+            string playerScoreBracket = GetScoreBracket(playerSoloScore);
+            Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
 
-        // Firestore에서 현재 플레이어의 데이터를 직접 가져와 솔로 점수(soloScore)를 얻습니다.
-        DocumentSnapshot userDoc = await db.Collection("user").Document(userId).GetSnapshotAsync();
-        if (!userDoc.Exists)
+            // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
+            Query waitingRoomsQuery = db.Collection(RoomsCollection)
+                .WhereEqualTo("Status", "waiting")
+                .WhereLessThan("PlayerCount", 2)
+                .WhereEqualTo("ScoreBracket", playerScoreBracket)
+                .Limit(1);
+
+            QuerySnapshot snapshot = await waitingRoomsQuery.GetSnapshotAsync();
+
+            if (snapshot.Count > 0)
+            {
+                // 참여할 룸을 찾았습니다.
+                DocumentSnapshot roomDoc = snapshot.Documents.First();
+                Debug.Log($"참여할 룸을 찾았습니다: {roomDoc.Id}");
+                await JoinRoomAsync(roomDoc.Reference);
+            }
+            else
+            {
+                // 참여할 룸이 없으므로 새 룸을 생성합니다.
+                Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
+                await CreateRoomAsync(playerScoreBracket); // 점수 구간을 전달
+            }
+
+        }
+        catch(Exception e)
         {
-            Debug.LogError($"Firestore에 사용자 데이터가 없습니다: {userId}");
-            return;
+            Debug.LogError($"[매치메이킹] 예외 발생: {e}");
         }
-
-        // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
-        PlayerData playerData = userDoc.ConvertTo<PlayerData>();
-        int playerSoloScore = playerData.soloScore;
-        string playerScoreBracket = GetScoreBracket(playerSoloScore);
-        Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
-
-        // 'waiting' 상태이고 플레이어가 2명 미만이며, 동일한 점수 구간의 룸을 찾습니다.
-        Query waitingRoomsQuery = db.Collection(RoomsCollection)
-            .WhereEqualTo("Status", "waiting")
-            .WhereLessThan("PlayerCount", 2)
-            .WhereEqualTo("ScoreBracket", playerScoreBracket)
-            .Limit(1);
-
-        QuerySnapshot snapshot = await waitingRoomsQuery.GetSnapshotAsync();
-
-        if (snapshot.Count > 0)
-        {
-            // 참여할 룸을 찾았습니다.
-            DocumentSnapshot roomDoc = snapshot.Documents.First();
-            Debug.Log($"참여할 룸을 찾았습니다: {roomDoc.Id}");
-            await JoinRoomAsync(roomDoc.Reference);
-        }
-        else
-        {
-            // 참여할 룸이 없으므로 새 룸을 생성합니다.
-            Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
-            await CreateRoomAsync(playerScoreBracket); // 점수 구간을 전달
-        }
+        
     }
 
     private async System.Threading.Tasks.Task JoinRoomAsync(DocumentReference roomRef)
     {
         string userId = FirebaseAuthManager.Instance.UserId;
 
-        // 참가 플레이어의 프로필 정보를 미리 가져옵니다. (트랜잭션 외부에서 await)
-        UserDataRoot joiningUserData = await DataManager.Instance.GetUserDataRootAsync(userId);
-        if (joiningUserData == null)
+        // 데이터베이스에서 다시 가져오는 대신, 현재 DataManager의 인스턴스 값을 사용합니다.
+        var joiningPlayer = DataManager.Instance.PlayerData;
+        var joiningInventory = DataManager.Instance.InventoryData;
+        if (joiningPlayer == null || joiningInventory == null)
         {
-            Debug.LogError($"참가 플레이어({userId})의 데이터를 불러오지 못했습니다.");
+            Debug.LogError($"참가 플레이어({userId})의 데이터를 DataManager에서 불러오지 못했습니다.");
             return;
         }
 
         // [테스트용 임시 코드] 인벤토리가 비어있으면 더미 데이터를 주입합니다.
-        if (joiningUserData.inventory == null || joiningUserData.inventory.donutEntries == null || joiningUserData.inventory.donutEntries.Count == 0)
+        if (joiningInventory.donutEntries == null || joiningInventory.donutEntries.Count == 0)
         {
             Debug.LogWarning($"참가 플레이어({userId})의 인벤토리가 비어있어 테스트용 더미 데이터를 주입합니다.");
-            joiningUserData.inventory = new InventoryData
+            joiningInventory.donutEntries = new List<DonutEntry>
             {
-                donutEntries = new List<DonutEntry>
-                {
-                    new DonutEntry { id = "Soft_15", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
-                    new DonutEntry { id = "Hard_22", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
-                    new DonutEntry { id = "Moist_13", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
-                    new DonutEntry { id = "Soft_14", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
-                    new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
-                }
+                new DonutEntry { id = "Soft_15", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
+                new DonutEntry { id = "Hard_22", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
+                new DonutEntry { id = "Moist_13", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
+                new DonutEntry { id = "Soft_14", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
+                new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
             };
         }
 
         // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
-        string displayNickname = string.IsNullOrEmpty(joiningUserData.player.nickname) ? "플레이어2" : joiningUserData.player.nickname;
+        string displayNickname = string.IsNullOrEmpty(joiningPlayer.nickname) ? "플레이어2" : joiningPlayer.nickname;
 
         PlayerProfile joiningProfile = new PlayerProfile
         {
             Nickname = displayNickname,
-            Email = joiningUserData.player.email,
-            Inventory = joiningUserData.inventory
+            Email = joiningPlayer.email,
+            curNamePlateType = joiningPlayer.curNamePlateType,
+            Inventory = joiningInventory
         };
         await db.RunTransactionAsync(async transaction =>
         {
@@ -336,39 +386,38 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         string userId = FirebaseAuthManager.Instance.UserId;
         DocumentReference newRoomRef = db.Collection(RoomsCollection).Document();
 
-        // 호스트 플레이어의 프로필 정보를 가져옵니다.
-        UserDataRoot hostUserData = await DataManager.Instance.GetUserDataRootAsync(userId);
-        if (hostUserData == null)
+        // 데이터베이스에서 다시 가져오는 대신, 현재 DataManager의 인스턴스 값을 사용합니다.
+        var hostPlayer = DataManager.Instance.PlayerData;
+        var hostInventory = DataManager.Instance.InventoryData;
+        if (hostPlayer == null || hostInventory == null)
         {
-            Debug.LogError($"호스트 플레이어({userId})의 데이터를 불러오지 못했습니다.");
+            Debug.LogError($"호스트 플레이어({userId})의 데이터를 DataManager에서 불러오지 못했습니다.");
             return;
         }
 
         // [테스트용 임시 코드] 인벤토리가 비어있으면 더미 데이터를 주입합니다.
-        if (hostUserData.inventory == null || hostUserData.inventory.donutEntries == null || hostUserData.inventory.donutEntries.Count == 0)
+        if (hostInventory.donutEntries == null || hostInventory.donutEntries.Count == 0)
         {
             Debug.LogWarning($"호스트 플레이어({userId})의 인벤토리가 비어있어 테스트용 더미 데이터를 주입합니다.");
-            hostUserData.inventory = new InventoryData
+            hostInventory.donutEntries = new List<DonutEntry>
             {
-                donutEntries = new List<DonutEntry>
-                {
-                    new DonutEntry { id = "Soft_10", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
-                    new DonutEntry { id = "Hard_5", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
-                    new DonutEntry { id = "Moist_20", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
-                    new DonutEntry { id = "Soft_22", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
-                    new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
-                }
+                new DonutEntry { id = "Soft_10", type = DonutType.Soft, weight = 10, resilience = 5, friction = 3 },
+                new DonutEntry { id = "Hard_5", type = DonutType.Hard, weight = 12, resilience = 6, friction = 4 },
+                new DonutEntry { id = "Moist_20", type = DonutType.Moist, weight = 11, resilience = 7, friction = 2 },
+                new DonutEntry { id = "Soft_22", type = DonutType.Soft, weight = 9, resilience = 8, friction = 5 },
+                new DonutEntry { id = "Hard_2", type = DonutType.Hard, weight = 13, resilience = 6, friction = 3 }
             };
         }
 
         // [테스트용 임시 코드] 닉네임이 비어있으면 더미 닉네임을 주입합니다.
-        string displayNickname = string.IsNullOrEmpty(hostUserData.player.nickname) ? "플레이어1" : hostUserData.player.nickname;
+        string displayNickname = string.IsNullOrEmpty(hostPlayer.nickname) ? "플레이어1" : hostPlayer.nickname;
 
         PlayerProfile hostProfile = new PlayerProfile
         {
             Nickname = displayNickname,
-            Email = hostUserData.player.email,
-            Inventory = hostUserData.inventory
+            Email = hostPlayer.email,
+            curNamePlateType = hostPlayer.curNamePlateType,
+            Inventory = hostInventory
         };
         var room = new Room
         {
@@ -473,7 +522,8 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                 { room.PlayerIds[1], 0 }
             },
             LastShot = null,
-            PredictedResult = null
+            PredictedResult = null,
+            ScoredDonuts = null
         };
 
         // "games" 컬렉션에 새 게임 문서를 추가합니다.
@@ -496,7 +546,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
         }
     }
 
-    private async void CancelMatchmaking()
+    public async void CancelMatchmaking()
     {
         Debug.Log("매치메이킹 시간 초과 또는 취소. 매칭을 중단합니다.");
         UIManager.Instance.Close(PanelId.MatchingPopUp); //매칭팝업창 닫기

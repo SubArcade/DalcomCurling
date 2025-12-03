@@ -10,7 +10,7 @@
     "Label_DeleteAccount": "계정삭제",
     "Label_AccountLink": "Google Play 계정연동",
     "Label_GameSetting": "게임 설정",
-    "Label_AlarmSetting": "알림 설정",
+    "Label_AlarmSetting": "알림",
     "Label_AlarmText": "알림을 받으시려면 기기 설정에서 알림이 켜져있는지 확인해주세요!",
     "Label_AlarmEnergy": "에너지 모두 재충전",
     "Label_EventAlarm": "이벤트 수신 알림",
@@ -32,10 +32,137 @@
     "Label_GeneratorUgrade": "생성기 업그레이드",
     "Label_UpgradeText": "생성기 레벨은 플레이어 레벨을 초과할 수 없어요!",
 
-
     "Btn_Upgrade": "업그레이드",
-    "Label_AskUpgrade": "생성기를 업그레이드할까요?"
+    "Label_AskUpgrade": "생성기를 업그레이드할까요?",
 
+    "Label_TitleList": "칭호 목록",
+    "Label_TitleSelect": "변경할 칭호를 선택하세요.",
+    "Label_SubTitle": "환생을 진행할 때마다 칭호를 얻을 수 있어요.",
+    "Label_NoTitle": "보유하고 있는 칭호가 없어요!",
+
+    "Label_ChangeNickname": "닉네임 변경",
+    "Btn_FirstFree": "최초 1회 무료",
+    "Label_ChangeText": "새 닉네임을 입력해주세요 2~8자를 쓸 수 있어요",
+    "Label_AskChange": "변경하시겠습니까?",
+
+    "Label_Yes": "예",
+    "Label_No": "아니요",
+    "Label_NotEnough": "재화가 부족합니다. 상점으로 이동할까요?",
+
+    "Label_Reincarnate": "환생하기",
+    "Label_WarningReincarnate": "[주의] 환생을 하면 모든 게임 정보가 초기화 되고 처음부터 다시 시작합니다.",
+    "Label_AskReincarnate": "환생을 진행할까요?",
+    "Btn_Reincarnate": "환생하기!",
+    "Label_ReincarnateText": "[주의] 환생을 하면 모든 게임 정보가 초기화 되고 처음부터 다시 시작합니다.\n\n▼ 아래 조건 만족 시 환생 가능\n플레이어 LV.20 & 모든 속성 도넛(단단/촉촉/말랑) 30단계 해금\n\n유지되는 항목 : 젬, 이펙트, 스킨, 캐릭터\n\n환생을 하면 칭호를 획득할 수 있습니다.",
+
+    "Label_GoldShop": "일반 상점",
+    "Label_CashShop": "캐시 상점",
+    "Label_Monthly": "월정액",
+    "Label_PackageTitle": "패키지",
+    "Label_RemoveADS": "광고 제거",
+    "Label_Currency": "재화",
+    "Label_GemTitle": "젬",
+    "Label_DonutText": "도넛",
+    "Label_EffectText": "이펙트",
+    "Label_CharacterText": "캐릭터",
+    "Label_MaleText": "캐릭터",
+    "Label_FemaleText": "여성",
+
+    "Label_Matching": "매칭중입니다",
+    "Btn_CancleMatch": "매칭 취소",
+
+    "Up_generator": "도넛생성기",
+    "Up_generatorUP": "도넛생성확률 증가",
+
+    "Order_Level": "단계",
+
+    "Label_askExit": "게임을 종료하시겠습니까?",
+
+    "Btn_cancle": "취소",
+    "Btn_guestLogin": "게스트 로그인",
+    "Label_guestDescr": "게스트로 로그인 할 경우, 디바이스를 초기화 하거나 앱 재설치 시 데이터가 삭제됩니다",
+
+    "Btn_confirm": "확인",
+
+    "Label_accountExit": "계정삭제",
+    "Label_acoountDeleteWarning": "계정을 삭제할 경우 연결된 데이터도 삭제됩니다.",
+    "Label_accountDeleteConfirm": "입력후에 확인을 터치하면 계정삭제가 진행됩니다.",
+    "Label_accountDeleteInsert": "아래 입력창에 DALCOM을 입력하세요",
+
+    "Label_getreward": "보상 획득",
+    "Label_Touch": "계속하려면 터치하세요",
+
+    "Label_levelUPreward": "레벨업 보상!",
+    "Label_getText": "획득하기",
+    "Label_adsDouble": "광고보고X2",
+
+    "Label_gameHelp": "게임 도움말",
+    "Label_step1": "생성기를 터치해서 도넛 만들기",
+    "Label_step2": "같은 도넛 두개를 합쳐서 상위단계 도넛 만들기",
+    "Label_step3": "주문서를 완료하고 골드 획득하기",
+    "Label_step4": "생성기 업그레이드로 더 높은 단계의 도넛 만들기",
+    "Label_step5": "엔트리를 설정하고 달콤컬링 플레이!",
+
+    "Label_orderLabel": "주문서 새로고침",
+    "Label_askRefresh": "광고를 보고 새로고침 횟수를 충전할까요?",
+    "Label_disRefresh": "매일 초기화되며 광고 한번당 5회가 충전됩니다.",
+    "Label_reFreshCharge": "충전하기",
+
+    "Label_energyCharge": "에너지 충전",
+    "Label_donutEnergy": "도넛을 생성하려면 에너지가 필요합니다",
+    "Label_energyTime": "2분30초마다 에너지 1개씩 회복가능",
+
+    "Label_Dalcom": "달콤 컬링!",
+
+    "Label_rankingTier": "랭킹 티어 정보",
+    "Label_bronze": "브론즈",
+    "Label_silver": "실버",
+    "Label_gold": "골드",
+    "Label_platinum": "플래티넘",
+    "Label_diamond": "다이아몬드",
+    "Label_challenger": "챌런저",
+
+    "Label_shopEffect1": "불방구",
+    "Label_shopEffect1Text": "전날 불닭을 먹었나봐요ㅠㅜ",
+    "Label_shopEffect2": "무지개 뿅뿅",
+    "Label_shopEffect2Text": "세상에서 가장 아름다운 개는? 무지개 하하하",
+    "Label_shopEffect3": "별빛 스파클링",
+    "Label_shopEffect3Text": "이 도넛은 스타가 될 도넛이다.",
+
+    "Label_shopCharacter1": "북치기박치기",
+    "Label_shopCharacter1Text": "박치기공룡 파키케팔로사우루스",
+    "Label_shopCharacter2": "큐티큐티 고먐미",
+    "Label_shopCharacter2Text": "냥냥",
+
+    "Label_ads1": "광고제거 7일권",
+    "Label_ads1Text": "오늘부터 7일동안 광고가 등장하지않아요!",
+    "Label_ads2": "광고제거 30일권",
+    "Label_ads2Text": "오늘부터 30일동안 광고가 등장하지않아요!",
+    "Label_ads3": "광고제거 180일권",
+    "Label_ads3Text": "오늘부터 180일동안 광고가 등장하지않아요!",
+    "Label_gemFree": "하루 한번 무료",
+
+    "Label_loockAds": "광고보기",
+
+    "ingame_waitingThrow": "상대방이 도넛을 던지는중...",
+
+    "ingame_checkConnect": "연결 확인중...",
+
+    "ingame_resultLevel": "플레이어 레벨",
+    "ingame_resultRank": "랭킹 등급",
+    "ingame_resultGetdonut": "획득 도넛",
+
+    "ingame_victoryText": "승리!",
+    "ingame_defeatText": "패배!",
+    "ingame_DonutSteal": "뺏어올 도넛을 선택하세요!",
+    "ingame_NextText": "다음",
+    "ingame_streak": "연승",
+
+    "ingame_surrenderText" :  "항복하시겠습니까?\n패배처리가 되며, 메인화면으로 돌아갑니다.",
+
+    "Label_ServicePolicy" : "서비스 이용약관 요약",
+    "Label_ServicePolicyDetail" : "• 본 게임의 서비스 이용 조건 및 제공 범위는 약관에 따라 운영됩니다.\n\n- 게임 콘텐츠, 계정 기능, 이용 가능한 환경(OS/기기) 등은 약관에 따라 제공됩니다.\n\n- 서비스는 업데이트나 점검 등으로 변경될 수 있으며, 필요 시 일부 기능이 제한될 수 있습니다.\n\n• 인앱결제(IAP)는 스토어 정책에 따라 처리됩니다.\n\n- 상품 구매·취소·환불은 Google Play 또는 App Store의 기준을 따릅니다.\n\n- 소비성 상품은 이미 사용된 경우 환불이 제한될 수 있습니다.\n\n• 이용자는 정당한 방법으로 서비스에 접근해야 하며, 금지 행위를 준수해야 합니다.\n\n- 불법 프로그램, 버그 악용, 계정 공유·거래 등은 금지됩니다.\n\n- 위반 시 계정 정지·기록 초기화 등 제재가 적용될 수 있습니다.\n\n• 게임 내부에서 제공되는 광고는 서비스 운영을 위한 요소입니다.\n\n- 광고 시청 보상 등 일부 기능은 운영 정책에 따라 제공되거나 변경될 수 있습니다.\n\n- 광고 노출 방식은 회사의 운영 정책 또는 제휴사 정책에 의해 달라질 수 있습니다.\n\n• 회사는 안정적인 서비스를 위해 최선을 다하지만, 외부 환경(네트워크/스토어 오류)은 책임 범위에 포함되지 않을 수 있습니다.\n\n- 스토어 결제 오류, 네트워크 장애 등은 해당 사업자의 정책이 우선합니다.\n\n- 예측 불가능한 기술적 문제 발생 시, 서비스가 일시 중단될 수 있습니다.\n\n• 자세한 내용은 전체 약관에서 확인할 수 있습니다.\n\n- 약관에는 서비스 이용 범위, 제한, 책임 범위, 이용자 권리 의무 등이 포함됩니다.\n\n- 약관은 서비스 안정화 및 법령 준수를 위해 변경될 수 있습니다.",
+    "Label_PrivacyNotice" : "개인정보 보호 안내"
   },
   "en": {
     "Btn_Start": "Start",
@@ -48,7 +175,7 @@
     "Label_DeleteAccount": "Delete Account",
     "Label_AccountLink": "Google Play Link Account",
     "Label_GameSetting": "Game Setting",
-    "Label_AlarmSetting": "Alarm Setting",
+    "Label_AlarmSetting": "Alarm",
     "Label_AlarmText": "Please check your device settings to ensure notifications are turned on",
     "Label_AlarmEnergy": "Energy Fully Recharged",
     "Label_EventAlarm": "Event Notifications",
@@ -71,6 +198,133 @@
     "Label_UpgradeText": "The generator level cannot exceed the player's level!",
 
     "Btn_Upgrade": "Upgrade",
-    "Label_AskUpgrade": "Do you want to upgrade your generator?"
+    "Label_AskUpgrade": "Do you want to upgrade your generator?",
+
+    "Label_TitleList": "TitleList",
+    "Label_TitleSelect": "Select a title to change.",
+    "Label_SubTitle": "You receive a title whenever you reincarnate.",
+    "Label_NoTitle": "You don't have any titles yet!!",
+
+    "Label_ChangeNickname": "Change Nickname",
+    "Btn_FirstFree": "First use free",
+    "Label_ChangeText": "Enter a new nickname (2–8 characters).",
+    "Label_AskChange": "Are you sure you want to change this?",
+
+    "Label_Yes": "Yes",
+    "Label_No": "No",
+    "Label_NotEnough": "You're low on Currency. Would you like to visit the shop?",
+
+    "Label_Reincarnate": "Reincarnate",
+    "Label_WarningReincarnate": "[Caution] Reincarnation wipes all progress and restarts the game.",
+    "Label_AskReincarnate": "Would you like to proceed with reincarnation?",
+    "Btn_Reincarnate": "Reincarnate!",
+    "Label_ReincarnateText": "[Notice] Reincarnation resets all game data and restarts the game from the beginning.\n\n▼ Requirements for Reincarnation\nPlayer LV.20 & All Donut Attributes (Hard/Soft/Moist) unlocked to Level 30\n\nItems retained: Gems, Effects, Skins, Characters\n\nYou can obtain a special title upon Reincarnation.",
+
+    "Label_GoldShop": "GoldShop",
+    "Label_CashShop": "CashShop",
+    "Label_Monthly": "Monthly Plan",
+    "Label_PackageTitle": "Package",
+    "Label_RemoveADS": "Rmove Abs",
+    "Label_Currency": "Currency",
+    "Label_GemTitle": "Gem",
+    "Label_DonutText": "Donut",
+    "Label_EffectText": "Effect",
+    "Label_CharacterText": "Character",
+    "Label_MaleText": "Character",
+    "Label_FemaleText": "Female",
+
+    "Label_Matching": "Matching",
+    "Btn_CancleMatch": "Cancle",
+    "ㄴ": null,
+    "Up_generator": "DonutGenerator",
+    "Up_generatorUP": "Donut chance Up",
+    "Order_Level": "Level",
+
+    "Label_askExit": "Do you want to quit the game?",
+
+    "Btn_cancle": "Cancle",
+    "Btn_guestLogin": "Guest Login",
+    "Label_guestDescr": "Guest login data will be lost if the device is reset or the app is reinstalled.",
+
+    "Btn_confirm": "Confirm",
+
+    "Label_accountExit": "Delete Account",
+    "Label_accountDeleteWarning": "Deleting your account will also delete all linked data.",
+    "Label_accountDeleteConfirm": "Enter the text and tap confirm to proceed with account deletion.",
+    "Label_accountDeleteInsert": "Please type DALCOM in the input field below.",
+
+    "Label_getreward": "Claim Reward",
+    "Label_Touch": "Tap to continue",
+
+    "Label_levelUPreward": "Level Up Reward!",
+    "Label_getText": "Claim",
+    "Label_adsDouble": "Watch Ad x2",
+
+    "Label_gameHelp": "Game Help",
+    "Label_step1": "Tap generator to make donuts",
+    "Label_step2": "Merge two donuts for higher tier",
+    "Label_step3": "Complete orders to earn gold",
+    "Label_step4": "Upgrade generator for better donuts",
+    "Label_step5": "Set entry and play Sweet Curling!",
+
+    "Label_orderLabel": "Order Refresh",
+    "Label_askRefresh": "Watch an ad to recharge refresh attempts?",
+    "Label_disRefresh": "Resets daily, each ad gives 5 refreshes.",
+    "Label_reFreshCharge": "Recharge",
+
+    "Label_energyCharge": "Energy Charge",
+    "Label_donutEnergy": "Energy is needed to make donuts",
+    "Label_energyTime": "Recover 1 energy every 2m30s",
+
+    "Label_Dalcom": "Dalcom Curling!",
+
+    "Label_rankingTier": "Ranking Tier Info",
+    "Label_bronze": "Bronze",
+    "Label_silver": "Silver",
+    "Label_gold": "Gold",
+    "Label_platinum": "Platinum",
+    "Label_diamond": "Diamond",
+    "Label_challenger": "Challenger",
+
+    "Label_shopEffect1": "Fireball",
+    "Label_shopEffect1Text": "Looks like you had spicy chicken yesterday…",
+    "Label_shopEffect2": "Rainbow Boom",
+    "Label_shopEffect2Text": "The most beautiful dog? Rainbow haha",
+    "Label_shopEffect3": "Starlight Sparkling",
+    "Label_shopEffect3Text": "This donut is destined to be a star.",
+
+    "Label_shopCharacter1": "Headbutt Dino",
+    "Label_shopCharacter1Text": "Pachycephalosaurus, the headbutt dinosaur",
+    "Label_shopCharacter2": "Cutie Kitty",
+    "Label_shopCharacter2Text": "Meow",
+
+    "Label_ads1": "Ad Removal 7 Days",
+    "Label_ads1Text": "No ads will appear for 7 days starting today!",
+    "Label_ads2": "Ad Removal 30 Days",
+    "Label_ads2Text": "No ads will appear for 30 days starting today!",
+    "Label_ads3": "Ad Removal 180 Days",
+    "Label_ads3Text": "No ads will appear for 180 days starting today!",
+    "Label_gemFree": "Free Once a Day",
+
+    "Label_loockAds": "Look Ads",
+    "Label_ServicePolicy" : "Service Policy",
+    "Label_ServicePolicyDetail" : "• The game is provided according to the Terms of Service, which define usage conditions and service scope.\\n\\n- Access requirements such as device compatibility, operating systems, and account functions follow the Terms of Service.\\n\\n- Some features may change or become limited due to updates, maintenance, or operational needs.\\n\\n• In-app purchases (IAP) are handled in accordance with each store’s policy.\\n\\n- Purchases, cancellations, and refunds follow Google Play or App Store rules.\\n\\n- Consumable items may not be refundable once they have been used.\\n\\n• Users must access the service through legitimate means and comply with prohibited actions.\\n\\n- Use of unauthorized programs, bug exploitation, and account sharing or trading are strictly prohibited.\\n\\n- Violations may result in penalties such as account suspension, data reset, or access restrictions without prior notice.\\n\\n• Advertisements within the game are part of the service operation.\\n\\n- Rewarded ads and ad placements may change depending on operational policy.\\n\\n- The type and frequency of ads may vary based on platform or partner requirements.\\n\\n• The company strives to provide stable service but cannot guarantee issues caused by external factors.\\n\\n- Store payment errors, network instability, and third-party service issues may fall outside our responsibility.\\n\\n- Unpredictable technical issues may result in temporary suspension or limited functionality.\\n\\n• Refer to the full Terms of Service for details.\\n\\n- The document includes usage limits, responsibilities, and user obligations.\\n\\n- Policies may be updated to improve service quality or comply with legal requirements.\"\n}",
+    "Label_PrivacyNotice" : "Privacy Notice",
+
+    "ingame_waitingThrow": "Opponent is throwing a donut...",
+
+    "ingame_checkConnect": "Checking connection...",
+
+    "ingame_resultLevel": "Player Level",
+    "ingame_resultRank": "Ranking Tier",
+    "ingame_resultGetdonut": "Donuts Earned",
+
+    "ingame_victoryText": "Victory!",
+    "ingame_defeatText": "Defeat!",
+    "ingame_DonutSteal": "Choose a donut to steal!",
+    "ingame_NextText": "Next",
+    "ingame_streak": "streak",
+
+    "ingame_surrenderText": "Do you want to surrender?\nIt will count as a defeat and return to the main screen."
   }
 }

@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,23 +14,60 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
     // UI Slider 컴포넌트를 드래그 앤 드롭으로 연결
     [Header("RoundPanel 노출변수")]
-    public TextMeshProUGUI aScoreText;
-    public TextMeshProUGUI bScoreText;
-    public TextMeshProUGUI roundText;
-    public TextMeshProUGUI roundChangeText;
-    // 현재 턴 번호를 표시하는 TextMeshProUGUI 객체
-    public TextMeshProUGUI turnText;
-    public GameObject CountDownText;
-    [Header("Debug")]
+    [SerializeField] private TextMeshProUGUI aScoreText;
+    [SerializeField] private TextMeshProUGUI bScoreText;
+    [SerializeField] private TextMeshProUGUI roundText;
+    [SerializeField] private TextMeshProUGUI roundChangeText;
+    [SerializeField] private TextMeshProUGUI turnText;
+    [SerializeField] private GameObject CountDownText;
+
+    [Header("디버그 텍스트")]
     public TextMeshProUGUI debugStateText;
     [Header("UI 제어 객체 (on/off)")]
     [SerializeField] private GameObject roundPanel;
     [SerializeField] private GameObject donutEntry;
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject result;
-    [SerializeField] private DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
+    [SerializeField] private Scr_TweenHandDragGuide guide;
+    [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject WaitThrowPopUp;
+
+    [Header("도넛 엔트리 항목")]
+    public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
     [SerializeField] private List<DonutEntryUI> myDisplayDonutSlots; // (표시 전용) 내 도넛 슬롯들
     [SerializeField] private List<DonutEntryUI> opponentDisplayDonutSlots; // (표시 전용) 상대방 도넛 슬롯들
+
+    [Header("결과창 보상 갱신을 위한 변수")]
+    [SerializeField] private TextMeshProUGUI expText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI pointText;
+    [SerializeField] private TextMeshProUGUI resultText; // 승리,패배 결과 텍스트
+    [SerializeField] private TextMeshProUGUI getDonutText; // 승리,패배에 따라 획득/잃은 도넛 텍스트
+
+
+    [Header("칭호를 적용할 자신과 상대의 텍스트와 이미지")]
+    [SerializeField] private TextMeshProUGUI EpitheText1; //ingameUI의 EpitheText들입니다
+    [SerializeField] private TextMeshProUGUI EpitheText2; //ingameUI의 epitheText들입니다
+    [SerializeField] private TextMeshProUGUI timeLineEpitheText1; //timelineUI의 epitheText들입니다.
+    [SerializeField] private TextMeshProUGUI timeLineEpitheText2;
+    [SerializeField] private Image EpitheImage1; //ingameUI의 텍스트부모이미지입니다
+    [SerializeField] private Image EpitheImage2;
+    [SerializeField] private Image timeLineEpitheImage1;//timelineUI의 부모이미지입니다
+    [SerializeField] private Image timeLineEpitheImage2;
+    [SerializeField] private Image timeLinePlayerCharacter1; //타임라인UI의 플레이어캐릭터 이미지입니다.
+    [SerializeField] private Image timeLinePlayerCharacter2;
+    [SerializeField] private CharacterSO characterSO; //so 넣어주시면됩니다
+    [SerializeField] private NamePlaateSO namePlateSO; //so넣어주시면됩니다.
+
+
+    [Header("플로팅 텍스트")]
+    [SerializeField] private FloatingText floatingText; // 씬에 미리 배치된 FloatingText 컴포넌트
+
+    // 사운드 관련 내용 추가 ---
+    [Header("BGM 전환 설정")]
+    [SerializeField] private int bgmTransitionTurn = 4; // BGM이 전환될 라운드 번호 (예: 3)
+    private bool isSpecialMusicPlaying = false; // BGM이 이미 전환되었는지 확인하는 플래그
+    private const string BGM_STATE_PARAMETER = "MusicState"; // FMOD에서 설정한 파라미터 이름
 
     //내부변수
     private int displayTurn = 0;
@@ -61,6 +98,20 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         {
             Debug.LogError("UI_LaunchIndicator_Firebase: Start()에서 FirebaseGameManager.Instance를 찾을 수 없습니다.");
         }
+
+        if (floatingText != null)
+        {
+            // 이 플로팅 텍스트는 파괴하지 않고 계속 재사용할 것이므로, destroyOnComplete 값을 false로 설정합니다.
+            floatingText.destroyOnComplete = false;
+            floatingText.gameObject.SetActive(false);
+        }
+
+        // 인게임 BGM 사운드 재생 ---
+        // 로비 BGM을 명시적으로 정지
+        SoundManager.Instance.StopBGM();
+
+        // 인게임 BGM을 재생 (Element 0으로 시작)
+        SoundManager.Instance.PlayBGMGroup("InGameBGM");
     }
 
     private void HandleProfilesLoaded()
@@ -87,10 +138,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         if (MyProfile != null)
         {
-            // TODO: 여기에 닉네임, 인벤토리 정보를 UI에 표시하는 로직 추가
-            Debug.Log($"UI_LaunchIndicator_Firebase: 내 닉네임: {MyProfile.Nickname}, 상대 닉네임: {OpponentProfile.Nickname}");
-
-            // 1. (선택 가능) 내 인벤토리 UI 채우기
+            // 내 인벤토리 UI 채우기
             if (donutSelectionUI != null)
             {
                 donutSelectionUI.Populate(MyProfile.Inventory.donutEntries);
@@ -100,11 +148,40 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 Debug.LogWarning("UI_LaunchIndicator_Firebase: donutSelectionUI가 할당되지 않았습니다.");
             }
 
-            // 2. (표시 전용) 내 인벤토리 UI 채우기
+            // 내 인벤토리 UI 채우기 (오프닝 타임라인)
             PopulateDisplayDonuts(myDisplayDonutSlots, MyProfile.Inventory.donutEntries);
 
-            // 3. (표시 전용) 상대방 인벤토리 UI 채우기
+            // 상대방 인벤토리 UI 채우기 (오프닝 타임라인) 
             PopulateDisplayDonuts(opponentDisplayDonutSlots, OpponentProfile.Inventory.donutEntries);
+
+            // 인게임UI의 칭호 텍스트 반영
+            if (EpitheText1 != null)
+                EpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, EpitheImage1);
+
+            if (EpitheText2 != null)
+                EpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, EpitheImage2);
+
+            //타임라인UI의 칭호 텍스트 반영
+            if (timeLineEpitheText1 != null)
+                timeLineEpitheText1.text = GetEpitheText(MyProfile.curNamePlateType, timeLineEpitheImage1);
+
+            if (timeLineEpitheText2 != null)
+                timeLineEpitheText2.text = GetEpitheText(OpponentProfile.curNamePlateType, timeLineEpitheImage2);
+
+            // ⭐ 타임라인 UI 캐릭터 이미지 반영
+            if (timeLinePlayerCharacter1 != null)
+            {
+                var myCharSprite = characterSO.GetCharacterSprite(MyProfile.Inventory.curCharacterType);
+                timeLinePlayerCharacter1.sprite = myCharSprite;
+                timeLinePlayerCharacter1.enabled = (myCharSprite != null);
+            }
+
+            if (timeLinePlayerCharacter2 != null)
+            {
+                var oppCharSprite = characterSO.GetCharacterSprite(OpponentProfile.Inventory.curCharacterType);
+                timeLinePlayerCharacter2.sprite = oppCharSprite;
+                timeLinePlayerCharacter2.enabled = (oppCharSprite != null);
+            }
         }
         else if (OpponentProfile != null)
         {
@@ -135,6 +212,12 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             string localState = FirebaseGameManager.Instance.CurrentLocalState;
             string gameState = FirebaseGameManager.Instance.CurrentGameState;
             debugStateText.text = $"Local State: {localState}\nGame State: {gameState}";
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) //세팅창열고닫기 [안드로이드는 뒤로가기 버튼]
+        {
+            if (settingsPanel.activeSelf) settingsPanel.SetActive(false);   // 닫기
+            else settingsPanel.SetActive(true); // 열기
         }
     }
 
@@ -177,19 +260,48 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     }
 
     /// <summary>
+    /// 지정된 위치에 플로팅 텍스트를 표시합니다.
+    /// </summary>
+    /// <param name="message">표시할 메시지</param>
+    /// <param name="screenPosition">텍스트가 나타날 스크린 좌표</param>
+    public void ShowFloatingText(string message, Vector3 screenPosition)
+    {
+        if (floatingText == null)
+        {
+            Debug.LogError("FloatingText 컴포넌트가 할당되지 않았습니다!");
+            return;
+        }
+
+        // 1. 위치 설정
+        floatingText.transform.position = screenPosition;
+
+        // 2. 텍스트 설정
+        floatingText.SetText(message);
+
+        // 3. 활성화 (활성화 시 FloatingText.cs의 OnEnable에서 애니메이션이 자동 시작됨)
+        floatingText.gameObject.SetActive(true);
+    }
+
+
+    /// <summary>
     /// UI 제어 메서드입니다.
     /// AllcloseUI() 먼저 호출하고 필요한UI만 켜지는 메서드 생성하여 호출 하면됩니다.
     /// </summary>
 
 
-    public void FinishedUI() // 결과창
+    public void FinishedUI(FirebaseGameManager.GameOutcome outcome) // 게임종료 - 결과창
     {
         AllcloseUI();
-        result.SetActive(true);
+        WaitThrowPopUp.SetActive(false);
+        DOTween.Kill("WatingThrowUI");
+        ResultRewardView(outcome); //게임결과 설정
+        result.SetActive(true); // 결과창 on
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
         AllcloseUI();
+        DOTween.Kill("WatingThrowUI");
+        WaitThrowPopUp.SetActive(false);
         roundPanel.SetActive(true);
         donutEntry.SetActive(true);
         minimap.SetActive(true);
@@ -201,7 +313,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public void IdleUI() //기본 상단 UI만 출력되는 상태
     {
         AllcloseUI();
+        WaitThrowPopUp.SetActive(false);
         roundPanel.SetActive(true);
+    }
+    public void WatingThrowUI()
+    {
+        AllcloseUI();
+        WaitThrowPopUp.SetActive(true);
     }
     public void AllcloseUI() // 모든 UI를 닫음
     {
@@ -209,6 +327,21 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         donutEntry.SetActive(false);
         minimap.SetActive(false);
         result.SetActive(false);
+        settingsPanel.SetActive(false);
+    }
+    public void ShowGuideUI(int select)
+    {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
+     // 반복 횟수 , 속도 거리등은 해당 객체 인스펙터에서 조절
+        guide.gameObject.SetActive(true);
+
+        if (select == 1) { guide.PlayVerticalDrag(); }
+        else if (select == 2) { guide.PlayHorizontalDrag(); }
+        else if (select == 3) { guide.PlayTouchMove(); }
+        else { Debug.Log("올바른 가이드 출력 번호가 아닙니다."); }
+    }
+    public void HideGuideUI()
+    {
+        guide.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -224,7 +357,8 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
 
         for (int i = 0; i < slots.Count; i++)
         {
-            if (i < entries.Count)
+            // 항목이 존재하고, null이 아닌지 확인
+            if (i < entries.Count && entries[i] != null)
             {
                 slots[i].gameObject.SetActive(true);
                 // 표시 전용 슬롯은 클릭 기능이 필요 없으므로 onClickAction에 null 전달
@@ -232,8 +366,99 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             }
             else
             {
-                slots[i].gameObject.SetActive(false); // 남는 슬롯은 비활성화
+                slots[i].gameObject.SetActive(false); // 남는 슬롯 또는 null인 슬롯은 비활성화
             }
+        }
+    }
+
+    public void ResultRewardView(FirebaseGameManager.GameOutcome outcome)  //게임결과에따라 각종 데이터를 넣어줌 TODO:캐릭터이미지랑 레벨,랭킹도 넣어야함
+    {
+        int exp = 0;
+        int rewardGold = 0;
+        int rewardPoint = 0;
+        string result = outcome.ToString();
+        string getDonut = "";
+
+        switch (outcome)
+        {
+            case FirebaseGameManager.GameOutcome.Win:
+                exp = 15;
+                rewardGold = 150;
+                rewardPoint = 20; // 페널티 복구 10점 + 승리 보너스 10점
+                result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_victoryText)}";
+
+                getDonut = "획득 도넛";
+
+                //GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
+                GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
+                break;
+            case FirebaseGameManager.GameOutcome.Lose:
+                exp = 8;
+                rewardGold = 50;
+                rewardPoint = 0; // 솔로스코어는 미리 반영되었으므로 0
+                result = $"{LocalizationManager.Instance.GetText(LocalizationKey.ingame_defeatText)}";
+
+                getDonut = "잃은 도넛";
+
+                break;
+            case FirebaseGameManager.GameOutcome.Draw:
+                exp = 10;
+                rewardGold = 100;
+                rewardPoint = 0; // 페널티로 잃었던 10점 복구
+                result = "DRAW!";
+                getDonut = "변동 없음";
+                GameManager.Instance.ProcessDrawOutcome(); // 페널티로 제거되었던 도넛 복구
+                break;
+        }
+
+        // UI 텍스트 갱신
+        //int previewLevel = DataManager.Instance.PlayerData.exp + exp; 
+
+        if (expText != null) expText.text = $"+{exp}";
+        if (goldText != null) goldText.text = $"+{rewardGold}";
+        if (pointText != null) pointText.text = $"+{rewardPoint}";
+        if (resultText != null) resultText.text = $"{result}";
+        if (getDonutText != null) getDonutText.text = $"{getDonut}";
+
+        GameManager.Instance.SetGameOutcome(outcome); // 게임 결과 저장
+        GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
+
+    }
+
+    // enum → 문자열 변환 함수
+    private string GetEpitheText(NamePlateType type, Image targetImage = null)
+    {
+        // SO에서 매핑된 NamePlate 가져오기
+        NamePlate plate = namePlateSO != null ? namePlateSO.GetByType(type) : null;
+
+        // 이미지 반영
+        if (targetImage != null)
+        {
+            if (plate != null && plate.plateSprite != null)
+            {
+                targetImage.sprite = plate.plateSprite;
+                targetImage.enabled = true;
+            }
+            else
+            {
+                targetImage.enabled = false;
+            }
+        }
+
+        // 텍스트 반환 (한글 이름 우선)
+        if (plate != null && !string.IsNullOrEmpty(plate.koNamePlate))
+            return plate.koNamePlate;
+
+        // 기본 fallback
+        switch (type)
+        {
+            case NamePlateType.NONE: return "";
+            case NamePlateType.DoughNewbie: return "초보 조물러";
+            case NamePlateType.SoftTouch: return "말랑 조작자";
+            case NamePlateType.DoughHandler: return "반죽 핸들러";
+            case NamePlateType.DonutPilot: return "도넛 파일럿";
+            case NamePlateType.DonutMaster: return "도넛 마스터";
+            default: return type.ToString();
         }
     }
 

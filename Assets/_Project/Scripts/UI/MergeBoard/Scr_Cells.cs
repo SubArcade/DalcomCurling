@@ -43,8 +43,8 @@ public class Cells : MonoBehaviour, IPointerClickHandler
         string path = $"DonutSprite/LockImage/lock_lv{level}";
         lockSprite = Resources.Load<Sprite>(path);
 
-        if (lockSprite == null)
-            Debug.LogWarning($"잠금 이미지가 없습니다: {path}");
+        //if (lockSprite == null)
+        //    Debug.LogWarning($"잠금 이미지가 없습니다: {path}");
     }
 
     // 플레이어 레벨에 따라 활성/비활성 갱신
@@ -68,7 +68,14 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public void SetItem(MergeItemUI item, DonutData data)
     {
         occupant = item;
-        donutId = data.id;
+        // ✅ null 체크 추가
+        donutId = data != null ? data.id : null;
+        if (item) item.BindToCell(this);
+    }
+    public void SetItem(MergeItemUI item, string id) //기프트박스 전용 오버로드 함수
+    {
+        occupant = item;
+        donutId = id;
         if (item) item.BindToCell(this);
     }
 

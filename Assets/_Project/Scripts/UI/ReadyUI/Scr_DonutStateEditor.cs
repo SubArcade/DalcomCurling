@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class Scr_DonutStateEditor : MonoBehaviour
 {
@@ -9,6 +9,7 @@ public class Scr_DonutStateEditor : MonoBehaviour
     [SerializeField] private TMP_Text donutLevelText;
     [SerializeField] private TMP_Text donutTypeText;
     [SerializeField] private TMP_Text donutPowerupValueText;
+    [SerializeField] private TMP_Text donutMaxValueText;
     [SerializeField] private Slider donutSlider;
     [SerializeField] private List<Scr_DonutSlot> slotUIs;
     [SerializeField] private GameObject blur;
@@ -23,6 +24,16 @@ public class Scr_DonutStateEditor : MonoBehaviour
     {
         // UIManager.Instance.OnReadyPanelOpen += () => Open(true);
         Open(true);
+        for (int i = 0; i < slotUIs.Count; i++)
+        {
+            int slotIndex = i + 1; // 1~5
+            slotUIs[i].Init(this, slotIndex);
+            RefreshSlot(slotIndex);
+            slotUIs[i].SetSelected(false);
+        }
+
+        // 기본 선택: 1번
+        SelectSlot(1);
     }
 
     private void OnDisable()
@@ -47,10 +58,10 @@ public class Scr_DonutStateEditor : MonoBehaviour
     private void Start()
     {
         // 최소 5칸 보장 + 기본값 세팅 (이미 함수 있음)
-        DataManager.Instance.EnsureDonutSlots();
+        //DataManager.Instance.EnsureDonutSlots();
 
         // 슬롯 초기 이미지 로드
-        for (int i = 0; i < slotUIs.Count; i++)
+        /*for (int i = 0; i < slotUIs.Count; i++)
         {
             int slotIndex = i + 1; // 1~5
             slotUIs[i].Init(this, slotIndex);
@@ -59,7 +70,7 @@ public class Scr_DonutStateEditor : MonoBehaviour
         }
 
         // 기본 선택: 1번
-        SelectSlot(1);
+        SelectSlot(1);*/
     }
 
     /// <summary>
@@ -116,6 +127,22 @@ public class Scr_DonutStateEditor : MonoBehaviour
         DonutEntry entry = (entryList != null && listIndex < entryList.Count)
             ? entryList[listIndex]
             : null;
+    
+        //Debug.Log(entry.id);    
+        // 도넛 amount가 0일경우 처음 앤트리에 넣은값
+        if (entry.donutAmount == 0)
+        {
+            DataManager.Instance.InventoryData.donutEntries[listIndex].donutAmount = 1;
+        }
+        
+        if (entry.level == 0)
+        {
+            string[] parts = entry.id.Split('_');
+            string last = parts[parts.Length - 1];
+            if (int.TryParse(last, out int parsedLevel)) 
+                entry.level = parsedLevel;
+            DataManager.Instance.InventoryData.donutEntries[listIndex].level = parsedLevel;
+        }
 
         Sprite sprite = GetSpriteForEntry(entry);
 
@@ -124,6 +151,7 @@ public class Scr_DonutStateEditor : MonoBehaviour
 
     /// <summary>
     /// 슬롯 선택 시 위쪽 이미지/텍스트 갱신 + Outline 처리
+    /// 선택된 슬롯 활성화
     /// </summary>
     private void SelectSlot(int slotIndex)
     {
@@ -134,26 +162,31 @@ public class Scr_DonutStateEditor : MonoBehaviour
         DonutEntry entry = (entries != null && listIndex < entries.Count)
             ? entries[listIndex]
             : null;
-
+        
         Sprite sprite = GetSpriteForEntry(entry);
         topDonutImage.sprite  = sprite;
         topDonutImage.enabled = (sprite != null);
 
+        // 슬라이더/ +숫자 초기화
+        donutSlider.SetValueWithoutNotify(1);
+        donutPowerupValueText.text = "+ 1";
+        donutSlider.minValue = 1;
+        
         if (entry != null)
         {
             donutTypeText.text  = entry.type.ToString();
-            donutLevelText.text = entry.weight.ToString(); // weight를 레벨처럼 사용 중
+            donutLevelText.text = $"LV.{entry.level.ToString()}";
+            donutSlider.maxValue = entry.level;
+            donutMaxValueText.text = entry.level.ToString();
         }
         else
         {
             donutTypeText.text  = "-";
-            donutLevelText.text = "-";
+            donutLevelText.text = "LV.0";
+            donutSlider.maxValue = 1f;
+            donutMaxValueText.text = "1";
         }
-
-        // 슬라이더/ +숫자 초기화
-        donutSlider.SetValueWithoutNotify(0);
-        donutPowerupValueText.text = "+ 0";
-
+        
         // 아래 선택 Outline 토글
         for (int i = 0; i < slotUIs.Count; i++)
         {
@@ -207,9 +240,10 @@ public class Scr_DonutStateEditor : MonoBehaviour
 
         DonutEntry entry = entries[listIndex];
         if (entry == null) return;
-
+        
         int previewLevel = entry.weight + delta;
-        donutLevelText.text = previewLevel.ToString();
+        
+        DataManager.Instance.InventoryData.donutEntries[listIndex].donutAmount = delta;
     }
 
     /// <summary>
@@ -234,7 +268,7 @@ public class Scr_DonutStateEditor : MonoBehaviour
         // UI 갱신
         donutSlider.SetValueWithoutNotify(0);
         donutPowerupValueText.text = "+ 0";
-        donutLevelText.text = entry.weight.ToString();
+        donutLevelText.text = entry.level.ToString();
 
         RefreshSlot(currentSelectedSlot);
     }

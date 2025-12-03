@@ -34,10 +34,7 @@ public class Scr_OrderSystem : MonoBehaviour
     [Header("갱신된 새로고침 횟수 텍스트")]
     [SerializeField] private TextMeshProUGUI refreshCountText;
 
-    
-    private int refreshCount = 5; //새로고침 횟수
-    private const int maxRefreshCount = 5; //최대 새로고침 횟수
-    private Coroutine refreshCoroutine; //일정 시간마다 새로고침 횟수 회복 코루틴
+    private const string RefreshCountKey = "Quest_RefreshCount";
 
     //도넛들의 체크이미지 활성/비활성용
     public class DonutVisualInfo
@@ -132,32 +129,8 @@ public class Scr_OrderSystem : MonoBehaviour
 
     void Awake()
     {
-        orderGroup1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderGroup1")?.gameObject;
-        orderGroup2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderGroup2")?.gameObject;
-        orderGroup3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderGroup3")?.gameObject;
-
-        orderDonuts1 = orderGroup1.GetComponentsInChildren<Image>().ToList();
-        orderDonuts2 = orderGroup2.GetComponentsInChildren<Image>().ToList();
-        orderDonuts3 = orderGroup3.GetComponentsInChildren<Image>().ToList();
-
-        refreshBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/RefreshButton")?.GetComponent<Button>();
-        refreshBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/RefreshButton")?.GetComponent<Button>();
-        refreshBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/RefreshButton")?.GetComponent<Button>();
-
-        costText1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-        costText3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn/cost_Text")?.GetComponent<TextMeshProUGUI>();
-
-        orderClearBtn1 = transform.Find("MainMenu/Top/QuestGroup/Order1/OrderClearBtn")?.gameObject;
-        orderClearBtn2 = transform.Find("MainMenu/Top/QuestGroup/Order2/OrderClearBtn")?.gameObject;
-        orderClearBtn3 = transform.Find("MainMenu/Top/QuestGroup/Order3/OrderClearBtn")?.gameObject;
-
-        refreshCountText = transform.Find("MainMenu/Top/ReroleGroup/RefreshCount/RefreshCount_text")?.GetComponent<TextMeshProUGUI>();
-        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
-
-        completeObject1 = transform.Find("MainMenu/Top/QuestGroup/Order1/CompleteObject")?.gameObject;
-        completeObject2 = transform.Find("MainMenu/Top/QuestGroup/Order2/CompleteObject")?.gameObject;
-        completeObject3 = transform.Find("MainMenu/Top/QuestGroup/Order3/CompleteObject")?.gameObject;
+        LoadRefreshCount();
+        refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
 
         // orderdonuts1~3의 자식 텍스트들을 리스트에 저장
         donutTextInfos1 = FindLevelAndTypeText(orderDonuts1);
@@ -192,7 +165,7 @@ public class Scr_OrderSystem : MonoBehaviour
         completeObject3.SetActive(false);
     
         // 새로고침 회복 코루틴
-        refreshCoroutine = StartCoroutine(RecoveryRefreshCount());
+        //refreshCoroutine = StartCoroutine(RecoveryRefreshCount());
 
         // 저장된 주문서 복원 시도
         bool isRestored = TryRestoreQuest();
@@ -224,6 +197,16 @@ public class Scr_OrderSystem : MonoBehaviour
         orderClearBtn1.SetActive(!isOrder1Complete);
         orderClearBtn2.SetActive(!isOrder2Complete);
         orderClearBtn3.SetActive(!isOrder3Complete);
+    }
+
+    void OnEnable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged += RefreshAllDonutTexts;
+    }
+
+    void OnDisable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged -= RefreshAllDonutTexts;
     }
 
     //도넛레벨별 가격 책정하기
@@ -301,14 +284,16 @@ public class Scr_OrderSystem : MonoBehaviour
     //새로고침 버튼 상호작용
     public void OnclickRefreshOrderBtn(Button ClickedButton)
     {
-        if (refreshCount <= 0)
+        if (DataManager.Instance.QuestData.refreshCount <= 0)
         {
+            UIManager.Instance.Open(PanelId.OrderRefreshPopUp);
             return;
         }
 
-        refreshCount--;
-        refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
-
+        DataManager.Instance.QuestData.refreshCount--;
+        SaveRefreshCount();
+        refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
+       
         // 해당 주문서의 CompleteObject 비활성화
         if (ClickedButton == refreshBtn1)
         {
@@ -331,92 +316,87 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 새로고침시 이미지, 이름.레벨,보상골드 갱신
     public void RefreshOrderDonut(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
     {
-        idList.Clear(); //id 초기화
+        idList.Clear(); // id 초기화
 
-        int count = Mathf.Min(orderImages.Count, textInfos.Count, 3); //도넛을 최대 3개까지만 새로고침
-        int totalReward = 0;
-        var questList = new List<QuestList>();
-        HashSet<string> usedDonuts = new(); //타입+레벨 검사해서 중복 방지
+        // 이번에 갱신할 도넛 개수를 랜덤으로 결정 (1~3)
+        int refreshCount = Random.Range(1, 4);
+
+        int totalReward = 0; //보상골드 초기화
+        var questList = new List<QuestList>(); //도넛들의 퀘스트 정보를 저장할 리스트
+        HashSet<string> usedDonuts = new(); //중복방지를 위한 도넛조합을 저장할 집합
 
         // 플레이어 레벨 기반 도넛 레벨 범위 계산
         int playerLevel = DataManager.Instance.PlayerData.level;
-        var (minLevel, maxLevel) = DonutLevelRange(playerLevel);
-        for (int i = 0; i < count; i++)
+        var (minLevel, maxLevel) = DonutLevelRange(playerLevel); 
+
+        // 먼저 모든 슬롯 비활성화
+        for (int i = 0; i < orderImages.Count; i++)
         {
-            DonutData donut = null; //도넛을 찾기 위한 변수와 무한루프 방지
-            int safety = 100;
-            while (safety-- > 0) //100에서 점점 1회씩 빼가며 중복되지않는 도넛 탐샘
+            orderImages[i].gameObject.SetActive(false);
+            if (i < textInfos.Count)
             {
-                DonutType randomType = (DonutType)Random.Range(0, System.Enum.GetValues(typeof(DonutType)).Length);
-                int randomLevel = Random.Range(minLevel, maxLevel + 1); //도넛의 타입과 레벨 무작위 선택
-                string comboKey = $"{randomType}_{randomLevel}"; //타입+레벨 조합한 키 생성
+                textInfos[i].levelText.text = "";
+                textInfos[i].typeText.text = "";
+            }
+        }
 
-            //도넛 타입과 레벨을 랜덤으로 고름
-            //DonutType randomType = orderDonutTypes[Random.Range(0, orderDonutTypes.Length)];
-            //int randomLevel = Random.Range(1, 31);
+        // refreshCount 만큼만 채워 넣기
+        for (int i = 0; i < refreshCount; i++)
+        {
+            DonutData donut = null; //도넛데이터를 찾기위해 변수 초기화
+            int safety = 100; //무한루프 방지용 100회 제한
+            while (safety-- > 0)
+            {
+                DonutType[] types = { DonutType.Hard, DonutType.Soft, DonutType.Moist };//타입랜덤으로 선택
+                DonutType randomType = types[Random.Range(0, types.Length)]; 
+                int randomLevel = Random.Range(minLevel, maxLevel + 1);//레벨을 랜덤으로 선택
+                string comboKey = $"{randomType}_{randomLevel}"; //타입과 레벨을 조합키로 문자열 생성
 
-                if (usedDonuts.Contains(comboKey)) continue; //이미 생성된 조합이면 다시 시도
+                if (usedDonuts.Contains(comboKey)) continue; //중복이면 다시 시도
 
-                var candidate = DataManager.Instance.GetDonutData(randomType, randomLevel); //해당 도넛 데이터 가져옴
-                if (candidate != null) //도넛이 존재하면
+                //위의 랜덤 타입과 레벨을 통해 데이터매니저에서 도넛을 찾음
+                var candidate = DataManager.Instance.GetDonutData(randomType, randomLevel);
+                if (candidate != null)
                 {
-                    donut = candidate; //도넛을 선택하고 
-                    usedDonuts.Add(comboKey); //조합을 추가해서 넣은뒤
+                    donut = candidate; //변수에 저장
+                    usedDonuts.Add(comboKey); //위의 조합키 문자열을 중복방지용 리스트에 저장
                     break;
                 }
             }
 
-            if (donut == null) continue; //도넛을 못 찾아도 계속 진행
+            if (donut == null) continue; //도넛이 없으면 건너뜀
 
-
-            //이미지, 타입, 단계 설명표시
+            // 슬롯 활성화
+            orderImages[i].gameObject.SetActive(true);
             orderImages[i].sprite = donut.sprite;
-            textInfos[i].typeText.text = donut.displayName;
-            textInfos[i].levelText.text = donut.description;
-            //저장
+
             idList.Add(donut.id);
 
             int reward = GetRewardByDonutLevel(donut.level);
             totalReward += reward;
 
-            // 퀘스트 정보 저장
             questList.Add(new QuestList
             {
                 donutId = donut.id,
                 rewardGold = reward
             });
 
+            // 텍스트 갱신
+            if (i < textInfos.Count)
+            {
+                textInfos[i].levelText.text = $"{donut.level}단계";
+                textInfos[i].typeText.text = donut.donutType.ToString();
+            }
         }
+
         costText.text = $"{totalReward}";
 
-        // 어떤 주문서인지에 따라 해당 퀘스트 저장
-        if (orderImages == orderDonuts1)
-        {
-            DataManager.Instance.QuestData.questList1 = questList;
-        }
-        else if (orderImages == orderDonuts2)
-        {
-            DataManager.Instance.QuestData.questList2 = questList;
-        }
-        else if (orderImages == orderDonuts3)
-        {
-            DataManager.Instance.QuestData.questList3 = questList;
-        }
-
         // 주문서별 보상 저장
-        if (orderImages == orderDonuts1)
-        {
-            rewardGold1 = totalReward; 
-        }
-        else if (orderImages == orderDonuts2)
-        {
-            rewardGold2 = totalReward;
-        }
-        else if (orderImages == orderDonuts3)
-        {
-            rewardGold3 = totalReward;
-        }
+        if (orderImages == orderDonuts1) rewardGold1 = totalReward;
+        else if (orderImages == orderDonuts2) rewardGold2 = totalReward;
+        else if (orderImages == orderDonuts3) rewardGold3 = totalReward;
     }
+
 
     //머지보드판에서 도넛 검색후 주문서 클리어 여부 결정
     public bool IsOrderCompleted(List<string> orderDonutIDs, List<DonutVisualInfo> visuals)
@@ -442,12 +422,12 @@ public class Scr_OrderSystem : MonoBehaviour
             if (!matched)
                 allMatched = false;
         }
-
+        
         return allMatched;
     }
 
     //주문서 완료시 버튼 상호작용
-    public async void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
+    public void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
     {
         //보드에서 주문서 도넛 제거
         foreach (var cell in BoardManager.Instance.GetAllCells())
@@ -467,6 +447,12 @@ public class Scr_OrderSystem : MonoBehaviour
         if (completeObject == completeObject1) reward = rewardGold1;
         else if (completeObject == completeObject2) reward = rewardGold2;
         else if (completeObject == completeObject3) reward = rewardGold3;
+
+        // 보상 지급 후 버튼 비활성화
+        var button = completeObject.GetComponent<Button>();
+        if (button != null)
+            button.interactable = false;
+
         //컴플리트버튼 유지를 위해 true 적용
         if (completeObject == completeObject1) isRewarding1 = true;
         else if (completeObject == completeObject2) isRewarding2 = true;
@@ -474,8 +460,13 @@ public class Scr_OrderSystem : MonoBehaviour
 
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;
-        await DataManager.Instance.UpdateUserDataAsync(gold: newGold);
-
+        DataManager.Instance.GoldChange(newGold);
+        
+        // 퀘스트 완료 보상 애널리틱스
+        AnalyticsManager.Instance.QuestRewardComplete();
+        // 새로운 주문서 등장
+        SoundManager.Instance.receiptReward();
+        
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)
             StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));
@@ -496,21 +487,11 @@ public class Scr_OrderSystem : MonoBehaviour
         else if (completeObject == completeObject3) isRewarding3 = false;
 
         completeObject.SetActive(false); // 완료 UI 숨김
-    }
 
-    //새로고침횟수 회복 코루틴 원하는 시간을 직접 넣으시면됩니다.
-    private IEnumerator RecoveryRefreshCount()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(10f);//요기!
-
-            if (refreshCount < maxRefreshCount)
-            {
-                refreshCount++;
-                refreshCountText.text = $"{refreshCount}/{maxRefreshCount}";
-            }
-        }
+        // 버튼 다시 활성화
+        var button = completeObject.GetComponent<Button>();
+        if (button != null)
+            button.interactable = true;
     }
 
     //게임 시작할때 이전 퀘스트정보 불러오기
@@ -527,12 +508,11 @@ public class Scr_OrderSystem : MonoBehaviour
             if (donut == null) continue;
 
             orderImages[i].sprite = donut.sprite;
-            textInfos[i].typeText.text = donut.displayName;
-            textInfos[i].levelText.text = donut.description;
 
             idList.Add(donut.id);
             totalReward += quest.rewardGold;
         }
+        SetDonutTexts(textInfos, idList);
         costText.text = $"{totalReward}";
     }
 
@@ -583,4 +563,76 @@ public class Scr_OrderSystem : MonoBehaviour
         }
         return (min, Mathf.Clamp(max, min, 30));
     }
+    //로컬라이제이션을 위한 언어변경용 함수
+    private void RefreshAllDonutTexts()
+    {
+        SetDonutTexts(donutTextInfos1, orderDonutIDs1);
+        SetDonutTexts(donutTextInfos2, orderDonutIDs2);
+        SetDonutTexts(donutTextInfos3, orderDonutIDs3);
+    }
+    //도넛 텍스트 로컬라이징 설정 함수
+    private void SetDonutTexts(List<DonutTextInfo> textInfos, List<string> idList)
+    {
+        for (int i = 0; i < textInfos.Count && i < idList.Count; i++)
+        {//텍스트와 아이디 리스트 둘중 짧은쪽까지만 범위지정         
+            var donut = DataManager.Instance.GetDonutByID(idList[i]); //현재 인덱스의 도넛 ID로 DonutData를 가져옴
+
+            if (donut == null || donut.donutType == DonutType.Gift) continue;
+            //도넛이 없거나 Gift 타입이면 무시
+
+            LocalizationKey typeKey = donut.donutType switch
+            { //로컬라이제이션키 설정
+                DonutType.Hard => LocalizationKey.Label_HardDonut,
+                DonutType.Soft => LocalizationKey.Label_SoftDonut,
+                DonutType.Moist => LocalizationKey.Label_MoistDonut,
+                _ => LocalizationKey.None
+            };
+
+            string localizedType = LocalizationManager.Instance.GetText(typeKey); //설정된 키 값 저장
+            string typeText = $"{localizedType}"; //문자열로 변환후 저장
+
+            textInfos[i].typeText.text = typeText; //UI에 표시될 텍스트
+
+            string levelLabel = LocalizationManager.Instance.GetText(LocalizationKey.Order_Level);
+            string lang = LocalizationManager.Instance.CurrentLanguage; //현재 언어상태 가져옴
+
+            string levelText = lang == "ko" 
+                ? $"{donut.level}{levelLabel}"
+                : $"{levelLabel}-{donut.level}";
+            //언어상태에따라 텍스트를 변경 ex)한글이면 1단계 영어면 Level-1
+
+            textInfos[i].levelText.text = levelText;//UI에 표시될 텍스트
+        }
+    }
+
+
+    //외부 접근용 함수 
+    public int GetRefreshCount() => DataManager.Instance.QuestData.refreshCount; //- 외부에서 Scr_OrderSystem의 refreshCount 값을 읽을 수 있게 해주는 역할
+
+    public int GetMaxRefreshCount() => DataManager.Instance.QuestData.maxCount;
+
+
+    public void AddRefreshCount(int amount)
+    {
+        DataManager.Instance.QuestData.refreshCount += amount;
+        refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
+    }
+
+    private void SaveRefreshCount()
+    {
+        PlayerPrefs.SetInt(RefreshCountKey, DataManager.Instance.QuestData.refreshCount);
+        PlayerPrefs.Save();
+    }
+    private void LoadRefreshCount()
+    {
+        if (PlayerPrefs.HasKey(RefreshCountKey))
+        {
+            DataManager.Instance.QuestData.refreshCount = PlayerPrefs.GetInt(RefreshCountKey);
+        }
+        else
+        {
+            DataManager.Instance.QuestData.refreshCount = DataManager.Instance.QuestData.maxCount;
+        }
+    }
+
 }

@@ -1,17 +1,32 @@
-using System;
-using UnityEngine;
+﻿using System;
+using System.Diagnostics;
 using GoogleMobileAds.Api;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+
+public enum AdType
+{
+    TEST,
+    ENERGY,
+    REFRESH,
+    GIFTBOX,
+    Gem
+}
 
 public class AdsRewarded : MonoBehaviour
 {
     public static AdsRewarded Instance { get; private set; }
-    
+
     // 보상형 광고단위 ID
     // ca-app-pub-4548432662417935/3098948422 안드로이드 배포용
     // ca-app-pub-3940256099942544/5224354917 안드로이드 테스트용
+    private const string TestAD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"; // 안드로이드 테스트
+    // 배포용
+    private const string EnergyAD_UNIT_ID = "ca-app-pub-4548432662417935/3098948422"; // 에너지
+    private const string RefreshAD_UNIT_ID = "ca-app-pub-4548432662417935/3823474752"; // 퀘스트 새로고침
+    private const string GiftBoxAD_UNIT_ID = "ca-app-pub-4548432662417935/3098948422"; // 기프트박스
 #if UNITY_ANDROID
-    private const string AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"; // 안드로이드 테스트
-    //private const string AD_UNIT_ID = "ca-app-pub-4548432662417935/3098948422"; // 안드로이드 배포
+    
 #elif UNITY_IOS
     private const string AD_UNIT_ID = "apple"; // 아이폰
 #else
@@ -53,21 +68,42 @@ public class AdsRewarded : MonoBehaviour
 
             // SDK 준비 완료 후 보상형 광고 로드
             sdkReady = true;
-            LoadRewarded(); 
+            LoadRewarded(AdType.TEST); 
         });
     }
 
 
     // 로드
-    public void LoadRewarded()
+    public void LoadRewarded(AdType adType)
     {
         if (!sdkReady) return;
 
         // 이전 광고 정리
         rewardedAd = null;
         var request = new AdRequest();
+        string adUnitId = TestAD_UNIT_ID;
+
+        switch (adType)
+        {
+            case AdType.TEST:
+                adUnitId = TestAD_UNIT_ID;
+                break;
+            case AdType.ENERGY:
+                adUnitId = EnergyAD_UNIT_ID;
+                break;
+            case AdType.REFRESH:
+                adUnitId = RefreshAD_UNIT_ID;
+                break;
+            case AdType.GIFTBOX:
+                adUnitId = GiftBoxAD_UNIT_ID;
+                break;
+        }
+
+        // 새로고침 횟수 다차면 막기
+        if (DataManager.Instance.QuestData.currentChargeCount >= DataManager.Instance.QuestData.maxChargeCount)
+            return;
         
-        RewardedAd.Load(AD_UNIT_ID, request, (RewardedAd ad, LoadAdError error) =>
+        RewardedAd.Load(adUnitId, request, (RewardedAd ad, LoadAdError error) =>
         {
             if (error != null || ad == null)
             {
@@ -83,12 +119,12 @@ public class AdsRewarded : MonoBehaviour
             rewardedAd.OnAdFullScreenContentClosed += () =>
             {
                 Debug.Log("[AdMob] Rewarded Closed → Preload next");
-                LoadRewarded(); // 닫히면 다음 광고 미리 로드
+                LoadRewarded(adType); // 닫히면 다음 광고 미리 로드
             };
             rewardedAd.OnAdFullScreenContentFailed += (AdError err) =>
             {
                 Debug.LogWarning($"[AdMob] Show Fail: {err}");
-                LoadRewarded();
+                LoadRewarded(adType);
             };
         });
     }
@@ -96,12 +132,12 @@ public class AdsRewarded : MonoBehaviour
     public bool IsReady() => rewardedAd != null;
 
     // 표시
-    public void ShowRewarded()
+    public void ShowRewarded(AdType adType)
     {
         if (!IsReady())
         {
             Debug.Log("[AdMob] Not Ready. Reloading...");
-            LoadRewarded();
+            LoadRewarded(adType);
             return;
         }
 

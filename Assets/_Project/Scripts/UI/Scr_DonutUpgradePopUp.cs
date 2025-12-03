@@ -4,6 +4,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum GeneratorType
+{
+    Hard,
+    Soft,
+    Moist
+}
 
 public class Scr_DonutUpgradePopUp : MonoBehaviour
 {
@@ -32,42 +38,21 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     [SerializeField] private TextMeshProUGUI MoistDonutOptionText;
     [SerializeField] private TextMeshProUGUI SoftDonutOptionText;
 
-    [Header("업그레이드 질문 팝업")]
+    [Header("업그레이드 팝업")]
     [SerializeField] private GameObject AskUpgradePopUp;
-    [SerializeField] private GameObject FailUpgradePopUp;
+    [SerializeField] private Button agreeUpgradeButton;
+    [SerializeField] private Button cancelUpgradeButton;
+    private GeneratorType pendingUpgradeType;
+    [SerializeField] private TextMeshProUGUI popupDescText;
 
-    
+    [Header("cost 갱신 텍스트")]
+    [SerializeField] private TextMeshProUGUI HardCostText;
+    [SerializeField] private TextMeshProUGUI MoistCostText;
+    [SerializeField] private TextMeshProUGUI SoftCostText;
+    [SerializeField] private TextMeshProUGUI popupCostText; // 팝업에 표시될 비용 텍스트
+
     //도넛 업그레이드 레벨 체크용도
-    
     private const int MaxLevel = 20;
-    void Awake()
-    {
-        //업글버튼 누르면 바로 업글 되게 해놓음
-        //데이터베이스에서 돈이랑 연결해서 업글버튼누르면
-        //돈이 있다면 askupgrade팝업
-        //돈이없다면 failupgrade팝업 뜨도록 코드 추가
-        //각 팝업에 존재하는 버튼들과 텍스트 인스펙터에 자동으로 잡히고 애드리스너등록
-        Transform canvas = GameObject.Find("Canvas")?.transform;
-        CloseButton = transform.Find("Panel/CloseButton")?.GetComponent<Button>();
-        HardUpgradeButton = transform.Find("Panel/ButtonPanel/HardUpgradePanel/HardUpgradeButton")?.GetComponent<Button>();
-        MoistUpgradeButton = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/MoistUpgradeButton")?.GetComponent<Button>();
-        SoftUpgradeButton = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/SoftUpgradeButton")?.GetComponent<Button>();
-
-        HardUpgradeMax = transform.Find("Panel/ButtonPanel/HardUpgradePanel/HardUpgradeMax")?.gameObject;
-        MoistUpgradeMax = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/MoistUpgradeMax")?.gameObject;
-        SoftUpgradeMax = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/SoftUpgradeMax")?.gameObject;
-
-        HardDonutCreatText = transform.Find("Panel/ButtonPanel/HardUpgradePanel/HardDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
-        MoistDonutCreatText = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/MoistDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
-        SoftDonutCreatText = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/SoftDonutCreate_Text")?.GetComponent<TextMeshProUGUI>();
-
-        HardDonutOptionText = transform.Find("Panel/ButtonPanel/HardUpgradePanel/UpgradeOptionLabel/HardDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
-        MoistDonutOptionText = transform.Find("Panel/ButtonPanel/MoistUpgradePanel/UpgradeOptionLabel/MoistDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
-        SoftDonutOptionText = transform.Find("Panel/ButtonPanel/SoftUpgradePanel/UpgradeOptionLabel/SoftDonutOption_Text")?.GetComponent<TextMeshProUGUI>();
-
-        AskUpgradePopUp = canvas.Find("AskUpgradePopup")?.gameObject;
-        FailUpgradePopUp = canvas.Find("FailUpgradePopup")?.gameObject;
-    }
 
     void Start()
     {
@@ -81,102 +66,286 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         //SoftUpgradeButton.onClick.AddListener(() =>
         //UpgradeDonut(ref softDonutLevel, "말랑", SoftDonutCreatText, SoftDonutOptionText, SoftUpgradeButton, SoftUpgradeMax));
 
-        HardUpgradeButton.onClick.AddListener(OnClickHardUpgrade);
-        MoistUpgradeButton.onClick.AddListener(OnClickMoistUpgrade);
-        SoftUpgradeButton.onClick.AddListener(OnClickSoftUpgrade);
+        HardUpgradeButton.onClick.AddListener(() => OpenAskUpgradePopup(GeneratorType.Hard));
+        MoistUpgradeButton.onClick.AddListener(() => OpenAskUpgradePopup(GeneratorType.Moist));
+        SoftUpgradeButton.onClick.AddListener(() => OpenAskUpgradePopup(GeneratorType.Soft));
+        agreeUpgradeButton.onClick.AddListener(OnClickAgreeUpgrade);
+        cancelUpgradeButton.onClick.AddListener(() => AskUpgradePopUp.gameObject.SetActive(false));
 
         updateAllText();
+    }
+    void OnEnable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged += updateAllText;
+        updateAllText(); // 팝업이 열릴 때도 즉시 반영
+    }
+
+    void OnDisable()
+    {
+        LocalizationManager.Instance.OnLanguageChanged -= updateAllText;
+    }
+
+    // 팝업 열기, 텍스트 연동
+    private void OpenAskUpgradePopup(GeneratorType type)
+    {
+        pendingUpgradeType = type;
+
+        int currentLevel = GetCurrentGeneratorLevel(type);
+        int nextLevel = currentLevel + 1;
+        int cost = GetUpgradeCost(currentLevel);
+
+        string typeName = type switch
+        {
+            GeneratorType.Hard => "단단 도넛",
+            GeneratorType.Soft => "말랑 도넛",
+            GeneratorType.Moist => "촉촉 도넛",
+            _ => ""
+        };
+
+        // 팝업 텍스트 갱신
+        popupDescText.text =
+            $"[{typeName}] 생성기를 업그레이드 할까요?\n" +
+            $"({currentLevel}단계 → {nextLevel}단계 업그레이드)\n" +
+            $"도넛 생성 확률이 증가합니다.";
+
+        popupCostText.text = $"{cost}";
+
+        AskUpgradePopUp.SetActive(true);
+    }
+
+    private void OnClickAgreeUpgrade()
+    {
+        UpgradeGenerator(pendingUpgradeType);
+
+        // 업그레이드 후 텍스트 갱신
+        updateAllText();
+
+        // 팝업 닫기
+        AskUpgradePopUp.SetActive(false);
     }
 
     //단단 업글
     void OnClickHardUpgrade()
     {
-        int level = Data.MergeBoardData.generatorLevelHard;
+        int hardLevel = Data.MergeBoardData.generatorLevelHard;
 
-        if (level >= MaxLevel)
+        if (hardLevel >= MaxLevel)
         {
             HardUpgradeButton.interactable = false;
             HardUpgradeMax.SetActive(true);
             return;
         }
 
-        level++;
-        Data.MergeBoardData.generatorLevelHard = level;
+        int playerLevel = Data.PlayerData.level;
+        if (hardLevel >= playerLevel) return;
 
-        UpdateDonutText(level, "단단", HardDonutCreatText, HardDonutOptionText);
+        int cost = GetUpgradeCost(hardLevel);
+        if (Data.PlayerData.gold < cost)
+        {
+            //비활성화로 만들어야함.
+            return;
+        }
+        Data.PlayerData.gold -= cost;
+        Data.GoldChange(Data.PlayerData.gold);
+
+        hardLevel++;
+        Data.MergeBoardData.generatorLevelHard = hardLevel;
+
+        UpdateDonutText(hardLevel, "단단", HardDonutCreatText, HardDonutOptionText);
     }
 
     //촉촉 업글
     void OnClickMoistUpgrade()
     {
-        int level = Data.MergeBoardData.generatorLevelMoist;
+        int moistLevel = Data.MergeBoardData.generatorLevelMoist;
 
-        if (level >= MaxLevel)
+        if (moistLevel >= MaxLevel)
         {
             MoistUpgradeButton.interactable = false;
             MoistUpgradeMax.SetActive(true);
             return;
         }
 
-        level++;
-        Data.MergeBoardData.generatorLevelMoist = level;
+        int playerLevel = Data.PlayerData.level;
+        if (moistLevel >= playerLevel) return;
 
-        UpdateDonutText(level, "촉촉", MoistDonutCreatText, MoistDonutOptionText);
+        int cost = GetUpgradeCost(moistLevel);
+        if (Data.PlayerData.gold < cost)
+        {
+            //비활성화로 만들어야함.
+            return;
+        }
+        Data.PlayerData.gold -= cost;
+        Data.GoldChange(Data.PlayerData.gold);
+        
+        moistLevel++;
+        Data.MergeBoardData.generatorLevelMoist = moistLevel;
+
+        UpdateDonutText(moistLevel, "촉촉", MoistDonutCreatText, MoistDonutOptionText);
     }
 
     //말랑 업글
     void OnClickSoftUpgrade()
     {
-        int level = Data.MergeBoardData.generatorLevelSoft;
+        int softLevel = Data.MergeBoardData.generatorLevelSoft;
 
-        if (level >= MaxLevel)
+        if (softLevel >= MaxLevel)
         {
             SoftUpgradeButton.interactable = false;
             SoftUpgradeMax.SetActive(true);
             return;
         }
 
-        level++;
-        Data.MergeBoardData.generatorLevelSoft = level;
+        int playerLevel = Data.PlayerData.level;
+        if (softLevel >= playerLevel) return;
 
-        UpdateDonutText(level, "말랑", SoftDonutCreatText, SoftDonutOptionText);
+        int cost = GetUpgradeCost(softLevel);
+        if (Data.PlayerData.gold < cost)
+        {
+            //비활성화로 만들어야함.
+            return;
+        }
+        Data.PlayerData.gold -= cost;
+        Data.GoldChange(Data.PlayerData.gold);
+
+        softLevel++;
+        Data.MergeBoardData.generatorLevelSoft = softLevel;
+
+        UpdateDonutText(softLevel, "말랑", SoftDonutCreatText, SoftDonutOptionText);
+    }
+
+    // 비활성화 확인용
+    private void UpdateUpgradeButtonState()
+    {
+        int hardLevel = Data.MergeBoardData.generatorLevelHard;
+        int moistLevel = Data.MergeBoardData.generatorLevelMoist;
+        int softLevel = Data.MergeBoardData.generatorLevelSoft;
+
+        int hardCost = GetUpgradeCost(hardLevel);
+        int moistCost = GetUpgradeCost(moistLevel);
+        int softCost = GetUpgradeCost(softLevel);
+
+        int gold = Data.PlayerData.gold;
+        int playerLevel = Data.PlayerData.level;
+
+        bool hardEnabled =
+        gold >= hardCost &&
+        hardLevel < MaxLevel &&
+        hardLevel < playerLevel;
+
+        bool moistEnabled =
+            gold >= moistCost &&
+            moistLevel < MaxLevel &&
+            moistLevel < playerLevel;
+
+        bool softEnabled =
+            gold >= softCost &&
+            softLevel < MaxLevel &&
+            softLevel < playerLevel;
+
+        HardUpgradeButton.interactable = hardEnabled;
+        MoistUpgradeButton.interactable = moistEnabled;
+        SoftUpgradeButton.interactable = softEnabled;
+
+        // 최대레벨일 때 Max 패널 ON
+        HardUpgradeMax.SetActive(hardLevel >= MaxLevel);
+        MoistUpgradeMax.SetActive(moistLevel >= MaxLevel);
+        SoftUpgradeMax.SetActive(softLevel >= MaxLevel);
     }
 
 
-    ////도넛 업그레이드 시 레벨업 & 만렙 도달시 업그레이드 비활성화
-    //void UpgradeDonut(ref int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText, Button upgradeButton, GameObject maxlevelPanel)
-    //{
-    //    if (level >= MaxLevel)
-    //    {
-    //        upgradeButton.interactable = false;
-    //        maxlevelPanel.SetActive(true);
-    //        return;
-    //    }
-    //    level++;
-    //    UpdateDonutText(level,type, createText, optionText);
+    //생성기레벨 참조
+    private int GetCurrentGeneratorLevel(GeneratorType type)
+    {
+        return type switch
+        {
+            GeneratorType.Hard => Data.MergeBoardData.generatorLevelHard,
+            GeneratorType.Soft => Data.MergeBoardData.generatorLevelSoft,
+            GeneratorType.Moist => Data.MergeBoardData.generatorLevelMoist,
+            _ => 0
+        };
+    }
 
-    //    if (level >= MaxLevel)
-    //    {
-    //        upgradeButton.interactable = false;
-    //        maxlevelPanel.SetActive(true);
-    //    }
-    //}
+    //업그레이드 종류선택
+    private void UpgradeGenerator(GeneratorType type)
+    {
+        switch (type)
+        {
+            case GeneratorType.Hard:
+                OnClickHardUpgrade();
+                break;
+
+            case GeneratorType.Soft:
+                OnClickSoftUpgrade();
+                break;
+
+            case GeneratorType.Moist:
+                OnClickMoistUpgrade();
+                break;
+        }
+    }
+
+    //업그레이드 비용
+    private int GetUpgradeCost(int level)
+    {
+        if (level <= 10)
+        {
+            return level * 1000;
+        }
+
+        return 10000 + ((level - 10) * 5000);
+    }
+
+    // 버튼 비용 텍스트 갱신
+    private void UpdateUpgradeCostTexts()
+    {
+        int hardLevel = Data.MergeBoardData.generatorLevelHard;
+        int moistLevel = Data.MergeBoardData.generatorLevelMoist;
+        int softLevel = Data.MergeBoardData.generatorLevelSoft;
+
+        HardCostText.text = GetUpgradeCost(hardLevel).ToString();
+        MoistCostText.text = GetUpgradeCost(moistLevel).ToString();
+        SoftCostText.text = GetUpgradeCost(softLevel).ToString();
+    }
+
 
     //도넛 레벨에 따라 텍스트 갱신
     void UpdateDonutText(int level,string type, TextMeshProUGUI createText, TextMeshProUGUI optionText) 
     {
-        createText.text = $"Lv{level} {type}도넛 생성기";
-        optionText.text = $"{level}단계 {type}도넛 생성확률 증가";
+        LocalizationKey typeKey;
+
+        switch (type)
+        {
+            case "단단":
+                typeKey = LocalizationKey.Label_HardDonut;
+                break;
+            case "촉촉":
+                typeKey = LocalizationKey.Label_MoistDonut;
+                break;
+            case "말랑":
+                typeKey = LocalizationKey.Label_SoftDonut;
+                break;
+            default:            
+                typeKey = LocalizationKey.Label_HardDonut;
+                break;
+        }
+
+        string localizedType = LocalizationManager.Instance.GetText(typeKey);
+        string generatorText = LocalizationManager.Instance.GetText(LocalizationKey.Up_generator);
+        string chanceText = LocalizationManager.Instance.GetText(LocalizationKey.Up_generatorUP);
+
+        createText.text = $"Lv{level} {localizedType} {generatorText}";
+        optionText.text = $"Lv{level} {localizedType} {chanceText}";
     }
 
     void updateAllText() 
     {
-        //UpdateDonutText(hardDonutLevel,"단단", HardDonutCreatText, HardDonutOptionText);
-        //UpdateDonutText(moistDonutLevel,"촉촉", MoistDonutCreatText, MoistDonutOptionText);
-        //UpdateDonutText(softDonutLevel,"말랑" ,SoftDonutCreatText, SoftDonutOptionText);
         UpdateDonutText(Data.MergeBoardData.generatorLevelHard, "단단", HardDonutCreatText, HardDonutOptionText);
         UpdateDonutText(Data.MergeBoardData.generatorLevelMoist, "촉촉", MoistDonutCreatText, MoistDonutOptionText);
         UpdateDonutText(Data.MergeBoardData.generatorLevelSoft, "말랑", SoftDonutCreatText, SoftDonutOptionText);
+
+        UpdateUpgradeCostTexts();
+        UpdateUpgradeButtonState();
     }
     void OnClickClosePopUp() 
     {

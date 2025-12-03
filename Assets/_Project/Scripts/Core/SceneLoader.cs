@@ -23,7 +23,7 @@ public class SceneLoader : MonoBehaviour
     }
     
     // 로컬
-    public void LoadLocal(string sceneName, bool wait = false, Action onFinish = null)
+    public void  LoadLocal(string sceneName, bool wait = false, Action onFinish = null)
     {
         print("Loading local scene: " + sceneName);
         UIManager.Instance?.ShowLoading("Loading...");
@@ -40,6 +40,9 @@ public class SceneLoader : MonoBehaviour
 
         yield return null;
         yield return null;
+        
+        if(sceneName == GameManager.Instance.gameSceneName)
+            AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.main_enter, false);
         
         // 3) 부트스트랩/타겟 외 모든 씬 언로드
         //print($"{sceneName} loadedaaaaaaaaaaaaaaaaaaaaaaaaaaa");
@@ -58,41 +61,6 @@ public class SceneLoader : MonoBehaviour
         //Debug.Log($"Loading scene: {sceneName}");
         onFinish?.Invoke();
     } 
-    
-    
-    // 기존 포톤 이벤트
-    public void LoadAdditiveForAll(string sceneName)
-    {
-        /*if (!PhotonNetwork.InRoom || !PhotonNetwork.IsMasterClient)
-        {
-            //Debug.LogWarning("[SceneLoader] Only MasterClient can call LoadForAll inside a room.");
-            return;
-        }
-
-        UIManager.Instance?.ShowLoading("Sync loading...");
-        
-        bool prev = PhotonNetwork.AutomaticallySyncScene;
-        PhotonNetwork.AutomaticallySyncScene = false;
-        
-        var content = new object[] { sceneName };
-        var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-        PhotonNetwork.RaiseEvent(EV_LOAD_ADD, content, options, SendOptions.SendReliable);
-        
-        PhotonNetwork.AutomaticallySyncScene = prev;*/
-    }
-    
-    // 방장이외의 다른사람들 이벤트
-    /*private void OnPhotonEvent(EventData ev)
-    {
-        if (ev.Code != EV_LOAD_ADD) return;
-    
-        //Debug.Log("OnPhotonEvent 실행");
-        string sceneName = (string)((object[])ev.CustomData)[0];
-        //Debug.Log($"OnPhotonEvent에서 실행하는 sceneName : {sceneName}");
-        
-        UIManager.Instance?.ShowLoading("loading...");
-        StartCoroutine(LoadRoutine(sceneName));
-    }*/
     
     private IEnumerator UnloadOthersExcept(string keepA, string keepB)
     {

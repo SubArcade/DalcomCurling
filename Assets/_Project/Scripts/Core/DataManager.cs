@@ -1,7 +1,8 @@
 ﻿using System;
-using Firebase.Firestore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Firebase.Firestore;
 using UnityEngine;
 
 public enum GameMode
@@ -27,34 +28,10 @@ public enum GameTier
 [System.Serializable, FirestoreData]
 public class UserDataRoot
 {
-    [field: SerializeField] [FirestoreProperty] public PlayerData player { get; set; } = new PlayerData(){
-        email = "test@test.com",
-        nickname = "test",
-        gold = 250,
-        gem = 7,
-        energy = 10,
-        level = 1,
-        exp = 0,
-        lastAt = 0,
-        maxEnergy = 20,
-        perSecEnergy = 10,
-        soloScore = 0,
-        soloTier = GameTier.Bronze,
-        levelMax = 20,
-    };
+    [field: SerializeField] [FirestoreProperty] public PlayerData player { get; set; } = new PlayerData();
     [field: SerializeField] [FirestoreProperty] public InventoryData inventory { get; set; } = new InventoryData();
-   
-    [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData()
-    {
-        cellMax = 49,
-        cellWidth = 7,
-        cellLength = 7,
-    };
-    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData()
-    { 
-        refreshCount = 0,
-        baseGold = 0,
-    };
+    [field: SerializeField] [FirestoreProperty] public MergeBoardData mergeBoard { get; set; } = new MergeBoardData();
+    [field: SerializeField] [FirestoreProperty] public QuestData quest { get; set; } = new QuestData();
 }
 
 public class DataManager : MonoBehaviour
@@ -66,7 +43,8 @@ public class DataManager : MonoBehaviour
     private string userCollection = "user";   // 컬랙션(테이블) 이름
     [Header("플레이어 데이터 (신규 생성 시 초기 저장, 기존 계정은 불러와 갱신)")]
     [SerializeField, Tooltip("프리미어키(PK)")] private string docId = "ZflvQAZZmYj1SKj8mZKZ";
-    
+
+    public bool isLogin = false;
     [SerializeField]private UserDataRoot userData = new UserDataRoot();
 
     public PlayerData PlayerData => userData.player;
@@ -76,6 +54,7 @@ public class DataManager : MonoBehaviour
     
     // 도넛 기본 데이터 SO
     private readonly Dictionary<DonutType, DonutTypeSO> _donutTypeDB = new();
+    private readonly List<GiftBoxSO> _giftBoxList = new();
     
     // 랭크
     private string rankCollection = "rank";
@@ -83,12 +62,75 @@ public class DataManager : MonoBehaviour
     [SerializeField, Tooltip("시즌")] private string Season = "2025";
     private GameMode gameMode = GameMode.SOLO;
     
+    [SerializeField] private RankData rankData = new RankData();
+    
     // 데이터 값 바뀐거 호출
     public event Action<PlayerData> OnUserDataChanged;
     public event Action<UserDataRoot> OnUserDataRootChanged;
-    
+    public event Action OnBoardDataLoaded;
+
     // 백그라운드 이벤트
-    public event Action PauseChanged;
+    public event Action<bool> PauseChanged;
+    
+    // 처음 셋팅 데이터
+    [SerializeField] private PlayerData firstPlayerData = new PlayerData()
+    {
+        email = "",
+        nickname = "Dalcom",
+        gold = 0,
+        gem = 0,
+        energy = 50,
+        level = 1,
+        exp = 0,
+        lastAt = 0,
+        gainNamePlateType =
+        {
+            NamePlateType.NONE
+        },
+        soloScore = 0,
+        soloTier = GameTier.Bronze,
+        changeNicknameCount = 0,
+        maxEnergy = 50,
+        perSecEnergy = 10,  // 테스트
+        levelMax = 20,
+    };
+    [SerializeField] private InventoryData firstInventoryData = new InventoryData()
+    {
+        donutEntries = new List<DonutEntry>()
+        {
+            null,
+            null,
+            null,
+            null,
+            null
+        },
+        dailyFreeGemClaimed = false,
+        effectList = new List<EffectType>()
+        {
+            EffectType.None,
+        },
+        characterList = new List<CharacterType>()
+        {
+            CharacterType.None
+        }
+    };
+    [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
+    {
+        generatorLevelHard = 1,
+        generatorLevelMoist = 1,
+        generatorLevelSoft = 1,
+        cellMax = 49,
+        cellWidth = 7,
+        cellLength = 7,
+    };
+    [SerializeField] private QuestData firstQuestData = new QuestData()
+    {
+        maxCount = 5,
+        refreshCount = 5,
+        maxChargeCount = 3,
+        currentChargeCount = 0,
+        baseGold = 0,
+    };
 
     // 바뀐 데이터 이벤트 함수 실행용 함수
     // 텍스트를 바꿔줄꺼다
@@ -109,7 +151,29 @@ public class DataManager : MonoBehaviour
         PlayerData.energy = energy;
         OnUserDataChanged?.Invoke(PlayerData);
     }
-    
+
+    public void ExpChange(int exp) 
+    {
+        PlayerData.exp = exp;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
+    public void ScoreChange(int score) 
+    {
+        PlayerData.soloScore = score;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+    public void LevelChange(int level) 
+    {
+        PlayerData.level = level;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+    public void NicknameChange(string Name)
+    {
+        PlayerData.nickname = Name;
+        OnUserDataChanged?.Invoke(PlayerData);
+    }
+
     void Awake()
     {
         Instance = this;
@@ -136,15 +200,17 @@ public class DataManager : MonoBehaviour
     {
         docId = uId;
         
-        int maxEnergy = userData.player.maxEnergy;
-        int secEnergy = userData.player.perSecEnergy;
-        int maxLevel = userData.player.levelMax;
+        int maxEnergy = firstPlayerData.maxEnergy;
+        int secEnergy = firstPlayerData.perSecEnergy;
+        int maxLevel = firstPlayerData.levelMax;
         
-        int cellMax = MergeBoardData.cellMax;
-        int cellWidth = MergeBoardData.cellWidth;
-        int cellLength = MergeBoardData.cellLength;
+        int cellMax = firstMergeBoardData.cellMax;
+        int cellWidth = firstMergeBoardData.cellWidth;
+        int cellLength = firstMergeBoardData.cellLength;
         
-        int baseGold = QuestData.baseGold;
+        int baseGold = firstQuestData.baseGold;
+        int RefreshCount = firstQuestData.refreshCount;
+        int maxCount = firstQuestData.maxCount;
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
@@ -152,11 +218,12 @@ public class DataManager : MonoBehaviour
         if (isAutoLogin)
         {
             userData = snap.ConvertTo<UserDataRoot>();
+            isLogin = true;
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
-            BaseQuestData(baseGold);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"자동 로그인: /{userCollection}/{uId}");
@@ -167,13 +234,16 @@ public class DataManager : MonoBehaviour
             // 처음 로그인 시
             PlayerData.email = userEmail;
             PlayerData.createAt = Timestamp.GetCurrentTimestamp();
+            isLogin = true;
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             FirstBasePlayerData();
+            FirstBaseInventoryData();
             BaseInventoryData();
             BaseMergeBoardData(cellMax, cellWidth, cellLength);
             FirstBaseMergeBoardData();
-            BaseQuestData(baseGold);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
+            FirstBaseQuestData();
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 신규 유저 생성: /{userCollection}/{uId}");
@@ -183,17 +253,19 @@ public class DataManager : MonoBehaviour
             // 기존 유저 로드
             PlayerData.email = userEmail;
             userData = snap.ConvertTo<UserDataRoot>();
+            isLogin = true;
             
             BasePlayerData(maxEnergy, secEnergy, maxLevel);
             //BaseInventoryData();
-            BaseMergeBoardData(cellMax, cellWidth, cellLength);
-            BaseQuestData(baseGold);
+            //BaseMergeBoardData(cellMax, cellWidth, cellLength);
+            BaseQuestData(baseGold, RefreshCount, maxCount);
 
             await docRef.SetAsync(userData, SetOptions.MergeAll);
             Debug.Log($"[FS] 기존 유저 로드/갱신 완료: /{userCollection}/{uId}");
         }
         OnUserDataChanged?.Invoke(PlayerData);
         OnUserDataRootChanged?.Invoke(userData);
+        OnBoardDataLoaded?.Invoke();
     }
     
     // 기본 데이터 적용
@@ -204,13 +276,14 @@ public class DataManager : MonoBehaviour
         PlayerData.levelMax = maxLevel;
     }
 
+    // 값이 바뀌는 처음 셋팅 데이터
     private void FirstBasePlayerData()
     {
-        PlayerData.gainNamePlateType.Add(NamePlateType.NONE);
+        userData.player = firstPlayerData;
     }
     
     // 기본 인벤토리 데이터
-    private void BaseInventoryData()
+    public void BaseInventoryData()
     {
         InventoryData.hardDonutCodexDataList = new List<DonutCodexData>();
         InventoryData.softDonutCodexDataList = new List<DonutCodexData>();
@@ -244,6 +317,21 @@ public class DataManager : MonoBehaviour
         }
         //Debug.Log("실행완료");
     }
+
+    public void FirstBaseInventoryData()
+    {
+        //EnsureDonutSlots();
+        userData.inventory = firstInventoryData;
+        userData.inventory.effectList = new List<EffectType>()
+        {
+            EffectType.None
+        };
+        userData.inventory.characterList = new List<CharacterType>()
+        {
+            CharacterType.None
+        };
+    }
+    
     
     // 기본 머지보드 데이터
     private void BaseMergeBoardData(int cellMax, int cellWidth, int cellLength)
@@ -254,7 +342,7 @@ public class DataManager : MonoBehaviour
     }
     
     // 처음 머지보드 데이터 셋
-    private void FirstBaseMergeBoardData()
+    public void FirstBaseMergeBoardData()
     {
         MergeBoardData.cells = new List<CellData>();
 
@@ -274,13 +362,27 @@ public class DataManager : MonoBehaviour
                 MergeBoardData.cells.Add(cellData);
             }
         }
+
+        MergeBoardData.generatorLevelHard = 1;
+        MergeBoardData.generatorLevelSoft = 1;
+        MergeBoardData.generatorLevelMoist = 1;
+        
     }
 
     // 기본 퀘스트 데이터
-    private void BaseQuestData(int baseGold)
+    private void BaseQuestData(int baseGold, int RefreshCount, int MaxCount)
     {
         QuestData.baseGold = baseGold;
+        QuestData.refreshCount = RefreshCount;
+        QuestData.maxCount = MaxCount;
     }
+
+    private void FirstBaseQuestData()
+    {
+        QuestData.currentChargeCount = firstQuestData.currentChargeCount;
+        QuestData.maxChargeCount = firstQuestData.maxChargeCount;
+    }
+    
     // 업데이트 BM이나 필수적인것들 중요한것들
     // 사용법 : await UpdateUserData(gold: 500, exp: 1200); 필요한 값만 넣어주세요
     public async Task UpdateUserDataAsync(
@@ -356,7 +458,7 @@ public class DataManager : MonoBehaviour
             
             var docRef = db.Collection(userCollection).Document(docId);
             await docRef.SetAsync(userData, SetOptions.MergeAll);
-            
+            await UpsertLeader(PlayerData.soloScore, PlayerData.soloTier);
             //Debug.Log($"[FS] 전체 저장 완료: /{userCollection}/{docId}");
         }
         catch (System.Exception e)
@@ -364,63 +466,7 @@ public class DataManager : MonoBehaviour
             Debug.LogError($"[FS][SAVE-ALL][ERR] {e}");
         }
     }
-
-    public async Task LoadBoardDataOnlyAsync()
-    {
-        var docRef = db.Collection(userCollection).Document(docId);
-        var snapshot = await docRef.GetSnapshotAsync();
-
-        if (!snapshot.Exists)
-        {
-            Debug.LogWarning("[FS] 문서 없음 → 신규 계정으로 간주");
-            return;
-        }
-
-        // Firestore 데이터를 Dictionary로 변환
-        Dictionary<string, object> doc = snapshot.ToDictionary();
-
-        if (!doc.ContainsKey("mergeBoard"))
-        {
-            Debug.LogWarning("[FS] mergeBoard 데이터 없음");
-            return;
-        }
-
-        var mergeBoardDict = doc["mergeBoard"] as Dictionary<string, object>;
-
-        if (!mergeBoardDict.ContainsKey("cells"))
-        {
-            Debug.LogWarning("[FS] mergeBoard.cells 없음");
-            return;
-        }
-
-        var rawCells = mergeBoardDict["cells"] as List<object>;
-
-        var cellList = new List<CellData>();
-
-        foreach (var cellObj in rawCells)
-        {
-            var c = cellObj as Dictionary<string, object>;
-
-            CellData cd = new CellData
-            {
-                x = Convert.ToInt32(c["x"]),
-                y = Convert.ToInt32(c["y"]),
-                donutId = c.ContainsKey("donutId") ? c["donutId"]?.ToString() : null,
-                isCellActive = c.ContainsKey("isCellActive") ?
-                               Convert.ToBoolean(c["isCellActive"]) : true
-            };
-
-            cellList.Add(cd);
-        }
-
-        // DataManager의 mergeBoard에 cellList 넣기
-        MergeBoardData.cells = cellList;
-
-        Debug.Log("[FS] mergeBoard.cells 로드 완료: " + cellList.Count);
-    }
-
-
-
+    
     // Rank 디비 관련 함수들
 
     // 디비에 들어가는 컬랙션과 문서 설정
@@ -436,6 +482,52 @@ public class DataManager : MonoBehaviour
         return ModeDoc(targetMode).Collection("leaders");
     }
 
+    // 계정 삭제
+    public async Task DeleteUserDataAsync()
+    {
+        var docRef = db.Collection("user").Document(docId);
+        await docRef.DeleteAsync();
+        Debug.Log("[DataManager] Firestore 유저 데이터 삭제 완료");
+    }
+    
+    // 도넛 생성기 OR 머지 후 도감 등록
+    public void AddCodexEntry(DonutType donutType, string donutId, int level)
+    {
+        level = level - 1;
+        switch (donutType)
+        {
+            case DonutType.Hard:
+                if (InventoryData.hardDonutCodexDataList[level].donutDexViewState == DonutDexViewState.Question)
+                {
+                    InventoryData.hardDonutCodexDataList[level] = new DonutCodexData()
+                    {
+                        id = donutId,
+                        donutDexViewState = DonutDexViewState.Reward
+                    };   
+                }
+                break;
+            case DonutType.Soft:
+                if (InventoryData.softDonutCodexDataList[level].donutDexViewState == DonutDexViewState.Question)
+                {
+                    InventoryData.softDonutCodexDataList[level] = new DonutCodexData()
+                    {
+                        id = donutId,
+                        donutDexViewState = DonutDexViewState.Reward
+                    };   
+                }
+                break;
+            case DonutType.Moist:
+                if (InventoryData.moistDnutCodexDataList[level].donutDexViewState == DonutDexViewState.Question)
+                {
+                    InventoryData.moistDnutCodexDataList[level] = new DonutCodexData()
+                    {
+                        id = donutId,
+                        donutDexViewState = DonutDexViewState.Reward
+                    };   
+                }
+                break;
+        }
+    }
     
     // 도넛 SO 데이터 불러오기
     
@@ -446,10 +538,23 @@ public class DataManager : MonoBehaviour
 
         foreach (var so in allSO)
         {
+            //if (so.type == DonutType.Gift)
+            //    continue; // Gift 타입 완전 제외
+
             if (!_donutTypeDB.ContainsKey(so.type))
             {
                 _donutTypeDB.Add(so.type, so);
                 //Debug.Log($"[DonutDB] Loaded {so.type} ({so.levels.Count} levels)");
+            }
+        }
+        
+        var allSo2 = Resources.LoadAll<GiftBoxSO>("DonutData");
+
+        foreach (var so in allSo2)
+        {
+            if (!_giftBoxList.Contains(so))
+            {
+                _giftBoxList.Add(so);
             }
         }
     }
@@ -463,6 +568,41 @@ public class DataManager : MonoBehaviour
         }
 
         //Debug.LogWarning($"[DonutDB] No data found for {type} level {level}");
+        return null;
+    }
+
+    // GiftBoxSo 데이터 가져오기
+    public GiftBoxData GetGiftBoxData(int level)
+    {
+        foreach (var so in _giftBoxList)
+        {
+            if (so.type == DonutType.Gift)
+            {
+                return so.GetLevelData(level); // GiftBoxData 반환
+            }
+        }
+
+        Debug.LogWarning($"[DonutDB] GiftBoxData not found for level {level}");
+        return null;
+    }
+
+    public GiftBoxData GetGiftBoxDataByID(string id) //기프트박스 데이터 변환
+    {
+        // id 형식이 "Gift_1", "Gift_2" 이런 형태라고 가정
+        if (string.IsNullOrEmpty(id))
+            return null;
+
+        if (id.StartsWith("Gift_"))
+        {
+            string levelStr = id.Replace("Gift_", "");
+
+            if (int.TryParse(levelStr, out int level))
+            {
+                // ⭐ 기존 함수 그대로 호출
+                return GetGiftBoxData(level);
+            }
+        }
+
         return null;
     }
 
@@ -489,6 +629,7 @@ public class DataManager : MonoBehaviour
         return next;
     }
 
+    // 생성기 레벨따라 도넛생성
     public List<DonutData> GetDonutsByTypeAndLevel(DonutType type, int level)
     {
         List<DonutData> result = new();
@@ -521,7 +662,7 @@ public class DataManager : MonoBehaviour
             {
                 InventoryData.donutEntries.Add(new DonutEntry()
                 {
-                    id = null,
+                    id = "Hard_1",
                     type = DonutType.Hard,   // 너가 정의한 기본값
                     weight = 0,
                     resilience = 0,
@@ -538,7 +679,7 @@ public class DataManager : MonoBehaviour
     {
         EnsureDonutSlots();
 
-        index = index - 1;
+        //index = index - 1;
         if (index < 0 || index >= InventoryData.donutEntries.Count)
         {
             Debug.LogError($"[InventoryData] 잘못된 인덱스: {index}");
@@ -547,16 +688,16 @@ public class DataManager : MonoBehaviour
 
         if (isDonutEntry)
         {
-            Debug.Log("앤트리 들어옴");
+            //Debug.Log("앤트리 들어옴");
             InventoryData.donutEntries[index] = entry;
         }
         else
         {
-            Debug.Log("도넛데이터 들어옴");
-            Debug.Log(donutData.id);
-            Debug.Log(donutData.donutType);
-            Debug.Log(donutData.weight);
-            Debug.Log(donutData.friction);
+            //Debug.Log("도넛데이터 들어옴");
+            // Debug.Log(donutData.id);
+            // Debug.Log(donutData.donutType);
+            // Debug.Log(donutData.weight);
+            // Debug.Log(donutData.friction);
             InventoryData.donutEntries[index].id = donutData.id;
             InventoryData.donutEntries[index].type = donutData.donutType;
             InventoryData.donutEntries[index].weight = donutData.weight;
@@ -565,6 +706,26 @@ public class DataManager : MonoBehaviour
         }
         
     }
+
+    /// <summary>
+    /// 게임 매니저로부터 받은 변경된 인벤토리와 점수 데이터를 적용하고 DB에 저장합니다.
+    /// 게임진입시 선반영하는 패널티요소를 위한 동작으로 한번만 수행됨
+    /// </summary>
+    public async Task ApplyPenaltyData(List<DonutEntry> updatedDonutEntries, int newScore)
+    {
+        // 1. 로컬 데이터 업데이트
+        InventoryData.donutEntries = updatedDonutEntries;
+        PlayerData.soloScore = newScore;
+
+        // 2. Firestore에 모든 변경사항 저장
+        await SaveAllUserDataAsync();
+        
+        // 3. 로컬 리스너에게 변경사항 알림
+        OnUserDataChanged?.Invoke(PlayerData);
+        OnUserDataRootChanged?.Invoke(userData);
+        Debug.Log($"페널티 데이터 적용 완료. 현재 점수: {newScore}");
+    }
+
     
     //생성기 레벨 받아오기
     public int GetGeneratorLevel(DonutType type)
@@ -590,20 +751,49 @@ public class DataManager : MonoBehaviour
 
     // 유저 데이터 넣기 (Rank)
     // 기본 데이터 값 설정 않넣어도 상관없다 ( GameMode mode = GameMode.SOLO, docid = docId)
-    public async Task UpsertLeader(int score, GameTier tier, GameMode? mode = null, string docid = null, string nickname = null)
-    {
-        mode = mode ?? gameMode;
-        docid = null ?? docId;
-        nickname = null ?? PlayerData.nickname;
-        var doc = LeadersCol(mode).Document(docid);
-        await doc.SetAsync(new Dictionary<string, object> {
-            { "nickname", nickname }, 
-            { "score", score }, 
-            { "tier", tier.ToString().ToLower() }, 
-            { "updatedAt", FieldValue.ServerTimestamp }
-        }, SetOptions.MergeAll);
-    }
+    // public async Task UpsertLeader(int score, GameTier tier, GameMode? mode = null, string docid = null, string nickname = null)
+    // {
+    //     mode = mode ?? gameMode;
+    //     docid = null ?? docId;
+    //     nickname = null ?? PlayerData.nickname;
+    //     var doc = LeadersCol(mode).Document(docid);
+    //     await doc.SetAsync(new Dictionary<string, object> {
+    //         { "nickname", nickname }, 
+    //         { "score", score }, 
+    //         { "tier", tier.ToString().ToLower() }, 
+    //         { "updatedAt", FieldValue.ServerTimestamp }
+    //     }, SetOptions.MergeAll);
+    // }
 
+    public async Task UpsertLeader(
+        int? score = null, 
+        GameTier? tier = null, 
+        GameMode? mode = null, 
+        string docid = null, 
+        string nickname = null)
+    {
+        mode     ??= gameMode;            // 현재 게임 모드 (SOLO/DUO 등)
+        docid    ??= docId;               // 현재 유저 UID
+        nickname ??= PlayerData.nickname; // 현재 닉네임
+
+        score ??= PlayerData.soloScore;   // 기본: 솔로 점수
+        tier  ??= PlayerData.soloTier;    // 기본: 솔로 티어
+
+        var data = new RankData
+        {
+            nickname  = nickname,
+            score     = score.Value,
+            tier      = tier.Value,
+            uid       = docid
+        };
+
+        rankData = data;
+        var docRef = LeadersCol(mode.Value).Document(docid);
+        await docRef.SetAsync(data, SetOptions.MergeAll);
+
+        Debug.Log($"[Rank] UpsertLeader 완료: mode={mode}, uid={docid}, score={data.score}, tier={data.tier}");
+    }
+    
     // 예시 (테이블 기본 셋팅)
     async Task SeedSummaryAsync()
     {
@@ -616,9 +806,63 @@ public class DataManager : MonoBehaviour
         }, SetOptions.MergeAll);
     }
 
+    private DocumentReference RankSummaryDoc =>
+    db.Collection("rank_summaries").Document(Season);
+
+    // GameMode → 필드 이름 매핑
+    private string GetSummaryFieldName(GameMode mode)
+    {
+        return mode switch
+        {
+            GameMode.SOLO => "soloTop100",
+            GameMode.DUO  => "duoTop100",
+            GameMode.TRIO => "trioTop100"
+        };
+    }
+
+    /// <summary>
+    /// leaders 컬렉션 기준으로 Top100 다시 계산해서
+    /// rank_summaries/{Season} 의 해당 모드 필드만 갱신
+    /// </summary>
+    public async Task RebuildRankSummaryAsync(GameMode mode, int limit = 100)
+    {
+        // 1) leaders에서 점수 내림차순 Top100 가져오기
+        var col = LeadersCol(mode); // 이미 있는 함수라 했지?
+        var query = col.OrderByDescending("score").Limit(limit);
+        var snap = await query.GetSnapshotAsync();
+
+        var topList = new List<Dictionary<string, object>>();
+
+        foreach (var doc in snap.Documents)
+        {
+            var data = doc.ConvertTo<RankData>();
+
+            topList.Add(new Dictionary<string, object>
+            {
+                { "nickname", data.nickname },
+                { "score",    data.score },
+                { "tier",     data.tier },
+                { "uid",      data.uid }
+            });
+        }
+
+        // 2) rank_summaries/{Season} 문서에 해당 모드 배열만 갈아끼우기
+        string fieldName = GetSummaryFieldName(mode);
+
+        var patch = new Dictionary<string, object>
+        {
+            { fieldName,  topList },
+            { "updatedAt", FieldValue.ServerTimestamp }
+        };
+
+        await RankSummaryDoc.SetAsync(patch, SetOptions.MergeAll);
+
+        Debug.Log($"[Rank] RebuildRankSummaryAsync: mode={mode}, count={topList.Count}");
+    }
+    
 
     // 랭크 구분 함수 ( 랭크를 디비에서 계산해서 넣어줘야 함 )
-    private GameTier CalculateTier(int score, int? rank = null)
+    public GameTier CalculateTier(int score, int? rank = null)
     {
         // 챌린저 구간 랭크 값 등수 받아와야함
         // 1) 챌린저 구간 ( 디비의 랭크 기준 )
@@ -646,8 +890,8 @@ public class DataManager : MonoBehaviour
         if (pause)
         {
             _ = SaveAllUserDataAsync();
-            PauseChanged?.Invoke();
         }
+        PauseChanged?.Invoke(pause);
     }
 
     // 포커스 잃을 떄
@@ -657,6 +901,7 @@ public class DataManager : MonoBehaviour
     //     {
     //         _ = SaveAllUserDataAsync();
     //     }
+    //     PauseChanged?.Invoke(hasFocus);
     // }
     
     // Util
@@ -715,4 +960,5 @@ public class DataManager : MonoBehaviour
             return null;
         }
     }
+        
 }

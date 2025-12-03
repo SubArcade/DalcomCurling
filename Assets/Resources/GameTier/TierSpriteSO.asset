@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33f452d18d5a4724697033bfd05cb111, type: 3}
+  m_Name: TierSpriteSO
+  m_EditorClassIdentifier: 
+  tierSprites:
+  - tier: 0
+    sprite: {fileID: 21300000, guid: 75460df1338b35f49941f84d0de4f628, type: 3}
+  - tier: 1
+    sprite: {fileID: 21300000, guid: e33b1688a109c0d46a5467a1165d86cd, type: 3}
+  - tier: 2
+    sprite: {fileID: 21300000, guid: bce0b0aeaf083f449b7201cece805a1b, type: 3}
+  - tier: 3
+    sprite: {fileID: 21300000, guid: 24144a0839739a24687aa179e221d8d4, type: 3}
+  - tier: 4
+    sprite: {fileID: 21300000, guid: 62fbb7d3c62ad0249a08d0d6a33046a1, type: 3}
+  - tier: 5
+    sprite: {fileID: 21300000, guid: d5624cbcbdf2c9349bb36e5f797c8809, type: 3}
+  - tier: 6
+    sprite: {fileID: 21300000, guid: ee0541622ebac3f41b9f7b4ef97daf2a, type: 3}
+  - tier: 7
+    sprite: {fileID: 21300000, guid: 277262590dbfc8a48913327eb96a03f4, type: 3}
+  - tier: 8
+    sprite: {fileID: 21300000, guid: 18835b02d2901944ca137ce6b7442ea1, type: 3}
