@@ -429,19 +429,27 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 완료시 버튼 상호작용
     public void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
     {
-        //보드에서 주문서 도넛 제거
+        //퀘스트 클리어 시 같은 도넛을 전부 없애버리는것을 방지하기위한 체크변수
+        var idsToRemove = new List<string>(orderDonutIDs);
+        //셀 전체검사
         foreach (var cell in BoardManager.Instance.GetAllCells())
-        {
+        {   //셀이 비활성화거나 비어있으면 건너뜀
             if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
 
-            if (orderDonutIDs.Contains(cell.donutId))
-            {
+            if (idsToRemove.Contains(cell.donutId))
+            {   //제거대상이 있으면 파괴
                 if (cell.occupant != null)
-                    Destroy(cell.occupant.gameObject); // 도넛 오브젝트 제거
+                    Destroy(cell.occupant.gameObject);
+                //셀을 비움
+                cell.ClearItem();
+                //1개만 삭제
+                idsToRemove.Remove(cell.donutId);
 
-                cell.ClearItem(); // 셀 정보 초기화
+                // ⭐ 같은 ID 하나 제거했으면 루프 종료
+                break;
             }
         }
+
         //보상골드 지급
         int reward = 0;
         if (completeObject == completeObject1) reward = rewardGold1;
@@ -457,6 +465,9 @@ public class Scr_OrderSystem : MonoBehaviour
         if (completeObject == completeObject1) isRewarding1 = true;
         else if (completeObject == completeObject2) isRewarding2 = true;
         else if (completeObject == completeObject3) isRewarding3 = true;
+
+        //클릭직후 완료버튼 즉시숨김
+        completeObject.SetActive(false);
 
         //보상골드 데이터 저장
         int newGold = DataManager.Instance.PlayerData.gold + reward;

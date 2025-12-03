@@ -1,5 +1,4 @@
 ﻿using DG.Tweening;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -21,6 +20,9 @@ public class Scr_ResultControl : MonoBehaviour
 
     [Header("플레이어의 캐릭터가 적용될 결과창 이미지")]
     [SerializeField] private Image characterImg;
+
+    [Header("승,패 여부에 따라 달라질 결과창 도넛 선택 텍스트")]
+    [SerializeField] private TextMeshProUGUI waitingText; //witepanel1의 waitingText입니다
 
     [Header("레벨판넬 witePanel1")]
     [SerializeField] private GameObject witePanel1;
@@ -106,6 +108,7 @@ public class Scr_ResultControl : MonoBehaviour
                 SetCharacterImage();
                 break;
         }
+        WaitingTextSet(gameOutcome);
     }
 
     private void SetupForWin()
@@ -396,6 +399,28 @@ public class Scr_ResultControl : MonoBehaviour
     private void OnDestroy()
     {
         DOTween.Kill("endgame");
+    }
+
+    private void WaitingTextSet(FirebaseGameManager.GameOutcome outcome) 
+    {
+        LocalizationKey key = LocalizationKey.ingame_waitingTextwhenDraw;
+
+        switch (outcome)
+        { 
+            case FirebaseGameManager.GameOutcome.Win:
+                key = LocalizationKey.ingame_waitingTextwhenWin;
+                break;
+            case FirebaseGameManager.GameOutcome.Lose:
+                key = LocalizationKey.ingame_waitingTextwhenLose;
+                break;
+            case FirebaseGameManager.GameOutcome.Draw:
+                key = LocalizationKey.ingame_waitingTextwhenDraw;
+                break;
+        }
+        if (waitingText != null) 
+        {
+            waitingText.text = LocalizationManager.Instance.GetText(key);
+        }
     }
 }
 
