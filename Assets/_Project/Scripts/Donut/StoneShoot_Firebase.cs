@@ -396,6 +396,7 @@ public class StoneShoot_Firebase : MonoBehaviour
                 //Debug.Log("회전 설정 완료. 발사합니다!");
                 FirebaseGameManager.Instance.OnIdleUI();
                 ReleaseShot(); // 발사!
+                SoundManager.Instance.shotSound();
             }
         }
     }

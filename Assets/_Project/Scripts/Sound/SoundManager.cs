@@ -28,6 +28,11 @@ public class SoundManager : MonoBehaviour
     private SoundGroup[] allSoundGroups;
     private Dictionary<string, EventReference> soundEventMap = new Dictionary<string, EventReference>();
 
+    [Header("발사시 재생되는 랜덤 음악 재생")]
+    [Tooltip("발사 시 재생할 5가지 SFX 이벤트를 여기에 할당합니다.")]
+    [SerializeField]
+    private EventReference[] launchSFXEvents;
+
     // BGM 재생 관리 필드
     private FMOD.Studio.EventInstance currentBGMInstance;
     private List<EventReference> currentBGMPlaylist;
@@ -109,6 +114,7 @@ public class SoundManager : MonoBehaviour
 
     #endregion
 
+    #region BGM SFX 재생 관련 구성
     // BGM 재생 (그룹/플레이리스트 관리)
 
     /// SoundGroup 이름으로 BGM 플레이리스트를 시작합니다
@@ -249,6 +255,7 @@ public class SoundManager : MonoBehaviour
             FMODUnity.RuntimeManager.PlayOneShot(sfxRef);
         }
     }
+    #endregion
 
     #region 아웃게임 SFX 사운드 모음
 
@@ -442,6 +449,36 @@ public class SoundManager : MonoBehaviour
     public void loseDecide()
     {
         PlaySFX("20_Negative_09");
+    }
+
+    // 발사시 나오는 사운드를 지정한 사운드중 하나가 랜덤으로 재생되게 하는 코드 추가
+    public void shotSound()
+    {
+        // 배열이 비어있는지 확인
+        if (launchSFXEvents == null || launchSFXEvents.Length == 0)
+        {
+            Debug.LogWarning("[SoundManager] launchSFXEvents 배열이 비어 있어 shotSound를 재생할 수 없습니다.");
+            return;
+        }
+
+        // 1. 배열의 인덱스를 랜덤으로 선택합니다. (0부터 배열 길이 직전까지)
+        int randomIndex = Random.Range(0, launchSFXEvents.Length);
+
+        EventReference sfxRef = launchSFXEvents[randomIndex];
+
+        if (!sfxRef.IsNull)
+        {
+            // 2. 랜덤으로 선택된 사운드 하나만 재생합니다.
+            FMODUnity.RuntimeManager.PlayOneShot(sfxRef);
+
+            string path;
+            FMODUnity.RuntimeManager.StudioSystem.lookupPath(sfxRef.Guid, out path);
+            Debug.Log($"[SoundManager] 샷 사운드 재생: {GetEventName(path)} (인덱스: {randomIndex})");
+        }
+        else
+        {
+            Debug.LogWarning($"[SoundManager] shotSound에서 인덱스 {randomIndex}에 유효한 이벤트가 없습니다.");
+        }
     }
 
     #endregion
