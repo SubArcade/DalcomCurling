@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -422,6 +422,7 @@ public class GameManager : MonoBehaviour
             DailyReset?.Invoke();
             DataManager.Instance.QuestData.currentChargeCount = 0;
             DataManager.Instance.InventoryData.dailyFreeGemClaimed = true;
+            DataManager.Instance.InventoryData.dailyFreeEnergy = 5;
             //Debug.Log("[Daily] 오늘자 리셋 완료");
         }
         else

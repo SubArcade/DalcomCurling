@@ -71,4 +71,5 @@ public class InventoryData
     
     // 상점 무료 젬
     [field: SerializeField, Tooltip("촉촉도넛 도감 상태")][FirestoreProperty] public bool dailyFreeGemClaimed  {get; set;}
+    [field: SerializeField, Tooltip("촉촉도넛 도감 상태")][FirestoreProperty] public int dailyFreeEnergy  {get; set;}
 }

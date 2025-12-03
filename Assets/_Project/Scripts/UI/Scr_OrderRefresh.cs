@@ -39,6 +39,7 @@ public class Scr_OrderRefresh : MonoBehaviour
 
     void OnEnable()
     {
+        DataManager.Instance.UpdateUI += UpdateUI;
         UpdateUI();
     }
 
@@ -55,8 +56,7 @@ public class Scr_OrderRefresh : MonoBehaviour
         //orderSystem.AddRefreshCount(5);
 
         DataManager.Instance.QuestData.currentChargeCount++;
-        UpdateUI();
-
+        //UpdateUI();
         if (DataManager.Instance.QuestData.currentChargeCount >= DataManager.Instance.QuestData.maxChargeCount)
             Btn.interactable = false;
     }
@@ -68,5 +68,5 @@ public class Scr_OrderRefresh : MonoBehaviour
         string chargeLabel = LocalizationManager.Instance.GetText(LocalizationKey.Label_reFreshCharge);
         adsText.text = $"{chargeLabel} ({DataManager.Instance.QuestData.maxChargeCount - DataManager.Instance.QuestData.currentChargeCount}/{DataManager.Instance.QuestData.maxChargeCount})";
     }
-
+    
 }

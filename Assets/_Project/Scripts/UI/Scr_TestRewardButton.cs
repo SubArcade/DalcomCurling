@@ -53,9 +53,11 @@ public class Scr_TestRewardButton : MonoBehaviour
                 break;
             case AdType.ENERGY:
                 DataManager.Instance.PlayerData.energy += reward; 
+                DataManager.Instance.EnergyChange(DataManager.Instance.PlayerData.energy);
                 break;
             case AdType.REFRESH:
                 DataManager.Instance.QuestData.refreshCount += reward;
+                DataManager.Instance.RefreshChange();
                 Debug.Log(DataManager.Instance.QuestData.refreshCount);
                 break;
             case AdType.GIFTBOX:

@@ -68,6 +68,7 @@ public class DataManager : MonoBehaviour
     public event Action<PlayerData> OnUserDataChanged;
     public event Action<UserDataRoot> OnUserDataRootChanged;
     public event Action OnBoardDataLoaded;
+    public event Action UpdateUI;
 
     // 백그라운드 이벤트
     public event Action<bool> PauseChanged;
@@ -105,6 +106,7 @@ public class DataManager : MonoBehaviour
             null
         },
         dailyFreeGemClaimed = false,
+        dailyFreeEnergy = 5,
         effectList = new List<EffectType>()
         {
             EffectType.None,
@@ -177,6 +179,11 @@ public class DataManager : MonoBehaviour
     {
         PlayerData.nickname = Name;
         OnUserDataChanged?.Invoke(PlayerData);
+    }
+    
+    public void RefreshChange()
+    {
+        UpdateUI?.Invoke();
     }
 
     void Awake()
@@ -329,6 +336,7 @@ public class DataManager : MonoBehaviour
         //EnsureDonutSlots();
         userData.inventory = firstInventoryData;
         userData.inventory.donutEntries = firstInventoryData.donutEntries;
+        userData.inventory.dailyFreeEnergy = firstInventoryData.dailyFreeEnergy;
         userData.inventory.effectList = new List<EffectType>()
         {
             EffectType.None

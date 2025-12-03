@@ -204,6 +204,7 @@ public class Scr_OrderSystem : MonoBehaviour
     void OnEnable()
     {
         LocalizationManager.Instance.OnLanguageChanged += RefreshAllDonutTexts;
+        DataManager.Instance.UpdateUI += AddRefreshCount;
     }
 
     void OnDisable()
@@ -657,9 +658,8 @@ public class Scr_OrderSystem : MonoBehaviour
     public int GetMaxRefreshCount() => DataManager.Instance.QuestData.maxCount;
 
 
-    public void AddRefreshCount(int amount)
+    public void AddRefreshCount()
     {
-        DataManager.Instance.QuestData.refreshCount += amount;
         refreshCountText.text = $"{DataManager.Instance.QuestData.refreshCount}/{DataManager.Instance.QuestData.maxCount}";
     }
 
