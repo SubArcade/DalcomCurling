@@ -2346,8 +2346,8 @@ RectTransform:
   - {fileID: 4590671532700024322}
   - {fileID: 1852198524174190123}
   - {fileID: 5162688705116240632}
-  - {fileID: 4041967075968025283}
   - {fileID: 8068549533298725215}
+  - {fileID: 4041967075968025283}
   - {fileID: 1675312238225134240}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6256,7 +6256,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 82125f76b099ce3439b914193a808416, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b3af2a4815b679043897df3f3e670b84, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6799,6 +6799,7 @@ MonoBehaviour:
   donut_1: {fileID: 4928106115312563232}
   donut_2: {fileID: 4651685590050927213}
   characterImg: {fileID: 3354357898022516937}
+  waitingText: {fileID: 0}
   witePanel1: {fileID: 3540696512153972942}
   levelText: {fileID: 2457156228077130259}
   expUpText: {fileID: 4367736475702213210}
