@@ -31,6 +31,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject WaitThrowPopUp;
+    [SerializeField] private GameObject timeLineUI;
 
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
@@ -76,6 +77,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public PlayerProfile MyProfile { get; private set; }
     public PlayerProfile OpponentProfile { get; private set; }
 
+    private void Awake()
+    {
+        timeLineUI.SetActive(true);
+    }
     void Start()
     {
         // Firebase에서 데이터를 로드합니다.
@@ -105,7 +110,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             floatingText.destroyOnComplete = false;
             floatingText.gameObject.SetActive(false);
         }
-
+                
         // 인게임 BGM 사운드 재생 ---
         // 로비 BGM을 명시적으로 정지
         SoundManager.Instance.StopBGM();
