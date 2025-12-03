@@ -31,6 +31,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject WaitThrowPopUp;
+    [SerializeField] private GameObject timeLineUI;
 
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
@@ -76,6 +77,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     public PlayerProfile MyProfile { get; private set; }
     public PlayerProfile OpponentProfile { get; private set; }
 
+    private void Awake()
+    {
+        timeLineUI.SetActive(true);
+    }
     void Start()
     {
         // Firebase에서 데이터를 로드합니다.
@@ -105,7 +110,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             floatingText.destroyOnComplete = false;
             floatingText.gameObject.SetActive(false);
         }
-
+                
         // 인게임 BGM 사운드 재생 ---
         // 로비 BGM을 명시적으로 정지
         SoundManager.Instance.StopBGM();
@@ -390,7 +395,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 getDonut = "획득 도넛";
 
                 //GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
-                GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
+                //GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
                 break;
             case FirebaseGameManager.GameOutcome.Lose:
                 exp = 8;
@@ -404,10 +409,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             case FirebaseGameManager.GameOutcome.Draw:
                 exp = 10;
                 rewardGold = 100;
-                rewardPoint = 0; // 페널티로 잃었던 10점 복구
+                rewardPoint = 10; // 페널티로 잃었던 10점 복구
                 result = "DRAW!";
                 getDonut = "변동 없음";
-                GameManager.Instance.ProcessDrawOutcome(); // 페널티로 제거되었던 도넛 복구
+                //GameManager.Instance.ProcessDrawOutcome(exp, rewardGold, rewardPoint); // 페널티로 제거되었던 도넛 복구
                 break;
         }
 
@@ -421,8 +426,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         if (getDonutText != null) getDonutText.text = $"{getDonut}";
 
         GameManager.Instance.SetGameOutcome(outcome); // 게임 결과 저장
+        Debug.Log($"exp : {exp}, reward : {rewardGold}, point : {rewardPoint}, result : {result}");
         GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
-
+        //GameManager.Instance.ApplyResultRewards();
     }
 
     // enum → 문자열 변환 함수

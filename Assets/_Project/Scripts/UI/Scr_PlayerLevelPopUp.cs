@@ -11,6 +11,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
     [Header("팝업 판넬")]    
     [SerializeField, Tooltip("칭호")] private GameObject namePlateListPopup;
     [SerializeField, Tooltip("닉네임 변경")] private GameObject nickNameChangePopup;
+    [SerializeField, Tooltip("퀘스트 스크립트")] private Scr_OrderSystem scrOrderSystem;
     
     [Header("기본창 전환")]
     [SerializeField, Tooltip("프로필 변경")] private GameObject profilePanel;
@@ -114,7 +115,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         //Debug.Log("텍스트 셋업");
         levelText.text = DataManager.Instance.PlayerData.level.ToString();
         nicknameText.text = DataManager.Instance.PlayerData.nickname;
-        expText.text = $"{DataManager.Instance.PlayerData.exp}/{DataManager.Instance.PlayerData.levelMax} EXP";
+        expText.text = $"{DataManager.Instance.PlayerData.exp}/100 EXP";
         nameTitleText.text = DataManager.Instance.PlayerData.curNamePlateType.ToString();
         expFillImage.fillAmount = DataManager.Instance.PlayerData.exp / 100f;
     }
@@ -217,13 +218,21 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         data.exp = 0;
         data.energy = 50;
         data.gold = 0;
+        data.soloScore = 0;
         DataManager.Instance.FirstBaseInventoryData();  // 엔트리 초기화
         DataManager.Instance.BaseInventoryData();   // 도감 초기화
         DataManager.Instance.FirstBaseMergeBoardData(); // 보드판 초기화
+        BoardManager.Instance.ResetBoard();
+        BoardManager.Instance.ResetEntry();
+        BoardManager.Instance.ResetTempGiftIds();
+        scrOrderSystem.ResetQuest();
         DataManager.Instance.MergeBoardData.tempGiftIds.Clear();    // 임시 보관칸 초기화
+        
+        // 생성기 레벨 초기화
         DataManager.Instance.MergeBoardData.generatorLevelHard = 1; 
         DataManager.Instance.MergeBoardData.generatorLevelSoft = 1;
         DataManager.Instance.MergeBoardData.generatorLevelMoist = 1;
+        
         DataManager.Instance.QuestData.questList1.Clear();
         DataManager.Instance.QuestData.questList2.Clear();
         DataManager.Instance.QuestData.questList3.Clear();
@@ -250,7 +259,7 @@ public class Scr_PlayerLevelPopUp : MonoBehaviour
         
         // 메뉴판 업데이트
         DataManager.Instance.GemChange(data.gem);
-        BoardManager.Instance.RefreshBoardUnlock();
+        BoardManager.Instance.RefreshBoardUnlock(); // 머지보드 초기화
     }
     
     // 환생하기 설명창

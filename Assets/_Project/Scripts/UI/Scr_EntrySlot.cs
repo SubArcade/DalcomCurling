@@ -19,7 +19,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler
         slotImage = GetComponent<Image>();
     }
     
-    void Start()
+    void OnEnable()
     {
         LoadFromInventory();
     }

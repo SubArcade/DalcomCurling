@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,7 +9,7 @@ public class TempStorageSlot : MonoBehaviour
 {
     [SerializeField] private const int MAX_STACK = 7;
 
-    private Queue<GiftBoxData> storage = new Queue<GiftBoxData>();
+    public Queue<GiftBoxData> storage = new Queue<GiftBoxData>();
 
     [SerializeField] private Button tempButton;
     public Image tempIcon; // 보관칸에 있을떄 출력할 이미지
@@ -16,13 +17,16 @@ public class TempStorageSlot : MonoBehaviour
     public Image tempTextBox; // 보관칸 텍스트박스
     public TMP_Text countText;
 
+    private void OnEnable()
+    {
+        DataManager.Instance.OnBoardDataLoaded += HandleBoardLoaded;
+    }
+
     void Start()
     {
-        tempButton = GetComponent<Button>();
         if (tempButton != null) tempButton.onClick.AddListener(OnClick);
-        tempButton.gameObject.SetActive(false);
-
-        DataManager.Instance.OnBoardDataLoaded += HandleBoardLoaded;
+        //tempButton.gameObject.SetActive(false);
+        HandleBoardLoaded();
     }
 
     // 데이터 대기
@@ -127,10 +131,12 @@ public class TempStorageSlot : MonoBehaviour
         RefreshUI();
     }
 
-    private void RefreshUI()
+    public void RefreshUI()
     {
+        Debug.Log("RefreshUI 실행");
         if (storage.Count == 0)
         {
+            Debug.Log("[RefreshUI] ctorage.Count = 0");
             tempButton.gameObject.SetActive(false);
             tempTextBox.gameObject.SetActive(false);
             tempIcon.sprite = null;

@@ -46,9 +46,6 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            if (DataManager.Instance != null)
-                DataManager.Instance.OnBoardDataLoaded += HandleDataLoadedForRewards;
         }
         else
         {
@@ -106,27 +103,6 @@ public class GameManager : MonoBehaviour
             SetState(GameState.Lobby);
         }
     }
-
-    private void OnDestroy()
-    {
-        if (Instance == this)
-        {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            if (DataManager.Instance != null)
-                DataManager.Instance.OnBoardDataLoaded -= HandleDataLoadedForRewards;
-        }
-    }
-
-    private void HandleDataLoadedForRewards()
-    {
-        // 로비 씬으로 돌아왔을 때(게임이 끝난 직후), 그리고 앱 최초 실행이 아닐 때만 보상 로직 실행
-        if (State == GameState.Lobby && !isAppStarted)
-        {
-            ApplyResultRewards();
-        }
-    }
-
-
     
     // 안드리오드 기계 뒤로가기 버튼 처리
     void Update()
@@ -159,20 +135,12 @@ public class GameManager : MonoBehaviour
     public async void EndGame()
     {
         Debug.Log("EndGame 실행");
-        SceneLoader.Instance.LoadLocal(menuSceneName);
-        
-        await Task.Yield();
-        await Task.Yield();
-        await Task.Yield();
-        await Task.Yield();
-        await Task.Yield();
-        await Task.Yield();
-        await Task.Yield();
-        await Task.Yield();
-        await Task.Yield();
-        
-        UIManager.Instance.Open(PanelId.MainPanel);
-        SetState(GameState.Lobby);
+        SceneLoader.Instance.LoadLocal(menuSceneName, true, () =>
+        {
+            UIManager.Instance.Open(PanelId.MainPanel);
+            SetState(GameState.Lobby);
+            ApplyResultRewards();
+        });
     }
     
 
@@ -207,81 +175,82 @@ public class GameManager : MonoBehaviour
     // 게임 종료 후 바로 실행되는 함수
     public void ApplyResultRewards()
     {
-        if (State == GameState.Lobby)
+        Debug.Log("ApplyResultRewards 작동111111111111111111111111111");
+        // 1. 페널티 복구 로직 (DB에서 데이터를 다시 로드한 후 실행)
+        if (LastGameOutcome == FirebaseGameManager.GameOutcome.Draw)
         {
-            // 1. 페널티 복구 로직 (DB에서 데이터를 다시 로드한 후 실행)
-            if (LastGameOutcome == FirebaseGameManager.GameOutcome.Draw)
+            if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
             {
-                if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
-                {
-                    DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
-                    DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
-                    DataManager.Instance.PlayerData.soloScore += 10; // 점수 복구
-                    Debug.Log("무승부: 페널티로 제거되었던 도넛과 점수가 복구됩니다.");
-                }
+                DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+                DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+                Debug.Log("무승부: 페널티로 제거되었던 도넛과 점수가 복구됩니다.");
             }
-            else if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
-            {
-                if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
-                {
-                    DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
-                    DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
-                    Debug.Log("승리: 페널티로 제거되었던 도넛이 복구됩니다.");
-                }
-            }
-            
-            UIManager.Instance.Open(PanelId.MainPanel);
-            
-            int oldLevel = DataManager.Instance.PlayerData.level;
-            UIManager.Instance.Open(PanelId.MainPanel);
-            
-            Debug.Log(">>>>>> 게임보상을 반영합니다.");
-            // 2. 실제 데이터 반영 (경험치, 골드, 포인트)
-            
-            LevelUp(pendingExp);
-            DataManager.Instance.PlayerData.gold += pendingGold;
-            DataManager.Instance.PlayerData.soloScore += pendingPoint;
-
-            DataManager.Instance.GoldChange(DataManager.Instance.PlayerData.gold);
-            DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);            
-
-            // 레벨업 팝업 조건
-            if (DataManager.Instance.PlayerData.level > oldLevel)
-            {
-                UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
-            }
-            
-            // 3. 승리 시 상대 도넛 보상 지급
-            //if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
-            //{
-            //    if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
-            //    if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
-            //}
-
-            // 보류 중인 보상 도넛 지급
-            foreach (var donutEntry in pendingRewardDonuts)
-            {
-                DonutData rewardDonut = DataManager.Instance.GetDonutByID(donutEntry.id);
-                if (rewardDonut != null)
-                {
-                    BoardManager.Instance.AddRewardDonut(rewardDonut);
-                }
-            }
-
-            // 4. pending 값 초기화
-            pendingExp = 0;
-            pendingGold = 0;
-            pendingPoint = 0;
-            pendingRewardDonuts.Clear();
-            
-            // 5. 모든 결과 및 보상이 적용된 최종 데이터를 Firestore에 저장
-            _ = DataManager.Instance.SaveAllUserDataAsync();
         }
-    }
-    private IEnumerator ApplyRewardsNextFrame()
-    {
-        yield return null; // 한 프레임 대기
-        ApplyResultRewards();
+        else if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+        {
+            if (penaltyIndex1 != -1 && penaltyIndex2 != -1)
+            {
+                DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
+                DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
+                Debug.Log("승리: 페널티로 제거되었던 도넛이 복구됩니다.");
+            }
+        }
+        else if (LastGameOutcome == FirebaseGameManager.GameOutcome.Lose)
+        {
+            Debug.Log("패배");
+        }
+        UIManager.Instance.Open(PanelId.MainPanel);
+        
+        int oldLevel = DataManager.Instance.PlayerData.level;
+        //UIManager.Instance.Open(PanelId.MainPanel);
+        
+        Debug.Log(">>>>>> 게임보상을 반영합니다.");
+        // 2. 실제 데이터 반영 (경험치, 골드, 포인트)
+        
+        //DataManager.Instance.PlayerData.exp += pendingExp;
+        DataManager.Instance.PlayerData.gold += pendingGold;
+        //DataManager.Instance.PlayerData.soloScore += pendingPoint;
+        Debug.Log($"pendingGold : {pendingGold}, pendingPoint : {pendingPoint}");
+
+        DataManager.Instance.GoldChange(DataManager.Instance.PlayerData.gold);
+        DataManager.Instance.LevelChange(DataManager.Instance.PlayerData.level);            
+
+        
+        // 3. 승리 시 상대 도넛 보상 지급
+        if (LastGameOutcome == FirebaseGameManager.GameOutcome.Win)
+        {
+            if (CapturedDonut1 != null) pendingRewardDonuts.Add(CapturedDonut1);
+            if (CapturedDonut2 != null) pendingRewardDonuts.Add(CapturedDonut2);
+        }
+        
+        // 보류 중인 보상 도넛 지급
+        foreach (var donutEntry in pendingRewardDonuts)
+        {
+            DonutData rewardDonut = DataManager.Instance.GetDonutByID(donutEntry.id);
+            if (rewardDonut != null)
+            {
+                BoardManager.Instance.AddRewardDonut(rewardDonut);
+            }
+        }
+        
+        
+        //LevelUp(pendingExp);
+        LevelUp(0);
+        // 레벨업 팝업 조건
+        if (DataManager.Instance.PlayerData.level > oldLevel)
+        {
+            UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
+        }
+
+        // 4. pending 값 초기화
+        pendingExp = 0;
+        pendingGold = 0;
+        pendingPoint = 0;
+        pendingRewardDonuts.Clear();
+        
+        // 5. 모든 결과 및 보상이 적용된 최종 데이터를 Firestore에 저장
+        _ = DataManager.Instance.SaveAllUserDataAsync();
+        
     }
 
     // 레벨업 로직
@@ -293,13 +262,13 @@ public class GameManager : MonoBehaviour
         DataManager.Instance.PlayerData.exp += getExp;
     
         // 100 이 넘으면 레벨업
-        if (DataManager.Instance.PlayerData.exp >= 100)
+        while (DataManager.Instance.PlayerData.exp >= 100)
         {
             DataManager.Instance.PlayerData.level += 1;
             DataManager.Instance.PlayerData.exp -= 100;
             
             LevelUpdate.Invoke(DataManager.Instance.PlayerData);
-            UIManager.Instance.Open(PanelId.LevelUpRewardPopUp);
+            //UIManager.Instance.Open(PanelId.LevelUpRewardPopUp); // ApplyResultRewards에서 처리
             // 레벨업 보상상자
            // BoardManager.Instance.SpawnGiftBox();
            // 레벨업팝업UI 컴포넌트로 달린 스크립트에보상상자 주는 함수있슴니다
@@ -309,6 +278,7 @@ public class GameManager : MonoBehaviour
     }
     private int index1;
     private int index2;
+    
     public void ApplyStartGamePenalty(int _index1, int _index2, List<DonutEntry> opponentDonuts)
     {
         if (DataManager.Instance == null) return;
@@ -364,7 +334,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 무승부 시, 페널티로 제거된 도넛을 복구하도록 DataManager에 요청합니다.
     /// </summary>
-    public void ProcessDrawOutcome()
+    public void ProcessDrawOutcome(int exp, int rewardGold, int rewardPoint)
     {
         if (DataManager.Instance == null) return;
         if (penaltyIndex1 == -1 || penaltyIndex2 == -1) // 페널티 정보가 유효하지 않으면 실행 안함
@@ -372,7 +342,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("무승부 도넛 복구 실패: 페널티 정보가 유효하지 않습니다.");
             return;
         }
-
+        
         // DataManager의 SetDonutAt을 직접 호출하여 로컬 인벤토리 복구
         DataManager.Instance.SetDonutAt(penaltyIndex1, true, penalizedDonut1);
         DataManager.Instance.SetDonutAt(penaltyIndex2, true, penalizedDonut2);
@@ -380,6 +350,8 @@ public class GameManager : MonoBehaviour
         // soloscore 10점 복구
         DataManager.Instance.PlayerData.soloScore += 10;
         Debug.Log($"무승부: soloscore 10점 복구. 현재 점수: {DataManager.Instance.PlayerData.soloScore}");
+        DataManager.Instance.PlayerData.gold += rewardGold;
+        
 
         // 로컬 리스너에게 변경 알림 
         //DataManager.Instance.OnUserDataChanged?.Invoke(DataManager.Instance.PlayerData);

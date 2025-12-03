@@ -313,6 +313,13 @@ public class Scr_OrderSystem : MonoBehaviour
         }
     }
 
+    public void ResetQuest()
+    {
+        OnclickRefreshOrderBtn(refreshBtn1);
+        OnclickRefreshOrderBtn(refreshBtn2);
+        OnclickRefreshOrderBtn(refreshBtn3);
+    }
+    
     //주문서 새로고침시 이미지, 이름.레벨,보상골드 갱신
     public void RefreshOrderDonut(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText)
     {
