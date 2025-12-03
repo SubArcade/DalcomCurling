@@ -5,43 +5,30 @@ using UnityEngine;
 public class Scr_DonutParticleSystem : MonoBehaviour
 {
     private EffectType selectedEffectType;
+    
     //public enum TrailType { None, FireTail, LightTail, MagicTail, IceTail}
 
-    [Header("팀 구별용 표시 오브젝트")]
-    [SerializeField] private GameObject myTeamCircle;
-    [SerializeField] private GameObject otherTeamCircle;
+    // [Header("팀 구별용 표시 오브젝트")]
+    // [SerializeField] private GameObject myTeamCircle;
+    // [SerializeField] private GameObject otherTeamCircle;
     private GameObject currentTeamCircleObject;
     
     //[Header("오라 파티클")]
     [SerializeField] private bool auraEnabled = false;
     private GameObject selectedAura = null;
-    //[SerializeField] private AuraType selectedAura = AuraType.None;
-    //[SerializeField] private GameObject auraFirePrefab;
-   // [SerializeField] private GameObject auraLightPrefab;
-    //[SerializeField] private GameObject auraMagicPrefab;
-   // [SerializeField] private GameObject auraIcePrefab;
-   // [SerializeField] private GameObject auraElectricPrefab;
+    
 
     //[Header("꼬리 파티클")]
     [SerializeField] private bool trailEnabled = false;
 
     private GameObject selectedTrail = null;
-    //[SerializeField] private TrailType selectedTrail = TrailType.None;
-    //[SerializeField] private TrailRenderer trailRenderer;
+    
     [SerializeField] private float minSpeedForTrail = 1.0f;
-    //[SerializeField] private GameObject trailFirePrefab;
-    //[SerializeField] private GameObject trailLightPrefab;
-   // [SerializeField] private GameObject trailMagicPrefab;
-    //[SerializeField] private GameObject trailIcePrefab;
-    //[SerializeField] private GameObject trailElectricPrefab;
+    
 
     //[Header("충돌 파티클")]
     private GameObject selectedCollision = null;
-   // [SerializeField] private GameObject collosionRed;
-   // [SerializeField] private GameObject collosionBlue;
-   // [SerializeField] private GameObject collosionMagic;
-   // [SerializeField] private GameObject collosionStar;
-   // [SerializeField] private float CrashParticleDuation = 2.0f; // 충돌 파티클 지속시간 -> 필요없을시 삭제하기
+   
                                                                 // 어차피 파티클 Looping 끈상태라서 필요없을것 같음
     [SerializeField] private string targetLayerName = "Donut";
     [SerializeField] private float minCrashForce = 1.0f; // 충돌에 필요한 최소값
@@ -55,13 +42,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
     private bool initialized = false;
     private bool attackFinished = false;
     
-    // 오라 파티클 프로퍼티
-    //public bool IsAuraEnabled => auraEnabled;
-   // public AuraType CurrentAuraType => selectedAura;
-
-    // 꼬리 파티클 프로퍼티
-    //public bool IsTrailEnabled => trailEnabled;
-    //public TrailType CurrentTrailType => selectedTrail;
+    
     
     // 파티클 시스템 컴포넌트는 오브젝트의 자식으로 이미 생성되어 있어야 합니다.
     public ParticleSystem trailParticleSystem;
@@ -111,6 +92,9 @@ public class Scr_DonutParticleSystem : MonoBehaviour
                  if (trailParticleSystem.isPlaying)
                  {
                      trailParticleSystem.Stop();
+                     particleTrailFinished = true;
+                     particleSystemParent.SetActive(false);
+                     this.enabled = false;
                  }
 
                  return;
@@ -136,7 +120,7 @@ public class Scr_DonutParticleSystem : MonoBehaviour
              // 6. Shape 모듈의 회전을 업데이트하여 입자가 정확히 반대 방향으로 방출되도록 합니다.
 
              
-             if (sqrVelocity > 0.01)
+             if (sqrVelocity >= 0.0001f)
              {
                  if (selectedEffectType == EffectType.Magic || selectedEffectType == EffectType.Star)
                  {
@@ -156,6 +140,8 @@ public class Scr_DonutParticleSystem : MonoBehaviour
                  //trailParticleSystem.transform.localScale = new Vector3(0, 0, 0);
                  trailParticleSystem.Stop();
                  particleTrailFinished = true;
+                 particleSystemParent.SetActive(false);
+                 this.enabled = false;
              }
              
              //trailParticleSystem.transform.position = capsuleCollider.bounds.center + direction * colliderRadius;
@@ -173,11 +159,11 @@ public class Scr_DonutParticleSystem : MonoBehaviour
         // InventoryData.curEffectType 값
         if (isMyTeam)
         {
-            CreateTeamCircle(myTeamCircle);
+            CreateTeamCircle(FirebaseGameManager.Instance.StoneManagerInGM.MyTeamCircle);
         }
         else 
         {
-            CreateTeamCircle(otherTeamCircle);
+            CreateTeamCircle(FirebaseGameManager.Instance.StoneManagerInGM.OtherTeamCircle);
         }
 
         if (effectType == EffectType.None)
