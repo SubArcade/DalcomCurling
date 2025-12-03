@@ -38,6 +38,7 @@ public class Scr_DeleteAccountPopUp : MonoBehaviour
             UIManager.Instance.Close(PanelId.DeleteAccountPopUp);
             UIManager.Instance.Open(PanelId.LoginPanel);
             input.text = string.Empty;
+            BoardManager.Instance.isCompleted = false;
         }
         else 
         {
