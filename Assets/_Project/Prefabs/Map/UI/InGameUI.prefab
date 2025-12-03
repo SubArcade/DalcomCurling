@@ -2347,8 +2347,8 @@ RectTransform:
   - {fileID: 1852198524174190123}
   - {fileID: 5162688705116240632}
   - {fileID: 4041967075968025283}
-  - {fileID: 1675312238225134240}
   - {fileID: 8068549533298725215}
+  - {fileID: 1675312238225134240}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6541,7 +6541,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -6741,7 +6741,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1675312238225134240
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6812,7 +6812,7 @@ MonoBehaviour:
   pointGage: {fileID: 2575563709307316822}
   pointText: {fileID: 8710893689512539522}
   tierSpriteSO: {fileID: 11400000, guid: 3f75ec32a38212c43b81dd144bfd7366, type: 2}
-  characterSO: {fileID: 0}
+  characterSO: {fileID: 11400000, guid: c957ed506c68e4543902569c112560eb, type: 2}
 --- !u!1 &7707825853747445572
 GameObject:
   m_ObjectHideFlags: 0
