@@ -244,7 +244,7 @@ public class StoneManager : MonoBehaviour
         }
 
         // 선택된 도넛의 물리 속성을 StoneForceController_Firebase에 전달합니다.
-        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, type,currentDonutId, selectedDonut.id, selectedDonut.weight, selectedDonut.resilience, selectedDonut.friction);
+        _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, type,currentDonutId, selectedDonut.id, selectedDonut.donutAmount);
 
         if (currentTurnPlayerId == game.PlayerIds[0]) // 현재 턴의 주인이 A팀(방장) 이면
         {
@@ -354,7 +354,7 @@ public class StoneManager : MonoBehaviour
                     float velocity = rb.velocity.sqrMagnitude;
                     // Debug.Log(
                     //     $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
-                    if (velocity > 0.01f * 0.01f) // sqrMagnitude는 제곱된 값을 반환하기에 비교할 숫자도 제곱. Mathf.Pow보다 오버헤드 적도록 직접연산
+                    if (velocity > 0.0001f) // sqrMagnitude는 제곱된 값을 반환하기에 비교할 숫자도 제곱. Mathf.Pow보다 오버헤드 적도록 직접연산
                     {
                         allStonesStopped = false;
                         break;
@@ -374,7 +374,7 @@ public class StoneManager : MonoBehaviour
                     float velocity = rb.velocity.sqrMagnitude;
                     // Debug.Log(
                     //     $"[Monitor] Checking stone: {controller.gameObject.name}, Velocity: {velocity}"); // 진단용 로그 추가
-                    if (velocity > 0.01f * 0.01f) // sqrMagnitude는 제곱된 값을 반환하기에 비교할 숫자도 제곱. Mathf.Pow보다 오버헤드 적도록 직접연산
+                    if (velocity > 0.0001f) // sqrMagnitude는 제곱된 값을 반환하기에 비교할 숫자도 제곱. Mathf.Pow보다 오버헤드 적도록 직접연산
                     {
                         allStonesStopped = false;
                         break;
@@ -533,7 +533,7 @@ public class StoneManager : MonoBehaviour
 
         // 서버에서 받은 정보로 돌 초기화
         StoneForceController_Firebase.Team team = (stoneInfo.Team == "A") ? StoneForceController_Firebase.Team.A : StoneForceController_Firebase.Team.B;
-        sfc.InitializeDonut(team, type, stoneInfo.StoneId, stoneInfo.DonutTypeAndNumber, stoneInfo.Weight, stoneInfo.Resilience, stoneInfo.Friction);
+        sfc.InitializeDonut(team, type, stoneInfo.StoneId, stoneInfo.DonutTypeAndNumber, stoneInfo.DonutAmount);
 
         // 올바른 딕셔너리에 추가
         if (team == StoneForceController_Firebase.Team.A)
@@ -580,9 +580,10 @@ public class StoneManager : MonoBehaviour
                     StoneId = sfc.donutId,
                     Team = sfc.team.ToString(),
                     DonutTypeAndNumber = sfc.DonutTypeAndNumber,
-                    Weight = sfc.DonutWeight,
-                    Resilience = sfc.DonutResilience,
-                    Friction = sfc.DonutFriction,
+                    // Weight = sfc.DonutWeight,
+                    // Resilience = sfc.DonutResilience,
+                    // Friction = sfc.DonutFriction,
+                    DonutAmount = sfc.donutSettingAmount,
                     Position = new Dictionary<string, float>
                     {
                         { "x", xPos },
@@ -614,9 +615,10 @@ public class StoneManager : MonoBehaviour
                     StoneId = sfc.donutId,
                     Team = sfc.team.ToString(),
                     DonutTypeAndNumber = sfc.DonutTypeAndNumber,
-                    Weight = sfc.DonutWeight,
-                    Resilience = sfc.DonutResilience,
-                    Friction = sfc.DonutFriction,
+                    // Weight = sfc.DonutWeight,
+                    // Resilience = sfc.DonutResilience,
+                    // Friction = sfc.DonutFriction,
+                    DonutAmount = sfc.donutSettingAmount,
                     Position = new Dictionary<string, float>
                     {
                         { "x", xPos },
@@ -694,7 +696,7 @@ public class StoneManager : MonoBehaviour
         {
             if (dictA.Value != attacker)
             {
-                dictA.Value.ChangeMassByCompatibility(attacker.type);   
+                dictA.Value.ChangeMassByCompatibility(attacker.type, attacker.donutSettingAmount);   
             }
         }
         
@@ -702,7 +704,7 @@ public class StoneManager : MonoBehaviour
         {
             if (dictB.Value != attacker)
             {
-                dictB.Value.ChangeMassByCompatibility(attacker.type);   
+                dictB.Value.ChangeMassByCompatibility(attacker.type, attacker.donutSettingAmount);   
             }
         }
     }
