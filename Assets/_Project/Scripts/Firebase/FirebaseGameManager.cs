@@ -246,20 +246,32 @@ public class FirebaseGameManager : MonoBehaviour
         bool turnChanged = !isFirstSnapshot && _currentGame.TurnNumber != newGameData.TurnNumber;
         bool newShotFired = _currentGame?.LastShot?.Timestamp != newGameData.LastShot?.Timestamp;
         //bool newPredictionReceived = _currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber;
+        // bool newPredictionReceived = false;
+        // if (_currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber
+        //     && _currentGame?.PredictedResult?.PredictingPlayerId != newGameData.PredictedResult?.PredictingPlayerId)
+        // {
+        //     newPredictionReceived = true;
+        // }
+        // else if (newGameData.PredictedResult?.TurnNumber == 0 &&
+        //          newGameData.RoundNumber != 1 && newGameData.PredictedResult.FinalStonePositions.Count != 0)
+        // {
+        //     newPredictionReceived = true;
+        // }
+        // else if (newGameData.PredictedResult == null && newGameData.RoundNumber != 1)
+        // {
+        //     newPredictionReceived = false;
+        // }
         bool newPredictionReceived = false;
-        if (_currentGame?.PredictedResult?.TurnNumber != newGameData.PredictedResult?.TurnNumber
-            && _currentGame?.PredictedResult?.PredictingPlayerId != newGameData.PredictedResult?.PredictingPlayerId)
+        if (newGameData.PredictedResult != null)
         {
-            newPredictionReceived = true;
-        }
-        else if (newGameData.PredictedResult?.TurnNumber == 0 &&
-                 newGameData.RoundNumber != 1 && newGameData.PredictedResult.FinalStonePositions.Count != 0)
-        {
-            newPredictionReceived = true;
-        }
-        else if (newGameData.PredictedResult == null && newGameData.RoundNumber != 1)
-        {
-            newPredictionReceived = false;
+            if (_currentGame.PredictedResult == null ||
+                _currentGame.PredictedResult.TurnNumber != newGameData.PredictedResult.TurnNumber ||
+                (_currentGame.PredictedResult.TurnNumber == newGameData.PredictedResult.TurnNumber &&
+                 _currentGame.PredictedResult.FinalStonePositions.Count !=
+                 newGameData.PredictedResult.FinalStonePositions.Count))
+            {
+                newPredictionReceived = true;
+            }
         }
 
         bool roundFinished = _currentGame?.RoundNumber != newGameData.RoundNumber;
@@ -450,7 +462,7 @@ public class FirebaseGameManager : MonoBehaviour
     {
         // 턴이 변경될 때, 이전 턴에서 캐시된 예측 결과가 있다면 지금 동기화합니다.
         // 이렇게 하면 카메라가 전환된 후, 새 턴이 시작되기 직전의 자연스러운 타이밍에 위치 보정이 이루어집니다.
-        if (_cachedPrediction != null && _cachedPrediction.TurnNumber == _currentGame.TurnNumber - 1)
+        if (_cachedPrediction != null && _cachedPrediction.TurnNumber == _currentGame.TurnNumber - 1 && _cachedPrediction.PredictingPlayerId != myUserId)
         {
             //Debug.Log($"새 턴({_currentGame.TurnNumber}) 시작 전, 이전 턴({_cachedPrediction.TurnNumber})의 최종 위치를 동기화합니다.");
             stoneManager?.SyncPositions(_cachedPrediction.FinalStonePositions);
