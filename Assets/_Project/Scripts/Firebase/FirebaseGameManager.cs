@@ -64,6 +64,8 @@ public class FirebaseGameManager : MonoBehaviour
     [SerializeField] private UI_LaunchIndicator_Firebase UI_LaunchIndicator_Firebase; // UI제어 스크립트
     [SerializeField] private DonutSelectionUI donutSelectionUI; // 도넛 선택 UI 스크립트
 
+    public StoneManager StoneManagerInGM => stoneManager;
+    
     // --- 플레이어 프로필 정보 ---
     private Dictionary<string, PlayerProfile> _playerProfiles;
 
