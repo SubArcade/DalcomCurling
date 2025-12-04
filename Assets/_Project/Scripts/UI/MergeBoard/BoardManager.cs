@@ -186,7 +186,9 @@ public class BoardManager : MonoBehaviour
         selectionHighlight.gameObject.SetActive(true);
         selectionHighlight.transform.SetParent(cell.transform, false);
         selectionHighlight.rectTransform.anchoredPosition = Vector2.zero;
+
         // 칸 선택 사운드
+        if (generatorCell) return;
         SoundManager.Instance.selectSlotScroll();
     }
 

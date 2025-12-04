@@ -178,6 +178,19 @@ public enum LocalizationKey
     ingame_waitingTextwhenWin, //인게임 결과창에 반영될 승패무 관련 텍스트
     ingame_waitingTextwhenLose,
     ingame_waitingTextwhenDraw,
+
+    toast_softNotEnoughGold,
+    toast_softNotEnoughLevel,
+    toast_hardNotEnoughGold,
+    toast_hardNotEnoughLevel,
+    toast_moistNotEnoughGold,
+    toast_moistNotEnoughLevel,
+
+    popup_upgradeAsk_desc1,
+    popup_upgradeAsk_levelChange,
+    popup_upgradeAsk_desc2,
+
+    toast_unlockRequirement,
 }
 
 public class LocalizationManager : MonoBehaviour
