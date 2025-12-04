@@ -701,7 +701,8 @@ public class FirebaseGameManager : MonoBehaviour
             // 턴 전환 로직만 남겨둠
             // 8턴(0~7)이 끝나면 라운드 전환 상태로 변경
             // 현재턴이 마지막 턴이고 선공플레이어가 아닐때 (후공 플레이이가 라운드 종료로직을 시작해야할때) true
-            if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
+            //if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
+            if (result.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
             {
                 stoneManager?.SyncPositions(result.FinalStonePositions); // 후공은 handleTurnchange가 호출되지 않고 roundchange 되므로 미리 호출
                 _cachedPrediction = null;
