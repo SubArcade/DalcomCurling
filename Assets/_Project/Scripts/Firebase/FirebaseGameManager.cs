@@ -90,6 +90,8 @@ public class FirebaseGameManager : MonoBehaviour
 
     // --- SO 연결 ---\
     [SerializeField] private EffectSO effectSo;
+    
+    private Coroutine waitInitializingCoroutine;
 
     public EffectSO EffectSoObject
     {
@@ -291,16 +293,19 @@ public class FirebaseGameManager : MonoBehaviour
         switch (_currentGame.GameState)
         {
             case "Initializing":
-                if (_currentGame.ReadyPlayers.Count == 2 && IsHost())
+                Debug.Log("Initi1alizing 들어옴");
+                var updates = new Dictionary<string, object>
                 {
-                    var updates = new Dictionary<string, object>
-                    {
-                        { "GameState", "Timeline" },
-                        { "LastUploaderId", myUserId }
-                    };
-                    db.Collection("games").Document(gameId).UpdateAsync(updates);
+                    { "GameState", "Timeline" },
+                    { "LastUploaderId", myUserId }
+                };
+                db.Collection("games").Document(gameId).UpdateAsync(updates);
+                
+                if (waitInitializingCoroutine == null)
+                {
+                    waitInitializingCoroutine = StartCoroutine(WaitInitializing());
                 }
-
+                
                 break;
             case "Timeline":
                 if (_localState == LocalGameState.Idle)
@@ -454,6 +459,29 @@ public class FirebaseGameManager : MonoBehaviour
 
     }
 
+    IEnumerator WaitInitializing()
+    {
+        float elapsed = 0f;
+        float timeout = 10f;
+
+        while (elapsed < timeout)
+        {
+            if (_currentGame.ReadyPlayers.Count == 2)
+            {
+                Debug.Log("Initializing 조건문 실행");
+                yield break;
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log("Initializing 타임아웃: 상대방이 연결되지 않음");
+        ForfeitGame(_currentGame.PlayerIds.FirstOrDefault(id => id != myUserId), "Opponent disconnected");
+        
+        waitInitializingCoroutine = null;
+    }
+    
     /// <summary>
     /// 턴이 바뀌었을 때 호출됩니다.
     /// 내 턴이면 돌을 준비하고 입력을 활성화하며, 상대 턴이면 입력을 비활성화합니다.
