@@ -136,7 +136,7 @@ public class BoardManager : MonoBehaviour
     {
         tempStorageSlot.storage.Clear();
         tempStorageSlot.RefreshUI();
-    }
+    } 
     
     public void OnCellClicked(Cells cell)
     {
