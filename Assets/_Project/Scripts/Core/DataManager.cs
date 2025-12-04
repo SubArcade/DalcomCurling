@@ -68,6 +68,7 @@ public class DataManager : MonoBehaviour
     public event Action<PlayerData> OnUserDataChanged;
     public event Action<UserDataRoot> OnUserDataRootChanged;
     public event Action OnBoardDataLoaded;
+    public event Action UpdateUI;
 
     // 백그라운드 이벤트
     public event Action<bool> PauseChanged;
@@ -105,6 +106,7 @@ public class DataManager : MonoBehaviour
             null
         },
         dailyFreeGemClaimed = false,
+        dailyFreeEnergy = 5,
         effectList = new List<EffectType>()
         {
             EffectType.None,
@@ -112,7 +114,8 @@ public class DataManager : MonoBehaviour
         characterList = new List<CharacterType>()
         {
             CharacterType.None
-        }
+        },
+        
     };
     [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
     {
@@ -122,6 +125,10 @@ public class DataManager : MonoBehaviour
         cellMax = 49,
         cellWidth = 7,
         cellLength = 7,
+        tempGiftIds = new List<string>()
+        {
+            null
+        }
     };
     [SerializeField] private QuestData firstQuestData = new QuestData()
     {
@@ -173,6 +180,11 @@ public class DataManager : MonoBehaviour
         PlayerData.nickname = Name;
         OnUserDataChanged?.Invoke(PlayerData);
     }
+    
+    public void RefreshChange()
+    {
+        UpdateUI?.Invoke();
+    }
 
     void Awake()
     {
@@ -211,6 +223,7 @@ public class DataManager : MonoBehaviour
         int baseGold = firstQuestData.baseGold;
         int RefreshCount = firstQuestData.refreshCount;
         int maxCount = firstQuestData.maxCount;
+        PlayerData.authProviderType = authProviderType;
         
         var docRef = db.Collection(userCollection).Document(uId);
         var snap = await docRef.GetSnapshotAsync();
@@ -322,6 +335,8 @@ public class DataManager : MonoBehaviour
     {
         //EnsureDonutSlots();
         userData.inventory = firstInventoryData;
+        userData.inventory.donutEntries = firstInventoryData.donutEntries;
+        userData.inventory.dailyFreeEnergy = firstInventoryData.dailyFreeEnergy;
         userData.inventory.effectList = new List<EffectType>()
         {
             EffectType.None
@@ -330,6 +345,7 @@ public class DataManager : MonoBehaviour
         {
             CharacterType.None
         };
+        
     }
     
     
@@ -367,6 +383,7 @@ public class DataManager : MonoBehaviour
         MergeBoardData.generatorLevelSoft = 1;
         MergeBoardData.generatorLevelMoist = 1;
         
+        MergeBoardData.tempGiftIds = firstMergeBoardData.tempGiftIds;
     }
 
     // 기본 퀘스트 데이터

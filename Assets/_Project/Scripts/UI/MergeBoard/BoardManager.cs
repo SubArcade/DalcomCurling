@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using static Cinemachine.DocumentationSortingAttribute;
 using static UnityEngine.EventSystems.EventTrigger;
+using DG.Tweening;
+using Random = UnityEngine.Random;
 
 public class BoardManager : MonoBehaviour
 {
@@ -38,9 +40,13 @@ public class BoardManager : MonoBehaviour
     };
 
     [Tooltip("임시 보관칸")] public TempStorageSlot tempStorageSlot;
-
+    public bool isCompleted = false;
+    
+    [SerializeField] private GameObject entryPopupObj;
+    
     void Awake()
     {
+        isCompleted = false;
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -51,37 +57,87 @@ public class BoardManager : MonoBehaviour
         tempStorageSlot = FindObjectOfType<TempStorageSlot>();
     }
 
+    private void OnEnable()
+    {
+        SetBoard();
+    }
+
     void Start()
     {
         selectionHighlight = GameObject.Find("Canvas/GameObject/Main_Panel/MainMenu/Mid/Merge/Background/SelectCursor_Image").GetComponent<Image>();
         if (selectionHighlight != null) selectionHighlight.gameObject.SetActive(false);
         //GenerateBoard();
         //UpdateBoardUnlock(1);
-        if (cells == null || cells.Length == 0) GenerateBoard();
-
-        CreateDonutButtonAtCenter();
-
-        // DataManager가 로드 완료될 때 보드 채우기
-        DataManager.Instance.OnBoardDataLoaded += HandleBoardLoaded;
-
-        //재입장시 로드
-        RefreshBoardUnlock();
-        LoadBoardLocal();
+        //SetBoard();
     }
 
-    // 로드 기다리기
-    void HandleBoardLoaded()
+    public void SetBoard()
     {
-        RefreshBoardUnlock();
-        LoadBoardLocal();
-    }
+        if (!isCompleted)
+        {
+            Debug.Log("[BoardManager] SetBoard 실행");
+            isCompleted = true;
+            if (cells == null || cells.Length == 0) GenerateBoard();
 
-    void OnDestroy()
+            CreateDonutButtonAtCenter();
+            RefreshBoardUnlock();
+            LoadBoardLocal();
+        }
+    }
+    
+    public void ResetBoard()
     {
-        if (DataManager.Instance != null)
-            DataManager.Instance.OnBoardDataLoaded -= HandleBoardLoaded;
+        foreach (Transform child in transform)
+        {
+            var item = child.GetComponentInChildren<MergeItemUI>();
+
+            if (item != null)
+            {
+                Debug.Log("[BoardManager] ResetBoard → " + item.name);
+                Destroy(item.gameObject);
+            }
+        }
+    }
+    public void ResetEntry(int index = 100)
+    {
+        if (entryPopupObj.GetComponent<Scr_EntryPopUP>() == null)
+            return;
+        
+        Debug.Log("[BoardManager] ResetBoard 호출");
+        var entryObj = entryPopupObj.GetComponent<Scr_EntryPopUP>();
+
+        if (index != 100)
+        {
+            var item = entryObj.entrySlots[index].gameObject.GetComponentInChildren<MergeItemUI>();
+            if (item != null)
+            {
+                //Debug.Log("[BoardManager] ResetBoard → " + item.name);
+                entryObj.entrySlots[index].currentItem = null;
+                Destroy(item.gameObject);
+            }
+        }
+        else
+        {
+            foreach (var child in entryObj.entrySlots)
+            {
+                var item = child.gameObject.GetComponentInChildren<MergeItemUI>();
+                
+                if (item != null)
+                {
+                    //Debug.Log("[BoardManager] ResetBoard → " + item.name);
+                    child.currentItem = null;
+                    Destroy(item.gameObject);
+                }
+            }
+        }
     }
 
+    public void ResetTempGiftIds()
+    {
+        tempStorageSlot.storage.Clear();
+        tempStorageSlot.RefreshUI();
+    }
+    
     public void OnCellClicked(Cells cell)
     {
         bool isSameCell = (selectedCell == cell);
@@ -136,6 +192,7 @@ public class BoardManager : MonoBehaviour
 
     void GenerateBoard()
     {
+        Debug.Log("GenerateBoard 완료");
         cells = new Cells[boardSize, boardSize];
 
         for (int y = 0; y < boardSize; y++)
@@ -176,13 +233,21 @@ public class BoardManager : MonoBehaviour
     // 빈칸 찾는셀
     public Cells FindEmptyActiveCell()
     {
+        Debug.Log("FindEmptyActiveCell1111111111111111111111111111111");
+        if (cells == null)
+        {
+            Debug.Log("[BoardManager] cells 배열이 NULL 입니다!!", this);
+            SetBoard();
+        }
+        
         List<Cells> available = new();
         foreach (var c in cells)
         {
             if (c == null || !c.isActive || c == generatorCell) continue;
-            if (c.IsEmpty()) available.Add(c);
+            if (c.IsEmpty() && c.isTempOccupied == false)
+                available.Add(c);
         }
-
+        
         return available.Count > 0 ? available[Random.Range(0, available.Count)] : null;
     }
 
@@ -228,10 +293,10 @@ public class BoardManager : MonoBehaviour
         }
 
         // 공용 도넛 프리팹으로 생성
-        GameObject donutObj = Instantiate(donutPrefab, target.transform);
+        GameObject donutObj = Instantiate(donutPrefab, generatorCell.transform);
         RectTransform rt = donutObj.GetComponent<RectTransform>();
         rt.anchoredPosition = Vector2.zero;
-        rt.localScale = Vector3.one;
+        rt.localScale = Vector3.zero;
 
         // 스프라이트, ID, 기타 정보 적용
         var item = donutObj.GetComponent<MergeItemUI>();
@@ -239,17 +304,43 @@ public class BoardManager : MonoBehaviour
         img.sprite = donutData.sprite;
         item.donutData = donutData;
         item.donutId = donutData.id;
-        target.SetItem(item, donutData);
 
+        //이동 시 캔버스 부모로
+        Canvas rootCanvas = generatorCell.GetComponentInParent<Canvas>();
+        donutObj.transform.SetParent(rootCanvas.transform, true);
 
-        // + 생성기에서 도넛을 생성 했을때 나는 사운드 ---
-        if (SoundManager.Instance != null)
+        target.isTempOccupied = true;
+
+        rt.DOScale(1.1f, 0.15f).SetEase(Ease.OutBack).OnComplete(() =>
         {
-            SoundManager.Instance.createDonut();
-        }
+            // target UI 위치 계산
+            RectTransform canvasRect = rootCanvas.transform as RectTransform;
 
-        //Debug.Log($"{donutData.displayName} 생성됨 (Level {donutData.level}, Type: {donutData.donutType})");
-        AutoSaveBoardLocal();
+            Vector2 uiTargetPos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect,
+                RectTransformUtility.WorldToScreenPoint(null, target.transform.position),
+                null,
+                out uiTargetPos
+            );
+
+            // 이동
+            rt.DOAnchorPos(uiTargetPos, 0.25f).SetEase(Ease.InOutQuad).OnComplete(() =>
+            {
+                // 도착 후 셀로 되돌리기
+                donutObj.transform.SetParent(target.transform, false);
+                rt.anchoredPosition = Vector2.zero;
+                rt.localScale = Vector3.one;
+
+                target.isTempOccupied = false;
+                target.SetItem(item, donutData);
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.createDonut();
+
+                AutoSaveBoardLocal();
+            });
+        });
     }
 
     //인게임 도넛 획득
@@ -263,19 +354,31 @@ public class BoardManager : MonoBehaviour
 
         // 빈 활성 칸 찾기
         Cells target = FindEmptyActiveCell();
+        
+         if (target == null)
+         {
+             Debug.Log("보드가 꽉 찼습니다 → 임시보관칸 이동");
+        
+             bool added = tempStorageSlot.Add(rewardData);
+        
+             if (!added)
+                 Debug.LogWarning("임시보관칸도 가득 찼습니다!");
+        
+             return; // 도넛 생성하지 않고 종료
+         }
 
-        if (target == null)
-        {
-            Debug.Log("보드가 꽉 찼습니다 → 임시보관칸 이동");
-
-            bool added = tempStorageSlot.Add(rewardData);
-
-            if (!added)
-                Debug.LogWarning("임시보관칸도 가득 찼습니다!");
-
-            return; // 도넛 생성하지 않고 종료
-        }
-
+        // var cellList = DataManager.Instance.MergeBoardData.cells;
+        //
+        // List<CellData> target = new();
+        //
+        // foreach (var cell in cellList)
+        // {
+        //     if (cell.isCellActive && cell.donutId == "" && cell.donutId == null)
+        //     {
+        //         target.Add(cell);
+        //     }
+        // }
+        
         // 보드에 도넛 생성
         GameObject obj = Instantiate(donutPrefab, target.transform);
         var item = obj.GetComponent<MergeItemUI>();
@@ -545,6 +648,7 @@ public class BoardManager : MonoBehaviour
         }
 
         Debug.Log("[LoadBoardLocal] 보드 로드 완료");
+        isCompleted = true;
     }
     
 

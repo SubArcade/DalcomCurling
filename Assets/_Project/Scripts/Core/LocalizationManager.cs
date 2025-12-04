@@ -16,6 +16,7 @@ public enum LocalizationKey
     Label_Account, //계정
     Label_DeleteAccount, //계정삭제
     Label_AccountLink, //구글 계정 연동
+    Label_AccountLinkDeactivate, //구글 계정 연동
     Label_GameSetting, //게임설정
     Label_AlarmSetting, //알람설정
     Label_AlarmText, //알람설정 바로 아래 텍스트
@@ -165,6 +166,18 @@ public enum LocalizationKey
     ingame_streak,
 
     ingame_surrenderText, //항복
+
+    Label_noGem, //젬부족 상점관련
+    Label_alreadyBuy, //이미 구매
+    Label_completeBuy, //구매완료
+
+    login_selectAccount, //로그인 패널
+    login_googleLogin,
+    login_guestLogin,
+
+    ingame_waitingTextwhenWin, //인게임 결과창에 반영될 승패무 관련 텍스트
+    ingame_waitingTextwhenLose,
+    ingame_waitingTextwhenDraw,
 }
 
 public class LocalizationManager : MonoBehaviour
@@ -181,7 +194,7 @@ public class LocalizationManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         LoadTables();
         SetLanguage(CurrentLanguage);

@@ -32,6 +32,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject WaitThrowPopUp;
     [SerializeField] private GameObject timeLineUI;
+    [SerializeField] private Image turnPanel;
 
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
@@ -133,12 +134,15 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         // GameManager에서 ID 정보를 가져옵니다.
         string myUserId = FirebaseAuthManager.Instance.UserId;
         string opponentId = gameManager.GetOpponentId();
+        Debug.Log($"GetPlayerProfile : {opponentId} 여기서 함수 호출");
 
         // 프로필 정보를 가져와서 저장합니다.
         MyProfile = gameManager.GetPlayerProfile(myUserId);
+        Debug.Log("GetPlayerProfile : MyProfile 여기서 함수 호출");
         OpponentProfile = gameManager.GetPlayerProfile(opponentId);
+        Debug.Log("GetPlayerProfile : OpponentProfile 여기서 함수 호출");
 
-        if (MyProfile != null && OpponentProfile != null)
+        if (MyProfile != null)
         {
             // 내 인벤토리 UI 채우기
             if (donutSelectionUI != null)
@@ -185,9 +189,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 timeLinePlayerCharacter2.enabled = (oppCharSprite != null);
             }
         }
+        else if (OpponentProfile != null)
+        {
+            Debug.LogWarning("UI_LaunchIndicator_Firebase: OpponentProfile 프로필 정보를 모두 가져오지 못했습니다.");
+        }
         else
         {
-            Debug.LogWarning("UI_LaunchIndicator_Firebase: 프로필 정보를 모두 가져오지 못했습니다.");
+            Debug.LogWarning("UI_LaunchIndicator_Firebase: MyProfile 프로필 정보를 모두 가져오지 못했습니다.");
         }
     }
 
@@ -388,7 +396,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
                 getDonut = "획득 도넛";
 
                 //GameManager.Instance.ProcessWinOutcome(); // 페널티로 제거되었던 도넛 복구
-                GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
+                //GameManager.Instance.ProcessDonutCapture(); // 상대 도넛 획득 (획득할 도넛 정보는 이미 게임 시작 시점에 결정됨)
                 break;
             case FirebaseGameManager.GameOutcome.Lose:
                 exp = 8;
@@ -402,10 +410,10 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             case FirebaseGameManager.GameOutcome.Draw:
                 exp = 10;
                 rewardGold = 100;
-                rewardPoint = 0; // 페널티로 잃었던 10점 복구
+                rewardPoint = 10; // 페널티로 잃었던 10점 복구
                 result = "DRAW!";
                 getDonut = "변동 없음";
-                GameManager.Instance.ProcessDrawOutcome(); // 페널티로 제거되었던 도넛 복구
+                //GameManager.Instance.ProcessDrawOutcome(exp, rewardGold, rewardPoint); // 페널티로 제거되었던 도넛 복구
                 break;
         }
 
@@ -419,8 +427,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         if (getDonutText != null) getDonutText.text = $"{getDonut}";
 
         GameManager.Instance.SetGameOutcome(outcome); // 게임 결과 저장
+        Debug.Log($"exp : {exp}, reward : {rewardGold}, point : {rewardPoint}, result : {result}");
         GameManager.Instance.SetResultRewards(exp, rewardGold, rewardPoint);
-
+        //GameManager.Instance.ApplyResultRewards();
     }
 
     // enum → 문자열 변환 함수
@@ -460,4 +469,17 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         }
     }
 
+    public void TurnColor(bool isMyTurn)
+    {
+        if (turnPanel == null) return;
+
+        if (isMyTurn)
+        {
+            turnPanel.color = Color.green;
+        }
+        else
+        {
+            turnPanel.color = Color.red;
+        }
+    }
 }

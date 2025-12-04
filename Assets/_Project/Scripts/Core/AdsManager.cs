@@ -82,7 +82,7 @@ public class AdsRewarded : MonoBehaviour
         rewardedAd = null;
         var request = new AdRequest();
         string adUnitId = TestAD_UNIT_ID;
-
+        
         switch (adType)
         {
             case AdType.TEST:
@@ -97,11 +97,11 @@ public class AdsRewarded : MonoBehaviour
             case AdType.GIFTBOX:
                 adUnitId = GiftBoxAD_UNIT_ID;
                 break;
+            case AdType.Gem:
+                adUnitId = TestAD_UNIT_ID;
+                break;
         }
-
-        // 새로고침 횟수 다차면 막기
-        if (DataManager.Instance.QuestData.currentChargeCount >= DataManager.Instance.QuestData.maxChargeCount)
-            return;
+        adUnitId = TestAD_UNIT_ID;
         
         RewardedAd.Load(adUnitId, request, (RewardedAd ad, LoadAdError error) =>
         {

@@ -244,6 +244,9 @@ public class Scr_DonutStateEditor : MonoBehaviour
         int previewLevel = entry.weight + delta;
         
         DataManager.Instance.InventoryData.donutEntries[listIndex].donutAmount = delta;
+        
+        // 애널리틱스 슬라이더
+        AnalyticsManager.Instance.ReadyDonutAdjust();
     }
 
     /// <summary>

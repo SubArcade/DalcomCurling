@@ -46,8 +46,10 @@ public class DonutEntryUI : MonoBehaviour
         DonutData originalDonutData = DataManager.Instance.GetDonutByID(data.id);
         if (originalDonutData != null)
         {
+            Debug.Log("도넛 이미지 들어옴11111111111111111111");
             if (donutImage != null)
             {
+                Debug.Log("도넛 이미지 들어옴2222222222222222222");
                 donutImage.sprite = originalDonutData.sprite;
             }
             else

@@ -24,6 +24,9 @@ public class Scr_EffectSlot : MonoBehaviour
         {
             activeImage.SetActive(true);
             DataManager.Instance.InventoryData.curEffectType = effectType;
+            
+            // 애널리틱스 이펙트 변경
+            AnalyticsManager.Instance.ReadyEquip();
         }
         else
         {

@@ -22,18 +22,17 @@ public class Scr_EnergyRechargePopUp : MonoBehaviour
 
     void Awake()
     {
-    }    
-    void Start()
-    {
         closeButton.onClick.AddListener(() => OnClickCloseBtn());
         gemButton.onClick.AddListener(() => OnClickGemBtn());
-    }
+        adsButton.onClick.AddListener(OnClickAdsBtn);
+    }    
+    
     void Update()
-{
-    int currentEnergy = DataManager.Instance.PlayerData.energy;
-    int maxEnergy = DataManager.Instance.PlayerData.maxEnergy;
-    UpdateEnergyUI(currentEnergy, maxEnergy);
-}
+    {
+        int currentEnergy = DataManager.Instance.PlayerData.energy;
+        int maxEnergy = DataManager.Instance.PlayerData.maxEnergy;
+        UpdateEnergyUI(currentEnergy, maxEnergy);
+    }
 
     void OnEnable()
     {
@@ -88,8 +87,22 @@ public class Scr_EnergyRechargePopUp : MonoBehaviour
     }
    
     //광고버튼 에너지충전
-    public void OnClickAdsBtn() 
+    public void OnClickAdsBtn()
     {
-        //ㅋㅋ
+        if (DataManager.Instance.InventoryData.dailyFreeEnergy == 0)
+        {
+            adsButton.interactable = false;
+            return;
+        }
+        DataManager.Instance.InventoryData.dailyFreeEnergy--;
+        
+        if (LocalizationManager.Instance.CurrentLanguage == "ko")
+        {
+            adsText.text = $"광고 ({DataManager.Instance.InventoryData.dailyFreeEnergy}/5)";
+        }
+        else
+        {
+            adsText.text = $"Ad ({DataManager.Instance.InventoryData.dailyFreeEnergy}/5)";
+        }
     }
 }
