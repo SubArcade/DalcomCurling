@@ -4,10 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic; // 리스트나 딕셔너리 같은 자료구조를 사용하기 위해 필요합니다.
 using System.Linq; // 리스트에서 데이터를 쉽게 찾거나 걸러낼 때 사용합니다.
-using DG.Tweening; // DOTween 애니메이션 라이브러리를 사용하기 위해 필요합니다.
-using Firebase.Firestore; // Firebase Firestore 기능을 사용하기 위해 필요합니다.
 using UnityEngine; // Unity 엔진의 기능을 사용하기 위해 필요합니다.
-using UnityEngine.PlayerLoop;
 
 /// <summary>
 /// 이 스크립트는 컬링 게임의 전체적인 흐름(상태)을 관리하는 중요한 역할을 합니다.
@@ -90,6 +87,8 @@ public class FirebaseGameManager : MonoBehaviour
 
     // --- SO 연결 ---\
     [SerializeField] private EffectSO effectSo;
+    
+    private Coroutine waitInitializingCoroutine;
 
     public EffectSO EffectSoObject
     {
@@ -122,6 +121,7 @@ public class FirebaseGameManager : MonoBehaviour
     public string CurrentLocalState => _localState.ToString();
 
     public string CurrentGameState => _currentGame?.GameState ?? "N/A";
+    [SerializeField] private GameObject blackOutInObj;
 
 
     #region Unity Lifecycle (유니티 생명주기)
@@ -291,16 +291,19 @@ public class FirebaseGameManager : MonoBehaviour
         switch (_currentGame.GameState)
         {
             case "Initializing":
-                if (_currentGame.ReadyPlayers.Count == 2 && IsHost())
+                Debug.Log("Initi1alizing 들어옴");
+                var updates = new Dictionary<string, object>
                 {
-                    var updates = new Dictionary<string, object>
-                    {
-                        { "GameState", "Timeline" },
-                        { "LastUploaderId", myUserId }
-                    };
-                    db.Collection("games").Document(gameId).UpdateAsync(updates);
+                    { "GameState", "Timeline" },
+                    { "LastUploaderId", myUserId }
+                };
+                db.Collection("games").Document(gameId).UpdateAsync(updates);
+                
+                if (waitInitializingCoroutine == null)
+                {
+                    waitInitializingCoroutine = StartCoroutine(WaitInitializing());
                 }
-
+                
                 break;
             case "Timeline":
                 if (_localState == LocalGameState.Idle)
@@ -454,6 +457,30 @@ public class FirebaseGameManager : MonoBehaviour
 
     }
 
+    // 상대방 연결이 끊기면 기다리고 일정 시간 지나면 결과 처리
+    IEnumerator WaitInitializing()
+    {
+        float elapsed = 0f;
+        float timeout = 10f;
+
+        while (elapsed < timeout)
+        {
+            if (_currentGame.ReadyPlayers.Count == 2)
+            {
+                Debug.Log("Initializing 조건문 실행");
+                yield break;
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log("Initializing 타임아웃: 상대방이 연결되지 않음");
+        ForfeitGame(_currentGame.PlayerIds.FirstOrDefault(id => id != myUserId), "Opponent disconnected");
+        
+        waitInitializingCoroutine = null;
+    }
+    
     /// <summary>
     /// 턴이 바뀌었을 때 호출됩니다.
     /// 내 턴이면 돌을 준비하고 입력을 활성화하며, 상대 턴이면 입력을 비활성화합니다.
@@ -771,6 +798,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleGameFinished()
     {
+        blackOutInObj.SetActive(false);
         _localState = LocalGameState.FinishedGame; // 서버로부터 게임 종료 명령을 받으면 자신의 로컬 상태도 종료 상태로 변경
         Time.fixedDeltaTime = initialFixedDeltaTime;
         inputController?.DisableInput(); // 입력 중지

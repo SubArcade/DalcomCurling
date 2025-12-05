@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -39,6 +38,8 @@ public class GameManager : MonoBehaviour
     private DonutEntry penalizedDonut2;
     private int penaltyIndex1 = -1;
     private int penaltyIndex2 = -1;
+
+    public bool isEasterEgg = false;
     
     private void Awake()
     {
