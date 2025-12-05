@@ -10,15 +10,19 @@ public class ToastMessage : MonoBehaviour
 
     private Tween currentTween;
 
-    private void Awake()
+    private bool isInitialized = false;
+
+    private void Init()
     {
-        // 처음엔 안 보이게
+        if (isInitialized) return;
+        isInitialized = true;
         toastText.alpha = 0f;
         toastText.gameObject.SetActive(false);
     }
 
     public void Show(string message)
     {
+        Init();
         // 이전 애니메이션 중지
         currentTween?.Kill();
 
