@@ -773,6 +773,7 @@ public class FirebaseGameManager : MonoBehaviour
     {
         _localState = LocalGameState.FinishedGame; // 서버로부터 게임 종료 명령을 받으면 자신의 로컬 상태도 종료 상태로 변경
         Time.fixedDeltaTime = initialFixedDeltaTime;
+        inputController?.DisableInput(); // 입력 중지
         //Debug.Log($"FixedDeltaTime = {Time.fixedDeltaTime}");
         Time.timeScale = 1f;
 

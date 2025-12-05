@@ -302,6 +302,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         DOTween.Kill("WatingThrowUI");
         ResultRewardView(outcome); //게임결과 설정
         result.SetActive(true); // 결과창 on
+        
+        DOVirtual.DelayedCall(30f, () =>
+        {
+                GameManager.Instance.EndGame();
+        }).SetId("endgame");
+
+        GameManager.Instance.EndGame();
     }
     public void FireShotReadyUI() // 발사 준비상태 모든 UI가 다보임
     {
