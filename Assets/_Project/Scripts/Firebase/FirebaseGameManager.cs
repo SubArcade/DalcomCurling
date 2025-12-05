@@ -124,6 +124,7 @@ public class FirebaseGameManager : MonoBehaviour
     public string CurrentLocalState => _localState.ToString();
 
     public string CurrentGameState => _currentGame?.GameState ?? "N/A";
+    [SerializeField] private GameObject blackOutInObj;
 
 
     #region Unity Lifecycle (유니티 생명주기)
@@ -459,6 +460,7 @@ public class FirebaseGameManager : MonoBehaviour
 
     }
 
+    // 상대방 연결이 끊기면 기다리고 일정 시간 지나면 결과 처리
     IEnumerator WaitInitializing()
     {
         float elapsed = 0f;
@@ -799,6 +801,7 @@ public class FirebaseGameManager : MonoBehaviour
     /// </summary>
     private void HandleGameFinished()
     {
+        blackOutInObj.SetActive(false);
         _localState = LocalGameState.FinishedGame; // 서버로부터 게임 종료 명령을 받으면 자신의 로컬 상태도 종료 상태로 변경
         Time.fixedDeltaTime = initialFixedDeltaTime;
         //Debug.Log($"FixedDeltaTime = {Time.fixedDeltaTime}");
