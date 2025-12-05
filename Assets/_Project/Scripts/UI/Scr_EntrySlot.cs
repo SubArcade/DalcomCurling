@@ -50,7 +50,7 @@ public class EntrySlot : MonoBehaviour, IDropHandler, IPointerClickHandler
             return;
         }
 
-        Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
+        //Debug.Log($"[OnDrop] {name} 드롭 시도 - 현재 currentItem: {currentItem?.name}");
 
         EntrySlot fromSlot = dragged.OriginalParent?.GetComponent<EntrySlot>();
 
