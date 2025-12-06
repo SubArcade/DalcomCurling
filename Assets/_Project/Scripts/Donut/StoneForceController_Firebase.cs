@@ -141,22 +141,34 @@
 ﻿        }
 ﻿    }
 ﻿
-﻿    void OnDestroy()
-﻿    {
-﻿        // --- 반사 오브젝트 파괴 ---
-﻿        // 원본 스톤이 파괴될 때 반사 오브젝트도 함께 파괴하여 씬에 남아있지 않도록 합니다.
-﻿        if (reflectionObject != null)
+﻿        void OnDestroy()
 ﻿        {
-﻿            Destroy(reflectionObject);
+﻿            // --- 반사 오브젝트 파괴 ---
+﻿            // 원본 스톤이 파괴될 때 반사 오브젝트도 함께 파괴하여 씬에 남아있지 않도록 합니다.
+﻿            if (reflectionObject != null)
+﻿            {
+﻿                Destroy(reflectionObject);
+﻿            }
 ﻿        }
-﻿    }
-﻿
-﻿
-﻿    private void FixedUpdate()
-﻿    {
-﻿        if (isShooted && attackMoveFinished == false && rigid.isKinematic == false 
-﻿            && sidewaysForceAddLimit > sidewaysForceAddCount && isCollided == false)
+﻿    
+﻿        /// <summary>
+﻿        /// LateUpdate를 기다리지 않고 반사 오브젝트의 위치를 즉시 강제로 업데이트합니다.
+﻿        /// StoneManager가 위치를 동기화할 때 호출됩니다.
+﻿        /// </summary>
+﻿        public void ForceUpdateReflectionPosition()
 ﻿        {
+﻿            if (reflectionObject != null)
+﻿            {
+﻿                reflectionObject.transform.position = new Vector3(transform.position.x, -transform.position.y, transform.position.z);
+﻿                reflectionObject.transform.rotation = transform.rotation;
+﻿            }
+﻿        }
+﻿    
+﻿    
+﻿        private void FixedUpdate()
+﻿        {
+﻿            if (isShooted && attackMoveFinished == false && rigid.isKinematic == false 
+﻿                && sidewaysForceAddLimit > sidewaysForceAddCount && isCollided == false)﻿        {
 ﻿            sidewaysForceAddCount++;
 ﻿            
 ﻿            

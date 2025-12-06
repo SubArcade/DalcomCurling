@@ -215,6 +215,9 @@ public class FirebaseGameManager : MonoBehaviour
     #endregion
 
     #region Firebase Event Handlers
+    
+
+
 
     /// <summary>
     /// Firestore에서 게임 데이터가 변경될 때마다 호출됩니다.
@@ -491,12 +494,18 @@ public class FirebaseGameManager : MonoBehaviour
         // 이렇게 하면 카메라가 전환된 후, 새 턴이 시작되기 직전의 자연스러운 타이밍에 위치 보정이 이루어집니다.
         if (_cachedPrediction != null && _cachedPrediction.TurnNumber == _currentGame.TurnNumber - 1 && _cachedPrediction.PredictingPlayerId != myUserId)
         {
-            //Debug.Log($"새 턴({_currentGame.TurnNumber}) 시작 전, 이전 턴({_cachedPrediction.TurnNumber})의 최종 위치를 동기화합니다.");
             stoneManager?.SyncPositions(_cachedPrediction.FinalStonePositions);
             _cachedPrediction = null; // 사용한 예측 결과는 비웁니다.
+            ProceedWithTurnChange();
         }
+        else
+        {
+            ProceedWithTurnChange();
+        }
+    }
 
-
+    private void ProceedWithTurnChange()
+    {
         // 턴이 변경될 때마다 UI에 현재 턴 번호를 업데이트합니다.
         UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(_currentGame.TurnNumber);
         UI_LaunchIndicator_Firebase?.TurnColor(_isMyTurn);
@@ -712,84 +721,82 @@ public class FirebaseGameManager : MonoBehaviour
 
     /// <summary>
     /// 예측 결과를 처리하는 메서드입니다.
-    /// 돌 위치를 동기화하고 다음 턴으로 넘깁니다.
+    /// 시뮬레이션이 완료된 돌들의 최종 위치를 동기화하고,
+    /// 라운드의 마지막 턴인 경우 점수를 계산하여 게임 상태를 업데이트하거나 다음 턴으로 넘깁니다.
     /// </summary>
+    /// <param name="result">상대방 또는 자신의 클라이언트로부터 받은 예측 결과 데이터.</param>
     private void ProcessPrediction(PredictedResult result)
     {
-        //Debug.Log($"{result.PredictingPlayerId}로부터 받은 예측 결과 처리. 결과를 캐시하고 턴 전환을 시작합니다.");
+        // Debug.Log($"{result.PredictingPlayerId}로부터 받은 예측 결과 처리. 결과를 캐시하고 턴 전환을 시작합니다.");
 
-        // 결과를 캐시하여 HandleTurnChange에서 사용하도록 함
+        // 예측 결과 데이터를 캐시합니다. (HandleTurnChange에서 사용될 수 있음)
         _cachedPrediction = result;
 
-        // stoneManager?.SyncPositions(result.FinalStonePositions); // HandleTurnChange에서 호출하도록 이동
+        // 1. 돌들의 최종 위치를 즉시 동기화합니다.
+        // 이 시점에서 stoneManager는 각 돌의 Transform.position과 해당 반사 효과 위치를 업데이트합니다.
+        stoneManager?.SyncPositions(result.FinalStonePositions);
+        // 예측을 처리했으므로 캐시된 예측 결과를 비웁니다.
+        _cachedPrediction = null;
 
-        DOVirtual.DelayedCall(1f, () =>
+        // 2. 턴 전환 또는 라운드 종료 로직을 결정합니다.
+        // 현재 턴이 라운드의 마지막 턴인지, 그리고 현재 플레이어가 해당 라운드의 후공 플레이어인지 확인합니다.
+        // 이 조건은 라운드 종료 및 점수 계산의 '권한'을 후공 플레이어에게 부여하여 동기화 문제를 방지합니다.
+        if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
         {
-            // 턴 전환 로직만 남겨둠
-            // 8턴(0~7)이 끝나면 라운드 전환 상태로 변경
-            // 현재턴이 마지막 턴이고 선공플레이어가 아닐때 (후공 플레이이가 라운드 종료로직을 시작해야할때) true
-            if (_currentGame.TurnNumber >= (shotsPerRound * 2) - 1 && !IsStartingPlayer())
+            // --- 라운드 종료 로직 (후공 플레이어만 실행) ---
+
+            // 1초 지연: 점수 계산 전 최종 돌 배치를 잠시 보여주기 위함입니다.
+            DOVirtual.DelayedCall(1f, () =>
             {
-                stoneManager?.SyncPositions(result.FinalStonePositions); // 후공은 handleTurnchange가 호출되지 않고 roundchange 되므로 미리 호출
-                _cachedPrediction = null;
-                DOVirtual.DelayedCall(1f, () =>
-                {
-                    //Debug.Log("게임 종료를 위한 계산 시작");
-                    gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
-                    // 호스트가 점수를 기반으로 다음 라운드 시작 플레이어를 결정하고 DB를 업데이트합니다.
-                    stoneManager.CalculateScore(out StoneForceController_Firebase.Team winnerTeam, out int score, out List<int> donutIds);
-                    UpdateScoreInLocal(winnerTeam, score); // 계산된 점수를 로컬상에서 변경
-                    //Debug.Log($"{winnerTeam}: {score}");
-                    string winnerId = null;
-                    if (winnerTeam != StoneForceController_Firebase.Team.None)
-                    {
-                        winnerId = (winnerTeam == stoneManager.myTeam) ? myUserId : GetNextPlayerId();
-                    }
-
-                    string nextRoundStarterId;
-                    if (score == 0 || winnerId == null) // 무승부이거나 승자가 없는 경우
-                    {
-                        // 간단히 플레이어1을 다음 라운드 시작 플레이어로 지정합니다. (기획에 따라 변경 가능)
-                        nextRoundStarterId = _currentGame.PlayerIds[0];
-                    }
-                    else
-                    {
-                        // 패자(점수를 못 낸 팀)가 다음 라운드를 시작합니다.
-                        nextRoundStarterId = _currentGame.PlayerIds.FirstOrDefault(id => id != winnerId);
-                    }
-
-                    //ResetGameDatas(nextRoundStarterId, false);
-
-                    // 3라운드가 끝났으면 게임 종료, 아니면 지속
-                    // 2라운드가 끝났지만, 점수차가 5점이상이 나면 3라운드에서 4점을 따라잡더라도 이길수 없으므로 콜드게임 처리
-                    if (_currentGame.RoundNumber >= 3 ||
-                        (_currentGame.RoundNumber == 2 && Math.Abs(aTeamScore - bTeamScore) >= 5))
-                    {
-                        ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds, true); // 게임 끝내기 위한 정보들도 전송해야함
-                    }
-                    else
-                    {
-                        ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds, false); // 다음 라운드를 위한 정보들 전송
-                    }
-                });
+                // 카메라를 프리룩 모드(전체 시점)로 전환하여 최종 배치와 점수를 확인하기 용이하게 합니다.
+                gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
                 
+                // 2. 현재 필드 위의 돌들을 기반으로 점수를 계산합니다.
+                // out 매개변수로 승리 팀, 점수, 점수를 획득한 돌들의 ID 리스트를 받습니다.
+                stoneManager.CalculateScore(out StoneForceController_Firebase.Team winnerTeam, out int score, out List<int> donutIds);
+                
+                // 3. 계산된 라운드 점수를 로컬 총 점수에 반영합니다.
+                UpdateScoreInLocal(winnerTeam, score);
+                
+                // 4. 다음 라운드의 시작 플레이어를 결정합니다.
+                // 기본적으로 패배 팀이 다음 라운드를 시작합니다. 무승부이거나 승자가 없는 경우 PlayerIds[0] (호스트)가 시작합니다.
+                string winnerId = (winnerTeam != StoneForceController_Firebase.Team.None) ? (winnerTeam == stoneManager.myTeam ? myUserId : GetNextPlayerId()) : null;
+                string nextRoundStarterId = (score == 0 || winnerId == null) ? _currentGame.PlayerIds[0] : _currentGame.PlayerIds.FirstOrDefault(id => id != winnerId);
 
-            }
-            else // 일반적인 턴에서 다음턴으로 넘겨줌
-            {
-                string nextPlayerId = GetNextPlayerId();
-                var updates = new Dictionary<string, object>
+                // 5. 게임 종료 여부 (콜드 게임 포함)를 판단합니다.
+                // - 3라운드까지 모두 완료되었거나 (정상 종료)
+                // - 2라운드 완료 시점에 점수 차이가 5점 이상 벌어져서 남은 1라운드에서 역전이 불가능한 경우 (콜드 게임)
+                if (_currentGame.RoundNumber >= 3 || (_currentGame.RoundNumber == 2 && Math.Abs(aTeamScore - bTeamScore) >= 5))
                 {
-                    { "CurrentTurnPlayerId", nextPlayerId },
-                    { "TurnNumber", FieldValue.Increment(1) }, //턴을 1씩 더해줌
-                    { "LastUploaderId", myUserId }
-                };
-                db.Collection("games").Document(gameId).UpdateAsync(updates);
-            }
+                    // 게임 종료: ResetGameDatas에 isFinished: true를 전달하여 게임을 완전히 끝냅니다.
+                    ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds, true);
+                }
+                else
+                {
+                    // 다음 라운드 진행: ResetGameDatas에 isFinished: false를 전달하여 다음 라운드를 준비합니다.
+                    ResetGameDatas(nextRoundStarterId, winnerTeam, donutIds, false);
+                }
+            });
+        }
+        else
+        {
+            // --- 다음 턴으로 전환 로직 (라운드 중간) ---
+            
+            // 다음 턴 플레이어의 ID를 가져옵니다.
+            string nextPlayerId = GetNextPlayerId();
+            
+            // 데이터베이스에 다음 턴 플레이어 정보와 턴 번호 증가를 요청합니다.
+            var updates = new Dictionary<string, object>
+            {
+                { "CurrentTurnPlayerId", nextPlayerId },    // 다음 플레이어로 턴 변경
+                { "TurnNumber", FieldValue.Increment(1) },  // 턴 번호 1 증가
+                { "LastUploaderId", myUserId }              // 마지막 업로더 ID 기록
+            };
+            db.Collection("games").Document(gameId).UpdateAsync(updates);
+        }
 
-            _localState = LocalGameState.Idle;
-            //_cachedPrediction = null;
-        });
+        // 예측 처리 완료 후 로컬 상태를 Idle로 변경하여 다음 게임 상태 변화를 기다립니다.
+        _localState = LocalGameState.Idle;
     }
 
 
@@ -1160,53 +1167,38 @@ public class FirebaseGameManager : MonoBehaviour
 
     public void OnRoundEnd() //이번 라운드가 끝났을때.
     {
-        // 라운드 변경 시 턴 UI를 강제 동기화하여 점수 계산시 턴 정보 일치화.
         UI_LaunchIndicator_Firebase?.UpdateTurnDisplay(7);
 
-        // 카메라 움직임 필요
         stoneManager?.SyncPositions(_currentGame.PredictedResult.FinalStonePositions);
-
+        
         gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
         roundDataUpdated = true;
 
-        //stoneManager.CalculateScore(out StoneForceController_Firebase.Team team, out int score, out List<int> donutIds);
         stoneManager?.VisualizeScoreDonuts(_currentGame.ScoredDonuts.Team, _currentGame.ScoredDonuts.StoneId);
         aTeamScore = _currentGame.ATeamScore;
         bTeamScore = _currentGame.BTeamScore;
-        string nextState;
 
         DOVirtual.DelayedCall(4f, () =>
         {
-            // 라운드 종료 시 플레이어의 도넛 사용 상태를 초기화합니다.
             donutSelectionUI?.ResetDonutUsage();
+            string nextState = (_currentGame.CurrentTurnPlayerId == "Finished" && _currentGame.RoundStartingPlayerId == "Finished") ? "Finished" : "Timeline";
 
-            if (_currentGame.CurrentTurnPlayerId == "Finished" && _currentGame.RoundStartingPlayerId == "Finished")
-            {
-                nextState = "Finished";
-            }
-            else
-            {
-                nextState = "Timeline";
-            }
             PredictedResult result = new PredictedResult
             {
                 PredictingPlayerId = myUserId,
                 TurnNumber = 0,
                 FinalStonePositions = new List<StonePosition>()
             };
+
             var updates = new Dictionary<string, object>
             {
                 { "LastUploaderId", myUserId },
                 { "PredictedResult", result },
-                { "ScoredDonuts", null},
-                { "GameState", nextState } // 다음 라운드 시작 전, 연출을 위해 Timeline 상태로 전환
+                { "ScoredDonuts", null },
+                { "GameState", nextState }
             };
-            //stoneManager?.ClearOldDonutsInNewRound(_currentGame);
             db.Collection("games").Document(gameId).UpdateAsync(updates);
         });
-
-
-
     }
 
     public void UpdateScoreInLocal(StoneForceController_Firebase.Team winner, int score)
