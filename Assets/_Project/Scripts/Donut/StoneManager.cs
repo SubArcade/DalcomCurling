@@ -495,11 +495,14 @@ public class StoneManager : MonoBehaviour
             //if(capCollider != null) capCollider.isTrigger = true;
             capCollider.isTrigger = true;
 
-            fc.transform.DOMove(newPosition, 0.2f).OnComplete(() => {
-                // 이동 완료 후 물리 다시 활성화
-                rb.isKinematic = false;
-                capCollider.isTrigger = false;
-            });
+            // 위치를 즉시 설정하도록 수정
+            fc.transform.position = newPosition;
+            // 반사 오브젝트의 위치도 즉시 업데이트합니다.
+            fc.ForceUpdateReflectionPosition();
+
+            // 위치 설정 후 즉시 물리 속성을 되돌립니다.
+            rb.isKinematic = false;
+            capCollider.isTrigger = false;
         }
     }
 

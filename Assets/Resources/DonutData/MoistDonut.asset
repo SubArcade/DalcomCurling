@@ -16,7 +16,7 @@ MonoBehaviour:
   levels:
   - id: Moist_1
     level: 1
-    sprite: {fileID: 21300000, guid: 6ceffdeb33c333b4792707edda86fa87, type: 3}
+    sprite: {fileID: 21300000, guid: 8721cccbb6bb690498aafafa0df19c79, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv1\uC740 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218 \uC5C6\uC5B4\uC694"
     descriptionEnglish: "Lv1 can\u2019t adjust weight"
@@ -28,7 +28,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_2
     level: 2
-    sprite: {fileID: 21300000, guid: bb52029c21491ed499bd5a89ef7aee28, type: 3}
+    sprite: {fileID: 21300000, guid: c371b5e2a93e883439519ab03ab3103d, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv2\uB294 2\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -41,7 +41,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_3
     level: 3
-    sprite: {fileID: 21300000, guid: a0fd460fc5c6eda4eb31030080d02088, type: 3}
+    sprite: {fileID: 21300000, guid: cafeb72ceae10674b9a33a7abd2bd6ea, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv3\uC740 3\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -54,7 +54,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_4
     level: 4
-    sprite: {fileID: 21300000, guid: 51127f64c61e12a46b10f889e46a938c, type: 3}
+    sprite: {fileID: 21300000, guid: ea25812890d04e54b900274918267988, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv4\uB294 4\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -67,7 +67,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_5
     level: 5
-    sprite: {fileID: 21300000, guid: 90c294db430e2df48a76cd187a9eb6a6, type: 3}
+    sprite: {fileID: 21300000, guid: ff6c3f3427d27dd4aa0eb39886831dc0, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv5\uB294 5\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -80,7 +80,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_6
     level: 6
-    sprite: {fileID: 21300000, guid: c44b51f4dd0898d4d878a28d8a9ffbea, type: 3}
+    sprite: {fileID: 21300000, guid: 8b135a6339185a542bfd3b35831f961f, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv6\uC740 6\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -93,7 +93,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_7
     level: 7
-    sprite: {fileID: 21300000, guid: 95011a1e9f937b14188a6592e23505ff, type: 3}
+    sprite: {fileID: 21300000, guid: bc3f411dccb040a429cd523624db0368, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv7\uC740 7\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -106,7 +106,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_8
     level: 8
-    sprite: {fileID: 21300000, guid: d0dc89d8910ddff45be5b16eb2fbd1c8, type: 3}
+    sprite: {fileID: 21300000, guid: 99992e90b87275b47b60f60ace2bcf35, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv8\uC740 8\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -119,7 +119,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_9
     level: 9
-    sprite: {fileID: 21300000, guid: a03ba7b275df8874f89930cf4a7dbf02, type: 3}
+    sprite: {fileID: 21300000, guid: 3623e2dcf7c2e3b43b9691ad976b9b1b, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv9\uB294 9\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560 \uC218
       \uC788\uC5B4\uC694"
@@ -132,7 +132,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_10
     level: 10
-    sprite: {fileID: 21300000, guid: 79444458256a5374b89f60e362fb807b, type: 3}
+    sprite: {fileID: 21300000, guid: 487b0742d83e09c43a2157ef6d405b24, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv10\uC740 10\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -145,7 +145,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_11
     level: 11
-    sprite: {fileID: 21300000, guid: edc93549227b39848b47627d92687aa7, type: 3}
+    sprite: {fileID: 21300000, guid: 6884b063222513b47875084d1d3fb9d1, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv11\uC740 11\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -158,7 +158,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_12
     level: 12
-    sprite: {fileID: 21300000, guid: 62b4d8aa0582d3341ad70c9c7afb4cf1, type: 3}
+    sprite: {fileID: 21300000, guid: 6f9837e498ae9a74da2c640e65934a87, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv12\uB294 12\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -171,7 +171,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_13
     level: 13
-    sprite: {fileID: 21300000, guid: e6845a58f3b5c6b44bd554015547da92, type: 3}
+    sprite: {fileID: 21300000, guid: a920f985d74d5b046ab124085ac4ffe6, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv13\uC740 13\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -184,7 +184,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_14
     level: 14
-    sprite: {fileID: 21300000, guid: 52d59adcc1a944541811e79889905356, type: 3}
+    sprite: {fileID: 21300000, guid: 55afe8988798af742a4f7dad540b0718, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv14\uB294 14\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -197,7 +197,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_15
     level: 15
-    sprite: {fileID: 21300000, guid: 7b7a330aaf81efd4fa320029a8d50f13, type: 3}
+    sprite: {fileID: 21300000, guid: 16edecab46deb154bb26f20facdd081a, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv15\uB294 15\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -210,7 +210,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_16
     level: 16
-    sprite: {fileID: 21300000, guid: c4376e155ff7b9240ae15a59d914711d, type: 3}
+    sprite: {fileID: 21300000, guid: 2d8b78eda22c9cb4cb6398ef7e50e91f, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv16\uC740 16\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -223,7 +223,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_17
     level: 17
-    sprite: {fileID: 21300000, guid: ab822b89f1d4ec949aaa493d6573ff50, type: 3}
+    sprite: {fileID: 21300000, guid: 99844d004cb3afd4eb42fa34e71cea22, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv17\uC740 17\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -236,7 +236,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_18
     level: 18
-    sprite: {fileID: 21300000, guid: 4f695c4d55dd82945b3b39f8af825746, type: 3}
+    sprite: {fileID: 21300000, guid: e08e9ab4daa6d134b9a15ba9fbc6ed29, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv18\uC740 18\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -249,7 +249,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_19
     level: 19
-    sprite: {fileID: 21300000, guid: f949059dfaaa3f6488f7c3e4e19dea46, type: 3}
+    sprite: {fileID: 21300000, guid: f4d985b32318b524e966376901441981, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv19\uB294 19\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -262,7 +262,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_20
     level: 20
-    sprite: {fileID: 21300000, guid: a8518e6f70ae7fb40b96051c8333a4f6, type: 3}
+    sprite: {fileID: 21300000, guid: 9a04cd8b8a26950469143515635ee30d, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv20\uC740 20\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -275,7 +275,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_21
     level: 21
-    sprite: {fileID: 21300000, guid: 77c937158fa4bc54e967ce2cd2ea26a6, type: 3}
+    sprite: {fileID: 21300000, guid: 89c3bd83964815f4589a5be782d6a44b, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv21\uC740 21\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -288,7 +288,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_22
     level: 22
-    sprite: {fileID: 21300000, guid: a84d11bca788abe4a98885357cbc8883, type: 3}
+    sprite: {fileID: 21300000, guid: 48eb639583565ce4f95d324d1db9bf51, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv22\uB294 22\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -301,7 +301,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_23
     level: 23
-    sprite: {fileID: 21300000, guid: 0c28e7a4aba5ada4a9ef931941b71c8a, type: 3}
+    sprite: {fileID: 21300000, guid: c5e25fadc51115d4f9566d29b8cafcc4, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv23\uC740 23\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -314,7 +314,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_24
     level: 24
-    sprite: {fileID: 21300000, guid: a99c40e498d2ce34491af3cda91d86bb, type: 3}
+    sprite: {fileID: 21300000, guid: 26579ec73d64170498febafec69c7d98, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv24\uB294 24\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -327,7 +327,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_25
     level: 25
-    sprite: {fileID: 21300000, guid: 955fdfcd850c54c48b4f503a3f5edf7f, type: 3}
+    sprite: {fileID: 21300000, guid: 78627b13a8e365446ae16e4cab134aa8, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv25\uB294 25\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -340,7 +340,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_26
     level: 26
-    sprite: {fileID: 21300000, guid: e5d8dc391f77eda47bd2b05772e35954, type: 3}
+    sprite: {fileID: 21300000, guid: e5687e8e3ab800e4b95fa9fec2ce823c, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv26\uC740 26\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -353,7 +353,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_27
     level: 27
-    sprite: {fileID: 21300000, guid: c0dd284f498681c4b872e900043a2406, type: 3}
+    sprite: {fileID: 21300000, guid: 3d9224d2b8929d54f84d9e232711d460, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv27\uC740 27\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -366,7 +366,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_28
     level: 28
-    sprite: {fileID: 21300000, guid: d7637659d9c3baa41ba3b7a50fe672c9, type: 3}
+    sprite: {fileID: 21300000, guid: 047f88a73ce8fdc4d94af84398f71485, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv28\uC740 28\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -379,7 +379,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_29
     level: 29
-    sprite: {fileID: 21300000, guid: 56bcdad9ef8f3bd4ea6d861a279eb05f, type: 3}
+    sprite: {fileID: 21300000, guid: b20a5160688767f40a4a04e7ce4c4ec3, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv29\uB294 29\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"
@@ -392,7 +392,7 @@ MonoBehaviour:
     rewardGem: 1
   - id: Moist_30
     level: 30
-    sprite: {fileID: 21300000, guid: bbdb795f9c21e494b97dfbf9d4b5be9f, type: 3}
+    sprite: {fileID: 21300000, guid: 93c5714d7cb5c1b4b8974e7dba7c697e, type: 3}
     displayName: "\uCD09\uCD09"
     description: "Lv30\uC740 30\uAE4C\uC9C0 \uBB34\uAC8C\uB97C \uC870\uC815\uD560
       \uC218 \uC788\uC5B4\uC694"

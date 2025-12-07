@@ -19,4 +19,13 @@ public class ToggleScaleUI : MonoBehaviour, IPointerClickHandler
         targetRect.DOScale(targetScale, duration)
                   .SetEase(Ease.OutBack);
     }
+    private void OnDisable()
+    {
+        // DOTween 중지 + 스케일 초기화
+        targetRect.DOKill();
+        targetRect.localScale = Vector3.one;
+
+        // 상태값도 초기화
+        isEnlarged = false;
+    }
 }

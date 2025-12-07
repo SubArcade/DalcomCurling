@@ -1560,7 +1560,13 @@ MonoBehaviour:
   MoistDonutOptionText: {fileID: 0}
   SoftDonutOptionText: {fileID: 0}
   AskUpgradePopUp: {fileID: 0}
-  FailUpgradePopUp: {fileID: 0}
+  agreeUpgradeButton: {fileID: 0}
+  cancelUpgradeButton: {fileID: 0}
+  popupDescText: {fileID: 0}
+  HardCostText: {fileID: 0}
+  MoistCostText: {fileID: 0}
+  SoftCostText: {fileID: 0}
+  popupCostText: {fileID: 0}
 --- !u!1 &5123957639613283104
 GameObject:
   m_ObjectHideFlags: 0

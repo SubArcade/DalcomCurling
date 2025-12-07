@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Purchasing;
+using UnityEngine.UI;
 
 public enum ProductGemType
 {
@@ -17,6 +18,30 @@ public class Scr_IAPGem : MonoBehaviour
 {
     [SerializeField] private ProductGemType productGemType;
     [SerializeField] private int rewardGem;
+    [SerializeField] private IAPButton iapButton;
+    [SerializeField] private Button button;
+    
+    void Awake()
+    {
+        button.onClick.AddListener(OnClickHandler);
+    }
+    
+    private void OnClickHandler()
+    {
+        // 여기에 조건 넣으면 됨
+        // if (!GameManager.Instance.isEasterEgg)
+        // {
+        //     Debug.Log("[IAP] IAP 비활성 → 바로 보상 지급");
+        //     DataManager.Instance.GemChange(DataManager.Instance.PlayerData.gem += rewardGem);
+        //     return;
+        // }
+        // else
+        // {
+        //     Debug.Log("[IAP] IAP 활성 → 실제 결제 진행");
+        //     iapButton.purch
+        // }
+    }
+    
     
     // 구매 시도
     public void TryPurchase()

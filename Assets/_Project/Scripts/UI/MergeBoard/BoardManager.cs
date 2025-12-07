@@ -136,7 +136,7 @@ public class BoardManager : MonoBehaviour
     {
         tempStorageSlot.storage.Clear();
         tempStorageSlot.RefreshUI();
-    }
+    } 
     
     public void OnCellClicked(Cells cell)
     {
@@ -186,7 +186,9 @@ public class BoardManager : MonoBehaviour
         selectionHighlight.gameObject.SetActive(true);
         selectionHighlight.transform.SetParent(cell.transform, false);
         selectionHighlight.rectTransform.anchoredPosition = Vector2.zero;
+
         // 칸 선택 사운드
+        if (generatorCell) return;
         SoundManager.Instance.selectSlotScroll();
     }
 
@@ -233,7 +235,7 @@ public class BoardManager : MonoBehaviour
     // 빈칸 찾는셀
     public Cells FindEmptyActiveCell()
     {
-        Debug.Log("FindEmptyActiveCell1111111111111111111111111111111");
+        //Debug.Log("FindEmptyActiveCell1111111111111111111111111111111");
         if (cells == null)
         {
             Debug.Log("[BoardManager] cells 배열이 NULL 입니다!!", this);
@@ -325,7 +327,7 @@ public class BoardManager : MonoBehaviour
             );
 
             // 이동
-            rt.DOAnchorPos(uiTargetPos, 0.25f).SetEase(Ease.InOutQuad).OnComplete(() =>
+            rt.DOAnchorPos(uiTargetPos, 0.125f).SetEase(Ease.InOutQuad).OnComplete(() =>
             {
                 // 도착 후 셀로 되돌리기
                 donutObj.transform.SetParent(target.transform, false);
