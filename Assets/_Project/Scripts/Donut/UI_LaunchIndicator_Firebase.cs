@@ -242,14 +242,27 @@
 ﻿    }
 ﻿
 ﻿
-﻿    public void RoundChanged(int round, int aScore, int bScore)
-﻿    {
-﻿        aScoreText.text = $"{aScore}";
-﻿        bScoreText.text = $"{bScore}";
-﻿        roundText.text = $"Round : {round}";
-﻿        roundChangeText.text = $"Round {round} Start!";
-﻿    }
-﻿
+﻿        public void RoundChanged(int round, int aScore, int bScore)
+﻿        {
+﻿            // FirebaseGameManager에서 현재 플레이어의 팀 정보를 가져옵니다.
+﻿            var myTeam = FirebaseGameManager.Instance.MyTeam;
+﻿    
+﻿            if (myTeam == StoneForceController_Firebase.Team.A)
+﻿            {
+﻿                // 내가 A팀이면, aScoreText가 내 점수, bScoreText가 상대 점수입니다.
+﻿                aScoreText.text = $"{aScore}";
+﻿                bScoreText.text = $"{bScore}";
+﻿            }
+﻿            else // 내가 B팀인 경우
+﻿            {
+﻿                // 내가 B팀이면, aScoreText(내 점수 UI)에는 B팀 점수를, bScoreText(상대 점수 UI)에는 A팀 점수를 넣어야 합니다.
+﻿                aScoreText.text = $"{bScore}";
+﻿                bScoreText.text = $"{aScore}";
+﻿            }
+﻿    
+﻿            roundText.text = $"Round : {round}";
+﻿            roundChangeText.text = $"Round {round} Start!";
+﻿        }﻿
 ﻿    /// <summary>
 ﻿    /// 현재 턴 번호를 UI에 업데이트합니다.
 ﻿    /// </summary>
@@ -347,7 +360,6 @@
 ﻿        roundPanel.SetActive(false);
 ﻿        donutEntry.SetActive(false);
 ﻿        minimap.SetActive(false);
-﻿        result.SetActive(false);
 ﻿        settingsPanel.SetActive(false);
         CompatibilityPopup.SetActive(false);
         CompatibilityPanel.SetActive(false);
