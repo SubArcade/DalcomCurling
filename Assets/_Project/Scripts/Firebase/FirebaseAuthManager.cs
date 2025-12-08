@@ -11,7 +11,7 @@ using GooglePlayGames.BasicApi;
 using UnityEngine;
 #endif
 
-public class FirebaseAuthManager
+public class  FirebaseAuthManager
 {
     // 유저 인증(로그인/로그아웃) 담당, 누가 이 앱을 사용 중인지
     private static FirebaseAuthManager instance = null;

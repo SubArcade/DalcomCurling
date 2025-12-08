@@ -26,3 +26,4 @@ public class QuestData
     public int baseGold { get; set; }
 
 }
+ 

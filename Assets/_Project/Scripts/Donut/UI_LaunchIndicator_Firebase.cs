@@ -20,7 +20,7 @@
 ﻿    [SerializeField] private TextMeshProUGUI roundChangeText;
 ﻿    [SerializeField] private TextMeshProUGUI turnText;
 ﻿    [SerializeField] private GameObject CountDownText;
-﻿
+
 ﻿    [Header("디버그 텍스트")]
 ﻿    public TextMeshProUGUI debugStateText;
 ﻿    [Header("UI 제어 객체 (on/off)")]
