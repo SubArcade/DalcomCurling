@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using DG.Tweening;
+﻿using DG.Tweening;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,12 +28,17 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     [SerializeField] private GameObject donutEntry;
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject result;
+    public Button resultConfirmButton; // 결과창의 확인 버튼
     [SerializeField] private Scr_TweenHandDragGuide guide;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject WaitThrowPopUp;
     [SerializeField] private GameObject waitSyncPopUp;
     [SerializeField] private GameObject timeLineUI;
     [SerializeField] private Image turnPanel;
+
+    [SerializeField] private GameObject CompatibilityPanel; // 도넛 상성
+    [SerializeField] public Button CompatibilityButton;
+    [SerializeField] private GameObject CompatibilityPopup;
 
     [Header("도넛 엔트리 항목")]
     public DonutSelectionUI donutSelectionUI; // (선택 가능) 내 도넛 선택 UI
@@ -85,6 +90,17 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
     }
     void Start()
     {
+        
+        if (resultConfirmButton != null)
+        {
+            resultConfirmButton.onClick.AddListener(() => GameManager.Instance.EndGame());
+        }
+
+        if (CompatibilityButton != null)
+        {
+            CompatibilityButton.onClick.AddListener(ToggleUI);
+        }
+
         // Firebase에서 데이터를 로드합니다.
         var gameManager = FirebaseGameManager.Instance;
         if (gameManager != null)
@@ -112,7 +128,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             floatingText.destroyOnComplete = false;
             floatingText.gameObject.SetActive(false);
         }
-                
+
         // 인게임 BGM 사운드 재생 ---
         // 로비 BGM을 명시적으로 정지
         SoundManager.Instance.StopBGM();
@@ -494,4 +510,13 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
             turnPanel.color = Color.red;
         }
     }
+
+    private void ToggleUI()
+    {
+        if (CompatibilityPopup == null) return;
+
+        bool isActive = CompatibilityPopup.activeSelf;
+        CompatibilityPopup.SetActive(!isActive);
+    }
+
 }
