@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,7 +20,6 @@ public class GameManager : MonoBehaviour
     public string gameSceneName;
     public string menuSceneName;
     private bool isAppStarted = true;
-    private bool isEndingGame = false;
     [SerializeField] private GameObject notifier;
     [SerializeField] private GameObject matchmakingObj;
     public long lastDailyReset;
@@ -39,8 +39,6 @@ public class GameManager : MonoBehaviour
     private DonutEntry penalizedDonut2;
     private int penaltyIndex1 = -1;
     private int penaltyIndex2 = -1;
-
-    public bool isEasterEgg = false;
     
     private void Awake()
     {
@@ -136,16 +134,12 @@ public class GameManager : MonoBehaviour
     // 게임 끝 -> 메인화면으로 다시 전환
     public async void EndGame()
     {
-        if (isEndingGame) return;
-        isEndingGame = true;
-        
         Debug.Log("EndGame 실행");
         SceneLoader.Instance.LoadLocal(menuSceneName, true, () =>
         {
             UIManager.Instance.Open(PanelId.MainPanel);
             SetState(GameState.Lobby);
             ApplyResultRewards();
-            isEndingGame = false;
         });
     }
     

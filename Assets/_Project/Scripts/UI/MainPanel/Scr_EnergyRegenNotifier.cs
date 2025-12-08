@@ -42,7 +42,7 @@ public class EnergyRegenNotifier : MonoBehaviour
     public void IsNotificationsEnabled(bool value)
     {
         DataManager.Instance.PlayerData.energyFullRecharged = value;
-        //Debug.Log(DataManager.Instance.PlayerData.energyFullRecharged);
+        Debug.Log(DataManager.Instance.PlayerData.energyFullRecharged);
         
         if (!value)
             CancelAllEnergyNotifications();
@@ -53,7 +53,7 @@ public class EnergyRegenNotifier : MonoBehaviour
     public void IsUseQuietHours(bool value)
     {
         DataManager.Instance.PlayerData.nightNotif = value;
-        //Debug.Log(DataManager.Instance.PlayerData.nightNotif);
+        Debug.Log(DataManager.Instance.PlayerData.nightNotif);
     }
     
     private void OnPauseChanged(bool isPaused)

@@ -154,7 +154,7 @@ public class Scr_MenuPanelControl : MonoBehaviour
     private void CheckReadyPanel()
     {
         int stack = 0;
-        //Debug.Log(DataManager.Instance.InventoryData.donutEntries);
+        Debug.Log(DataManager.Instance.InventoryData.donutEntries);
         foreach (var entry in DataManager.Instance.InventoryData.donutEntries)
         {
             if (entry == null)

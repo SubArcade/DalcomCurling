@@ -28,15 +28,10 @@ public class SoundManager : MonoBehaviour
     private SoundGroup[] allSoundGroups;
     private Dictionary<string, EventReference> soundEventMap = new Dictionary<string, EventReference>();
 
-    [Header("발사시 재생되는 랜덤 사운드 재생")]
+    [Header("발사시 재생되는 랜덤 음악 재생")]
     [Tooltip("발사 시 재생할 5가지 SFX 이벤트를 여기에 할당합니다.")]
     [SerializeField]
     private EventReference[] launchSFXEvents;
-
-    [Header("도넛 충돌시 재생되는 랜덤 사운드 재생")]
-    [Tooltip("충돌 사운드를 여기에 할당하기")]
-    [SerializeField]
-    private EventReference[] stoneCrashEvents;
 
     // BGM 재생 관리 필드
     private FMOD.Studio.EventInstance currentBGMInstance;
@@ -408,28 +403,9 @@ public class SoundManager : MonoBehaviour
     }
 
     // 도넛 - 도넛 충돌 약하게 사운드
-    public void stoneCrash()
+    public void stoneCrashweak()
     {
-        // 배열이 비어있는지 확인
-        if (stoneCrashEvents == null || stoneCrashEvents.Length == 0)
-        {
-            return;
-        }
-
-        int randomIndex = Random.Range(0, stoneCrashEvents.Length);
-
-        EventReference sfxRef = stoneCrashEvents[randomIndex];
-
-        if (!sfxRef.IsNull)
-        {
-            FMODUnity.RuntimeManager.PlayOneShot(sfxRef);
-            string path;
-            FMODUnity.RuntimeManager.StudioSystem.lookupPath(sfxRef.Guid, out path);
-        }
-        else
-        {
-            //Debug.LogWarning($"[SoundManager] shotSound에서 인덱스 {randomIndex}에 유효한 이벤트가 없습니다.");
-        }
+        PlaySFX("13_02_Synth_Boing_4");
     }
 
 
@@ -475,25 +451,29 @@ public class SoundManager : MonoBehaviour
         PlaySFX("20_Negative_09");
     }
 
-
     // 발사시 나오는 사운드를 지정한 사운드중 하나가 랜덤으로 재생되게 하는 코드 추가
     public void shotSound()
     {
         // 배열이 비어있는지 확인
         if (launchSFXEvents == null || launchSFXEvents.Length == 0)
         {
+            //Debug.LogWarning("[SoundManager] launchSFXEvents 배열이 비어 있어 shotSound를 재생할 수 없습니다.");
             return;
         }
 
+        // 1. 배열의 인덱스를 랜덤으로 선택합니다. (0부터 배열 길이 직전까지)
         int randomIndex = Random.Range(0, launchSFXEvents.Length);
 
         EventReference sfxRef = launchSFXEvents[randomIndex];
 
         if (!sfxRef.IsNull)
         {
+            // 2. 랜덤으로 선택된 사운드 하나만 재생합니다.
             FMODUnity.RuntimeManager.PlayOneShot(sfxRef);
+
             string path;
             FMODUnity.RuntimeManager.StudioSystem.lookupPath(sfxRef.Guid, out path);
+            //Debug.Log($"[SoundManager] 샷 사운드 재생: {GetEventName(path)} (인덱스: {randomIndex})");
         }
         else
         {

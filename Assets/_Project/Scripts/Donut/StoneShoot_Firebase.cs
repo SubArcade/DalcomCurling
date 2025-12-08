@@ -528,15 +528,15 @@ public class StoneShoot_Firebase : MonoBehaviour
 
         float alpha = Mathf.Lerp(0.3f, 1f, t);
         Color resultColor;
-        if (t > 0.6f && t < 0.75f)
-        {
-            resultColor = new Color(min_Green_Color.r, min_Green_Color.g, min_Green_Color.b, t);
-            resultColor = Color.green;
-        }
-        else if (t >= 0.75f)
+        if (t >= 0.7f)
         {
             resultColor = new Color(min_Red_Color.r, min_Red_Color.g, min_Red_Color.b, t);
             //resultColor = Color.red;
+        }
+        else if (t > 0.6f)
+        {
+            resultColor = new Color(min_Green_Color.r, min_Green_Color.g, min_Green_Color.b, t);
+            //resultColor = Color.green;
         }
         else
         {

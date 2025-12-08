@@ -17,8 +17,6 @@ public class Scr_ButtonScale : MonoBehaviour
     [SerializeField] private GameObject TrashCan;
     [SerializeField] private Transform TrashCanTransform;
     [SerializeField] private Image TrashCanImage;
-    [SerializeField] private Sprite TrashCanSprite;
-    [SerializeField] private Sprite openTrashCanImage;
 
     [Header("시작버튼 관련")]
     [SerializeField] private GameObject StartPopUp;
@@ -68,36 +66,7 @@ public class Scr_ButtonScale : MonoBehaviour
     private void OnMouseTrashCan()
     {
         trashOriginalScale = TrashCanTransform.localScale;
-
-        EventTrigger trigger = TrashCan.GetComponent<EventTrigger>();
-        if (trigger == null)
-        {
-            trigger = TrashCan.AddComponent<EventTrigger>();
-        }
-
-        // 마우스 올릴 때
-        AddTrigger(trigger, EventTriggerType.PointerEnter, () =>
-        {
-            // 이미지 교체 (열린 쓰레기통)
-            TrashCanImage.sprite = openTrashCanImage;
-
-            // 크기 확대
-            TrashCanTransform.DOScale(trashOriginalScale * 1.2f, 0.2f).SetEase(Ease.OutBack);
-        });
-
-        // 마우스 내릴 때
-        AddTrigger(trigger, EventTriggerType.PointerExit, () =>
-        {
-            // 크기를 원래대로 돌린 뒤 → 애니메이션 완료 후 이미지 교체
-            TrashCanTransform.DOScale(trashOriginalScale, 0.2f)
-                .SetEase(Ease.OutBack)
-                .OnComplete(() =>
-                {
-                    // 이미지 교체 (닫힌 쓰레기통)
-                    TrashCanImage.sprite = TrashCanSprite;
-                });
-        });
-
+        AddHoverEffect(TrashCan, TrashCanTransform, trashOriginalScale);
     } //쓰레기통크기
     private void OnMouseStartButton()
     {
