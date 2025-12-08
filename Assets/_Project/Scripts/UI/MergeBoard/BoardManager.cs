@@ -327,7 +327,7 @@ public class BoardManager : MonoBehaviour
             );
 
             // 이동
-            rt.DOAnchorPos(uiTargetPos, 0.25f).SetEase(Ease.InOutQuad).OnComplete(() =>
+            rt.DOAnchorPos(uiTargetPos, 0.125f).SetEase(Ease.InOutQuad).OnComplete(() =>
             {
                 // 도착 후 셀로 되돌리기
                 donutObj.transform.SetParent(target.transform, false);

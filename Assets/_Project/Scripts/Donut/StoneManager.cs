@@ -35,6 +35,8 @@ public class StoneManager : MonoBehaviour
     public StoneForceController_Firebase.Team myTeam { get; private set; } = StoneForceController_Firebase.Team.None;
     private List<StonePosition> lastStonePosition = new List<StonePosition>();
     
+    public StoneForceController_Firebase CurrentTurnStone => _currentTurnStone;
+    
     [Header("도넛 상성 및 레벨에 따른 질량값 조절")] 
     [SerializeField]
     private float winMinMass = 1.4f;
@@ -143,7 +145,7 @@ public class StoneManager : MonoBehaviour
     // 새 라운드가 시작될 때 돌을 생성하고 초기화합니다.
     // playerId가 인자로 넘어오면, 현재 턴과 무관하게 해당 플레이어의 프리팹을 생성
     // playerId가 인자로 넘어오지 않으면 현재 턴에 해당하는 프리팹을 생성
-    public Rigidbody SpawnStone(Game game, DonutEntry selectedDonut, string playerId = null)
+    public Rigidbody SpawnStone(Game game, DonutEntry selectedDonut, string playerId = null, int opponentsDonutId = -99)
     {
         Vector3 startPos = spawnPosition.position;
         gameReference = game;
@@ -243,6 +245,12 @@ public class StoneManager : MonoBehaviour
             return null;
         }
 
+        if (opponentsDonutId != -99) // 만약 상대방 도넛의 id 정보가 담겨있다면
+        {
+            // 지금 생성할 도넛은 상대방의 도넛 이므로 상대가 제시한 도넛 id를 덮어씌운다
+            currentDonutId = opponentsDonutId;
+        }
+        
         // 선택된 도넛의 물리 속성을 StoneForceController_Firebase에 전달합니다.
         _currentTurnStone.InitializeDonut(_currentTurnStoneTeam, type,currentDonutId, selectedDonut.id, selectedDonut.donutAmount);
 
@@ -495,17 +503,21 @@ public class StoneManager : MonoBehaviour
             //if(capCollider != null) capCollider.isTrigger = true;
             capCollider.isTrigger = true;
 
-            fc.transform.DOMove(newPosition, 0.2f).OnComplete(() => {
-                // 이동 완료 후 물리 다시 활성화
-                rb.isKinematic = false;
-                capCollider.isTrigger = false;
-            });
+            // 위치를 즉시 설정하도록 수정
+            fc.transform.position = newPosition;
+            // 반사 오브젝트의 위치도 즉시 업데이트합니다.
+            fc.ForceUpdateReflectionPosition();
+
+            // 위치 설정 후 즉시 물리 속성을 되돌립니다.
+            rb.isKinematic = false;
+            capCollider.isTrigger = false;
         }
     }
 
     // 동기화 과정에서 로컬에 존재하지 않는 돌을 생성하는 도우미 메서드
     private StoneForceController_Firebase SpawnMissingStone(StonePosition stoneInfo)
     {
+        Debug.Log("SpawnMissingStone 호출됨");
         if (string.IsNullOrEmpty(stoneInfo.DonutTypeAndNumber))
         {
             Debug.LogError($"SpawnMissingStone: DonutId가 없어 누락된 돌(ID: {stoneInfo.StoneId})을 생성할 수 없습니다.");
@@ -778,19 +790,28 @@ public class StoneManager : MonoBehaviour
         {
             foreach (int id in idList)
             {
-                for (int i = 0; i < _stoneControllers_A.Count; i++)
+                // for (int i = 0; i < _stoneControllers_A.Count; i++)
+                // {
+                //     if (_stoneControllers_A.TryGetValue(i, out StoneForceController_Firebase val))
+                //     {
+                //         if (val.donutId == id)
+                //         {
+                //             sfc.Add(_stoneControllers_A[i]);
+                //         }
+                //     }
+                //     else
+                //     {
+                //         Debug.Log("없음");
+                //         Debug.Log($"필요 = {id}, 총 개수 = {_stoneControllers_A.Count}");
+                //     }
+                // }
+                if (_stoneControllers_A.TryGetValue(id, out StoneForceController_Firebase val))
                 {
-                    if (_stoneControllers_A.TryGetValue(i, out StoneForceController_Firebase val))
-                    {
-                        if (val.donutId == id)
-                        {
-                            sfc.Add(_stoneControllers_A[i]);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("없음");
-                    }
+                    sfc.Add(val);
+                }
+                else
+                {
+                    Debug.Log("없음");
                 }
             }            
         }
@@ -798,19 +819,28 @@ public class StoneManager : MonoBehaviour
         {
             foreach (int id in idList)
             {
-                for (int i = 0; i < _stoneControllers_B.Count; i++)
+                // for (int i = 0; i < _stoneControllers_B.Count; i++)
+                // {
+                //     if (_stoneControllers_B.TryGetValue(i, out StoneForceController_Firebase val))
+                //     {
+                //         if (val.donutId == id)
+                //         {
+                //             sfc.Add(_stoneControllers_B[i]);
+                //         }
+                //     }
+                //     else
+                //     {
+                //         Debug.Log("없음");
+                //         Debug.Log($"필요 = {id}, 총 개수 = {_stoneControllers_B.Count}");
+                //     }
+                // }
+                if (_stoneControllers_B.TryGetValue(id, out StoneForceController_Firebase val))
                 {
-                    if (_stoneControllers_B.TryGetValue(i, out StoneForceController_Firebase val))
-                    {
-                        if (val.donutId == id)
-                        {
-                            sfc.Add(_stoneControllers_B[i]);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("없음");
-                    }
+                    sfc.Add(val);
+                }
+                else
+                {
+                    Debug.Log("없음");
                 }
             }       
         }

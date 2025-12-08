@@ -13,7 +13,7 @@ public class DisabledButtonMessage : MonoBehaviour, IPointerClickHandler
 
     private void Awake()
     {
-        toast = FindObjectOfType<ToastMessage>();
+        if (toast == null) toast = FindObjectOfType<ToastMessage>(true);
         overlayImage = GetComponent<Image>();
     }
 

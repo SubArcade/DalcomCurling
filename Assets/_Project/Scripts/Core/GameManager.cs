@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public string gameSceneName;
     public string menuSceneName;
     private bool isAppStarted = true;
+    private bool isEndingGame = false;
     [SerializeField] private GameObject notifier;
     [SerializeField] private GameObject matchmakingObj;
     public long lastDailyReset;
@@ -135,12 +136,16 @@ public class GameManager : MonoBehaviour
     // 게임 끝 -> 메인화면으로 다시 전환
     public async void EndGame()
     {
+        if (isEndingGame) return;
+        isEndingGame = true;
+        
         Debug.Log("EndGame 실행");
         SceneLoader.Instance.LoadLocal(menuSceneName, true, () =>
         {
             UIManager.Instance.Open(PanelId.MainPanel);
             SetState(GameState.Lobby);
             ApplyResultRewards();
+            isEndingGame = false;
         });
     }
     
