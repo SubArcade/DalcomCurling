@@ -455,29 +455,24 @@ public class Scr_OrderSystem : MonoBehaviour
 
         //퀘스트 클리어 시 같은 도넛을 전부 없애버리는것을 방지하기위한 체크변수
         var idsToRemove = new List<string>(orderDonutIDs);
-        
-        // 퀘스트에 필요한 각 도넛 ID를 하나씩 처리하기 위해 복사본 리스트를 순회
-        foreach (var targetId in idsToRemove.ToList())         
-        {
-            // 머지보드의 모든 셀을 순회하며 현재 targetId를 가진 도넛을 찾는다
-            foreach (var cell in BoardManager.Instance.GetAllCells())
-            {
-                // 셀이 비활성화거나 도넛 ID가 비어있으면 검사하지 않고 다음 셀로 넘어간다
-                if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
+        //셀 전체검사
+        foreach (var cell in BoardManager.Instance.GetAllCells())
+        {   //셀이 비활성화거나 비어있으면 건너뜀
+            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
 
-                if (cell.donutId == targetId)
-                {
-                    if (cell.occupant != null)
-                        Destroy(cell.occupant.gameObject);
+            if (idsToRemove.Contains(cell.donutId))
+            {   //제거대상이 있으면 파괴
+                if (cell.occupant != null)
+                    Destroy(cell.occupant.gameObject);
+                //셀을 비움
+                cell.ClearItem();
+                //1개만 삭제
+                idsToRemove.Remove(cell.donutId);
 
-                    cell.ClearItem();
-
-                    // 해당 도넛 ID는 1개만 제거하면 되므로 루프 종료
-                    break;
-                }
+                // ⭐ 같은 ID 하나 제거했으면 루프 종료
+                break;
             }
         }
-
 
         //보상골드 지급
         int reward = 0;
