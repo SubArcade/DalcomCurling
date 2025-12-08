@@ -94,31 +94,24 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         int nextLevel = currentLevel + 1;
         int cost = GetUpgradeCost(currentLevel);
 
-        LocalizationKey typeKey = type switch
+        string typeName = type switch
         {
-            GeneratorType.Hard => LocalizationKey.Label_HardDonut,
-            GeneratorType.Soft => LocalizationKey.Label_SoftDonut,
-            GeneratorType.Moist => LocalizationKey.Label_MoistDonut,
-            _ => LocalizationKey.Label_HardDonut
+            GeneratorType.Hard => "단단 도넛",
+            GeneratorType.Soft => "말랑 도넛",
+            GeneratorType.Moist => "촉촉 도넛",
+            _ => ""
         };
 
-        string localizedType = LocalizationManager.Instance.GetText(typeKey);
-
-        string desc1 = LocalizationManager.Instance.GetText(LocalizationKey.popup_upgradeAsk_desc1);
-        string levelText = LocalizationManager.Instance.GetText(LocalizationKey.popup_upgradeAsk_levelChange);
-        string desc2 = LocalizationManager.Instance.GetText(LocalizationKey.popup_upgradeAsk_desc2);
-
-        // ⭐ 문자열 조립 (string.Format)
+        // 팝업 텍스트 갱신
         popupDescText.text =
-            string.Format(desc1, localizedType) + "\n" +
-            string.Format(levelText, currentLevel, nextLevel) + "\n" +
-            desc2;
+            $"[{typeName}] 생성기를 업그레이드 할까요?\n" +
+            $"({currentLevel}단계 → {nextLevel}단계 업그레이드)\n" +
+            $"도넛 생성 확률이 증가합니다.";
 
-        popupCostText.text = cost.ToString();
+        popupCostText.text = $"{cost}";
 
         AskUpgradePopUp.SetActive(true);
     }
-
 
     private void OnClickAgreeUpgrade()
     {
@@ -258,9 +251,6 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
         HardUpgradeMax.SetActive(hardLevel >= MaxLevel);
         MoistUpgradeMax.SetActive(moistLevel >= MaxLevel);
         SoftUpgradeMax.SetActive(softLevel >= MaxLevel);
-
-        foreach (var msg in GetComponentsInChildren<DisabledButtonMessage>(true))
-            msg.ApplyInteractableState();
     }
 
 
@@ -361,33 +351,4 @@ public class Scr_DonutUpgradePopUp : MonoBehaviour
     {
         UIManager.Instance.Close(PanelId.DonutUpgradePopup);
     }
-
-    public LocalizationKey GetUpgradeDisabledReasonKey(GeneratorType type)
-    {
-        int level = GetCurrentGeneratorLevel(type);
-        int cost = GetUpgradeCost(level);
-        int gold = Data.PlayerData.gold;
-        int playerLevel = Data.PlayerData.level;
-
-        switch (type)
-        {
-            case GeneratorType.Hard:
-                if (gold < cost) return LocalizationKey.toast_hardNotEnoughGold;
-                if (level >= playerLevel) return LocalizationKey.toast_hardNotEnoughLevel;
-                break;
-
-            case GeneratorType.Soft:
-                if (gold < cost) return LocalizationKey.toast_softNotEnoughGold;
-                if (level >= playerLevel) return LocalizationKey.toast_softNotEnoughLevel;
-                break;
-
-            case GeneratorType.Moist:
-                if (gold < cost) return LocalizationKey.toast_moistNotEnoughGold;
-                if (level >= playerLevel) return LocalizationKey.toast_moistNotEnoughLevel;
-                break;
-        }
-
-        return LocalizationKey.None;
-    }
-
 }

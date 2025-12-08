@@ -11,7 +11,6 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public Image LockOverlay => lockOverlay;
 
     [SerializeField] private int requiredLevel; // 이 칸을 해금하기 위한 최소 플레이어 레벨
-    [SerializeField] private ToastMessage toastMessage;
 
     public bool isActive { get; set; }
     public MergeItemUI occupant { get; set; }
@@ -20,11 +19,6 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public bool isTempOccupied = false; // 임시점유 확인용
 
     private Sprite lockSprite;
-
-    private void Awake()
-    {
-        toastMessage = FindObjectOfType<ToastMessage>();
-    }
 
     public void Init(int x, int y)
     {
@@ -36,14 +30,22 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public void SetActive(bool active)
     {
         isActive = active;
-        if (lockOverlay != null) lockOverlay.gameObject.SetActive(!active);
+
+        // 활성화되지 않았으면 lockOverlay를 보이게
+        if (lockOverlay != null)
+            lockOverlay.gameObject.SetActive(!active);
     }
 
     public void SetLockLevel(int level)
     {
         requiredLevel = level;
+
+        // lock_lv3, lock_lv5 등 이름 규칙으로 Resources 폴더에서 로드
         string path = $"DonutSprite/LockImage/lock_lv{level}";
         lockSprite = Resources.Load<Sprite>(path);
+
+        //if (lockSprite == null)
+        //    Debug.LogWarning($"잠금 이미지가 없습니다: {path}");
     }
 
     // 플레이어 레벨에 따라 활성/비활성 갱신
@@ -57,7 +59,8 @@ public class Cells : MonoBehaviour, IPointerClickHandler
         if (lockOverlay != null)
         {
             lockOverlay.gameObject.SetActive(!unlocked);
-            if (!unlocked && lockSprite != null) lockOverlay.sprite = lockSprite;
+            if (!unlocked && lockSprite != null)
+                lockOverlay.sprite = lockSprite;
         }
     }
 
@@ -66,16 +69,17 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     public void SetItem(MergeItemUI item, DonutData data)
     {
         occupant = item;
+        // ✅ null 체크 추가
         donutId = data != null ? data.id : null;
         if (item) item.BindToCell(this);
     }
-
     public void SetItem(MergeItemUI item, string id) //기프트박스 전용 오버로드 함수
     {
         occupant = item;
         donutId = id;
         if (item) item.BindToCell(this);
     }
+
 
     public void ClearItem()
     {
@@ -85,13 +89,7 @@ public class Cells : MonoBehaviour, IPointerClickHandler
     
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!isActive)
-        {
-            string msg = string.Format(
-            LocalizationManager.Instance.GetText(LocalizationKey.toast_unlockRequirement),requiredLevel);
-            toastMessage.Show(msg);
-            return;
-        }
+        if (!isActive) return;
         BoardManager.Instance.OnCellClicked(this);
     }
 }

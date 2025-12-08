@@ -526,14 +526,14 @@ public class StoneShoot_Firebase : MonoBehaviour
         float t = Mathf.InverseLerp(0, maxDragDistance, draggedDistanceForTrajectory); // 드래그한 거리를 비율화
         //Color resultColor = Color.Lerp(min_Color, max_Color, t); // 그 비율에 따라 시작 색상과 종료 색상 믹싱
 
-        //float alpha = Mathf.Lerp(0.3f, 1f, t);
+        float alpha = Mathf.Lerp(0.3f, 1f, t);
         Color resultColor;
-        if (t >= 0.68f)
+        if (t >= 0.7f)
         {
             resultColor = new Color(min_Red_Color.r, min_Red_Color.g, min_Red_Color.b, t);
             //resultColor = Color.red;
         }
-        else if (t > 0.62f)
+        else if (t > 0.6f)
         {
             resultColor = new Color(min_Green_Color.r, min_Green_Color.g, min_Green_Color.b, t);
             //resultColor = Color.green;
@@ -598,7 +598,6 @@ public class StoneShoot_Firebase : MonoBehaviour
             Force = Mathf.Round(finalForce * calculatedRandomValue * (1 - (draggedAmountBetween_0_Or_1 * 0.1f)) * 100f) / 100f, // 최종 힘
             // 소숫점 1째까지만
             PlayerId = stoneManager.myUserId,
-            DonutId = stoneManager.CurrentTurnStone.donutId,
             Team = stoneManager.myTeam, // 발사하는 팀
             Spin = spinValue,
             Direction = directionDict, // 발사 방향
