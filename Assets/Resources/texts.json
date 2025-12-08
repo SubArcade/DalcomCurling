@@ -25,7 +25,7 @@
     "Label_Profile": "프로필",
     "Label_Rank": "랭킹",
 
-    "Label_Codex": "도넛 도감",
+    "Label_Codex": "도토리",
     "Label_HardDonut": "단단",
     "Label_SoftDonut": "말랑",
     "Label_MoistDonut": "촉촉",
@@ -188,7 +188,9 @@
     "popup_upgradeAsk_levelChange": "({0}단계 → {1}단계 업그레이드)",
     "popup_upgradeAsk_desc2": "도넛 생성 확률이 증가합니다.",
 
-    "toast_unlockRequirement": "{0} 레벨에 해금됩니다!"
+    "toast_unlockRequirement": "{0} 레벨에 해금됩니다!",
+    "Btn_Entry" : "엔트리",
+    "Btn_basket" : "휴지통"
 
   },
   "en": {
@@ -378,6 +380,8 @@
     "popup_upgradeAsk_levelChange": "(Lv.{0} → Lv.{1} Upgrade)",
     "popup_upgradeAsk_desc2": "Donut spawn chance increases.",
 
-    "toast_unlockRequirement": "Unlocks at level {0}!"
+    "toast_unlockRequirement": "Unlocks at level {0}!",
+    "Btn_Entry" : "Entry",
+    "Btn_basket" : "Basket"
   }
 }

@@ -191,6 +191,8 @@ public enum LocalizationKey
     popup_upgradeAsk_desc2,
 
     toast_unlockRequirement,
+    Btn_Entry,
+    Btn_basket,
 }
 
 public class LocalizationManager : MonoBehaviour

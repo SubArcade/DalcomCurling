@@ -18,11 +18,13 @@ public class Scr_DonutCodex : MonoBehaviour
     [SerializeField, Tooltip("단단")] private Button hardButton; 
     [SerializeField, Tooltip("말랑")] private Button softButton; 
     [SerializeField, Tooltip("촉촉")] private Button moistButton; 
+    [SerializeField, Tooltip("촉촉")] private Button infoButton; 
     
     [Header("판넬")]
     [SerializeField, Tooltip("말랑")] private GameObject hardPanel; 
     [SerializeField, Tooltip("단단")] private GameObject softPanel; 
     [SerializeField, Tooltip("촉촉")] private GameObject moistPanel; 
+    [SerializeField, Tooltip("촉촉")] private GameObject infoPanel; 
     
     [Header("버튼 이미지")]
     [SerializeField, Tooltip("단단")] private Image hardImage;
@@ -31,6 +33,7 @@ public class Scr_DonutCodex : MonoBehaviour
     
     [Header("닫기 버튼")]
     [SerializeField, Tooltip("닫기")] private Button closeButton;
+    [SerializeField, Tooltip("닫기")] private Button infoPopupCloseButton;
     
     [Header("도넛 정보창")]
     [SerializeField, Tooltip("이미지")] private Image image;
@@ -107,6 +110,11 @@ public class Scr_DonutCodex : MonoBehaviour
         moistButton.onClick.AddListener(RefreshMoist);
         
         closeButton.onClick.AddListener(() => UIManager.Instance.Open(PanelId.MainPanel));
+        
+        
+        // 도감 설명창
+        infoButton.onClick.AddListener(() => infoPanel.SetActive(true));
+        infoPopupCloseButton.onClick.AddListener(() => infoPanel.SetActive(false));
     }
     
     // 단단 버튼
