@@ -255,6 +255,7 @@
 ﻿        float normalizedDiff = Mathf.Clamp01(amountDiff / 58.0f);
 ﻿        switch (attackerType)
 ﻿        {
+
 ﻿            case DonutType.Hard:
 ﻿                if (type == DonutType.Hard) // 단단
 ﻿                {
