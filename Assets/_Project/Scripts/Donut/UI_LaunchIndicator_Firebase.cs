@@ -328,6 +328,7 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         roundPanel.SetActive(true);
         donutEntry.SetActive(true);
         minimap.SetActive(true);
+        CompatibilityPanel.SetActive(true);
     }
     public void FireShotReadyTwoUI()
     {
@@ -360,8 +361,9 @@ public class UI_LaunchIndicator_Firebase : MonoBehaviour
         roundPanel.SetActive(false);
         donutEntry.SetActive(false);
         minimap.SetActive(false);
-        result.SetActive(false);
         settingsPanel.SetActive(false);
+        CompatibilityPopup.SetActive(false);
+        CompatibilityPanel.SetActive(false);
     }
     public void ShowGuideUI(int select)
     {// 조작가이드용 손가락 실행 해주는 부분 (1 == 위아래 , 2 == 좌우)
