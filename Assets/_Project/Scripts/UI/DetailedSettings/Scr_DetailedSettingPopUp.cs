@@ -185,7 +185,15 @@ public class Scr_DetailedSettingPopUp : MonoBehaviour
 
         closeButton.onClick.AddListener(() =>
         {
-            UIManager.Instance.Close(PanelId.DetailedSettingsPanel);
+            //UIManager.Instance.Close(PanelId.DetailedSettingsPanel);
+            if (UIManager.Instance.CurrentPanelId == PanelId.ReadyMenuPanel)
+            {
+                UIManager.Instance.Open(PanelId.ReadyMenuPanel);
+            }
+            else
+            {
+                UIManager.Instance.Close(PanelId.DetailedSettingsPanel);
+            }
         });
 
         InitVolumeSettings();

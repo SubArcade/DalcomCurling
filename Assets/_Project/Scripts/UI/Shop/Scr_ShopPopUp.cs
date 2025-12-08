@@ -167,7 +167,7 @@ public class Scr_ShopPopUp : MonoBehaviour
 
     public void SetPlayerText(PlayerData playerData)
     {
-        energyText.text = $"{playerData.energy}/{playerData.maxEnergy}";
+        energyText.text = $"{playerData.energy}";
         goldText.text = $"{playerData.gold}";
         gemText.text = $"{playerData.gem}";
     }

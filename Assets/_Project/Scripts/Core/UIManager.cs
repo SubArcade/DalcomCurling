@@ -183,12 +183,25 @@ public class UIManager : MonoBehaviour
                 currentPanel[PanelId.MainPanel].SetActive(true);
                 currentPanel[PanelId.ReadyMenuPanel].SetActive(true);
                 break;
+            case PanelId.DetailedSettingsPanel:
+                if (currentPanelId == PanelId.ReadyMenuPanel)
+                {
+                    currentPanel[PanelId.MainPanel].SetActive(true);
+                    currentPanel[PanelId.ReadyMenuPanel].SetActive(true);
+                }
+                else
+                {
+                    currentPanel[PanelId.MainPanel].SetActive(true);
+                }
+                break;
             default:
                 currentPanel[PanelId.MainPanel].SetActive(true);
                 break;
         }
-
-        currentPanelId = id;
+        
+        if(id != PanelId.DetailedSettingsPanel)
+            currentPanelId = id;
+        
         yield return new WaitForSeconds(1f);
 
         // 열림 완료 콜백

@@ -193,6 +193,7 @@ public enum LocalizationKey
     toast_unlockRequirement,
     Btn_Entry,
     Btn_basket,
+    Btn_Shop
 }
 
 public class LocalizationManager : MonoBehaviour

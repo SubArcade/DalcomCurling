@@ -693,7 +693,7 @@ public class Scr_OrderSystem : MonoBehaviour
         var img = completeObject.GetComponent<Image>();
         if (img != null)
         {
-            img.color = new Color(1f, 0.5f, 0.5f, 1f); // 옅은 붉은색
+           // img.color = new Color(1f, 0.5f, 0.5f, 1f); // 옅은 붉은색
         }
     }
 
@@ -703,7 +703,7 @@ public class Scr_OrderSystem : MonoBehaviour
         var img = completeObject.GetComponent<Image>();
         if (img != null)
         {
-            img.color = HexToColor("#66E3AD"); // 원래 색상
+            //img.color = HexToColor("#66E3AD"); // 원래 색상
         }
     }
 
@@ -714,7 +714,7 @@ public class Scr_OrderSystem : MonoBehaviour
         if (img != null)
         {
             // 원래 색보다 조금 더 짙은 톤 (예: #4CCB95)
-            img.color = HexToColor("#4CCB95");
+            //img.color = HexToColor("#4CCB95");
         }
     }
 
