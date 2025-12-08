@@ -104,8 +104,6 @@ public class LastShot
     [FirestoreProperty]
     public StoneForceController_Firebase.Team Team { get; set; }
     [FirestoreProperty]
-    public int DonutId { get; set; }
-    [FirestoreProperty]
     public float Force { get; set; }
     [FirestoreProperty] public float Spin { get; set; }
     [FirestoreProperty] public Dictionary<string, float> Direction { get; set; }
@@ -276,10 +274,10 @@ public class FirebaseMatchmakingManager : MonoBehaviour
                 return;
             }
             
-            //Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 직전");
+            Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 직전");
             // PlayerData 클래스를 사용하여 데이터를 역직렬화합니다.
             PlayerData playerData = userDoc.ConvertTo<PlayerData>();
-            //Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 끝");
+            Debug.Log("[매치메이킹] ConvertTo<PlayerData>() 호출 끝");
             int playerSoloScore = playerData.soloScore;
             string playerScoreBracket = GetScoreBracket(playerSoloScore);
             Debug.Log($"현재 플레이어의 솔로 점수: {playerSoloScore}, 점수 구간: {playerScoreBracket}");
@@ -297,13 +295,13 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             {
                 // 참여할 룸을 찾았습니다.
                 DocumentSnapshot roomDoc = snapshot.Documents.First();
-                //Debug.Log($"참여할 룸을 찾았습니다: {roomDoc.Id}");
+                Debug.Log($"참여할 룸을 찾았습니다: {roomDoc.Id}");
                 await JoinRoomAsync(roomDoc.Reference);
             }
             else
             {
                 // 참여할 룸이 없으므로 새 룸을 생성합니다.
-                //Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
+                Debug.Log("참여할 룸이 없어 새 룸을 생성합니다.");
                 await CreateRoomAsync(playerScoreBracket); // 점수 구간을 전달
             }
 
@@ -463,7 +461,7 @@ public class FirebaseMatchmakingManager : MonoBehaviour
             if (!snapshot.Exists) return;
 
             Room room = snapshot.ConvertTo<Room>();
-            //Debug.Log($"룸 데이터 변경 감지: {snapshot.Id}");
+            Debug.Log($"룸 데이터 변경 감지: {snapshot.Id}");
 
             // 룸이 채워졌는지 확인합니다.
             if (room.Status == "playing" && room.PlayerIds.Count == 2)

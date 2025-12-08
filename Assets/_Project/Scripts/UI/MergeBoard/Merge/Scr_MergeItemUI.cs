@@ -123,10 +123,10 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             {
                 int donutLv = donutData.level;
                 int value = DonutReturnCoin(donutLv); // 반환계산
-                //Debug.Log($"반환 값 : {value}");
+                Debug.Log($"반환 값 : {value}");
                 int returnCoin = DataManager.Instance.PlayerData.gold + value;
                 DataManager.Instance.GoldChange(returnCoin);
-                //Debug.Log($"현재 금액 : {returnCoin}");
+                Debug.Log($"현재 금액 : {returnCoin}");
             }
 
             // 셀 참조 초기화
@@ -391,7 +391,7 @@ public class MergeItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             // 머지 성공 애널리틱스
             AnalyticsManager.Instance.MergeSuccess();
             DataManager.Instance.AddCodexEntry(nextDonut.donutType, nextDonut.id, nextDonut.level);
-            //Debug.Log($"{nextDonut.donutType}111111111111111111111111111111111");
+            Debug.Log($"{nextDonut.donutType}111111111111111111111111111111111");
             if (nextDonut.donutType == DonutType.Gift)
             {
                 if(SoundManager.Instance != null)

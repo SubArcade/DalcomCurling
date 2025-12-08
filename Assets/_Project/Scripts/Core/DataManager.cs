@@ -95,7 +95,6 @@ public class DataManager : MonoBehaviour
         perSecEnergy = 10,  // 테스트
         levelMax = 20,
     };
-    
     [SerializeField] private InventoryData firstInventoryData = new InventoryData()
     {
         donutEntries = new List<DonutEntry>()
@@ -118,7 +117,6 @@ public class DataManager : MonoBehaviour
         },
         
     };
-    
     [SerializeField] private MergeBoardData firstMergeBoardData = new MergeBoardData()
     {
         generatorLevelHard = 1,
@@ -132,7 +130,6 @@ public class DataManager : MonoBehaviour
             null
         }
     };
-    
     [SerializeField] private QuestData firstQuestData = new QuestData()
     {
         maxCount = 5,
@@ -295,24 +292,7 @@ public class DataManager : MonoBehaviour
     // 값이 바뀌는 처음 셋팅 데이터
     private void FirstBasePlayerData()
     {
-        //userData.player = firstPlayerData;
-        userData.player.email = firstPlayerData.email;
-        userData.player.nickname = firstPlayerData.nickname;
-        userData.player.gold = firstPlayerData.gold;
-        userData.player.gem = firstPlayerData.gem;
-        userData.player.energy = firstPlayerData.energy;
-        userData.player.level = firstPlayerData.level;
-        userData.player.exp = firstPlayerData.exp;
-        userData.player.lastAt = firstPlayerData.lastAt;
-        
-        userData.player.gainNamePlateType = new List<NamePlateType>(firstPlayerData.gainNamePlateType);
-
-        userData.player.soloScore = firstPlayerData.soloScore;
-        userData.player.soloTier = firstPlayerData.soloTier;
-        userData.player.changeNicknameCount = firstPlayerData.changeNicknameCount;
-        userData.player.maxEnergy = firstPlayerData.maxEnergy;
-        userData.player.perSecEnergy = firstPlayerData.perSecEnergy;
-        userData.player.levelMax = firstPlayerData.levelMax;
+        userData.player = firstPlayerData;
     }
     
     // 기본 인벤토리 데이터
@@ -354,19 +334,18 @@ public class DataManager : MonoBehaviour
     public void FirstBaseInventoryData()
     {
         //EnsureDonutSlots();
-        //userData.inventory = firstInventoryData;
-        userData.inventory.donutEntries = new List<DonutEntry>()
-        {
-            null,
-            null,
-            null,
-            null,
-            null
-        };
-        userData.inventory.dailyFreeGemClaimed = firstInventoryData.dailyFreeGemClaimed;
+        userData.inventory = firstInventoryData;
+        userData.inventory.donutEntries = firstInventoryData.donutEntries;
         userData.inventory.dailyFreeEnergy = firstInventoryData.dailyFreeEnergy;
-        userData.inventory.effectList = new List<EffectType>(firstInventoryData.effectList);
-        userData.inventory.characterList = new List<CharacterType>(firstInventoryData.characterList);
+        userData.inventory.effectList = new List<EffectType>()
+        {
+            EffectType.None
+        };
+        userData.inventory.characterList = new List<CharacterType>()
+        {
+            CharacterType.None
+        };
+        
     }
     
     
@@ -404,7 +383,7 @@ public class DataManager : MonoBehaviour
         MergeBoardData.generatorLevelSoft = 1;
         MergeBoardData.generatorLevelMoist = 1;
         
-        MergeBoardData.tempGiftIds = new List<string>(firstMergeBoardData.tempGiftIds);
+        MergeBoardData.tempGiftIds = firstMergeBoardData.tempGiftIds;
     }
 
     // 기본 퀘스트 데이터
