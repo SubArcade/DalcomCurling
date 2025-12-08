@@ -467,7 +467,7 @@ public class FirebaseGameManager : MonoBehaviour
             //Debug.Log($"새 턴({_currentGame.TurnNumber}) 시작 전, 이전 턴({_cachedPrediction.TurnNumber})의 최종 위치를 동기화합니다.");
             UI_LaunchIndicator_Firebase.WaitingSyncUI();
             stoneManager?.SyncPositions(_cachedPrediction.FinalStonePositions);
-            UI_LaunchIndicator_Firebase.CloseSyncUI();
+            DOVirtual.DelayedCall(0.2f, () => UI_LaunchIndicator_Firebase.CloseSyncUI());
             _cachedPrediction = null; // 사용한 예측 결과는 비웁니다.
         }
 
@@ -708,7 +708,7 @@ public class FirebaseGameManager : MonoBehaviour
             {
                 UI_LaunchIndicator_Firebase.WaitingSyncUI();
                 stoneManager?.SyncPositions(result.FinalStonePositions); // 후공은 handleTurnchange가 호출되지 않고 roundchange 되므로 미리 호출
-                UI_LaunchIndicator_Firebase.CloseSyncUI();
+                DOVirtual.DelayedCall(0.2f, () => UI_LaunchIndicator_Firebase.CloseSyncUI());
                 
                 _cachedPrediction = null;
                 DOVirtual.DelayedCall(1f, () =>
@@ -1144,7 +1144,7 @@ public class FirebaseGameManager : MonoBehaviour
         // 카메라 움직임 필요
         UI_LaunchIndicator_Firebase.WaitingSyncUI();
         stoneManager?.SyncPositions(_currentGame.PredictedResult.FinalStonePositions);
-        UI_LaunchIndicator_Firebase.CloseSyncUI();
+        DOVirtual.DelayedCall(0.2f, () => UI_LaunchIndicator_Firebase.CloseSyncUI());
         
         
         gameCamControl?.SwitchCamera(FREE_LOOK_CAM);
