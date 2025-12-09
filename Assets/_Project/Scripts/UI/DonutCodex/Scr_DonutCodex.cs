@@ -128,7 +128,7 @@ public class Scr_DonutCodex : MonoBehaviour
         {
             titleText.text = "단단 도넛";
             levelText.text = "1단계";
-            infotext.text = "단단 도넛에 대한 설명이에요 ( + 값 관련 설명)\n단단 도넛에 대한 설명이에요 ( + 값 관련 설명)";
+            infotext.text = "단단 도넛에 대한 설명이에요 ( + 값 관련 설명)";
         }
         else
         {
@@ -263,7 +263,10 @@ public class Scr_DonutCodex : MonoBehaviour
 
     // 정보창 셋팅
     public void InfoSet(Scr_donutShell shell)
-    {  
+    {
+        if (curDonutShell == shell)
+            return;
+        
         DonutData donutData = DataManager.Instance.GetDonutData(shell.donutType, shell.level);
         image.sprite = donutData.sprite;
         shell.donutRoot.GetComponent<Image>().sprite = shell.activeSprite;

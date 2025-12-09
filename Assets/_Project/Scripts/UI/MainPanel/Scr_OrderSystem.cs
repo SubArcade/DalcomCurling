@@ -444,13 +444,13 @@ public class Scr_OrderSystem : MonoBehaviour
 
         //윗줄 넘어왔으면처리중으로 전환
         isOrderClearing = true;
-
+        Debug.Log("111111111111111111111111111111");
         // 모든 완료 버튼 잠시 비활성화 (시각적으로도 눌리지 않게)
-        SetCompleteImageRed(completeObject1);
-        SetCompleteImageRed(completeObject2);
-        SetCompleteImageRed(completeObject3);
+        // SetCompleteImageRed(completeObject1);
+        // SetCompleteImageRed(completeObject2);
+        // SetCompleteImageRed(completeObject3);
         // ⭐ 눌린 버튼은 조금 더 짙은 원래색으로 표시
-        SetPressedButtonColor(completeObject);
+        //SetPressedButtonColor(completeObject);
 
 
         //퀘스트 클리어 시 같은 도넛을 전부 없애버리는것을 방지하기위한 체크변수
@@ -463,14 +463,17 @@ public class Scr_OrderSystem : MonoBehaviour
             if (idsToRemove.Contains(cell.donutId))
             {   //제거대상이 있으면 파괴
                 if (cell.occupant != null)
+                {
+                    Debug.Log($"22222222222222222222222{cell.donutId}");
                     Destroy(cell.occupant.gameObject);
+                }
                 //셀을 비움
                 cell.ClearItem();
                 //1개만 삭제
                 idsToRemove.Remove(cell.donutId);
 
                 // ⭐ 같은 ID 하나 제거했으면 루프 종료
-                break;
+                //break;
             }
         }
 
@@ -504,11 +507,20 @@ public class Scr_OrderSystem : MonoBehaviour
         
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)
+        {
+            Debug.Log(completeObject);
             StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));
+        }
         else if (completeObject == completeObject2)
+        {
+            Debug.Log(completeObject);
             StartCoroutine(RefreshAfterOrderClear(orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2, completeObject2, 1.5f));
+        }
         else if (completeObject == completeObject3)
+        {
+            Debug.Log(completeObject);
             StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, completeObject3, 1.5f));
+        }
     }
 
     //주문서 완료 후 퀘스트 알아서 새로고침

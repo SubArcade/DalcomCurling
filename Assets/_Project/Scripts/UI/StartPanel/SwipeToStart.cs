@@ -20,6 +20,8 @@ public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     private Vector2 originalPos;
     private Vector3 originalScale;
     private float originalAlpha;
+    
+    [SerializeField] private GameObject swipteToDownObj;
 
     void OnEnable()
     {
@@ -83,6 +85,7 @@ public class SwipeToStart : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             // 애널리틱 종료
             AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.app_launch, false);
             AnalyticsManager.Instance.SetActivetLogTimer(AnalyticsTimerType.main_enter, true);
+            swipteToDownObj.GetComponent<SwipeToDown>().ImageSet();
         });
     }
     

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -22,11 +23,16 @@ public class SwipeToDown : MonoBehaviour
     {
         originalPos = donut.anchoredPosition;
         originalAlpha = donutImage.color.a;
+        donutImage.color = new Color(originalAlpha, originalAlpha, originalAlpha, 0);
 
         ResetDonut();
         
         //StartSwipeDown();
         PlayBlinkEffect();
+    }
+
+    private void OnEnable()
+    {
         StartCoroutine(DelaySwipeDown(introStartDelayTime));
     }
 
@@ -39,6 +45,7 @@ public class SwipeToDown : MonoBehaviour
     private void StartSwipeDown()
     {
         if (donut == null) return;
+        donutImage.color = new Color(originalAlpha, originalAlpha, originalAlpha, 1);
 
         Vector3 startPos = donut.anchoredPosition + Vector2.up * moveDistance;
         donut.anchoredPosition = startPos; 
@@ -67,6 +74,7 @@ public class SwipeToDown : MonoBehaviour
         var c = donutImage.color;
         c.a = originalAlpha;
         donutImage.color = c;
+        donutImage.color = new Color(originalAlpha, originalAlpha, originalAlpha, 0);
     }
     
     private void PlayBlinkEffect()
@@ -81,5 +89,10 @@ public class SwipeToDown : MonoBehaviour
             .DOFade(0.3f, 0.6f)          // 살짝 투명해짐
             .SetEase(Ease.InOutSine)
             .SetLoops(-1, LoopType.Yoyo); // 무한 반복 Yoyo
+    }
+
+    public void ImageSet()
+    {
+        donutImage.color = new Color(originalAlpha, originalAlpha, originalAlpha, 0);
     }
 }
