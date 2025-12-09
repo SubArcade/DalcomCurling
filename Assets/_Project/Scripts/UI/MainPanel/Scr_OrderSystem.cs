@@ -439,43 +439,47 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 완료시 버튼 상호작용
     public void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
     {
+        Debug.Log($"OnClickCompleteObject: {completeObject.gameObject.name}");
         //다른주문서 처리중에는 리턴
         if (isOrderClearing) return;
 
         //윗줄 넘어왔으면처리중으로 전환
         isOrderClearing = true;
-        Debug.Log("111111111111111111111111111111");
+
         // 모든 완료 버튼 잠시 비활성화 (시각적으로도 눌리지 않게)
         // SetCompleteImageRed(completeObject1);
         // SetCompleteImageRed(completeObject2);
         // SetCompleteImageRed(completeObject3);
-        // ⭐ 눌린 버튼은 조금 더 짙은 원래색으로 표시
-        //SetPressedButtonColor(completeObject);
+        // // ⭐ 눌린 버튼은 조금 더 짙은 원래색으로 표시
+        // SetPressedButtonColor(completeObject);
 
 
         //퀘스트 클리어 시 같은 도넛을 전부 없애버리는것을 방지하기위한 체크변수
         var idsToRemove = new List<string>(orderDonutIDs);
-        //셀 전체검사
-        foreach (var cell in BoardManager.Instance.GetAllCells())
-        {   //셀이 비활성화거나 비어있으면 건너뜀
-            if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
+        
+        // 퀘스트에 필요한 각 도넛 ID를 하나씩 처리하기 위해 복사본 리스트를 순회
+        foreach (var targetId in idsToRemove.ToList())         
+        {
+            // 머지보드의 모든 셀을 순회하며 현재 targetId를 가진 도넛을 찾는다
+            foreach (var cell in BoardManager.Instance.GetAllCells())
+            {
+                // 셀이 비활성화거나 도넛 ID가 비어있으면 검사하지 않고 다음 셀로 넘어간다
+                if (!cell.isActive || string.IsNullOrEmpty(cell.donutId)) continue;
 
-            if (idsToRemove.Contains(cell.donutId))
-            {   //제거대상이 있으면 파괴
-                if (cell.occupant != null)
+                if (cell.donutId == targetId)
                 {
-                    Debug.Log($"22222222222222222222222{cell.donutId}");
-                    Destroy(cell.occupant.gameObject);
-                }
-                //셀을 비움
-                cell.ClearItem();
-                //1개만 삭제
-                idsToRemove.Remove(cell.donutId);
+                    Debug.Log($"OnClickCompleteObject: {cell.donutId}");
+                    if (cell.occupant != null)
+                        Destroy(cell.occupant.gameObject);
 
-                // ⭐ 같은 ID 하나 제거했으면 루프 종료
-                //break;
+                    cell.ClearItem();
+
+                    // 해당 도넛 ID는 1개만 제거하면 되므로 루프 종료
+                    break;
+                }
             }
         }
+
 
         //보상골드 지급
         int reward = 0;
@@ -508,17 +512,17 @@ public class Scr_OrderSystem : MonoBehaviour
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)
         {
-            Debug.Log(completeObject);
+            Debug.Log($"1111111111111111: {completeObject}");   
             StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));
         }
         else if (completeObject == completeObject2)
         {
-            Debug.Log(completeObject);
+            Debug.Log($"2222222222222222222: {completeObject}");
             StartCoroutine(RefreshAfterOrderClear(orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2, completeObject2, 1.5f));
         }
         else if (completeObject == completeObject3)
         {
-            Debug.Log(completeObject);
+            Debug.Log($"33333333333333333: {completeObject}");
             StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, completeObject3, 1.5f));
         }
     }
@@ -705,7 +709,7 @@ public class Scr_OrderSystem : MonoBehaviour
         var img = completeObject.GetComponent<Image>();
         if (img != null)
         {
-           // img.color = new Color(1f, 0.5f, 0.5f, 1f); // 옅은 붉은색
+            //img.color = new Color(1f, 0.5f, 0.5f, 1f); // 옅은 붉은색
         }
     }
 
