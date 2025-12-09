@@ -19,6 +19,8 @@ public class Test_MainMenu : MonoBehaviour
 
     public Button testDBSaveButton;
     public Button testLogoutButton;
+    
+    public Button testShopButton;
 
     private Dictionary<string, string> idDictionary = new Dictionary<string, string>
     {
@@ -64,6 +66,11 @@ public class Test_MainMenu : MonoBehaviour
             FirebaseAuthManager.Instance.Logout();
         });
         //testLogoutButton.onClick.AddListener(addNameTitle);
+        
+        testShopButton.onClick.AddListener(() =>
+        {
+            GameManager.Instance.isEasterEgg = !GameManager.Instance.isEasterEgg;
+        });
     }
 
     // void OnEnable() 

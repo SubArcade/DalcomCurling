@@ -439,7 +439,7 @@ public class Scr_OrderSystem : MonoBehaviour
     //주문서 완료시 버튼 상호작용
     public void OnClickCompleteObject(GameObject completeObject, List<string> orderDonutIDs)
     {
-        Debug.Log($"OnClickCompleteObject: {completeObject.gameObject.name}");
+        //Debug.Log($"OnClickCompleteObject: {completeObject.gameObject.name}");
         //다른주문서 처리중에는 리턴
         if (isOrderClearing) return;
 
@@ -468,7 +468,7 @@ public class Scr_OrderSystem : MonoBehaviour
 
                 if (cell.donutId == targetId)
                 {
-                    Debug.Log($"OnClickCompleteObject: {cell.donutId}");
+                    //Debug.Log($"OnClickCompleteObject: {cell.donutId}");
                     if (cell.occupant != null)
                         Destroy(cell.occupant.gameObject);
 
@@ -512,17 +512,17 @@ public class Scr_OrderSystem : MonoBehaviour
         //  주문서별 자동 새로고침 코루틴 시작
         if (completeObject == completeObject1)
         {
-            Debug.Log($"1111111111111111: {completeObject}");   
+            //Debug.Log($"1111111111111111: {completeObject}");   
             StartCoroutine(RefreshAfterOrderClear(orderDonuts1, donutTextInfos1, orderDonutIDs1, costText1, completeObject1, 1.5f));
         }
         else if (completeObject == completeObject2)
         {
-            Debug.Log($"2222222222222222222: {completeObject}");
+            //Debug.Log($"2222222222222222222: {completeObject}");
             StartCoroutine(RefreshAfterOrderClear(orderDonuts2, donutTextInfos2, orderDonutIDs2, costText2, completeObject2, 1.5f));
         }
         else if (completeObject == completeObject3)
         {
-            Debug.Log($"33333333333333333: {completeObject}");
+            //Debug.Log($"33333333333333333: {completeObject}");
             StartCoroutine(RefreshAfterOrderClear(orderDonuts3, donutTextInfos3, orderDonutIDs3, costText3, completeObject3, 1.5f));
         }
     }
@@ -531,6 +531,7 @@ public class Scr_OrderSystem : MonoBehaviour
     private IEnumerator RefreshAfterOrderClear(List<Image> orderImages, List<DonutTextInfo> textInfos, List<string> idList, TextMeshProUGUI costText, GameObject completeObject, float delaySeconds) 
     {
         yield return new WaitForSeconds(delaySeconds);
+        //Debug.Log($"RefreshAfterOrderClear : {completeObject.gameObject.name}");
         RefreshOrderDonut(orderImages, textInfos, idList, costText); // 새로고침
         //새로고침이 되었으니 컴플리트 버튼 비활성화
         if (completeObject == completeObject1) isRewarding1 = false;
@@ -545,11 +546,11 @@ public class Scr_OrderSystem : MonoBehaviour
             button.interactable = true;
 
         // 처리중이 다끝나면 모든 완료 버튼 다시 활성화
-        ResetCompleteImageColor(completeObject1);
-        ResetCompleteImageColor(completeObject2);
-        ResetCompleteImageColor(completeObject3);
-        // ⭐ 눌린 버튼만 원래 색(#66E3AD)으로 복원
-        ResetCompleteImageColor(completeObject);
+        // ResetCompleteImageColor(completeObject1);
+        // ResetCompleteImageColor(completeObject2);
+        // ResetCompleteImageColor(completeObject3);
+        // // ⭐ 눌린 버튼만 원래 색(#66E3AD)으로 복원
+        // ResetCompleteImageColor(completeObject);
 
 
         //이제 다른 주문서 완료가능

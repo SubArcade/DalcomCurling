@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     private bool isAppStarted = true;
     [SerializeField] private GameObject notifier;
     [SerializeField] private GameObject matchmakingObj;
+    [SerializeField] private GameObject iapInitObj;
     public long lastDailyReset;
     public event Action DailyReset;
     public event Action<PlayerData> LevelUpdate;
@@ -39,6 +40,8 @@ public class GameManager : MonoBehaviour
     private DonutEntry penalizedDonut2;
     private int penaltyIndex1 = -1;
     private int penaltyIndex2 = -1;
+    
+    public bool isEasterEgg = false;
     
     private void Awake()
     {
@@ -79,6 +82,7 @@ public class GameManager : MonoBehaviour
         
         notifier.SetActive(true);
         matchmakingObj.SetActive(true);
+        //iapInitObj.SetActive(true);
         CheckDailyReset();
     }
     

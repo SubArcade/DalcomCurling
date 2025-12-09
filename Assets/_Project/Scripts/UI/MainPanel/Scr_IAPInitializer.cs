@@ -1,35 +1,47 @@
+
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Purchasing;
 
 public class Scr_IAPInitializer : MonoBehaviour, IStoreListener
 {
-    public static IStoreController StoreController;
-    public static IExtensionProvider ExtensionProvider;
+    public static Scr_IAPInitializer Instance;
+    public IStoreController StoreController;
+    public IExtensionProvider ExtensionProvider;
+
+    private bool isInitializing = false;
 
     private void Awake()
     {
-        if (StoreController != null)
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
             return;
+        }
+
+        Instance = this;
+        //DontDestroyOnLoad(gameObject);
+
+        // 2) 이미 초기화됐거나, 초기화 중이면 또 안 들어가게
+        if (StoreController != null || isInitializing)
+            return;
+
+        isInitializing = true;
 
         Debug.Log("[IAP] Initializing...");
 
         var module = StandardPurchasingModule.Instance(AppStore.GooglePlay);
         var builder = ConfigurationBuilder.Instance(module);
 
-        // catalog.json 자동 등록
         var catalog = ProductCatalog.LoadDefaultCatalog();
-
         foreach (var p in catalog.allValidProducts)
         {
-            Debug.Log($"[IAP] Add product from catalog: {p.id}, type={p.type}");
-            
+            //Debug.Log($"[IAP] Add product from catalog: {p.id}, type={p.type}");
             builder.AddProduct(p.id, p.type);
         }
 
         UnityPurchasing.Initialize(this, builder);
     }
-
     public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
     {
         Debug.Log("[IAP] OnInitialized SUCCESS");
@@ -56,7 +68,19 @@ public class Scr_IAPInitializer : MonoBehaviour, IStoreListener
 
     public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs e)
     {
-        Debug.Log($"[IAP] Purchase: {e.purchasedProduct.definition.id}");
+        string productId = e.purchasedProduct.definition.id;
+        Debug.Log($"[IAP] Purchase: {productId}");
+        
+        var allGems = FindObjectsOfType<Scr_IAPGem>();
+        foreach (var gem in allGems)
+        {
+            if (gem.ProductId == productId)
+            {
+                gem.GrantReward();
+                break;
+            }
+        }
+        
         return PurchaseProcessingResult.Complete;
     }
 

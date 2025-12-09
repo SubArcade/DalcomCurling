@@ -826,7 +826,9 @@ MonoBehaviour:
   menuSceneName: Sce_MainMenu
   notifier: {fileID: 2559032892304817238}
   matchmakingObj: {fileID: 1179012149}
+  iapInitObj: {fileID: 0}
   lastDailyReset: 0
+  isEasterEgg: 0
   pendingExp: 0
   pendingGold: 0
   pendingPoint: 0
@@ -1469,7 +1471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1700842877
 Transform:
   m_ObjectHideFlags: 0
