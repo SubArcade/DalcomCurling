@@ -156,7 +156,7 @@ public class Scr_DonutCodex : MonoBehaviour
         {
             titleText.text = "말랑 도넛";
             levelText.text = "1단계";
-            infotext.text = "말랑 도넛에 대한 설명이에요 ( + 값 관련 설명)\n말랑 도넛에 대한 설명이에요 ( + 값 관련 설명)";
+            infotext.text = "말랑 도넛에 대한 설명이에요 ( + 값 관련 설명)";
         }
         else
         {
@@ -183,7 +183,7 @@ public class Scr_DonutCodex : MonoBehaviour
         {
             titleText.text = "촉촉 도넛";
             levelText.text = "1단계";
-            infotext.text = "촉촉 도넛에 대한 설명이에요 ( + 값 관련 설명)\n촉촉 도넛에 대한 설명이에요 ( + 값 관련 설명)";
+            infotext.text = "촉촉 도넛에 대한 설명이에요 ( + 값 관련 설명)";
         }
         else
         {
